@@ -5,15 +5,15 @@ Deze code hoort bij het project 003664.2019.NDW_DSS_Mapmatching, uitgevoerd door
 ## Algemene opzet van de code
 
 * Bronnen die met Java geparst worden hebben per bron een Java project met suffix `-parser`:
-** In ieder van deze Java projecten bevat de package op het hoogste niveau een klasse met suffix `Exporter`:
-*** Deze klasse is te draaien als Java project in Eclipse en gebruikt een klasse met suffix `Parser` om de data te parsen.
-*** De `Exporter` klasse genereert één of meerdere SQL bestanden die handmatig in PostgreSQL te laden zijn, bijvoorbeeld met pgAdmin of via de commandline tool `psql`.
-*** Per Java project staat er een specifiekere uitleg onder de volgende kopjes.
+    * In ieder van deze Java projecten bevat de package op het hoogste niveau een klasse met suffix `Exporter`:
+        * Deze klasse is te draaien als Java project in Eclipse en gebruikt een klasse met suffix `Parser` om de data te parsen.
+        * De `Exporter` klasse genereert één of meerdere SQL bestanden die handmatig in PostgreSQL te laden zijn, bijvoorbeeld met pgAdmin of via de commandline tool `psql`.
+        * Per Java project staat er een specifiekere uitleg onder de volgende kopjes.
 * Map matching algoritmes die in Java zijn geschreven staan in Java projecten met suffix `-map-matcher`:
-** In ieder van deze Java projecten bevat de package op het hoogste niveau een klasse met suffix `MapMatcher`:
-*** Deze klasse is te draaien als Java project in Eclipse en voert de map matching algoritmes uit voor één of meerdere bronnen.
-*** Communicatie met de database gebeurt binnen Java met de klassen onder de package `dataaccess.dao`. In deze klassen staat de SQL (inclusief de gebruikte tabelnamen) om de benodigde data op te halen of weg te schrijven.
-*** Per Java project staat er een specifiekere uitleg onder de volgende kopjes.
+    * In ieder van deze Java projecten bevat de package op het hoogste niveau een klasse met suffix `MapMatcher`:
+        * Deze klasse is te draaien als Java project in Eclipse en voert de map matching algoritmes uit voor één of meerdere bronnen.
+        * Communicatie met de database gebeurt binnen Java met de klassen onder de package `dataaccess.dao`. In deze klassen staat de SQL (inclusief de gebruikte tabelnamen) om de benodigde data op te halen of weg te schrijven.
+        * Per Java project staat er een specifiekere uitleg onder de volgende kopjes.
 
 ## mst-parser
 
