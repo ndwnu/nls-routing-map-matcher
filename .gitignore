@@ -32,8 +32,11 @@ waze-parser/.classpath
 waze-parser/.project
 waze-parser/.settings/
 waze-parser/target/
+
 inrix-parser/files/inrix_nodes.sql
 inrix-parser/files/inrix_segments.sql
+
 mst-parser/files/measurement.sql
 mst-parser/files/locations.sql
+
 waze-parser/files_out/waze_data.sql
