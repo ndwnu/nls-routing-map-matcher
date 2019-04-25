@@ -9,9 +9,11 @@ import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Stopwatch;
 
+import nl.dat.routingmapmatcher.dataaccess.repository.LmsRepository;
 import nl.dat.routingmapmatcher.dataaccess.repository.MstShapefileRepository;
 import nl.dat.routingmapmatcher.dataaccess.repository.NdwNetworkRepository;
 import nl.dat.routingmapmatcher.dataaccess.repository.NwbRepository;
+import nl.dat.routingmapmatcher.dataaccess.repository.SituationRecordRepository;
 import nl.dat.routingmapmatcher.dataaccess.repository.StartToEndRepository;
 import nl.dat.routingmapmatcher.dataaccess.repository.WazeRepository;
 import nl.dat.routingmapmatcher.dataaccess.support.DatabaseConnectionManager;
@@ -43,6 +45,8 @@ public class RoutingMapMatcher {
     matchWazeJams(readNdwNetwork(NdwNetworkSubset.FULL_NETWORK));
     matchWazeIrregularities(readNdwNetwork(NdwNetworkSubset.FULL_NETWORK));
     matchMstLinesShapefile(readNdwNetwork(NdwNetworkSubset.FULL_NETWORK));
+    matchSituationRecordLines(readNdwNetwork(NdwNetworkSubset.FULL_NETWORK));
+    matchLmsLinks(readNdwNetwork(NdwNetworkSubset.FULL_NETWORK));
   }
 
   private NdwGraphHopper readNdwNetwork(final NdwNetworkSubset subset) {
@@ -152,5 +156,59 @@ public class RoutingMapMatcher {
 
     logger.info("Done");
   }
+
+  private void matchSituationRecordLines(final NdwGraphHopper ndwNetwork) {
+    final Jdbi jdbi = DatabaseConnectionManager.getInstance().getJdbi();
+
+    final SituationRecordRepository repository = new SituationRecordRepository(jdbi);
+    final List<LineStringLocation> situationRecordsOrdered  = repository.getSituationRecordOrderedLines();
+    final List<LineStringLocation> situationRecordsUnordered  = repository.getSituationRecordUnorderedLinears();
+    final List<LineStringLocation> situationRecords = new ArrayList<>();
+    situationRecords.addAll(situationRecordsOrdered);
+    situationRecords.addAll(situationRecordsUnordered);
+    logger.info("Start map matching for Situation Record lines, count = {}", situationRecords.size());
+    final Stopwatch stopwatch = Stopwatch.createStarted();
+    final LineStringMapMatcher lineStringMapMatcher = new ViterbiLineStringMapMatcher(ndwNetwork);
+    final List<LineStringMatch> situationRecordLineMatches = new ArrayList<>(situationRecords.size());
+    int counter = 1;
+    for (final LineStringLocation situationRecord : situationRecords) {
+      situationRecordLineMatches.add(lineStringMapMatcher.match(situationRecord));
+      if (counter % 100 == 0) {
+        logger.info("Matched {} Situation Record lines of {} total", counter, situationRecords.size());
+      }
+      counter++;
+    }
+    logger.info("Write results to database, matching took {} for {} locations", stopwatch, situationRecords.size());
+    repository.replaceSituationRecordLineMatches(situationRecordLineMatches);
+
+    logger.info("Done");
+  }
+
+  private void matchLmsLinks(final NdwGraphHopper ndwNetwork) {
+    final Jdbi jdbi = DatabaseConnectionManager.getInstance().getJdbi();
+
+    final LmsRepository repository = new LmsRepository(jdbi);
+    final List<LineStringLocation> lmsLinks = repository.getLmsLinks();
+    logger.info("Start map matching for LMS links, count = {}", lmsLinks.size());
+    final Stopwatch stopwatch = Stopwatch.createStarted();
+    final LineStringMapMatcher lineStringMapMatcher = new ViterbiLineStringMapMatcher(ndwNetwork);
+    final List<LineStringMatch> lmsLinkMatches = new ArrayList<>(lmsLinks.size());
+    int counter = 1;
+    for (final LineStringLocation lmsLink : lmsLinks) {
+      lmsLinkMatches.add(lineStringMapMatcher.match(lmsLink));
+      if (counter % 100 == 0) {
+        logger.info("Matched {} LMS links of {} total", counter, lmsLinks.size());
+      }
+      counter++;
+    }
+    logger.info("Write results to database, matching took {} for {} locations", stopwatch, lmsLinks.size());
+    repository.replaceLmsLinkMatches(lmsLinkMatches);
+
+    logger.info("Done");
+
+
+
+  }
+
 
 }

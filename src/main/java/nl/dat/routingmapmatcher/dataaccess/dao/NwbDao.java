@@ -16,16 +16,17 @@ public interface NwbDao {
 
   @SqlQuery(
       "WITH nwb_per_direction AS ( " +
-      "  SELECT gid, wegbehsrt, false AS reversed, geom " +
+      "  SELECT gid, wegbehsrt, null AS location_index, false AS reversed, geom " +
       "  FROM public.nwb " +
       "  WHERE rijrichtng IS NULL OR rijrichtng = 'H' " +
       "  UNION ALL " +
-      "  SELECT gid, wegbehsrt, true AS reversed, ST_Reverse(geom) AS geom " +
+      "  SELECT gid, wegbehsrt, null AS location_index, true AS reversed, ST_Reverse(geom) AS geom " +
       "  FROM public.nwb " +
       "  WHERE rijrichtng IS NULL OR rijrichtng = 'T' " +
       ") " +
       "SELECT " +
       "  gid AS id, " +
+      "  location_index, " +
       "  reversed, " +
       "  ST_Length(ST_Transform(geom, 4326)::geography) AS length_in_meters, " +
       "  ST_AsEWKB(ST_Transform(geom, 4326)) AS geometry_wkb " +
@@ -36,16 +37,17 @@ public interface NwbDao {
 
   @SqlQuery(
       "WITH nwb_per_direction AS ( " +
-      "  SELECT gid, wegbehsrt, false AS reversed, geom " +
+      "  SELECT gid, wegbehsrt, null AS location_index, false AS reversed, geom " +
       "  FROM public.nwb " +
       "  WHERE rijrichtng IS NULL OR rijrichtng = 'H' " +
       "  UNION ALL " +
-      "  SELECT gid, wegbehsrt, true AS reversed, ST_Reverse(geom) AS geom " +
+      "  SELECT gid, wegbehsrt, null AS location_index, true AS reversed, ST_Reverse(geom) AS geom " +
       "  FROM public.nwb " +
       "  WHERE rijrichtng IS NULL OR rijrichtng = 'T' " +
       ") " +
       "SELECT " +
       "  gid AS id, " +
+      "  location_index, " +
       "  reversed, " +
       "  ST_Length(ST_Transform(geom, 4326)::geography) AS length_in_meters, " +
       "  ST_AsEWKB(ST_Transform(geom, 4326)) AS geometry_wkb " +

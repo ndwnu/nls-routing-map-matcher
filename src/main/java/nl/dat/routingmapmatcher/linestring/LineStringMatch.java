@@ -1,13 +1,13 @@
 package nl.dat.routingmapmatcher.linestring;
 
 import java.util.List;
+import java.util.Optional;
 
 import com.vividsolutions.jts.geom.LineString;
 
 public class LineStringMatch {
 
-  private final int id;
-  private final boolean reversed;
+  private final LineStringLocation location;
   private final List<Integer> ndwLinkIds;
   private final double startLinkFraction;
   private final double endLinkFraction;
@@ -15,11 +15,10 @@ public class LineStringMatch {
   private final String status;
   private final LineString lineString;
 
-  public LineStringMatch(final int id, final boolean reversed, final List<Integer> ndwLinkIds,
+  public LineStringMatch(final LineStringLocation location, final List<Integer> ndwLinkIds,
       final double startLinkFraction, final double endLinkFraction, final double reliability, final String status,
       final LineString lineString) {
-    this.id = id;
-    this.reversed = reversed;
+    this.location = location;
     this.ndwLinkIds = ndwLinkIds;
     this.startLinkFraction = startLinkFraction;
     this.endLinkFraction = endLinkFraction;
@@ -28,12 +27,8 @@ public class LineStringMatch {
     this.lineString = lineString;
   }
 
-  public int getId() {
-    return id;
-  }
-
-  public boolean isReversed() {
-    return reversed;
+  public LineStringLocation getLocation() {
+    return location;
   }
 
   public List<Integer> getNdwLinkIds() {
@@ -58,6 +53,14 @@ public class LineStringMatch {
 
   public LineString getLineString() {
     return lineString;
+  }
+
+  public int getId() {
+    return location.getId();
+  }
+
+  public Optional<Integer> getLocationIndex() {
+    return location.getLocationIndex();
   }
 
 }
