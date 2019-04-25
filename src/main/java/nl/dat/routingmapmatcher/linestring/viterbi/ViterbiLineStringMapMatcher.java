@@ -1,6 +1,7 @@
 package nl.dat.routingmapmatcher.linestring.viterbi;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import org.slf4j.Logger;
@@ -36,6 +37,7 @@ import nl.dat.routingmapmatcher.graphhopper.NdwLinkFlagEncoder;
 import nl.dat.routingmapmatcher.linestring.LineStringLocation;
 import nl.dat.routingmapmatcher.linestring.LineStringMapMatcher;
 import nl.dat.routingmapmatcher.linestring.LineStringMatch;
+import nl.dat.routingmapmatcher.linestring.ReliabilityCalculationType;
 import nl.dat.routingmapmatcher.util.PathUtil;
 
 public class ViterbiLineStringMapMatcher implements LineStringMapMatcher {
@@ -50,8 +52,10 @@ public class ViterbiLineStringMapMatcher implements LineStringMapMatcher {
   private static final double MEASUREMENT_ERROR_SIGMA_IN_METERS = 20.0;
 
   /**
-   * The beta (1/lamdba) parameter used for the exponential distribution to determine the probability that the
-   * length of a route between two successive GPS observations is the same as the distance as the crow flies
+   * The beta (1/lamdba) parameter used for the exponential distribution to determine the
+   * probability that the
+   * length of a route between two successive GPS observations is the same as the distance as the
+   * crow flies
    * between those GPS observations.
    */
   private static final double TRANSITION_PROBABILITY_BETA = 100.0;
@@ -136,7 +140,6 @@ public class ViterbiLineStringMapMatcher implements LineStringMapMatcher {
     } else {
       lineStringMatch = createFailedMatch(lineStringLocation, STATUS_NO_PATH);
     }
-
     return lineStringMatch;
   }
 
@@ -158,8 +161,10 @@ public class ViterbiLineStringMapMatcher implements LineStringMapMatcher {
       }
       final GPXEntry gpxEntry = new GPXEntry(coordinateSequence.getY(index), coordinateSequence.getX(index),
           timestampInMillis);
-      // Only add gpx entry when coordinate is nearby the NDW base network. This way, when an empty GPS track is
-      // returned, we can be pretty confident that there is no matching possible on the NDW base network.
+      // Only add gpx entry when coordinate is nearby the NDW base network. This way, when an empty
+      // GPS track is
+      // returned, we can be pretty confident that there is no matching possible on the NDW base
+      // network.
       if (isNearbyNdwNetwork(gpxEntry)) {
         gpsTrack.add(gpxEntry);
       }
@@ -195,17 +200,33 @@ public class ViterbiLineStringMapMatcher implements LineStringMapMatcher {
     if (edges.isEmpty()) {
       throw new RoutingMapMatcherException("Unexpected: path has no edges");
     }
-    final int id = lineStringLocation.getId();
-    final boolean reversed = lineStringLocation.isReversed();
     final List<Integer> ndwLinkIds = pathUtil.determineNdwLinkIds(ndwNetwork, flagEncoder, edges);
     final QueryGraph queryGraph = queryGraphExtractor.extractQueryGraph(path);
     final double startLinkFraction = pathUtil.determineStartLinkFraction(edges.get(0), queryGraph);
     final double endLinkFraction = pathUtil.determineEndLinkFraction(edges.get(edges.size() - 1), queryGraph);
-    final double reliability = calculateCandidatePathScore(path, lineStringLocation);
+    double reliability;
+    if (lineStringLocation.getReliabilityCalculationType().equals(ReliabilityCalculationType.POINT_OBSERVATIONS)) {
+      reliability = calculateCandidatePathScoreOnlyPoints(path, lineStringLocation);
+    } else {
+      reliability = calculateCandidatePathScore(path, lineStringLocation);
+    }
     final String status = STATUS_MATCH;
     final LineString lineString = pathUtil.createLineString(path.calcPoints());
-    return new LineStringMatch(id, reversed, ndwLinkIds, startLinkFraction, endLinkFraction, reliability, status,
+    return new LineStringMatch(lineStringLocation, ndwLinkIds, startLinkFraction, endLinkFraction, reliability, status,
         lineString);
+  }
+
+  private double calculateCandidatePathScoreOnlyPoints(final Path path, final LineStringLocation lineStringLocation) {
+    final PointList pathPointList = path.calcPoints();
+    final CoordinateSequence geometryCoordinates = lineStringLocation.getGeometry().getCoordinateSequence();
+    final List<Double> pointDistancesToMatch = new ArrayList<>();
+    for (int index = 0; index < geometryCoordinates.size(); index++) {
+      final double latitude = geometryCoordinates.getY(index);
+      final double longitude = geometryCoordinates.getX(index);
+      pointDistancesToMatch.add(calculateSmallestDistanceToPointList(latitude, longitude,
+          pathPointList));
+    }
+    return Math.max(0, 100 - Collections.min(pointDistancesToMatch) - Collections.max(pointDistancesToMatch));
   }
 
   private double calculateCandidatePathScore(final Path path, final LineStringLocation lineStringLocation) {
@@ -266,14 +287,12 @@ public class ViterbiLineStringMapMatcher implements LineStringMapMatcher {
 
   private LineStringMatch createFailedMatch(final LineStringLocation lineStringLocation,
       final String status) {
-    final int id = lineStringLocation.getId();
-    final boolean reversed = lineStringLocation.isReversed();
     final List<Integer> ndwLinkIds = Lists.newArrayList();
     final double startLinkFraction = 0.0;
     final double endLinkFraction = 0.0;
     final double reliability = 0.0;
     final LineString lineString = lineStringLocation.getGeometry();
-    return new LineStringMatch(id, reversed, ndwLinkIds, startLinkFraction, endLinkFraction, reliability, status,
+    return new LineStringMatch(lineStringLocation, ndwLinkIds, startLinkFraction, endLinkFraction, reliability, status,
         lineString);
   }
 

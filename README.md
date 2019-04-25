@@ -36,7 +36,6 @@ De situations parser kan gebruikt worden om data van bijvoorbeeld http://opendat
 * Installeer Eclipse.
 * Importeer de map `situations-parser` als Maven project in Eclipse.
 * Download het bestand http://opendata.ndw.nu/actuele_statusberichten.xml.gz en zet het in `situations-parser/files/actuele_statusberichten.xml.gz`.
-* Download het bestand http://opendata.ndw.nu/wegwerkzaamheden.xml.gz en zet het in `situations-parser/files/wegwerkzaamheden.xml.gz`.
 * Voer binnen Eclipse de klasse `SituationsExporter` uit als Java-applicatie.
 * Installeer PostgreSQL 10 en PostGIS 2.5 indien nodig.
 * Maak een nieuwe database `ndssmapmatching` (of hergebruik hem als deze database al bestaat).
@@ -115,6 +114,14 @@ Het Nationaal Wegenbestand (NWB) bevat gegevens die gebruikt kunnen worden om he
 * Voer het commando `shp2pgsql.exe -s 28992:4326 -S -t 2D -I Telpunten.shp measurement_site_points_shapefile > mst_telpunten.sql` uit in de uitgepakte map (`shp2pgsql` wordt meegeleverd met PostgreSQL).
 * Voer de queries van `mst_telpunten.sql` uit in de nieuwe database. Vanwege de grootte kan het best een commando als `psql -f mst_telpunten.sql -p 5432 ndssmapmatching postgres > out.txt` gebruikt worden (`psql` wordt meegeleverd met PostgreSQL).
 
+## NRM/LMS shapefile importeren
+
+* Installeer PostgreSQL 10 en PostGIS 2.5 indien nodig.
+* Maak een nieuwe database `ndssmapmatching` (of hergebruik hem als deze database al bestaat).
+* Gebruik een shapefile van het NRM/LMS, bijvoorbeeld: `routing-map-matcher/files/CUBE_AV_LMS.shp`
+* Voer het commando `shp2pgsql.exe -s 28992:4326 -S -t 2D -I CUBE_AV_LMS.shp lms_links > lms.sql` uit in de uitgepakte map (`shp2pgsql` wordt meegeleverd met PostgreSQL).
+* Voer de queries van `lms.sql` uit in de nieuwe database. Vanwege de grootte kan het best een commando als `psql -f lms.sql -p 5432 ndssmapmatching postgres > out.txt` gebruikt worden (`psql` wordt meegeleverd met PostgreSQL).
+
 ## routing-map-matcher
 
 De routing map matcher gebruikt routezoekalgoritmes om bronnen te mappen op het basisnetwerk.
@@ -128,6 +135,8 @@ De routing map matcher gebruikt routezoekalgoritmes om bronnen te mappen op het 
 * Voer de stappen uit onder het kopje "MST shapefiles importeren".
 * Voer de stappen uit onder het kopje "mst-parser".
 * Voer de stappen uit onder het kopje "waze-parser".
+* Voer de stappen uit onder het kopje "situations-parser".
+* Voer de stappen uit onder het kopje "NRM/LMS shapefile importeren".
 * Voer binnen Eclipse de klasse `RoutingMapMatcher` uit als Java-applicatie. De applicatie sluit af met de foutmelding dat `POSTGRES_END_POINT` niet gedefinieerd is.
 * Open de run configuration van `RoutingMapMatcher` en ga naar het tabblad "Environment". Voeg de volgende environment variables toe:
     * `POSTGRES_END_POINT`: `localhost:5432` (of pas aan indien nodig)
@@ -156,6 +165,14 @@ De routing map matcher gebruikt routezoekalgoritmes om bronnen te mappen op het 
         * Het volledige NDW basisnetwerk wordt ingeladen.
         * Alle lijnlocaties uit de shapefile "Meetvakken" worden ingeladen en gemapt op het basisnetwerk.
         * Het resultaat van de mapping wordt weggeschreven (of overschreven) in de nieuwe tabel `public.measurement_site_lines_shapefile_matches`.
+	* Voor de situatieberichten in `actuele_statusberichten.xml`:
+		* Het volledige NDW basisnetwerk wordt ingeladen.
+        * Alle lijnlocaties van de situatieberichten worden ingeladen en gemapt op het basisnetwerk.
+        * Het resultaat van de mapping wordt weggeschreven (of overschreven) in de nieuwe tabel `public.situation_record_line_matches`.
+	* Voor de NRM/LMS links:
+		* Het volledige NDW basisnetwerk wordt ingeladen.
+        * Alle lijnlocaties van de NRM/LMS links worden ingeladen en gemapt op het basisnetwerk.
+        * Het resultaat van de mapping wordt weggeschreven (of overschreven) in de nieuwe tabel `public.lms_link_matches`.	
 * Instellen van parameters voor het start-to-end algoritme kan met de constantes in `StartToEndMapMatcher.java`.
 * Instellen van parameters voor het Viterbi algoritme kan met de constantes in `ViterbiLineStringMapMatcher.java`.
 
@@ -171,19 +188,6 @@ Het is mogelijk om een mapping van het NWB netwerk op het NDW basisnetwerk te ge
         * Sorteer de mappings op score: betrouwbaarheid * fractie dat wegvak in de route zit
         * Hevel attributen over van de mapping met de beste score
 * De gekoppelde attributen staan in de (mogelijk nieuw aangemaakte) tabel `basemaps.segments_190101_nwb_attributes` met status `match`.
-
-## NDW basisnetwerk verder verrijken met interpoleren van NWB attributen
-
-Het is mogelijk om gaten in de verrijkte NWB attributen van het NDW basisnetwerk op te vullen.
-
-* Voer de stappen uit onder het kopje "NDW basisnetwerk verrijken met NWB attributen".
-* Voer in de database `ndssmapmatching` de query van het bestand `sql/basemaps_segments_190101_nwb_attributes_interpolated.sql` uit (vanwege de hoeveelheid routes die moet worden gevonden kan vele uren duren):
-    * Per eiland van wegvakken zonder NWB attributen:
-        * Tussen alle aangrenzende wegvakken met dezelfde NWB attributen:
-            * Zoek de korste route door het eiland
-        * Voor ieder wegvak dat precies in één kortste route zit:
-            * Gebruik de bijbehorende NWB attributen voor dit wegvak.
-* De gekoppelde attributen staan in de tabel `basemaps.segments_190101_nwb_attributes` met status `interpolated`.
 
 ## inrix-map-matcher
 
@@ -219,3 +223,31 @@ De map matching MST punten wordt uitgevoerd in PostgreSQL.
 * De map matching staat in de (mogelijk nieuw aangemaakte) tabel `measurement_site_points_shapefile_matches`
 * Voer in de database `ndssmapmatching` de query van het bestand `sql/measurement_site_point_matches.sql` uit om de overige MST punten te map matchen naar het NDW basisnetwerk
 * De map matching staat in de (mogelijk nieuw aangemaakte) tabel `measurement_site_point_matches`.
+
+## Map matching van MSI locaties
+
+De map matching van MSI locaties wordt uitgevoerd in PostgreSQL.
+
+* Voer de stappen uit onder het kopje "msi-parser".
+* Voer de stappen uit onder het kopje "routing-map-matcher".
+* Voer in de database `ndssmapmatching` de query van het bestand `sql/msi_displays_matches.sql` uit om de MSI locaties te map matchen naar het NDW basisnetwerk.
+* De map matching staat in de (mogelijk nieuw aangemaakte) tabel `msi_displays_matches`.
+
+## Map matching van situatieberichten puntlocaties
+
+De map matching van situatieberichten puntlocaties wordt uitgevoerd in PostgreSQL.
+
+* Voer de stappen uit onder het kopje "situations-parser".
+* Voer de stappen uit onder het kopje "routing-map-matcher".
+* Aan de hand van de output van situatieberichten lijnlocaties met de routing-map-matcher: pas de array van situation record id's aan in `sql/situation_record_point_matches.sql`. Zie het SQL script voor meer uitleg.
+* Voer in de database `ndssmapmatching` de query van het bestand `sql/situation_record_point_matches.sql` uit om de situatieberichten puntlocaties te map matchen naar het NDW basisnetwerk.
+* De map matching staat in de (mogelijk nieuw aangemaakte) tabel `situation_record_point_matches`.
+
+## Map matching van Waze alerts
+
+De map matching van Waze alerts wordt uitgevoerd in PostgreSQL.
+
+* Voer de stappen uit onder het kopje "waze-parser".
+* Voer de stappen uit onder het kopje "NDW basisnetwerk verrijken met NWB attributen".
+* Voer in de database `ndssmapmatching` de query van het bestand `sql/waze_alerts_matches.sql` uit om de Waze alerts te map matchen naar het NDW basisnetwerk.
+* De map matching staat in de (mogelijk nieuw aangemaakte) tabel `waze_alerts_matches`.

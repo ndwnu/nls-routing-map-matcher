@@ -12,17 +12,25 @@ import nl.dat.routingmapmatcher.dataaccess.mapper.LineStringLocationMapper;
 import nl.dat.routingmapmatcher.linestring.LineStringLocation;
 import nl.dat.routingmapmatcher.linestring.LineStringMatch;
 
-public interface MstShapefileDao {
+public interface LmsLinkDao {
 
+  /*
+   * Read LMS links that are no connectors (linktype = 99), are not in another country (prv_code = 0)
+   * and are not part of a future alternative.
+   */
   @SqlQuery(
-      "SELECT gid AS id, null AS location_index, null AS reversed, lengte AS length_in_meters, ST_AsEWKB(geom) AS geometry_wkb " +
-      "FROM public.measurement_site_lines_shapefile " +
-      "ORDER BY id ")
+      "SELECT gid AS id, null AS location_index, null AS reversed, afstand AS length_in_meters, "
+      + " ST_AsEWKB(geom) AS geometry_wkb "
+      + " FROM public.lms_links "
+      + " WHERE linktype <> 99 "
+      + " AND jaar < 2019 "
+      + " AND prv_code > 0 "
+      + " ORDER BY id ")
   @RegisterRowMapper(LineStringLocationMapper.class)
-  public List<LineStringLocation> getMstLinesShapefile();
+  public List<LineStringLocation> getLmsLinks();
 
   @SqlUpdate(
-      "CREATE TABLE IF NOT EXISTS public.measurement_site_lines_shapefile_matches " +
+      "CREATE TABLE IF NOT EXISTS public.lms_link_matches " +
       "( " +
       "  gid integer NOT NULL, " +
       "  ndw_link_ids integer[] NOT NULL, " +
@@ -32,19 +40,19 @@ public interface MstShapefileDao {
       "  status text, " +
       "  line_string geography(LineString,4326), " +
       "  PRIMARY KEY (gid), " +
-      "  CONSTRAINT ms_lines_matches_fkey_ms_lines_shapefile FOREIGN KEY (gid) " +
-      "      REFERENCES public.measurement_site_lines_shapefile(gid) " +
+      "  CONSTRAINT lms_link_matches_fkey_lms_links FOREIGN KEY (gid) " +
+      "      REFERENCES public.lms_links(gid) " +
       ") "
       )
-  void createMstLinesShapefileMatchesTableIfNotExists();
+  void createLmsLinkMatchesTableIfNotExists();
 
-  @SqlUpdate("TRUNCATE TABLE public.measurement_site_lines_shapefile_matches")
-  void truncateMstLinesShapefileMatchesTable();
+  @SqlUpdate("TRUNCATE TABLE public.lms_link_matches")
+  void truncateLmsLinkMatchesTable();
 
   @SqlBatch(
-      "INSERT INTO public.measurement_site_lines_shapefile_matches(gid, ndw_link_ids, " +
+      "INSERT INTO public.lms_link_matches(gid, ndw_link_ids, " +
       "  start_link_fraction, end_link_fraction, reliability, status, line_string) VALUES " +
       "  (:id, :ndwLinkIds, :startLinkFraction, :endLinkFraction, :reliability, :status, :lineString)")
-  int[] insertMstLinesShapefileMatches(@BindBean List<LineStringMatch> lineStringMatches);
+  void insertLmsLinkMatches(@BindBean List<LineStringMatch> lineStringMatches);
 
 }

@@ -15,7 +15,8 @@ import nl.dat.routingmapmatcher.linestring.LineStringMatch;
 public interface WazeDao {
 
   @SqlQuery(
-      "SELECT jam_id AS id, false AS reversed, length AS length_in_meters, ST_AsEWKB(line::geometry) AS geometry_wkb " +
+      "SELECT jam_id AS id, null AS location_index, null AS reversed, length AS length_in_meters, " +
+      "ST_AsEWKB(line::geometry) AS geometry_wkb " +
       "FROM public.waze_jams " +
       "ORDER BY id")
   @RegisterRowMapper(LineStringLocationMapper.class)
@@ -48,7 +49,8 @@ public interface WazeDao {
   int[] insertWazeJamsMatches(@BindBean List<LineStringMatch> lineStringMatches);
 
   @SqlQuery(
-      "SELECT irregularity_id AS id, false AS reversed, length AS length_in_meters, ST_AsEWKB(line::geometry) AS geometry_wkb " +
+      "SELECT irregularity_id AS id, null AS location_index, null AS reversed, length AS length_in_meters, " +
+      "ST_AsEWKB(line::geometry) AS geometry_wkb " +
       "FROM public.waze_irregularities " +
       "ORDER BY id")
   @RegisterRowMapper(LineStringLocationMapper.class)
