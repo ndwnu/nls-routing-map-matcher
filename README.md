@@ -31,7 +31,7 @@ De MST parser kan gebruikt worden om data van bijvoorbeeld http://opendata.ndw.n
 
 ## situations-parser
 
-De situations parser kan gebruikt worden om data van bijvoorbeeld http://opendata.ndw.nu/actuele_statusberichten.xml.gz en http://opendata.ndw.nu/wegwerkzaamheden.xml.gz te parsen. Voorbeeld van gebruik:
+De situations parser kan gebruikt worden om data van bijvoorbeeld http://opendata.ndw.nu/actuele_statusberichten.xml.gz te parsen. Voorbeeld van gebruik:
 
 * Installeer Eclipse.
 * Importeer de map `situations-parser` als Maven project in Eclipse.
@@ -212,6 +212,26 @@ De INRIX map matcher gebruikt de OpenLR decoder van TomTom om INRIX segmenten te
     * Alle INRIX segmenten worden worden ingeladen en gemapt op het basisnetwerk. Dit kan een aantal uren duren.
     * Het resultaat van de mapping wordt weggeschreven (of overschreven) in de nieuwe tabel `public.inrix_segment_matches`.
 * Instellen van parameters voor de OpenLR decoder kan in `inrix-map-matcher/src/main/resources/OpenLR_Decoder_properties.xml`
+
+## Mapmatching van KNMI neerslagdata
+
+* Installeer Eclipse.
+* Importeer de map `knmi-map-matcher` als Maven project in Eclipse.
+* Installeer PostgreSQL 10 en PostGIS 2.5 indien nodig.
+* Maak een nieuwe database `ndssmapmatching` (of hergebruik hem als deze database al bestaat).
+* Download de h5-files met neerslagdata van https://data.knmi.nl/datasets/rad_nl25_rac_mfbs_01h/2.0 en zet ze in `knmi-map-matcher/files` 
+* Voer binnen Eclipse de klasse `KnmiMapMatcher` uit als Java-applicatie. De applicatie sluit af met de foutmelding dat `POSTGRES_END_POINT` niet gedefinieerd is.
+* Open de run configuration van `KnmiMapMatcher` en ga naar het tabblad "Environment". Voeg de volgende environment variables toe:
+    * `POSTGRES_END_POINT`: `localhost:5432` (of pas aan indien nodig)
+    * `POSTGRES_DATABASE`: `ndssmapmatching`
+    * `POSTGRES_USERNAME`: `postgres` (of pas aan indien nodig)
+    * `POSTGRES_PASSWORD`: `postgres` (of pas aan indien nodig)
+* Voer de aangepaste run configuration uit.
+* De applicatie voert nu de volgende stappen uit:
+	* De KNMI rasterpunten worden in de tabel `knmi_raster_points` gezet inclusief geometrische informatie
+	* Voor elke NDW link wordt het dichtstbijzijnde KNMI rasterpunt bepaald en weggeschreven in de tabel `basemaps.segments_190101_knmi_data`
+	* Voor elk KNMI rasterpunt wordt de neerslagdata uit de h5-files gehaald en toegevoegd aan de tabel `knmi_raster_points`
+	* De volgorde van regendata in de array in de kolom hourly_rainfall correspondeert met de filenamen in de tabel `knmi_rainfall_data_filenames`. De h5-files worden in de Java code lexicografisch geordend, door de filenaamgeving door het KNMI correspondeert dit met de chronologische volgorde.
 
 ## Map matching van MST punten
 

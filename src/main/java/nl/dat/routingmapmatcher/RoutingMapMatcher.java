@@ -161,8 +161,9 @@ public class RoutingMapMatcher {
     final Jdbi jdbi = DatabaseConnectionManager.getInstance().getJdbi();
 
     final SituationRecordRepository repository = new SituationRecordRepository(jdbi);
-    final List<LineStringLocation> situationRecordsOrdered  = repository.getSituationRecordOrderedLines();
-    final List<LineStringLocation> situationRecordsUnordered  = repository.getSituationRecordUnorderedLinears();
+    final List<Integer> singlePoints = new ArrayList<>();
+    final List<LineStringLocation> situationRecordsOrdered  = repository.getSituationRecordOrderedLines(singlePoints);
+    final List<LineStringLocation> situationRecordsUnordered  = repository.getSituationRecordUnorderedLinears(singlePoints);
     final List<LineStringLocation> situationRecords = new ArrayList<>();
     situationRecords.addAll(situationRecordsOrdered);
     situationRecords.addAll(situationRecordsUnordered);

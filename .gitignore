@@ -40,3 +40,11 @@ mst-parser/files/measurement.sql
 mst-parser/files/locations.sql
 
 waze-parser/files_out/waze_data.sql
+
+situations-parser/files/situation_records.sql
+situations-parser/files/situation_record_locations.sql
+
+knmi-map-matcher/.classpath
+knmi-map-matcher/.project
+knmi-map-matcher/.settings/
+knmi-map-matcher/target/
