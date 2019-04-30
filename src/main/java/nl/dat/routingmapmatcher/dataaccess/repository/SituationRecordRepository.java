@@ -32,7 +32,7 @@ public class SituationRecordRepository {
     this.jdbi = jdbi;
   }
 
-  public List<LineStringLocation> getSituationRecordOrderedLines() {
+  public List<LineStringLocation> getSituationRecordOrderedLines(final List<Integer> singlePoints) {
     try (Handle handle = jdbi.open()) {
       final SituationRecordDao situationRecordDao = handle.attach(SituationRecordDao.class);
       final Iterator<SituationRecordLocationDto> iterator = situationRecordDao.getSituationRecordOrderedLocations();
@@ -49,20 +49,22 @@ public class SituationRecordRepository {
             addPointLocations(locationDto, pointLocations);
             locationIndex = locationDto.getLocationIndex();
           } else {
-            addLineStringLocation(situationRecordId, locationIndex, pointLocations, lineStringLocations);
+            addLineStringLocation(situationRecordId, locationIndex, pointLocations, lineStringLocations,
+                singlePoints);
             situationRecordId = locationDto.getSituationRecordId();
             locationIndex = locationDto.getLocationIndex();
             pointLocations = new ArrayList<>();
             addPointLocations(locationDto, pointLocations);
           }
         }
-        addLineStringLocation(situationRecordId, locationIndex, pointLocations, lineStringLocations);
+        addLineStringLocation(situationRecordId, locationIndex, pointLocations, lineStringLocations,
+            singlePoints);
       }
       return lineStringLocations;
     }
   }
 
-  public List<LineStringLocation> getSituationRecordUnorderedLinears() {
+  public List<LineStringLocation> getSituationRecordUnorderedLinears(final List<Integer> singlePoints) {
     try (Handle handle = jdbi.open()) {
       final SituationRecordDao situationRecordDao = handle.attach(SituationRecordDao.class);
       final Iterator<SituationRecordLocationDto> iterator = situationRecordDao.getSituationRecordUnorderedLinears();
@@ -72,10 +74,10 @@ public class SituationRecordRepository {
         final SituationRecordLocationDto locationDto = iterator.next();
         addPointLocations(locationDto, pointLocations);
         addLineStringLocation(locationDto.getSituationRecordId(), locationDto.getLocationIndex(),
-            pointLocations, lineStringLocations);
+            pointLocations, lineStringLocations, singlePoints);
       }
-      logger.info("Note: the single point locations listed above should be matched with the PostgreSQL "
-          + "script for situation record points");
+      logger.info("Note: the following situation record ids contain single point locations and should be "
+          + "matched with the PostgreSQL script for situation record points: {}", singlePoints);
       return lineStringLocations;
     }
   }
@@ -129,7 +131,8 @@ public class SituationRecordRepository {
   }
 
   private void addLineStringLocation(final int situationRecordId, final int locationIndex,
-      final List<Point> pointLocations, final List<LineStringLocation> lineStringLocations) {
+      final List<Point> pointLocations, final List<LineStringLocation> lineStringLocations,
+      final List<Integer> singlePoints) {
     if (pointLocations.size() > 1) {
       Optional<Integer> locationIndexOptional;
       if (locationIndex == 0) {
@@ -145,6 +148,7 @@ public class SituationRecordRepository {
       lineStringLocations.add(lineStringLocation);
     } else {
       // These situation records should be matched with the SQL script for point matching
+      singlePoints.add(situationRecordId);
       logger.info("Single point location: situation record id {} and location index {}",
           situationRecordId, locationIndex);
     }
