@@ -15,8 +15,9 @@ import nl.dat.routingmapmatcher.linestring.LineStringMatch;
 
 public interface SituationRecordDao {
 
-  // There is 1 situation record location (location_type = 'point') without location of display.
-  // Hence, the additional requirement in the query below.
+  // Excluded are situation record locations (location_type = 'point') without location of display.
+  // There is only 1 in the current xml-file (26-3-2019)
+  // Run SQL query in postgres to check the number of excluded locations.
   @SqlQuery("SELECT "
       + " situation_record_id, "
       + " location_index, "
@@ -32,6 +33,9 @@ public interface SituationRecordDao {
   @RegisterRowMapper(SituationRecordLineDtoMapper.class)
   public Iterator<SituationRecordLocationDto> getSituationRecordOrderedLocations();
 
+  // Excluded are situation record locations (location_type = 'linear') without locations for start or end point.
+  // There are none in the current xml-file (26-3-2019)
+  // Run SQL query in postgres to check the number of excluded locations.
   @SqlQuery("SELECT "
       + " situation_record_id, "
       + " location_index, "
@@ -42,6 +46,8 @@ public interface SituationRecordDao {
       + " INNER JOIN public.situation_records USING (situation_record_id) "
       + " WHERE ordered_locations = false "
       + " AND location_type = 'linear' "
+      + " AND linear_coordinates_start_point IS NOT NULL "
+      + " AND linear_coordinates_end_point IS NOT NULL "
       + " ORDER BY situation_record_id, location_index ")
   @RegisterRowMapper(SituationRecordLineDtoMapper.class)
   public Iterator<SituationRecordLocationDto> getSituationRecordUnorderedLinears();
