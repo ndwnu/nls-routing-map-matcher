@@ -198,6 +198,10 @@ De INRIX map matcher gebruikt de OpenLR decoder van TomTom om INRIX segmenten te
 * Installeer PostgreSQL 10 en PostGIS 2.5 indien nodig.
 * Maak een nieuwe database `ndssmapmatching` (of hergebruik hem als deze database al bestaat).
 * Voer de stappen uit onder het kopje "NDW basisnetwerk importeren".
+* De INRIX map matcher maakt gebruik van OpenLR kenmerken, die moeten voor elke NDW link worden bepaald. Dit gebeurt aan de hand van Open Street Map kenmerken. Hiervoor zijn de volgende stappen nodig:
+	* Voeg de Open Street Map tabel public.planet_osm_line toe in de nieuwe database.
+	* Voer de queries in `sql/basemaps_segments_190101_openlr_attributes.sql` uit in de nieuwe database.
+	* De tabel basemaps.segments_190101_openlr_attributes is aangemaakt met daarin de OpenLR kenmerken per NDW link.
 * Voer de stappen uit onder het kopje "inrix-parser".
 * Voer de queries in `function_check_offsets_full_matches.sql`, `function_compute_linestring_of_match.sql` en `function_compute_linestring_and_reliability_of_match.sql` (in de map `inrix-map-matcher/queries/`) uit in de nieuwe database.
 * Voer binnen Eclipse de klasse `InrixMapMatcher` uit als Java-applicatie. De applicatie sluit af met de foutmelding dat `POSTGRES_END_POINT` niet gedefinieerd is.
