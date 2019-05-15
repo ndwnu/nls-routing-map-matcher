@@ -19,12 +19,12 @@ public interface LmsLinkDao {
    * and are not part of a future alternative.
    */
   @SqlQuery(
-      "SELECT gid AS id, null AS location_index, null AS reversed, afstand AS length_in_meters, "
+      "SELECT gid AS id, null AS location_index, null AS reversed, ST_Length(ST_Transform(geom,28992)) AS length_in_meters, "
       + " ST_AsEWKB(geom) AS geometry_wkb "
       + " FROM public.lms_links "
-      + " WHERE linktype <> 99 "
-      + " AND jaar < 2019 "
-      + " AND prv_code > 0 "
+      + " WHERE os_linktyp <> 99 "
+      + " AND os_jaar < 2019 "
+      + " AND os_prv_cod > 0 "
       + " ORDER BY id ")
   @RegisterRowMapper(LineStringLocationMapper.class)
   public List<LineStringLocation> getLmsLinks();
