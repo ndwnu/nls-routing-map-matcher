@@ -118,8 +118,8 @@ Het Nationaal Wegenbestand (NWB) bevat gegevens die gebruikt kunnen worden om he
 
 * Installeer PostgreSQL 10 en PostGIS 2.5 indien nodig.
 * Maak een nieuwe database `ndssmapmatching` (of hergebruik hem als deze database al bestaat).
-* Gebruik een shapefile van het NRM/LMS, bijvoorbeeld: `routing-map-matcher/files/CUBE_AV_LMS.shp`
-* Voer het commando `shp2pgsql.exe -s 28992:4326 -S -t 2D -I CUBE_AV_LMS.shp lms_links > lms.sql` uit in de uitgepakte map (`shp2pgsql` wordt meegeleverd met PostgreSQL).
+* Gebruik een shapefile van het NRM/LMS, bijvoorbeeld: `routing-map-matcher/files/Samengevoegd_2018_Autonetwerk_NRM2019.shp`
+* Voer het commando `shp2pgsql.exe -s 28992:4326 -S -t 2D -I Samengevoegd_2018_Autonetwerk_NRM2019.shp lms_links > lms.sql` uit in de uitgepakte map (`shp2pgsql` wordt meegeleverd met PostgreSQL).
 * Voer de queries van `lms.sql` uit in de nieuwe database. Vanwege de grootte kan het best een commando als `psql -f lms.sql -p 5432 ndssmapmatching postgres > out.txt` gebruikt worden (`psql` wordt meegeleverd met PostgreSQL).
 
 ## routing-map-matcher
