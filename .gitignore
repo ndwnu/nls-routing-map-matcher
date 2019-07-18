@@ -1,38 +1,18 @@
-inrix-map-matcher/.classpath
-inrix-map-matcher/.project
-inrix-map-matcher/.settings/
-inrix-map-matcher/target/
+# IntelliJ IDE
+.idea
+*.iml
 
-inrix-parser/.classpath
-inrix-parser/.project
-inrix-parser/.settings/
-inrix-parser/target/
+# Eclipse IDE
+.settings/
+.project
+.classpath
+.checkstyle
+.factorypath
 
-msi-parser/.classpath
-msi-parser/.project
-msi-parser/.settings/
-msi-parser/target/
+# Build folder
+target
 
-mst-parser/.classpath
-mst-parser/.project
-mst-parser/.settings/
-mst-parser/target/
-
-routing-map-matcher/.classpath
-routing-map-matcher/.project
-routing-map-matcher/.settings/
-routing-map-matcher/target/
-
-situations-parser/.classpath
-situations-parser/.project
-situations-parser/.settings/
-situations-parser/target/
-
-waze-parser/.classpath
-waze-parser/.project
-waze-parser/.settings/
-waze-parser/target/
-
+# Output files
 inrix-parser/files/inrix_nodes.sql
 inrix-parser/files/inrix_segments.sql
 
@@ -43,8 +23,3 @@ waze-parser/files_out/waze_data.sql
 
 situations-parser/files/situation_records.sql
 situations-parser/files/situation_record_locations.sql
-
-knmi-map-matcher/.classpath
-knmi-map-matcher/.project
-knmi-map-matcher/.settings/
-knmi-map-matcher/target/
