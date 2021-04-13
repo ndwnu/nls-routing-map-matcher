@@ -3,19 +3,19 @@ package nl.dat.routingmapmatcher.util;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.locationtech.jts.geom.GeometryFactory;
+import org.locationtech.jts.geom.LineString;
+import org.locationtech.jts.geom.impl.PackedCoordinateSequence;
+
 import com.graphhopper.routing.QueryGraph;
+import com.graphhopper.storage.IntsRef;
 import com.graphhopper.util.EdgeExplorer;
 import com.graphhopper.util.EdgeIterator;
 import com.graphhopper.util.EdgeIteratorState;
 import com.graphhopper.util.PointList;
-import com.vividsolutions.jts.geom.GeometryFactory;
-import com.vividsolutions.jts.geom.LineString;
-import com.vividsolutions.jts.geom.impl.PackedCoordinateSequence;
 
 import nl.dat.routingmapmatcher.exceptions.RoutingMapMatcherException;
-import nl.dat.routingmapmatcher.graphhopper.NdwGraphHopper;
-import nl.dat.routingmapmatcher.graphhopper.NdwLinkFlagEncoder;
-import nl.dat.routingmapmatcher.graphhopper.NdwLinkProperties;
+import nl.dat.routingmapmatcher.graphhopper.LinkFlagEncoder;
 
 public class PathUtil {
 
@@ -47,21 +47,12 @@ public class PathUtil {
     return lineString;
   }
 
-  public List<Integer> determineNdwLinkIds(final NdwGraphHopper ndwNetwork, final NdwLinkFlagEncoder flagEncoder,
-      final List<EdgeIteratorState> edges) {
+  public List<Integer> determineNdwLinkIds(final LinkFlagEncoder flagEncoder, final List<EdgeIteratorState> edges) {
     final List<Integer> ndwLinkIds = new ArrayList<>(edges.size());
     Integer previousNdwLinkId = null;
     for (final EdgeIteratorState edge : edges) {
-      final long flags = edge.getFlags();
-      final boolean reversed = flagEncoder.isReversed(flags);
-      final int index = flagEncoder.getIndex(flags);
-      final NdwLinkProperties linkProperties = ndwNetwork.getLinkProperties(index);
-      final Integer ndwLinkId;
-      if (reversed) {
-        ndwLinkId = linkProperties.getBackwardId();
-      } else {
-        ndwLinkId = linkProperties.getForwardId();
-      }
+      final IntsRef flags = edge.getFlags();
+      final Integer ndwLinkId = flagEncoder.getId(flags);
       if (previousNdwLinkId == null || !previousNdwLinkId.equals(ndwLinkId)) {
         ndwLinkIds.add(ndwLinkId);
       }
@@ -155,6 +146,4 @@ public class PathUtil {
 
     return endLinkFraction;
   }
-
-
 }

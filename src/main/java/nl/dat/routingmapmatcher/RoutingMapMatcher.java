@@ -11,14 +11,14 @@ import com.google.common.base.Stopwatch;
 
 import nl.dat.routingmapmatcher.dataaccess.repository.LmsRepository;
 import nl.dat.routingmapmatcher.dataaccess.repository.MstShapefileRepository;
-import nl.dat.routingmapmatcher.dataaccess.repository.NdwNetworkRepository;
+import nl.dat.routingmapmatcher.dataaccess.repository.NetworkRepository;
 import nl.dat.routingmapmatcher.dataaccess.repository.NwbRepository;
 import nl.dat.routingmapmatcher.dataaccess.repository.SituationRecordRepository;
 import nl.dat.routingmapmatcher.dataaccess.repository.StartToEndRepository;
 import nl.dat.routingmapmatcher.dataaccess.repository.WazeRepository;
 import nl.dat.routingmapmatcher.dataaccess.support.DatabaseConnectionManager;
 import nl.dat.routingmapmatcher.enums.NdwNetworkSubset;
-import nl.dat.routingmapmatcher.graphhopper.NdwGraphHopper;
+import nl.dat.routingmapmatcher.graphhopper.NetworkGraphHopper;
 import nl.dat.routingmapmatcher.linestring.LineStringLocation;
 import nl.dat.routingmapmatcher.linestring.LineStringMapMatcher;
 import nl.dat.routingmapmatcher.linestring.LineStringMatch;
@@ -35,28 +35,28 @@ public class RoutingMapMatcher {
     try {
       new RoutingMapMatcher().run();
     } catch (final Exception e) {
-      logger.error("An exception occured", e);
+      logger.error("An exception occurred", e);
     }
   }
 
   public void run() {
-    matchNoFcdStartToEndMeasurementLocations(readNdwNetwork(NdwNetworkSubset.NO_SMALL_LINKS));
-    matchNwb(readNdwNetwork(NdwNetworkSubset.FULL_NETWORK));
-    matchWazeJams(readNdwNetwork(NdwNetworkSubset.FULL_NETWORK));
-    matchWazeIrregularities(readNdwNetwork(NdwNetworkSubset.FULL_NETWORK));
-    matchMstLinesShapefile(readNdwNetwork(NdwNetworkSubset.FULL_NETWORK));
-    matchSituationRecordLines(readNdwNetwork(NdwNetworkSubset.FULL_NETWORK));
-    matchLmsLinks(readNdwNetwork(NdwNetworkSubset.FULL_NETWORK));
+    matchNoFcdStartToEndMeasurementLocations(readNdwNetwork(NdwNetworkSubset.OSM_NO_SMALL_LINKS));
+    matchNwb(readNdwNetwork(NdwNetworkSubset.OSM_FULL_NETWORK));
+    matchWazeJams(readNdwNetwork(NdwNetworkSubset.OSM_FULL_NETWORK));
+    matchWazeIrregularities(readNdwNetwork(NdwNetworkSubset.OSM_FULL_NETWORK));
+    matchMstLinesShapefile(readNdwNetwork(NdwNetworkSubset.OSM_FULL_NETWORK));
+    matchSituationRecordLines(readNdwNetwork(NdwNetworkSubset.OSM_FULL_NETWORK));
+    matchLmsLinks(readNdwNetwork(NdwNetworkSubset.OSM_FULL_NETWORK));
   }
 
-  private NdwGraphHopper readNdwNetwork(final NdwNetworkSubset subset) {
+  private NetworkGraphHopper readNdwNetwork(final NdwNetworkSubset subset) {
     final Jdbi jdbi = DatabaseConnectionManager.getInstance().getJdbi();
     logger.info("Start reading NDW network with subset {}", subset);
-    final NdwNetworkRepository ndwNetworkRepository = new NdwNetworkRepository(jdbi);
-    return ndwNetworkRepository.getNdwNetwork(subset);
+    final NetworkRepository ndwNetworkRepository = new NetworkRepository(jdbi);
+    return ndwNetworkRepository.getNetwork(subset.getNetworkQuery());
   }
 
-  private void matchNoFcdStartToEndMeasurementLocations(final NdwGraphHopper ndwNetwork) {
+  private void matchNoFcdStartToEndMeasurementLocations(final NetworkGraphHopper ndwNetwork) {
     final Jdbi jdbi = DatabaseConnectionManager.getInstance().getJdbi();
 
     final StartToEndRepository startToEndRepository = new StartToEndRepository(jdbi);
@@ -77,7 +77,7 @@ public class RoutingMapMatcher {
     logger.info("Done");
   }
 
-  private void matchNwb(final NdwGraphHopper ndwNetwork) {
+  private void matchNwb(final NetworkGraphHopper ndwNetwork) {
     final Jdbi jdbi = DatabaseConnectionManager.getInstance().getJdbi();
 
     final NwbRepository nwbRepository = new NwbRepository(jdbi);
@@ -96,7 +96,7 @@ public class RoutingMapMatcher {
     logger.info("Done");
   }
 
-  private void matchWazeJams(final NdwGraphHopper ndwNetwork) {
+  private void matchWazeJams(final NetworkGraphHopper ndwNetwork) {
     final Jdbi jdbi = DatabaseConnectionManager.getInstance().getJdbi();
 
     final WazeRepository wazeRepository = new WazeRepository(jdbi);
@@ -115,7 +115,7 @@ public class RoutingMapMatcher {
     logger.info("Done");
   }
 
-  private void matchWazeIrregularities(final NdwGraphHopper ndwNetwork) {
+  private void matchWazeIrregularities(final NetworkGraphHopper ndwNetwork) {
     final Jdbi jdbi = DatabaseConnectionManager.getInstance().getJdbi();
 
     final WazeRepository wazeRepository = new WazeRepository(jdbi);
@@ -134,7 +134,7 @@ public class RoutingMapMatcher {
     logger.info("Done");
   }
 
-  private void matchMstLinesShapefile(final NdwGraphHopper ndwNetwork) {
+  private void matchMstLinesShapefile(final NetworkGraphHopper ndwNetwork) {
     final Jdbi jdbi = DatabaseConnectionManager.getInstance().getJdbi();
 
     final MstShapefileRepository mstShapefileRepository = new MstShapefileRepository(jdbi);
@@ -157,7 +157,7 @@ public class RoutingMapMatcher {
     logger.info("Done");
   }
 
-  private void matchSituationRecordLines(final NdwGraphHopper ndwNetwork) {
+  private void matchSituationRecordLines(final NetworkGraphHopper ndwNetwork) {
     final Jdbi jdbi = DatabaseConnectionManager.getInstance().getJdbi();
 
     final SituationRecordRepository repository = new SituationRecordRepository(jdbi);
@@ -185,7 +185,7 @@ public class RoutingMapMatcher {
     logger.info("Done");
   }
 
-  private void matchLmsLinks(final NdwGraphHopper ndwNetwork) {
+  private void matchLmsLinks(final NetworkGraphHopper ndwNetwork) {
     final Jdbi jdbi = DatabaseConnectionManager.getInstance().getJdbi();
 
     final LmsRepository repository = new LmsRepository(jdbi);
@@ -206,10 +206,5 @@ public class RoutingMapMatcher {
     repository.replaceLmsLinkMatches(lmsLinkMatches);
 
     logger.info("Done");
-
-
-
   }
-
-
 }

@@ -4,6 +4,10 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import org.locationtech.jts.geom.CoordinateSequence;
+import org.locationtech.jts.geom.GeometryFactory;
+import org.locationtech.jts.geom.LineString;
+import org.locationtech.jts.geom.PrecisionModel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -25,15 +29,11 @@ import com.graphhopper.util.EdgeIteratorState;
 import com.graphhopper.util.GPXEntry;
 import com.graphhopper.util.Parameters;
 import com.graphhopper.util.PointList;
-import com.vividsolutions.jts.geom.CoordinateSequence;
-import com.vividsolutions.jts.geom.GeometryFactory;
-import com.vividsolutions.jts.geom.LineString;
-import com.vividsolutions.jts.geom.PrecisionModel;
 
 import nl.dat.routingmapmatcher.constants.GlobalConstants;
 import nl.dat.routingmapmatcher.exceptions.RoutingMapMatcherException;
-import nl.dat.routingmapmatcher.graphhopper.NdwGraphHopper;
-import nl.dat.routingmapmatcher.graphhopper.NdwLinkFlagEncoder;
+import nl.dat.routingmapmatcher.graphhopper.LinkFlagEncoder;
+import nl.dat.routingmapmatcher.graphhopper.NetworkGraphHopper;
 import nl.dat.routingmapmatcher.linestring.LineStringLocation;
 import nl.dat.routingmapmatcher.linestring.LineStringMapMatcher;
 import nl.dat.routingmapmatcher.linestring.LineStringMatch;
@@ -83,8 +83,7 @@ public class ViterbiLineStringMapMatcher implements LineStringMapMatcher {
 
   private static final int MILLIS_PER_SECOND = 1000;
 
-  private final NdwGraphHopper ndwNetwork;
-  private final NdwLinkFlagEncoder flagEncoder;
+  private final LinkFlagEncoder flagEncoder;
   private final MapMatching mapMatching;
   private final CustomDistanceCalc distanceCalc;
   private final LocationIndexTree locationIndexTree;
@@ -94,13 +93,12 @@ public class ViterbiLineStringMapMatcher implements LineStringMapMatcher {
   private final PathUtil pathUtil;
   private final QueryGraphExtractor queryGraphExtractor;
 
-  public ViterbiLineStringMapMatcher(final NdwGraphHopper ndwNetwork) {
+  public ViterbiLineStringMapMatcher(final NetworkGraphHopper ndwNetwork) {
     Preconditions.checkNotNull(ndwNetwork);
     final List<FlagEncoder> flagEncoders = ndwNetwork.getEncodingManager().fetchEdgeEncoders();
     Preconditions.checkArgument(flagEncoders.size() == 1);
-    Preconditions.checkArgument(flagEncoders.get(0) instanceof NdwLinkFlagEncoder);
-    this.ndwNetwork = ndwNetwork;
-    this.flagEncoder = (NdwLinkFlagEncoder) flagEncoders.get(0);
+    Preconditions.checkArgument(flagEncoders.get(0) instanceof LinkFlagEncoder);
+    this.flagEncoder = (LinkFlagEncoder) flagEncoders.get(0);
 
     final String algorithm = Parameters.Algorithms.DIJKSTRA_BI;
     final Weighting weighting = new ShortestWeighting(flagEncoder);
@@ -200,7 +198,7 @@ public class ViterbiLineStringMapMatcher implements LineStringMapMatcher {
     if (edges.isEmpty()) {
       throw new RoutingMapMatcherException("Unexpected: path has no edges");
     }
-    final List<Integer> ndwLinkIds = pathUtil.determineNdwLinkIds(ndwNetwork, flagEncoder, edges);
+    final List<Integer> ndwLinkIds = pathUtil.determineNdwLinkIds(flagEncoder, edges);
     final QueryGraph queryGraph = queryGraphExtractor.extractQueryGraph(path);
     final double startLinkFraction = pathUtil.determineStartLinkFraction(edges.get(0), queryGraph);
     final double endLinkFraction = pathUtil.determineEndLinkFraction(edges.get(edges.size() - 1), queryGraph);
@@ -295,5 +293,4 @@ public class ViterbiLineStringMapMatcher implements LineStringMapMatcher {
     return new LineStringMatch(lineStringLocation, ndwLinkIds, startLinkFraction, endLinkFraction, reliability, status,
         lineString);
   }
-
 }

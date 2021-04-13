@@ -2,7 +2,7 @@ package nl.dat.routingmapmatcher.starttoend;
 
 import java.util.List;
 
-import com.vividsolutions.jts.geom.LineString;
+import org.locationtech.jts.geom.LineString;
 
 public class StartToEndMatch {
 
@@ -59,5 +59,4 @@ public class StartToEndMatch {
   public LineString getLineString() {
     return lineString;
   }
-
 }

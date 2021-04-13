@@ -2,8 +2,9 @@ package nl.dat.routingmapmatcher.linestring;
 
 import java.util.Optional;
 
+import org.locationtech.jts.geom.LineString;
+
 import com.google.common.base.MoreObjects;
-import com.vividsolutions.jts.geom.LineString;
 
 public class LineStringLocation {
 
@@ -58,5 +59,4 @@ public class LineStringLocation {
         .add("lengthInMeters", lengthInMeters)
         .toString();
   }
-
 }

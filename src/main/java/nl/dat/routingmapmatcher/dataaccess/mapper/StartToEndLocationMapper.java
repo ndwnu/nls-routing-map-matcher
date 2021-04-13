@@ -5,13 +5,12 @@ import java.sql.SQLException;
 
 import org.jdbi.v3.core.mapper.RowMapper;
 import org.jdbi.v3.core.statement.StatementContext;
-
-import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.geom.GeometryFactory;
-import com.vividsolutions.jts.geom.Point;
-import com.vividsolutions.jts.geom.PrecisionModel;
-import com.vividsolutions.jts.io.ParseException;
-import com.vividsolutions.jts.io.WKBReader;
+import org.locationtech.jts.geom.Geometry;
+import org.locationtech.jts.geom.GeometryFactory;
+import org.locationtech.jts.geom.Point;
+import org.locationtech.jts.geom.PrecisionModel;
+import org.locationtech.jts.io.ParseException;
+import org.locationtech.jts.io.WKBReader;
 
 import nl.dat.routingmapmatcher.constants.GlobalConstants;
 import nl.dat.routingmapmatcher.starttoend.StartToEndLocation;
@@ -49,5 +48,4 @@ public class StartToEndLocationMapper implements RowMapper<StartToEndLocation> {
       throw new SQLException("Unable to parse WKB", e);
     }
   }
-
 }

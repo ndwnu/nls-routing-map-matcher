@@ -1,6 +1,6 @@
 package nl.dat.routingmapmatcher.starttoend;
 
-import com.vividsolutions.jts.geom.Point;
+import org.locationtech.jts.geom.Point;
 
 public class StartToEndLocation {
 
@@ -38,5 +38,4 @@ public class StartToEndLocation {
   public Point getEndPoint() {
     return endPoint;
   }
-
 }

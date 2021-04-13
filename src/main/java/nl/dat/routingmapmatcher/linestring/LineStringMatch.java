@@ -3,7 +3,7 @@ package nl.dat.routingmapmatcher.linestring;
 import java.util.List;
 import java.util.Optional;
 
-import com.vividsolutions.jts.geom.LineString;
+import org.locationtech.jts.geom.LineString;
 
 public class LineStringMatch {
 

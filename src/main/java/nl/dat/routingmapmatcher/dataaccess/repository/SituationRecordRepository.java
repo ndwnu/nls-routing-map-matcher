@@ -7,13 +7,12 @@ import java.util.Optional;
 
 import org.jdbi.v3.core.Handle;
 import org.jdbi.v3.core.Jdbi;
+import org.locationtech.jts.geom.Coordinate;
+import org.locationtech.jts.geom.LineString;
+import org.locationtech.jts.geom.Point;
+import org.locationtech.jts.geom.PrecisionModel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.LineString;
-import com.vividsolutions.jts.geom.Point;
-import com.vividsolutions.jts.geom.PrecisionModel;
 
 import nl.dat.routingmapmatcher.constants.GlobalConstants;
 import nl.dat.routingmapmatcher.dataaccess.dao.SituationRecordDao;
@@ -161,5 +160,4 @@ public class SituationRecordRepository {
     }
     return new LineString(coordinates.toArray(new Coordinate[0]), new PrecisionModel(), GlobalConstants.WGS84_SRID);
   }
-
 }
