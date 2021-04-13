@@ -63,4 +63,7 @@ public class LineStringMatch {
     return location.getLocationIndex();
   }
 
+  public Optional<Boolean> getReversed() {
+    return location.getReversed();
+  }
 }
