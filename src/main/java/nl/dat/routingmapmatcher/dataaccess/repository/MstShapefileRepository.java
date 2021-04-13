@@ -9,7 +9,7 @@ import nl.dat.routingmapmatcher.dataaccess.dao.MstShapefileDao;
 import nl.dat.routingmapmatcher.linestring.LineStringLocation;
 import nl.dat.routingmapmatcher.linestring.LineStringMatch;
 
-public class MstShapefileRepository {
+public class MstShapefileRepository implements LineStringLocationRepository {
 
   private final Jdbi jdbi;
 
@@ -17,14 +17,16 @@ public class MstShapefileRepository {
     this.jdbi = jdbi;
   }
 
-  public List<LineStringLocation> getMstLinesShapefile() {
+  @Override
+  public List<LineStringLocation> getLocations() {
     try (Handle handle = jdbi.open()) {
       final MstShapefileDao mstShapefileDao = handle.attach(MstShapefileDao.class);
       return mstShapefileDao.getMstLinesShapefile();
     }
   }
 
-  public void replaceMstLinesShapefileMatches(final List<LineStringMatch> lineStringMatches) {
+  @Override
+  public void replaceMatches(final List<LineStringMatch> lineStringMatches) {
     jdbi.useTransaction((final Handle handle) -> {
       final MstShapefileDao mstShapefileDao = handle.attach(MstShapefileDao.class);
       mstShapefileDao.createMstLinesShapefileMatchesTableIfNotExists();
@@ -32,5 +34,4 @@ public class MstShapefileRepository {
       mstShapefileDao.insertMstLinesShapefileMatches(lineStringMatches);
     });
   }
-
 }

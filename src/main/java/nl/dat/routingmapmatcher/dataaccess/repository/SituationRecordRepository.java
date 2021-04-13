@@ -21,7 +21,7 @@ import nl.dat.routingmapmatcher.linestring.LineStringLocation;
 import nl.dat.routingmapmatcher.linestring.LineStringMatch;
 import nl.dat.routingmapmatcher.linestring.ReliabilityCalculationType;
 
-public class SituationRecordRepository {
+public class SituationRecordRepository implements LineStringLocationRepository {
 
   private static final Logger logger = LoggerFactory.getLogger(SituationRecordRepository.class);
 
@@ -29,6 +29,17 @@ public class SituationRecordRepository {
 
   public SituationRecordRepository(final Jdbi jdbi) {
     this.jdbi = jdbi;
+  }
+
+  @Override
+  public List<LineStringLocation> getLocations() {
+    final List<Integer> singlePoints = new ArrayList<>();
+    final List<LineStringLocation> situationRecordsOrdered = getSituationRecordOrderedLines(singlePoints);
+    final List<LineStringLocation> situationRecordsUnordered = getSituationRecordUnorderedLinears(singlePoints);
+    final List<LineStringLocation> situationRecords = new ArrayList<>();
+    situationRecords.addAll(situationRecordsOrdered);
+    situationRecords.addAll(situationRecordsUnordered);
+    return situationRecords;
   }
 
   public List<LineStringLocation> getSituationRecordOrderedLines(final List<Integer> singlePoints) {
@@ -81,7 +92,8 @@ public class SituationRecordRepository {
     }
   }
 
-  public void replaceSituationRecordLineMatches(final List<LineStringMatch> lineStringMatches) {
+  @Override
+  public void replaceMatches(final List<LineStringMatch> lineStringMatches) {
     jdbi.useTransaction((final Handle handle) -> {
       final SituationRecordDao situationRecordDao = handle.attach(SituationRecordDao.class);
       situationRecordDao.createSituationRecordLineMatchesTableIfNotExists();
