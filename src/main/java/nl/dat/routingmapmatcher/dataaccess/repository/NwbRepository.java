@@ -9,7 +9,7 @@ import nl.dat.routingmapmatcher.dataaccess.dao.NwbDao;
 import nl.dat.routingmapmatcher.linestring.LineStringLocation;
 import nl.dat.routingmapmatcher.linestring.LineStringMatch;
 
-public class NwbRepository {
+public class NwbRepository implements LineStringLocationRepository {
 
   private final Jdbi jdbi;
 
@@ -17,21 +17,23 @@ public class NwbRepository {
     this.jdbi = jdbi;
   }
 
-  public List<LineStringLocation> getNwbLocations() {
+  @Override
+  public List<LineStringLocation> getLocations() {
     try (Handle handle = jdbi.open()) {
       final NwbDao nwbDao = handle.attach(NwbDao.class);
       return nwbDao.getNwbLocations();
     }
   }
 
-  public List<LineStringLocation> getNwbLocationsOnlyNationalHighways() {
+  public List<LineStringLocation> getLocationsOnlyNationalHighways() {
     try (Handle handle = jdbi.open()) {
       final NwbDao nwbDao = handle.attach(NwbDao.class);
       return nwbDao.getNwbLocationsOnlyNationalHighways();
     }
   }
 
-  public void replaceNwbMatches(final List<LineStringMatch> lineStringMatches) {
+  @Override
+  public void replaceMatches(final List<LineStringMatch> lineStringMatches) {
     jdbi.useTransaction((final Handle handle) -> {
       final NwbDao nwbDao = handle.attach(NwbDao.class);
       nwbDao.createNwbMatchesTableIfNotExists();
@@ -39,5 +41,4 @@ public class NwbRepository {
       nwbDao.insertNwbMatches(lineStringMatches);
     });
   }
-
 }

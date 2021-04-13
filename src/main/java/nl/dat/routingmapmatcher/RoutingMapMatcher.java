@@ -9,13 +9,16 @@ import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Stopwatch;
 
+import nl.dat.routingmapmatcher.dataaccess.repository.FcdRepository;
+import nl.dat.routingmapmatcher.dataaccess.repository.LineStringLocationRepository;
 import nl.dat.routingmapmatcher.dataaccess.repository.LmsRepository;
 import nl.dat.routingmapmatcher.dataaccess.repository.MstShapefileRepository;
 import nl.dat.routingmapmatcher.dataaccess.repository.NetworkRepository;
 import nl.dat.routingmapmatcher.dataaccess.repository.NwbRepository;
 import nl.dat.routingmapmatcher.dataaccess.repository.SituationRecordRepository;
 import nl.dat.routingmapmatcher.dataaccess.repository.StartToEndRepository;
-import nl.dat.routingmapmatcher.dataaccess.repository.WazeRepository;
+import nl.dat.routingmapmatcher.dataaccess.repository.WazeIrregularitiesRepository;
+import nl.dat.routingmapmatcher.dataaccess.repository.WazeJamsRepository;
 import nl.dat.routingmapmatcher.dataaccess.support.DatabaseConnectionManager;
 import nl.dat.routingmapmatcher.enums.NdwNetworkSubset;
 import nl.dat.routingmapmatcher.graphhopper.NetworkGraphHopper;
@@ -41,6 +44,7 @@ public class RoutingMapMatcher {
 
   public void run() {
     matchNoFcdStartToEndMeasurementLocations(readNdwNetwork(NdwNetworkSubset.OSM_NO_SMALL_LINKS));
+    matchFcd(readNdwNetwork(NdwNetworkSubset.OSM_FULL_NETWORK));
     matchNwb(readNdwNetwork(NdwNetworkSubset.OSM_FULL_NETWORK));
     matchWazeJams(readNdwNetwork(NdwNetworkSubset.OSM_FULL_NETWORK));
     matchWazeIrregularities(readNdwNetwork(NdwNetworkSubset.OSM_FULL_NETWORK));
@@ -77,133 +81,65 @@ public class RoutingMapMatcher {
     logger.info("Done");
   }
 
+  private void matchFcd(final NetworkGraphHopper ndwNetwork) {
+    final Jdbi jdbi = DatabaseConnectionManager.getInstance().getJdbi();
+
+    matchLocations(ndwNetwork, new FcdRepository(jdbi), "FCD level 1 links");
+  }
+
   private void matchNwb(final NetworkGraphHopper ndwNetwork) {
     final Jdbi jdbi = DatabaseConnectionManager.getInstance().getJdbi();
 
-    final NwbRepository nwbRepository = new NwbRepository(jdbi);
-    final List<LineStringLocation> nwbLocations = nwbRepository.getNwbLocations();
-    logger.info("Start map matching for NWB national highways, count = {}", nwbLocations.size());
-    final Stopwatch stopwatch = Stopwatch.createStarted();
-    final LineStringMapMatcher lineStringMapMatcher = new ViterbiLineStringMapMatcher(ndwNetwork);
-    final List<LineStringMatch> nwbMatches = new ArrayList<>(nwbLocations.size());
-    for (final LineStringLocation nwbNationalHighwayLocation : nwbLocations) {
-      nwbMatches.add(lineStringMapMatcher.match(nwbNationalHighwayLocation));
-    }
-
-    logger.info("Write results to database, matching took {} for {} locations", stopwatch, nwbLocations.size());
-    nwbRepository.replaceNwbMatches(nwbMatches);
-
-    logger.info("Done");
+    matchLocations(ndwNetwork, new NwbRepository(jdbi), "NWB national highways");
   }
 
   private void matchWazeJams(final NetworkGraphHopper ndwNetwork) {
     final Jdbi jdbi = DatabaseConnectionManager.getInstance().getJdbi();
 
-    final WazeRepository wazeRepository = new WazeRepository(jdbi);
-    final List<LineStringLocation> wazeJams = wazeRepository.getWazeJams();
-    logger.info("Start map matching for waze jams, count = {}", wazeJams.size());
-    final Stopwatch stopwatch = Stopwatch.createStarted();
-    final LineStringMapMatcher lineStringMapMatcher = new ViterbiLineStringMapMatcher(ndwNetwork);
-    final List<LineStringMatch> wazeJamMatches = new ArrayList<>(wazeJams.size());
-    for (final LineStringLocation wazeJam : wazeJams) {
-      wazeJamMatches.add(lineStringMapMatcher.match(wazeJam));
-    }
-
-    logger.info("Write results to database, matching took {} for {} locations", stopwatch, wazeJams.size());
-    wazeRepository.replaceWazeJamsMatches(wazeJamMatches);
-
-    logger.info("Done");
+    matchLocations(ndwNetwork, new WazeJamsRepository(jdbi), "Waze jams");
   }
 
   private void matchWazeIrregularities(final NetworkGraphHopper ndwNetwork) {
     final Jdbi jdbi = DatabaseConnectionManager.getInstance().getJdbi();
 
-    final WazeRepository wazeRepository = new WazeRepository(jdbi);
-    final List<LineStringLocation> wazeIrregularities = wazeRepository.getWazeIrregularities();
-    logger.info("Start map matching for waze irregularities, count = {}", wazeIrregularities.size());
-    final Stopwatch stopwatch = Stopwatch.createStarted();
-    final LineStringMapMatcher lineStringMapMatcher = new ViterbiLineStringMapMatcher(ndwNetwork);
-    final List<LineStringMatch> wazeIrregularitiesMatches = new ArrayList<>(wazeIrregularities.size());
-    for (final LineStringLocation wazeIrregularity : wazeIrregularities) {
-      wazeIrregularitiesMatches.add(lineStringMapMatcher.match(wazeIrregularity));
-    }
-
-    logger.info("Write results to database, matching took {} for {} locations", stopwatch, wazeIrregularities.size());
-    wazeRepository.replaceWazeIrregularitiesMatches(wazeIrregularitiesMatches);
-
-    logger.info("Done");
+    matchLocations(ndwNetwork, new WazeIrregularitiesRepository(jdbi), "Waze irregularities");
   }
 
   private void matchMstLinesShapefile(final NetworkGraphHopper ndwNetwork) {
     final Jdbi jdbi = DatabaseConnectionManager.getInstance().getJdbi();
 
-    final MstShapefileRepository mstShapefileRepository = new MstShapefileRepository(jdbi);
-    final List<LineStringLocation> mstLines = mstShapefileRepository.getMstLinesShapefile();
-    logger.info("Start map matching for MST lines, count = {}", mstLines.size());
-    final Stopwatch stopwatch = Stopwatch.createStarted();
-    final LineStringMapMatcher lineStringMapMatcher = new ViterbiLineStringMapMatcher(ndwNetwork);
-    final List<LineStringMatch> mstLinesMatches = new ArrayList<>(mstLines.size());
-    int counter = 1;
-    for (final LineStringLocation mstLine : mstLines) {
-      mstLinesMatches.add(lineStringMapMatcher.match(mstLine));
-      if (counter % 100 == 0) {
-        logger.info("Matched {} MST lines of {} total", counter, mstLines.size());
-      }
-      counter++;
-    }
-    logger.info("Write results to database, matching took {} for {} locations", stopwatch, mstLines.size());
-    mstShapefileRepository.replaceMstLinesShapefileMatches(mstLinesMatches);
-
-    logger.info("Done");
+    matchLocations(ndwNetwork, new MstShapefileRepository(jdbi), "MST lines");
   }
 
   private void matchSituationRecordLines(final NetworkGraphHopper ndwNetwork) {
     final Jdbi jdbi = DatabaseConnectionManager.getInstance().getJdbi();
 
-    final SituationRecordRepository repository = new SituationRecordRepository(jdbi);
-    final List<Integer> singlePoints = new ArrayList<>();
-    final List<LineStringLocation> situationRecordsOrdered  = repository.getSituationRecordOrderedLines(singlePoints);
-    final List<LineStringLocation> situationRecordsUnordered  = repository.getSituationRecordUnorderedLinears(singlePoints);
-    final List<LineStringLocation> situationRecords = new ArrayList<>();
-    situationRecords.addAll(situationRecordsOrdered);
-    situationRecords.addAll(situationRecordsUnordered);
-    logger.info("Start map matching for Situation Record lines, count = {}", situationRecords.size());
-    final Stopwatch stopwatch = Stopwatch.createStarted();
-    final LineStringMapMatcher lineStringMapMatcher = new ViterbiLineStringMapMatcher(ndwNetwork);
-    final List<LineStringMatch> situationRecordLineMatches = new ArrayList<>(situationRecords.size());
-    int counter = 1;
-    for (final LineStringLocation situationRecord : situationRecords) {
-      situationRecordLineMatches.add(lineStringMapMatcher.match(situationRecord));
-      if (counter % 100 == 0) {
-        logger.info("Matched {} Situation Record lines of {} total", counter, situationRecords.size());
-      }
-      counter++;
-    }
-    logger.info("Write results to database, matching took {} for {} locations", stopwatch, situationRecords.size());
-    repository.replaceSituationRecordLineMatches(situationRecordLineMatches);
-
-    logger.info("Done");
+    matchLocations(ndwNetwork, new SituationRecordRepository(jdbi), "Situation Record lines");
   }
 
   private void matchLmsLinks(final NetworkGraphHopper ndwNetwork) {
     final Jdbi jdbi = DatabaseConnectionManager.getInstance().getJdbi();
 
-    final LmsRepository repository = new LmsRepository(jdbi);
-    final List<LineStringLocation> lmsLinks = repository.getLmsLinks();
-    logger.info("Start map matching for LMS links, count = {}", lmsLinks.size());
+    matchLocations(ndwNetwork, new LmsRepository(jdbi), "LMS links");
+  }
+
+  private void matchLocations(final NetworkGraphHopper ndwNetwork, final LineStringLocationRepository repository,
+      final String locationsName) {
+    final List<LineStringLocation> locations = repository.getLocations();
+    logger.info("Start map matching for " + locationsName + ", count = {}", locations.size());
     final Stopwatch stopwatch = Stopwatch.createStarted();
     final LineStringMapMatcher lineStringMapMatcher = new ViterbiLineStringMapMatcher(ndwNetwork);
-    final List<LineStringMatch> lmsLinkMatches = new ArrayList<>(lmsLinks.size());
+    final List<LineStringMatch> matches = new ArrayList<>(locations.size());
     int counter = 1;
-    for (final LineStringLocation lmsLink : lmsLinks) {
-      lmsLinkMatches.add(lineStringMapMatcher.match(lmsLink));
+    for (final LineStringLocation location : locations) {
+      matches.add(lineStringMapMatcher.match(location));
       if (counter % 100 == 0) {
-        logger.info("Matched {} LMS links of {} total", counter, lmsLinks.size());
+        logger.info("Matched {} " + locationsName + " of {} total", counter, locations.size());
       }
       counter++;
     }
-    logger.info("Write results to database, matching took {} for {} locations", stopwatch, lmsLinks.size());
-    repository.replaceLmsLinkMatches(lmsLinkMatches);
+    logger.info("Write results to database, matching took {} for {} locations", stopwatch, locations.size());
+    repository.replaceMatches(matches);
 
     logger.info("Done");
   }
