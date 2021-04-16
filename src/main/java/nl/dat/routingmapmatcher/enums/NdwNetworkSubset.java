@@ -5,7 +5,8 @@ public enum NdwNetworkSubset {
   OSM_FULL_NETWORK(getOsmQuery("")),
   OSM_ONLY_NATIONAL_HIGHWAYS(getOsmQuery("WHERE clazz IN (11, 12) ")),
   OSM_NO_SMALL_LINKS(getOsmQuery("WHERE clazz NOT IN (41, 42, 43) ")),
-  NWB(getNwbQuery());
+  NWB(getNwbQuery()),
+  FCD(getFcdQuery());
 
   private final String networkQuery;
 
@@ -53,6 +54,20 @@ public enum NdwNetworkSubset {
         "  ST_Length(geom) AS distance_in_meters, " +
         "  ST_AsEWKB(ST_Transform(geom, 4326)) AS geometry_wkb " +
         "FROM nwb_wegvakken " +
+        "ORDER BY link_id ASC";
+  }
+
+  private static String getFcdQuery() {
+    return
+        "SELECT " +
+        "  linkid AS link_id, " +
+        "  beginnodeid AS from_node_id, " +
+        "  endnodeid AS to_node_id, " +
+        "  maxspeedkph AS speed_kmh, " +
+        "  0 AS reverse_speed_kmh, " +
+        "  length_geog AS distance_in_meters, " +
+        "  ST_AsEWKB(geom) AS geometry_wkb " +
+        "FROM fcd.segments_15342_lvl1 " +
         "ORDER BY link_id ASC";
   }
 }
