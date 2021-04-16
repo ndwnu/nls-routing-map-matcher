@@ -46,5 +46,5 @@ public interface WazeJamsDao {
       "INSERT INTO public.waze_jams_matches(jam_id, ndw_link_ids, " +
       "  start_link_fraction, end_link_fraction, reliability, status, line_string) VALUES " +
       "  (:id, :ndwLinkIds, :startLinkFraction, :endLinkFraction, :reliability, :status, :lineString)")
-  int[] insertWazeJamsMatches(@BindBean List<LineStringMatch> lineStringMatches);
+  void insertWazeJamsMatches(@BindBean List<LineStringMatch> lineStringMatches);
 }

@@ -27,7 +27,7 @@ public interface LmsLinkDao {
       + " AND os_prv_cod > 0 "
       + " ORDER BY id ")
   @RegisterRowMapper(LineStringLocationMapper.class)
-  public List<LineStringLocation> getLmsLinks();
+  List<LineStringLocation> getLmsLinks();
 
   @SqlUpdate(
       "CREATE TABLE IF NOT EXISTS public.lms_link_matches " +
@@ -54,5 +54,4 @@ public interface LmsLinkDao {
       "  start_link_fraction, end_link_fraction, reliability, status, line_string) VALUES " +
       "  (:id, :ndwLinkIds, :startLinkFraction, :endLinkFraction, :reliability, :status, :lineString)")
   void insertLmsLinkMatches(@BindBean List<LineStringMatch> lineStringMatches);
-
 }

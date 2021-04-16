@@ -50,5 +50,5 @@ public interface CbmSiterecordDao {
       "INSERT INTO public.cbm_siterecord_matches(id, reversed, fcd_link_ids, " +
           "  start_link_fraction, end_link_fraction, reliability, status, line_string) VALUES " +
           "  (:id, :reversed, :ndwLinkIds, :startLinkFraction, :endLinkFraction, :reliability, :status, :lineString)")
-  int[] insertCbmSiterecordMatches(@BindBean List<LineStringMatch> lineStringMatches);
+  void insertCbmSiterecordMatches(@BindBean List<LineStringMatch> lineStringMatches);
 }

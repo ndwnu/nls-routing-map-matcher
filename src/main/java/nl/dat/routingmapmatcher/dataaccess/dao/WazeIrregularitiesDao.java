@@ -46,5 +46,5 @@ public interface WazeIrregularitiesDao {
       "INSERT INTO public.waze_irregularities_matches(irregularity_id, ndw_link_ids, " +
       "  start_link_fraction, end_link_fraction, reliability, status, line_string) VALUES " +
       "  (:id, :ndwLinkIds, :startLinkFraction, :endLinkFraction, :reliability, :status, :lineString)")
-  int[] insertWazeIrregularitiesMatches(@BindBean List<LineStringMatch> lineStringMatches);
+  void insertWazeIrregularitiesMatches(@BindBean List<LineStringMatch> lineStringMatches);
 }

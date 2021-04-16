@@ -31,7 +31,7 @@ public interface SituationRecordDao {
       + " AND situation_records.location_for_display IS NOT NULL "
       + " ORDER BY situation_record_id, location_index ")
   @RegisterRowMapper(SituationRecordLineDtoMapper.class)
-  public Iterator<SituationRecordLocationDto> getSituationRecordOrderedLocations();
+  Iterator<SituationRecordLocationDto> getSituationRecordOrderedLocations();
 
   // Excluded are situation record locations (location_type = 'linear') without locations for start or end point.
   // There are none in the current xml-file (26-3-2019)
@@ -50,7 +50,7 @@ public interface SituationRecordDao {
       + " AND linear_coordinates_end_point IS NOT NULL "
       + " ORDER BY situation_record_id, location_index ")
   @RegisterRowMapper(SituationRecordLineDtoMapper.class)
-  public Iterator<SituationRecordLocationDto> getSituationRecordUnorderedLinears();
+  Iterator<SituationRecordLocationDto> getSituationRecordUnorderedLinears();
 
   @SqlUpdate(
       "CREATE TABLE IF NOT EXISTS public.situation_record_line_matches " +
@@ -78,5 +78,4 @@ public interface SituationRecordDao {
       "  start_link_fraction, end_link_fraction, reliability, status, line_string) VALUES " +
       "  (:id, :locationIndex, :ndwLinkIds, :startLinkFraction, :endLinkFraction, :reliability, :status, :lineString)")
   void insertSituationRecordLineMatches(@BindBean List<LineStringMatch> lineStringMatches);
-
 }

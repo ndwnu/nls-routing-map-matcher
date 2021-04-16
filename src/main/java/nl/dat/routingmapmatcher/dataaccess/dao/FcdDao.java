@@ -49,5 +49,5 @@ public interface FcdDao {
       "INSERT INTO public.fcd_matches(linkid, reversed, ndw_link_ids, " +
           "  start_link_fraction, end_link_fraction, reliability, status, line_string) VALUES " +
           "  (:id, :reversed, :ndwLinkIds, :startLinkFraction, :endLinkFraction, :reliability, :status, :lineString)")
-  int[] insertFcdMatches(@BindBean List<LineStringMatch> lineStringMatches);
+  void insertFcdMatches(@BindBean List<LineStringMatch> lineStringMatches);
 }
