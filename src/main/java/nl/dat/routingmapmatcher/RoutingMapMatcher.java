@@ -9,6 +9,7 @@ import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Stopwatch;
 
+import nl.dat.routingmapmatcher.dataaccess.repository.CbmSiterecordRepository;
 import nl.dat.routingmapmatcher.dataaccess.repository.FcdRepository;
 import nl.dat.routingmapmatcher.dataaccess.repository.LineStringLocationRepository;
 import nl.dat.routingmapmatcher.dataaccess.repository.LmsRepository;
@@ -44,6 +45,7 @@ public class RoutingMapMatcher {
 
   public void run() {
     matchNoFcdStartToEndMeasurementLocations(readNdwNetwork(NdwNetworkSubset.OSM_NO_SMALL_LINKS));
+    matchCbmSiterecords(readNdwNetwork(NdwNetworkSubset.FCD));
     matchFcd(readNdwNetwork(NdwNetworkSubset.OSM_FULL_NETWORK));
     matchNwb(readNdwNetwork(NdwNetworkSubset.OSM_FULL_NETWORK));
     matchWazeJams(readNdwNetwork(NdwNetworkSubset.OSM_FULL_NETWORK));
@@ -79,6 +81,12 @@ public class RoutingMapMatcher {
     startToEndRepository.replaceMatches(startToEndMatches);
 
     logger.info("Done");
+  }
+
+  private void matchCbmSiterecords(final NetworkGraphHopper ndwNetwork) {
+    final Jdbi jdbi = DatabaseConnectionManager.getInstance().getJdbi();
+
+    matchLocations(ndwNetwork, new CbmSiterecordRepository(jdbi), "CBM siterecords");
   }
 
   private void matchFcd(final NetworkGraphHopper ndwNetwork) {

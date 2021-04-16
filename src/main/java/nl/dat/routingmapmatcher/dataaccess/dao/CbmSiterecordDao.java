@@ -12,42 +12,43 @@ import nl.dat.routingmapmatcher.dataaccess.mapper.LineStringLocationMapper;
 import nl.dat.routingmapmatcher.linestring.LineStringLocation;
 import nl.dat.routingmapmatcher.linestring.LineStringMatch;
 
-public interface FcdDao {
+public interface CbmSiterecordDao {
 
   @SqlQuery("SELECT " +
-      "  linkid AS id, " +
+      "  id, " +
       "  NULL AS location_index, " +
       "  false AS reversed, " +
-      "  length_geog AS length_in_meters, " +
-      "  ST_AsEWKB(geom) AS geometry_wkb " +
-      "FROM fcd.segments_15342_lvl1 " +
-      "ORDER BY linkid")
+      "  ST_Length(line_shape::geography) AS length_in_meters, " +
+      "  ST_AsEWKB(line_shape) AS geometry_wkb " +
+      "FROM public.cbm_siterecord " +
+      "WHERE equipment_type_used = 'fcd' AND location_type = 'linear' AND line_shape IS NOT NULL " +
+      "ORDER BY id")
   @RegisterRowMapper(LineStringLocationMapper.class)
-  List<LineStringLocation> getFcdLocations();
+  List<LineStringLocation> getCbmSiterecords();
 
   @SqlUpdate(
-      "CREATE TABLE IF NOT EXISTS public.fcd_matches " +
+      "CREATE TABLE IF NOT EXISTS public.cbm_siterecord_matches " +
           "( " +
-          "  linkid integer NOT NULL PRIMARY KEY, " +
+          "  id integer NOT NULL PRIMARY KEY, " +
           "  reversed boolean NOT NULL, " +
-          "  ndw_link_ids integer[] NOT NULL, " +
+          "  fcd_link_ids integer[] NOT NULL, " +
           "  start_link_fraction double precision, " +
           "  end_link_fraction double precision, " +
           "  reliability double precision, " +
           "  status text, " +
           "  line_string geography(LineString,4326), " +
-          "  CONSTRAINT fcd_matches_fkey_fcd FOREIGN KEY (linkid) " +
-          "      REFERENCES fcd.segments_15342_lvl1(linkid) " +
+          "  CONSTRAINT cbm_siterecord_matches_fkey_cbm_siterecord FOREIGN KEY (id) " +
+          "      REFERENCES public.cbm_siterecord(id) " +
           ") "
   )
-  void createFcdMatchesTableIfNotExists();
+  void createCbmSiterecordMatchesTableIfNotExists();
 
-  @SqlUpdate("TRUNCATE TABLE public.fcd_matches")
-  void truncateFcdMatchesTable();
+  @SqlUpdate("TRUNCATE TABLE public.cbm_siterecord_matches")
+  void truncateCbmSiterecordMatchesTable();
 
   @SqlBatch(
-      "INSERT INTO public.fcd_matches(linkid, reversed, ndw_link_ids, " +
+      "INSERT INTO public.cbm_siterecord_matches(id, reversed, fcd_link_ids, " +
           "  start_link_fraction, end_link_fraction, reliability, status, line_string) VALUES " +
           "  (:id, :reversed, :ndwLinkIds, :startLinkFraction, :endLinkFraction, :reliability, :status, :lineString)")
-  int[] insertFcdMatches(@BindBean List<LineStringMatch> lineStringMatches);
+  int[] insertCbmSiterecordMatches(@BindBean List<LineStringMatch> lineStringMatches);
 }
