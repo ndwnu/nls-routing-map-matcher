@@ -21,6 +21,7 @@ import nl.dat.routingmapmatcher.dataaccess.repository.StartToEndRepository;
 import nl.dat.routingmapmatcher.dataaccess.repository.WazeIrregularitiesRepository;
 import nl.dat.routingmapmatcher.dataaccess.repository.WazeJamsRepository;
 import nl.dat.routingmapmatcher.dataaccess.support.DatabaseConnectionManager;
+import nl.dat.routingmapmatcher.enums.MatchStatus;
 import nl.dat.routingmapmatcher.enums.NdwNetworkSubset;
 import nl.dat.routingmapmatcher.graphhopper.NetworkGraphHopper;
 import nl.dat.routingmapmatcher.linestring.LineStringLocation;
@@ -134,21 +135,28 @@ public class RoutingMapMatcher {
   private void matchLocations(final NetworkGraphHopper ndwNetwork, final LineStringLocationRepository repository,
       final String locationsName) {
     final List<LineStringLocation> locations = repository.getLocations();
-    logger.info("Start map matching for " + locationsName + ", count = {}", locations.size());
+    final int numLocations = locations.size();
+
+    logger.info("Start map matching for " + locationsName + ", count = {}", numLocations);
     final Stopwatch stopwatch = Stopwatch.createStarted();
     final LineStringMapMatcher lineStringMapMatcher = new ViterbiLineStringMapMatcher(ndwNetwork);
-    final List<LineStringMatch> matches = new ArrayList<>(locations.size());
-    int counter = 1;
-    for (final LineStringLocation location : locations) {
-      matches.add(lineStringMapMatcher.match(location));
-      if (counter % 100 == 0) {
-        logger.info("Matched {} " + locationsName + " of {} total", counter, locations.size());
+    final List<LineStringMatch> matches = new ArrayList<>(numLocations);
+    int matched = 0;
+    for (int i = 0; i < numLocations; i++) {
+      final LineStringMatch match = lineStringMapMatcher.match(locations.get(i));
+      matches.add(match);
+      if (MatchStatus.MATCH.equals(match.getStatus())) {
+        matched++;
       }
-      counter++;
+      if ((i + 1) % 100 == 0) {
+        logger.info("Processed {} " + locationsName + " of {} total", i + 1, numLocations);
+      }
     }
-    logger.info("Write results to database, matching took {} for {} locations", stopwatch, locations.size());
+
+    logger.info("Writing results to database. Processing took {}", stopwatch);
     repository.replaceMatches(matches);
 
-    logger.info("Done");
+    logger.info("Done. Processed {} locations, {} successfully matched ({}%)", numLocations, matched,
+        matched * 10000 / numLocations / 100.0);
   }
 }
