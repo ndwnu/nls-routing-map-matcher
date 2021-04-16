@@ -5,6 +5,8 @@ import java.util.Optional;
 
 import org.locationtech.jts.geom.LineString;
 
+import nl.dat.routingmapmatcher.enums.MatchStatus;
+
 public class LineStringMatch {
 
   private final LineStringLocation location;
@@ -12,11 +14,11 @@ public class LineStringMatch {
   private final double startLinkFraction;
   private final double endLinkFraction;
   private final double reliability;
-  private final String status;
+  private final MatchStatus status;
   private final LineString lineString;
 
   public LineStringMatch(final LineStringLocation location, final List<Integer> ndwLinkIds,
-      final double startLinkFraction, final double endLinkFraction, final double reliability, final String status,
+      final double startLinkFraction, final double endLinkFraction, final double reliability, final MatchStatus status,
       final LineString lineString) {
     this.location = location;
     this.ndwLinkIds = ndwLinkIds;
@@ -47,7 +49,7 @@ public class LineStringMatch {
     return reliability;
   }
 
-  public String getStatus() {
+  public MatchStatus getStatus() {
     return status;
   }
 

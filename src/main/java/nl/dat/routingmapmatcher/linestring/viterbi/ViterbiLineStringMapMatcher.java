@@ -31,6 +31,7 @@ import com.graphhopper.util.Parameters;
 import com.graphhopper.util.PointList;
 
 import nl.dat.routingmapmatcher.constants.GlobalConstants;
+import nl.dat.routingmapmatcher.enums.MatchStatus;
 import nl.dat.routingmapmatcher.exceptions.RoutingMapMatcherException;
 import nl.dat.routingmapmatcher.graphhopper.LinkFlagEncoder;
 import nl.dat.routingmapmatcher.graphhopper.NetworkGraphHopper;
@@ -74,10 +75,6 @@ public class ViterbiLineStringMapMatcher implements LineStringMapMatcher {
    * This value does not affect the matching.
    */
   private static final double GPS_TRACK_SPEED_IN_METERS_PER_SECOND = 3.0;
-
-  private static final String STATUS_EXCEPTION = "exception";
-  private static final String STATUS_NO_PATH = "no_path";
-  private static final String STATUS_MATCH = "match";
 
   private static final boolean REDUCE_TO_SEGMENT = true;
 
@@ -129,14 +126,14 @@ public class ViterbiLineStringMapMatcher implements LineStringMapMatcher {
         if (matchResult.getMergedPath().getEdgeCount() > 0) {
           lineStringMatch = createMatch(matchResult, lineStringLocation);
         } else {
-          lineStringMatch = createFailedMatch(lineStringLocation, STATUS_NO_PATH);
+          lineStringMatch = createFailedMatch(lineStringLocation, MatchStatus.NO_PATH);
         }
       } catch (final Exception e) {
         logger.debug("Exception while map matching, creating failed result for {}", lineStringLocation, e);
-        lineStringMatch = createFailedMatch(lineStringLocation, STATUS_EXCEPTION);
+        lineStringMatch = createFailedMatch(lineStringLocation, MatchStatus.EXCEPTION);
       }
     } else {
-      lineStringMatch = createFailedMatch(lineStringLocation, STATUS_NO_PATH);
+      lineStringMatch = createFailedMatch(lineStringLocation, MatchStatus.NO_PATH);
     }
     return lineStringMatch;
   }
@@ -208,10 +205,9 @@ public class ViterbiLineStringMapMatcher implements LineStringMapMatcher {
     } else {
       reliability = calculateCandidatePathScore(path, lineStringLocation);
     }
-    final String status = STATUS_MATCH;
     final LineString lineString = pathUtil.createLineString(path.calcPoints());
-    return new LineStringMatch(lineStringLocation, ndwLinkIds, startLinkFraction, endLinkFraction, reliability, status,
-        lineString);
+    return new LineStringMatch(lineStringLocation, ndwLinkIds, startLinkFraction, endLinkFraction, reliability,
+        MatchStatus.MATCH, lineString);
   }
 
   private double calculateCandidatePathScoreOnlyPoints(final Path path, final LineStringLocation lineStringLocation) {
@@ -283,8 +279,7 @@ public class ViterbiLineStringMapMatcher implements LineStringMapMatcher {
     return smallestDistanceToLtcLink;
   }
 
-  private LineStringMatch createFailedMatch(final LineStringLocation lineStringLocation,
-      final String status) {
+  private LineStringMatch createFailedMatch(final LineStringLocation lineStringLocation, final MatchStatus status) {
     final List<Integer> ndwLinkIds = Lists.newArrayList();
     final double startLinkFraction = 0.0;
     final double endLinkFraction = 0.0;
