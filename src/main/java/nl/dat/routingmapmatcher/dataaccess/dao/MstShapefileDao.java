@@ -19,7 +19,7 @@ public interface MstShapefileDao {
       "FROM public.measurement_site_lines_shapefile " +
       "ORDER BY id ")
   @RegisterRowMapper(LineStringLocationMapper.class)
-  public List<LineStringLocation> getMstLinesShapefile();
+  List<LineStringLocation> getMstLinesShapefile();
 
   @SqlUpdate(
       "CREATE TABLE IF NOT EXISTS public.measurement_site_lines_shapefile_matches " +
@@ -45,6 +45,5 @@ public interface MstShapefileDao {
       "INSERT INTO public.measurement_site_lines_shapefile_matches(gid, ndw_link_ids, " +
       "  start_link_fraction, end_link_fraction, reliability, status, line_string) VALUES " +
       "  (:id, :ndwLinkIds, :startLinkFraction, :endLinkFraction, :reliability, :status, :lineString)")
-  int[] insertMstLinesShapefileMatches(@BindBean List<LineStringMatch> lineStringMatches);
-
+  void insertMstLinesShapefileMatches(@BindBean List<LineStringMatch> lineStringMatches);
 }

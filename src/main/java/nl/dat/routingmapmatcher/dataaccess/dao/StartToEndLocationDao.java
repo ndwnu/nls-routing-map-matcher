@@ -27,6 +27,5 @@ public interface StartToEndLocationDao {
       "ORDER BY id, location_index"
       )
   @RegisterRowMapper(StartToEndLocationMapper.class)
-  public List<StartToEndLocation> getNoFcdStartToEndMeasurementLocations();
-
+  List<StartToEndLocation> getNoFcdStartToEndMeasurementLocations();
 }
