@@ -67,7 +67,7 @@ public enum NdwNetworkSubset {
         "  0 AS reverse_speed_kmh, " +
         "  length_geog AS distance_in_meters, " +
         "  ST_AsEWKB(geom) AS geometry_wkb " +
-        "FROM fcd.segments_15342_lvl1 " +
+        "FROM fcd.segments_15271_lvl1 " +
         "ORDER BY link_id ASC";
   }
 }
