@@ -2,7 +2,9 @@ package nl.dat.routingmapmatcher.starttoend;
 
 import java.util.List;
 
-import com.vividsolutions.jts.geom.LineString;
+import org.locationtech.jts.geom.LineString;
+
+import nl.dat.routingmapmatcher.enums.MatchStatus;
 
 public class StartToEndMatch {
 
@@ -12,12 +14,12 @@ public class StartToEndMatch {
   private final double startLinkFraction;
   private final double endLinkFraction;
   private final double reliability;
-  private final String status;
+  private final MatchStatus status;
   private final LineString lineString;
 
   public StartToEndMatch(final int id, final int locationIndex, final List<Integer> ndwLinkIds,
-      final double startLinkFraction, final double endLinkFraction, final double reliability,
-      final String status, final LineString lineString) {
+      final double startLinkFraction, final double endLinkFraction, final double reliability, final MatchStatus status,
+      final LineString lineString) {
     this.id = id;
     this.locationIndex = locationIndex;
     this.ndwLinkIds = ndwLinkIds;
@@ -52,12 +54,11 @@ public class StartToEndMatch {
     return reliability;
   }
 
-  public String getStatus() {
+  public MatchStatus getStatus() {
     return status;
   }
 
   public LineString getLineString() {
     return lineString;
   }
-
 }

@@ -4,6 +4,10 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import org.locationtech.jts.geom.CoordinateSequence;
+import org.locationtech.jts.geom.GeometryFactory;
+import org.locationtech.jts.geom.LineString;
+import org.locationtech.jts.geom.PrecisionModel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -25,15 +29,12 @@ import com.graphhopper.util.EdgeIteratorState;
 import com.graphhopper.util.GPXEntry;
 import com.graphhopper.util.Parameters;
 import com.graphhopper.util.PointList;
-import com.vividsolutions.jts.geom.CoordinateSequence;
-import com.vividsolutions.jts.geom.GeometryFactory;
-import com.vividsolutions.jts.geom.LineString;
-import com.vividsolutions.jts.geom.PrecisionModel;
 
 import nl.dat.routingmapmatcher.constants.GlobalConstants;
+import nl.dat.routingmapmatcher.enums.MatchStatus;
 import nl.dat.routingmapmatcher.exceptions.RoutingMapMatcherException;
-import nl.dat.routingmapmatcher.graphhopper.NdwGraphHopper;
-import nl.dat.routingmapmatcher.graphhopper.NdwLinkFlagEncoder;
+import nl.dat.routingmapmatcher.graphhopper.LinkFlagEncoder;
+import nl.dat.routingmapmatcher.graphhopper.NetworkGraphHopper;
 import nl.dat.routingmapmatcher.linestring.LineStringLocation;
 import nl.dat.routingmapmatcher.linestring.LineStringMapMatcher;
 import nl.dat.routingmapmatcher.linestring.LineStringMatch;
@@ -75,16 +76,11 @@ public class ViterbiLineStringMapMatcher implements LineStringMapMatcher {
    */
   private static final double GPS_TRACK_SPEED_IN_METERS_PER_SECOND = 3.0;
 
-  private static final String STATUS_EXCEPTION = "exception";
-  private static final String STATUS_NO_PATH = "no_path";
-  private static final String STATUS_MATCH = "match";
-
   private static final boolean REDUCE_TO_SEGMENT = true;
 
   private static final int MILLIS_PER_SECOND = 1000;
 
-  private final NdwGraphHopper ndwNetwork;
-  private final NdwLinkFlagEncoder flagEncoder;
+  private final LinkFlagEncoder flagEncoder;
   private final MapMatching mapMatching;
   private final CustomDistanceCalc distanceCalc;
   private final LocationIndexTree locationIndexTree;
@@ -94,13 +90,12 @@ public class ViterbiLineStringMapMatcher implements LineStringMapMatcher {
   private final PathUtil pathUtil;
   private final QueryGraphExtractor queryGraphExtractor;
 
-  public ViterbiLineStringMapMatcher(final NdwGraphHopper ndwNetwork) {
+  public ViterbiLineStringMapMatcher(final NetworkGraphHopper ndwNetwork) {
     Preconditions.checkNotNull(ndwNetwork);
     final List<FlagEncoder> flagEncoders = ndwNetwork.getEncodingManager().fetchEdgeEncoders();
     Preconditions.checkArgument(flagEncoders.size() == 1);
-    Preconditions.checkArgument(flagEncoders.get(0) instanceof NdwLinkFlagEncoder);
-    this.ndwNetwork = ndwNetwork;
-    this.flagEncoder = (NdwLinkFlagEncoder) flagEncoders.get(0);
+    Preconditions.checkArgument(flagEncoders.get(0) instanceof LinkFlagEncoder);
+    this.flagEncoder = (LinkFlagEncoder) flagEncoders.get(0);
 
     final String algorithm = Parameters.Algorithms.DIJKSTRA_BI;
     final Weighting weighting = new ShortestWeighting(flagEncoder);
@@ -131,14 +126,14 @@ public class ViterbiLineStringMapMatcher implements LineStringMapMatcher {
         if (matchResult.getMergedPath().getEdgeCount() > 0) {
           lineStringMatch = createMatch(matchResult, lineStringLocation);
         } else {
-          lineStringMatch = createFailedMatch(lineStringLocation, STATUS_NO_PATH);
+          lineStringMatch = createFailedMatch(lineStringLocation, MatchStatus.NO_PATH);
         }
       } catch (final Exception e) {
         logger.debug("Exception while map matching, creating failed result for {}", lineStringLocation, e);
-        lineStringMatch = createFailedMatch(lineStringLocation, STATUS_EXCEPTION);
+        lineStringMatch = createFailedMatch(lineStringLocation, MatchStatus.EXCEPTION);
       }
     } else {
-      lineStringMatch = createFailedMatch(lineStringLocation, STATUS_NO_PATH);
+      lineStringMatch = createFailedMatch(lineStringLocation, MatchStatus.NO_PATH);
     }
     return lineStringMatch;
   }
@@ -200,7 +195,7 @@ public class ViterbiLineStringMapMatcher implements LineStringMapMatcher {
     if (edges.isEmpty()) {
       throw new RoutingMapMatcherException("Unexpected: path has no edges");
     }
-    final List<Integer> ndwLinkIds = pathUtil.determineNdwLinkIds(ndwNetwork, flagEncoder, edges);
+    final List<Integer> ndwLinkIds = pathUtil.determineNdwLinkIds(flagEncoder, edges);
     final QueryGraph queryGraph = queryGraphExtractor.extractQueryGraph(path);
     final double startLinkFraction = pathUtil.determineStartLinkFraction(edges.get(0), queryGraph);
     final double endLinkFraction = pathUtil.determineEndLinkFraction(edges.get(edges.size() - 1), queryGraph);
@@ -210,10 +205,9 @@ public class ViterbiLineStringMapMatcher implements LineStringMapMatcher {
     } else {
       reliability = calculateCandidatePathScore(path, lineStringLocation);
     }
-    final String status = STATUS_MATCH;
     final LineString lineString = pathUtil.createLineString(path.calcPoints());
-    return new LineStringMatch(lineStringLocation, ndwLinkIds, startLinkFraction, endLinkFraction, reliability, status,
-        lineString);
+    return new LineStringMatch(lineStringLocation, ndwLinkIds, startLinkFraction, endLinkFraction, reliability,
+        MatchStatus.MATCH, lineString);
   }
 
   private double calculateCandidatePathScoreOnlyPoints(final Path path, final LineStringLocation lineStringLocation) {
@@ -285,8 +279,7 @@ public class ViterbiLineStringMapMatcher implements LineStringMapMatcher {
     return smallestDistanceToLtcLink;
   }
 
-  private LineStringMatch createFailedMatch(final LineStringLocation lineStringLocation,
-      final String status) {
+  private LineStringMatch createFailedMatch(final LineStringLocation lineStringLocation, final MatchStatus status) {
     final List<Integer> ndwLinkIds = Lists.newArrayList();
     final double startLinkFraction = 0.0;
     final double endLinkFraction = 0.0;
@@ -295,5 +288,4 @@ public class ViterbiLineStringMapMatcher implements LineStringMapMatcher {
     return new LineStringMatch(lineStringLocation, ndwLinkIds, startLinkFraction, endLinkFraction, reliability, status,
         lineString);
   }
-
 }

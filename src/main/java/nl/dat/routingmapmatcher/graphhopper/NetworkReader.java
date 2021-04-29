@@ -4,51 +4,40 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Date;
 import java.util.Iterator;
-import java.util.List;
 
-import org.jdbi.v3.core.Handle;
+import org.jdbi.v3.core.result.ResultIterator;
+import org.locationtech.jts.geom.Coordinate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Preconditions;
-import com.graphhopper.coll.GHLongIntBTree;
 import com.graphhopper.coll.LongIntMap;
 import com.graphhopper.reader.DataReader;
 import com.graphhopper.reader.dem.ElevationProvider;
 import com.graphhopper.routing.util.EncodingManager;
 import com.graphhopper.storage.GraphHopperStorage;
-import com.graphhopper.util.DistanceCalc;
+import com.graphhopper.storage.IntsRef;
 import com.graphhopper.util.EdgeIteratorState;
 import com.graphhopper.util.PointList;
-import com.vividsolutions.jts.geom.Coordinate;
 
-import nl.dat.routingmapmatcher.dataaccess.dao.NdwLinkDao;
-import nl.dat.routingmapmatcher.dataaccess.dto.NdwLinkDto;
-import nl.dat.routingmapmatcher.enums.NdwNetworkSubset;
-import nl.dat.routingmapmatcher.exceptions.RoutingMapMatcherException;
+import nl.dat.routingmapmatcher.dataaccess.dao.LinkDao;
+import nl.dat.routingmapmatcher.dataaccess.dto.LinkDto;
 
-class NdwNetworkReader implements DataReader {
+class NetworkReader implements DataReader {
 
-  private static final Logger logger = LoggerFactory.getLogger(NdwNetworkReader.class);
+  private static final Logger logger = LoggerFactory.getLogger(NetworkReader.class);
 
   private final GraphHopperStorage ghStorage;
-  private final Handle handle;
-  private final NdwNetworkSubset subset;
-  private final List<NdwLinkProperties> linkProperties;
+  private final LinkDao linkDao;
+  private final LongIntMap nodeIdToInternalNodeIdMap;
   private final EncodingManager encodingManager;
-  private final DistanceCalc distanceCalculator;
 
-  private LongIntMap nodeIdToInternalNodeIdMap;
-
-  public NdwNetworkReader(final GraphHopperStorage ghStorage, final Handle handle,
-      final NdwNetworkSubset subset, final List<NdwLinkProperties> linkProperties) {
+  public NetworkReader(final GraphHopperStorage ghStorage, final LinkDao linkDao,
+      final LongIntMap nodeIdToInternalNodeIdMap) {
     this.ghStorage = Preconditions.checkNotNull(ghStorage);
-    this.handle = Preconditions.checkNotNull(handle);
-    this.subset = Preconditions.checkNotNull(subset);
-    this.linkProperties = Preconditions.checkNotNull(linkProperties);
+    this.linkDao = Preconditions.checkNotNull(linkDao);
+    this.nodeIdToInternalNodeIdMap = Preconditions.checkNotNull(nodeIdToInternalNodeIdMap);
     this.encodingManager = Preconditions.checkNotNull(ghStorage.getEncodingManager());
-    this.distanceCalculator = GraphHopperConstants.distanceCalculation;
-    this.nodeIdToInternalNodeIdMap = new GHLongIntBTree(200);
   }
 
   @Override
@@ -83,49 +72,43 @@ class NdwNetworkReader implements DataReader {
 
   @Override
   public void readGraph() throws IOException {
-    logger.info("Start reading NDW links");
+    logger.info("Start reading links");
     ghStorage.create(1000);
 
-    final NdwLinkDao ndwLinkDao = handle.attach(NdwLinkDao.class);
-    readNdwLinks(ndwLinkDao);
+    try (final ResultIterator<LinkDto> links = linkDao.getLinksIterator()) {
+      readLinks(links);
+    }
 
-    logger.info("Finished reading NDW links");
-    finishedReading();
+    logger.info("Finished reading links");
   }
 
-  private void readNdwLinks(final NdwLinkDao ndwLinkDao) {
+  private void readLinks(final Iterator<LinkDto> links) {
     int count = 0;
-    final Iterator<NdwLinkDto> ndwLinks = ndwLinkDao.getNdwLinksIterator(subset);
-    while (ndwLinks.hasNext()) {
-      final NdwLinkDto ndwLink = ndwLinks.next();
-      ndwLink.setIndex(count);
-      addNdwLink(ndwLink);
+    while (links.hasNext()) {
+      final LinkDto link = links.next();
+      addLink(link);
       count++;
       logCount(count);
     }
   }
 
-  private void addNdwLink(final NdwLinkDto ndwLink) {
-    final Coordinate[] coordinates = ndwLink.getGeometry().getCoordinates();
+  private void addLink(final LinkDto link) {
+    final Coordinate[] coordinates = link.getGeometry().getCoordinates();
     if (coordinates.length < 2) {
       throw new IllegalStateException("Invalid geometry");
     }
-    final int internalFromNodeId = addNodeIfNeeded(ndwLink.getFromNodeId(), coordinates[0].y,
+    final int internalFromNodeId = addNodeIfNeeded(link.getFromNodeId(), coordinates[0].y,
         coordinates[0].x);
-    final int internalToNodeId = addNodeIfNeeded(ndwLink.getToNodeId(), coordinates[coordinates.length - 1].y,
+    final int internalToNodeId = addNodeIfNeeded(link.getToNodeId(), coordinates[coordinates.length - 1].y,
         coordinates[coordinates.length - 1].x);
-    final long wayFlags = determineWayFlags(ndwLink);
+    final IntsRef wayFlags = determineWayFlags(link);
     final EdgeIteratorState edge = ghStorage.edge(internalFromNodeId, internalToNodeId)
-        .setDistance(calculateLengthInMeters(coordinates))
+        .setDistance(link.getDistanceInMeters())
         .setFlags(wayFlags);
     if (coordinates.length > 2) {
       final PointList geometry = createPointListWithoutStartAndEndPoint(coordinates);
       edge.setWayGeometry(geometry);
     }
-    if (linkProperties.size() != ndwLink.getIndex()) {
-      throw new RoutingMapMatcherException("Index of NDW link does not match index in NDW link properties");
-    }
-    linkProperties.add(new NdwLinkProperties(ndwLink.getForwardId(), ndwLink.getBackwardId()));
   }
 
   private int addNodeIfNeeded(final long id, final double latitude, final double longitude) {
@@ -138,23 +121,15 @@ class NdwNetworkReader implements DataReader {
     return internalNodeId;
   }
 
-  private long determineWayFlags(final NdwLinkDto ndwLink) {
-    final long includeWay = encodingManager.acceptWay(ndwLink);
-    if (includeWay == 0) {
-      return 0;
+  private IntsRef determineWayFlags(final LinkDto link) {
+    final EncodingManager.AcceptWay acceptWay = new EncodingManager.AcceptWay();
+    final boolean includeWay = encodingManager.acceptWay(link, acceptWay);
+    if (!includeWay) {
+      return IntsRef.EMPTY;
     }
 
     final long relationFlags = 0;
-    return encodingManager.handleWayTags(ndwLink, includeWay, relationFlags);
-  }
-
-  private double calculateLengthInMeters(final Coordinate[] coordinates) {
-    double lengthInMeters = 0.0;
-    for (int index = 1; index < coordinates.length; index++) {
-      lengthInMeters += distanceCalculator.calcDist(coordinates[index - 1].y, coordinates[index - 1].x,
-          coordinates[index].y, coordinates[index].x);
-    }
-    return lengthInMeters;
+    return encodingManager.handleWayTags(link, acceptWay, relationFlags);
   }
 
   private PointList createPointListWithoutStartAndEndPoint(final Coordinate[] coordinates) {
@@ -167,7 +142,9 @@ class NdwNetworkReader implements DataReader {
   }
 
   private void logCount(final int count) {
-    boolean log = count == 1_000;
+    boolean log = count <= 10 && count % 5 == 0;
+    log = log || count <= 100 && count % 50 == 0;
+    log = log || count <= 1_000 && count % 500 == 0;
     log = log || count <= 10_000 && count % 5_000 == 0;
     log = log || count <= 100_000 && count % 50_000 == 0;
     log = log || count % 500_000 == 0;
@@ -176,14 +153,9 @@ class NdwNetworkReader implements DataReader {
     }
   }
 
-  private void finishedReading() {
-    nodeIdToInternalNodeIdMap = null;
-  }
-
   @Override
   public Date getDataDate() {
     // Don't return a date
     return null;
   }
-
 }

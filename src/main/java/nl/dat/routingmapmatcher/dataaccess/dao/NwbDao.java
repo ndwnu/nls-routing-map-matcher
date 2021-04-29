@@ -33,7 +33,7 @@ public interface NwbDao {
       "FROM nwb_per_direction " +
       "ORDER BY gid, geom")
   @RegisterRowMapper(LineStringLocationMapper.class)
-  public List<LineStringLocation> getNwbLocations();
+  List<LineStringLocation> getNwbLocations();
 
   @SqlQuery(
       "WITH nwb_per_direction AS ( " +
@@ -55,7 +55,7 @@ public interface NwbDao {
       "WHERE wegbehsrt = 'R' " +
       "ORDER BY gid, geom")
   @RegisterRowMapper(LineStringLocationMapper.class)
-  public List<LineStringLocation> getNwbLocationsOnlyNationalHighways();
+  List<LineStringLocation> getNwbLocationsOnlyNationalHighways();
 
   @SqlUpdate(
       "CREATE TABLE IF NOT EXISTS public.nwb_matches " +
@@ -82,7 +82,5 @@ public interface NwbDao {
       "INSERT INTO public.nwb_matches(gid, reversed, ndw_link_ids, " +
       "  start_link_fraction, end_link_fraction, reliability, status, line_string) VALUES " +
       "  (:id, :reversed, :ndwLinkIds, :startLinkFraction, :endLinkFraction, :reliability, :status, :lineString)")
-  int[] insertNwbMatches(@BindBean List<LineStringMatch> lineStringMatches);
-
-
+  void insertNwbMatches(@BindBean List<LineStringMatch> lineStringMatches);
 }

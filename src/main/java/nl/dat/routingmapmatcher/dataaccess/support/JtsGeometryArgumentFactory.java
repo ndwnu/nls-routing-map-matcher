@@ -5,9 +5,8 @@ import java.sql.Types;
 import org.jdbi.v3.core.argument.AbstractArgumentFactory;
 import org.jdbi.v3.core.argument.Argument;
 import org.jdbi.v3.core.config.ConfigRegistry;
-
-import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.io.WKBWriter;
+import org.locationtech.jts.geom.Geometry;
+import org.locationtech.jts.io.WKBWriter;
 
 public class JtsGeometryArgumentFactory extends AbstractArgumentFactory<Geometry> {
 
@@ -25,5 +24,4 @@ public class JtsGeometryArgumentFactory extends AbstractArgumentFactory<Geometry
   protected Argument build(final Geometry geometry, final ConfigRegistry config) {
     return (position, statement, ctx) -> statement.setBytes(position, wkbWriter.write(geometry));
   }
-
 }

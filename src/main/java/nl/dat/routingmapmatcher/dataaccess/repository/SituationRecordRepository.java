@@ -7,13 +7,12 @@ import java.util.Optional;
 
 import org.jdbi.v3.core.Handle;
 import org.jdbi.v3.core.Jdbi;
+import org.locationtech.jts.geom.Coordinate;
+import org.locationtech.jts.geom.LineString;
+import org.locationtech.jts.geom.Point;
+import org.locationtech.jts.geom.PrecisionModel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.LineString;
-import com.vividsolutions.jts.geom.Point;
-import com.vividsolutions.jts.geom.PrecisionModel;
 
 import nl.dat.routingmapmatcher.constants.GlobalConstants;
 import nl.dat.routingmapmatcher.dataaccess.dao.SituationRecordDao;
@@ -22,7 +21,7 @@ import nl.dat.routingmapmatcher.linestring.LineStringLocation;
 import nl.dat.routingmapmatcher.linestring.LineStringMatch;
 import nl.dat.routingmapmatcher.linestring.ReliabilityCalculationType;
 
-public class SituationRecordRepository {
+public class SituationRecordRepository implements LineStringLocationRepository {
 
   private static final Logger logger = LoggerFactory.getLogger(SituationRecordRepository.class);
 
@@ -30,6 +29,17 @@ public class SituationRecordRepository {
 
   public SituationRecordRepository(final Jdbi jdbi) {
     this.jdbi = jdbi;
+  }
+
+  @Override
+  public List<LineStringLocation> getLocations() {
+    final List<Integer> singlePoints = new ArrayList<>();
+    final List<LineStringLocation> situationRecordsOrdered = getSituationRecordOrderedLines(singlePoints);
+    final List<LineStringLocation> situationRecordsUnordered = getSituationRecordUnorderedLinears(singlePoints);
+    final List<LineStringLocation> situationRecords = new ArrayList<>();
+    situationRecords.addAll(situationRecordsOrdered);
+    situationRecords.addAll(situationRecordsUnordered);
+    return situationRecords;
   }
 
   public List<LineStringLocation> getSituationRecordOrderedLines(final List<Integer> singlePoints) {
@@ -82,7 +92,8 @@ public class SituationRecordRepository {
     }
   }
 
-  public void replaceSituationRecordLineMatches(final List<LineStringMatch> lineStringMatches) {
+  @Override
+  public void replaceMatches(final List<LineStringMatch> lineStringMatches) {
     jdbi.useTransaction((final Handle handle) -> {
       final SituationRecordDao situationRecordDao = handle.attach(SituationRecordDao.class);
       situationRecordDao.createSituationRecordLineMatchesTableIfNotExists();
@@ -161,5 +172,4 @@ public class SituationRecordRepository {
     }
     return new LineString(coordinates.toArray(new Coordinate[0]), new PrecisionModel(), GlobalConstants.WGS84_SRID);
   }
-
 }
