@@ -5,6 +5,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.locationtech.jts.geom.Coordinate;
+import org.locationtech.jts.geom.GeometryFactory;
+import org.locationtech.jts.geom.LineString;
+import org.locationtech.jts.geom.Point;
+import org.locationtech.jts.geom.PrecisionModel;
+
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 import com.graphhopper.routing.AlgorithmOptions;
@@ -24,17 +30,13 @@ import com.graphhopper.util.DistanceCalc;
 import com.graphhopper.util.EdgeIteratorState;
 import com.graphhopper.util.Parameters;
 import com.graphhopper.util.PointList;
-import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.GeometryFactory;
-import com.vividsolutions.jts.geom.LineString;
-import com.vividsolutions.jts.geom.Point;
-import com.vividsolutions.jts.geom.PrecisionModel;
 
 import nl.dat.routingmapmatcher.constants.GlobalConstants;
+import nl.dat.routingmapmatcher.enums.MatchStatus;
 import nl.dat.routingmapmatcher.exceptions.RoutingMapMatcherException;
 import nl.dat.routingmapmatcher.graphhopper.GraphHopperConstants;
-import nl.dat.routingmapmatcher.graphhopper.NdwGraphHopper;
-import nl.dat.routingmapmatcher.graphhopper.NdwLinkFlagEncoder;
+import nl.dat.routingmapmatcher.graphhopper.LinkFlagEncoder;
+import nl.dat.routingmapmatcher.graphhopper.NetworkGraphHopper;
 import nl.dat.routingmapmatcher.util.PathUtil;
 
 public class StartToEndMapMatcher {
@@ -62,12 +64,7 @@ public class StartToEndMapMatcher {
    */
   private static final int SANITY_CHECK_MAX_DISTANCE_AS_THE_CROW_FLIES_EXTRA_METERS = 50;
 
-  private static final String STATUS_INVALID_INPUT = "invalid_input";
-  private static final String STATUS_NO_PATH = "no_path";
-  private static final String STATUS_MATCH = "match";
-
-  private final NdwGraphHopper ndwNetwork;
-  private final NdwLinkFlagEncoder flagEncoder;
+  private final LinkFlagEncoder flagEncoder;
   private final Graph routingGraph;
   private final LocationIndexTree locationIndexTree;
   private final EdgeFilter edgeFilter;
@@ -80,14 +77,13 @@ public class StartToEndMapMatcher {
   private final GeometryFactory geometryFactory;
   private final PathUtil pathUtil;
 
-  public StartToEndMapMatcher(final NdwGraphHopper ndwNetwork) {
+  public StartToEndMapMatcher(final NetworkGraphHopper ndwNetwork) {
     Preconditions.checkNotNull(ndwNetwork);
     final List<FlagEncoder> flagEncoders = ndwNetwork.getEncodingManager().fetchEdgeEncoders();
     Preconditions.checkArgument(flagEncoders.size() == 1);
-    Preconditions.checkArgument(flagEncoders.get(0) instanceof NdwLinkFlagEncoder);
+    Preconditions.checkArgument(flagEncoders.get(0) instanceof LinkFlagEncoder);
 
-    this.ndwNetwork = ndwNetwork;
-    this.flagEncoder = (NdwLinkFlagEncoder) flagEncoders.get(0);
+    this.flagEncoder = (LinkFlagEncoder) flagEncoders.get(0);
     this.routingGraph = ndwNetwork.getGraphHopperStorage();
     this.locationIndexTree = (LocationIndexTree) ndwNetwork.getLocationIndex();
     this.edgeFilter = EdgeFilter.ALL_EDGES;
@@ -117,7 +113,7 @@ public class StartToEndMapMatcher {
 
     final StartToEndMatch match;
     if (!sanityCheckPassed(startToEndLocation, distanceAsTheCrowFliesInMeters)) {
-      match = createFailedMatch(startToEndLocation, STATUS_INVALID_INPUT);
+      match = createFailedMatch(startToEndLocation, MatchStatus.INVALID_INPUT);
     } else {
       match = findMatch(startToEndLocation);
     }
@@ -135,7 +131,7 @@ public class StartToEndMapMatcher {
     return distanceAsTheCrowFliesInMeters <= maximumDistanceAsTheCrosFliesInMeters;
   }
 
-  private StartToEndMatch createFailedMatch(final StartToEndLocation startToEndLocation, final String status) {
+  private StartToEndMatch createFailedMatch(final StartToEndLocation startToEndLocation, final MatchStatus status) {
     final int id = startToEndLocation.getId();
     final int locationIndex = startToEndLocation.getLocationIndex();
     final List<Integer> ndwLinkIds = Lists.newArrayList();
@@ -164,7 +160,7 @@ public class StartToEndMapMatcher {
       final Path path = chooseBestCandidatePath(candidatePaths, startToEndLocation);
       match = createMatch(startToEndLocation, path, queryGraph);
     } else {
-      match = createFailedMatch(startToEndLocation, STATUS_NO_PATH);
+      match = createFailedMatch(startToEndLocation, MatchStatus.NO_PATH);
     }
 
     return match;
@@ -268,14 +264,12 @@ public class StartToEndMapMatcher {
     if (edges.isEmpty()) {
       throw new RoutingMapMatcherException("Unexpected: path has no edges");
     }
-    final List<Integer> ndwLinkIds = pathUtil.determineNdwLinkIds(ndwNetwork, flagEncoder, edges);
+    final List<Integer> ndwLinkIds = pathUtil.determineNdwLinkIds(flagEncoder, edges);
     final double startLinkFraction = pathUtil.determineStartLinkFraction(edges.get(0), queryGraph);
     final double endLinkFraction = pathUtil.determineEndLinkFraction(edges.get(edges.size() - 1), queryGraph);
     final double reliability = calculateCandidatePathScore(path, startToEndLocation);
-    final String status = STATUS_MATCH;
     final LineString lineString = pathUtil.createLineString(path.calcPoints());
     return new StartToEndMatch(id, locationIndex, ndwLinkIds, startLinkFraction, endLinkFraction, reliability,
-        status, lineString);
+        MatchStatus.MATCH, lineString);
   }
-
 }

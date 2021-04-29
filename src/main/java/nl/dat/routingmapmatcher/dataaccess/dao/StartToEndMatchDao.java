@@ -35,6 +35,5 @@ public interface StartToEndMatchDao {
       "INSERT INTO public.measurement_site_line_matches(measurement_site_id, location_index, ndw_link_ids, " +
       "  start_link_fraction, end_link_fraction, reliability, status, line_string) VALUES " +
       "  (:id, :locationIndex, :ndwLinkIds, :startLinkFraction, :endLinkFraction, :reliability, :status, :lineString)")
-  int[] insertMeasurementSiteLocationMatches(@BindBean List<StartToEndMatch> startToEndMatches);
-
+  void insertMeasurementSiteLocationMatches(@BindBean List<StartToEndMatch> startToEndMatches);
 }

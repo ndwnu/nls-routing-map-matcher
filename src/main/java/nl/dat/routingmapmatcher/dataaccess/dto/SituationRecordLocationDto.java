@@ -1,6 +1,6 @@
 package nl.dat.routingmapmatcher.dataaccess.dto;
 
-import com.vividsolutions.jts.geom.Point;
+import org.locationtech.jts.geom.Point;
 
 public class SituationRecordLocationDto {
 
@@ -53,7 +53,4 @@ public class SituationRecordLocationDto {
   public Point getEndPoint() {
     return endPoint;
   }
-
-
-
 }

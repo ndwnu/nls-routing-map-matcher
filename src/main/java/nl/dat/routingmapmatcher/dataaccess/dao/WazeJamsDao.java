@@ -12,38 +12,39 @@ import nl.dat.routingmapmatcher.dataaccess.mapper.LineStringLocationMapper;
 import nl.dat.routingmapmatcher.linestring.LineStringLocation;
 import nl.dat.routingmapmatcher.linestring.LineStringMatch;
 
-public interface MstShapefileDao {
+public interface WazeJamsDao {
 
   @SqlQuery(
-      "SELECT gid AS id, null AS location_index, null AS reversed, lengte AS length_in_meters, ST_AsEWKB(geom) AS geometry_wkb " +
-      "FROM public.measurement_site_lines_shapefile " +
-      "ORDER BY id ")
+      "SELECT jam_id AS id, null AS location_index, null AS reversed, length AS length_in_meters, " +
+      "ST_AsEWKB(line::geometry) AS geometry_wkb " +
+      "FROM public.waze_jams " +
+      "ORDER BY id")
   @RegisterRowMapper(LineStringLocationMapper.class)
-  List<LineStringLocation> getMstLinesShapefile();
+  List<LineStringLocation> getWazeJams();
 
   @SqlUpdate(
-      "CREATE TABLE IF NOT EXISTS public.measurement_site_lines_shapefile_matches " +
+      "CREATE TABLE IF NOT EXISTS public.waze_jams_matches " +
       "( " +
-      "  gid integer NOT NULL, " +
+      "  jam_id integer NOT NULL, " +
       "  ndw_link_ids integer[] NOT NULL, " +
       "  start_link_fraction double precision, " +
       "  end_link_fraction double precision, " +
       "  reliability double precision, " +
       "  status text, " +
       "  line_string geography(LineString,4326), " +
-      "  PRIMARY KEY (gid), " +
-      "  CONSTRAINT ms_lines_matches_fkey_ms_lines_shapefile FOREIGN KEY (gid) " +
-      "      REFERENCES public.measurement_site_lines_shapefile(gid) " +
+      "  PRIMARY KEY (jam_id), " +
+      "  CONSTRAINT waze_jams_matches_fkey_waze_jams FOREIGN KEY (jam_id) " +
+      "      REFERENCES public.waze_jams(jam_id) " +
       ") "
       )
-  void createMstLinesShapefileMatchesTableIfNotExists();
+  void createWazeJamsMatchesTableIfNotExists();
 
-  @SqlUpdate("TRUNCATE TABLE public.measurement_site_lines_shapefile_matches")
-  void truncateMstLinesShapefileMatchesTable();
+  @SqlUpdate("TRUNCATE TABLE public.waze_jams_matches")
+  void truncateWazeJamsMatchesTable();
 
   @SqlBatch(
-      "INSERT INTO public.measurement_site_lines_shapefile_matches(gid, ndw_link_ids, " +
+      "INSERT INTO public.waze_jams_matches(jam_id, ndw_link_ids, " +
       "  start_link_fraction, end_link_fraction, reliability, status, line_string) VALUES " +
       "  (:id, :ndwLinkIds, :startLinkFraction, :endLinkFraction, :reliability, :status, :lineString)")
-  void insertMstLinesShapefileMatches(@BindBean List<LineStringMatch> lineStringMatches);
+  void insertWazeJamsMatches(@BindBean List<LineStringMatch> lineStringMatches);
 }
