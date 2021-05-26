@@ -1,12 +1,9 @@
 package nu.ndw.nls.routingmapmatcher.graphhopper;
 
-import com.google.common.base.Supplier;
 import com.graphhopper.routing.util.EncodingManager;
-import nu.ndw.nls.routingmapmatcher.domain.model.Link;
 import nu.ndw.nls.routingmapmatcher.domain.model.RoutingNetwork;
 
 import java.util.Arrays;
-import java.util.Iterator;
 
 public class NetworkGraphHopperFactory {
 

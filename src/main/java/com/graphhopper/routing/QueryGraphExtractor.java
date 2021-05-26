@@ -1,7 +1,5 @@
 package com.graphhopper.routing;
 
-import com.graphhopper.routing.Path;
-import com.graphhopper.routing.QueryGraph;
 import nu.ndw.nls.routingmapmatcher.domain.exception.RoutingMapMatcherException;
 
 /**

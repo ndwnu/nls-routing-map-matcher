@@ -10,11 +10,19 @@
     <description>Map match data to a routable network using routing</description>
 
     <properties>
-        <maven.compiler.source>1.8</maven.compiler.source>
-        <maven.compiler.target>1.8</maven.compiler.target>
+        <maven.compiler.source>11</maven.compiler.source>
+        <maven.compiler.target>11</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.javadoc.failOnError>false</maven.javadoc.failOnError>
         <lombok.version>1.18.12</lombok.version>
+        <graphhopper-core.version>0.12.0</graphhopper-core.version>
+        <graphhopper-map-matching-core.version>0.12.0-3</graphhopper-map-matching-core.version>
+        <jts-core.version>1.15.1</jts-core.version>
+        <guava.version>23.6-jre</guava.version>
+        <logback-classic.version>1.1.7</logback-classic.version>
+        <junit-jupiter.version>5.7.2</junit-jupiter.version>
+        <hamcrest.version>2.2</hamcrest.version>
+        <mockito-junit-jupiter.version>3.10.0</mockito-junit-jupiter.version>
     </properties>
 
     <dependencies>
@@ -22,12 +30,12 @@
         <dependency>
             <groupId>com.graphhopper</groupId>
             <artifactId>graphhopper-core</artifactId>
-            <version>0.12.0</version>
+            <version>${graphhopper-core.version}</version>
         </dependency>
         <dependency>
             <groupId>com.graphhopper</groupId>
             <artifactId>graphhopper-map-matching-core</artifactId>
-            <version>0.12.0-3</version>
+            <version>${graphhopper-map-matching-core.version}</version>
             <exclusions>
                 <exclusion>
                     <groupId>com.graphhopper</groupId>
@@ -44,42 +52,50 @@
         <dependency>
             <groupId>org.locationtech.jts</groupId>
             <artifactId>jts-core</artifactId>
-            <version>1.15.1</version>
+            <version>${jts-core.version}</version>
         </dependency>
 
         <!-- Utilities -->
         <dependency>
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
-            <version>23.6-jre</version>
+            <version>${guava.version}</version>
         </dependency>
 
         <!-- Logging -->
         <dependency>
             <groupId>ch.qos.logback</groupId>
             <artifactId>logback-classic</artifactId>
-            <version>1.1.7</version>
+            <version>${logback-classic.version}</version>
         </dependency>
 
         <!-- Testing -->
+
         <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <version>4.12</version>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-engine</artifactId>
+            <version>${junit-jupiter.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>org.assertj</groupId>
-            <artifactId>assertj-core</artifactId>
-            <version>3.9.0</version>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-params</artifactId>
+            <version>${junit-jupiter.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.mockito</groupId>
-            <artifactId>mockito-core</artifactId>
-            <version>2.22.0</version>
+            <artifactId>mockito-junit-jupiter</artifactId>
+            <version>${mockito-junit-jupiter.version}</version>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>org.hamcrest</groupId>
+            <artifactId>hamcrest-library</artifactId>
+            <version>${hamcrest.version}</version>
+            <scope>test</scope>
+        </dependency>
+
     </dependencies>
     <build>
         <defaultGoal>clean verify</defaultGoal>
@@ -97,7 +113,6 @@
                             <artifactId>lombok</artifactId>
                             <version>${lombok.version}</version>
                         </path>
-
                     </annotationProcessorPaths>
                 </configuration>
             </plugin>
