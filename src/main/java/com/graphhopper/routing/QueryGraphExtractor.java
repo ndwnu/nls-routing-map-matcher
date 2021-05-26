@@ -1,6 +1,6 @@
 package com.graphhopper.routing;
 
-import nl.dat.routingmapmatcher.exceptions.RoutingMapMatcherException;
+import nu.ndw.nls.routingmapmatcher.domain.exception.RoutingMapMatcherException;
 
 /**
  * Extract a query graph from a path.
