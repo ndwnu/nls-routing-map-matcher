@@ -1,6 +1,7 @@
 package nu.ndw.nls.routingmapmatcher.domain;
 
 import com.google.common.base.Supplier;
+import nu.ndw.nls.routingmapmatcher.domain.model.MapMatchingRequest;
 import nu.ndw.nls.routingmapmatcher.domain.model.MatchStatus;
 import nu.ndw.nls.routingmapmatcher.domain.model.RoutingNetwork;
 import nu.ndw.nls.routingmapmatcher.domain.model.linestring.LineStringLocation;
@@ -23,8 +24,8 @@ public class RoutingMapMatcher {
     }
 
     public Stream<LineStringMatch> matchLocations(RoutingNetwork routingNetwork,
-                                                  Supplier<List<LineStringLocation>> locationsSupplier) {
-        final List<LineStringLocation> locations = locationsSupplier.get();
+                                                  MapMatchingRequest mapMatchingRequest) {
+        final List<LineStringLocation> locations = mapMatchingRequest.getLocationSupplier().get();
         final int numLocations = locations.size();
         final LineStringMapMatcher lineStringMapMatcher = lineStringMapMatcherFactory
                 .createLineStringMapMatcher(routingNetwork);
