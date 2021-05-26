@@ -10,6 +10,6 @@ import java.util.function.Supplier;
 @Value
 @Builder
 public class MapMatchingRequest {
-    String name;
+    String locationTypeName;
     Supplier<List<LineStringLocation>> locationSupplier;
 }
