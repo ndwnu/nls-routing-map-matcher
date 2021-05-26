@@ -28,7 +28,7 @@ public class RoutingMapMatcher {
                 .createLineStringMapMatcher(routingNetwork);
         final AtomicInteger matched = new AtomicInteger();
         final AtomicInteger processed = new AtomicInteger();
-        log.info("Start map matching for " + mapMatchingRequest.getName() + ", count = {}", numLocations);
+        log.info("Start map matching for {}, count = {}", mapMatchingRequest.getLocationTypeName(), numLocations);
         return locations
                 .stream()
                 .map(lineStringLocation ->

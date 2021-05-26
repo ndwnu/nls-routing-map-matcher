@@ -21,7 +21,7 @@ public class ViterbiLinestringMapMatcherFactory  implements LineStringMapMatcher
     }
 
     private NetworkGraphHopper readNetwork(final RoutingNetwork routingNetwork) {
-        logger.info("Start reading network with version {}", routingNetwork.getNetworkVersion());
+        logger.info("Start reading network with version {}", routingNetwork.getNetworkNameAndVersion());
         return networkGraphHopperFactory.createNetworkGraphHopper(routingNetwork);
     }
 }

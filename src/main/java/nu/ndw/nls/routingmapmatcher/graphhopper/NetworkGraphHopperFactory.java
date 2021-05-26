@@ -15,8 +15,8 @@ public class NetworkGraphHopperFactory {
     graphHopper.setElevation(false);
     graphHopper.setCHEnabled(false);
     graphHopper.setMinNetworkSize(0, 0);
-    graphHopper.setDataReaderFile("graphhopper_" + routingNetwork.getNetworkVersion());
-    graphHopper.setGraphHopperLocation("graphhopper_" + routingNetwork.getNetworkVersion());
+    graphHopper.setDataReaderFile("graphhopper_" + routingNetwork.getNetworkNameAndVersion());
+    graphHopper.setGraphHopperLocation("graphhopper_" + routingNetwork.getNetworkNameAndVersion());
     final LinkFlagEncoder flagEncoder = new LinkFlagEncoder();
     graphHopper.setEncodingManager(EncodingManager.create(Arrays.asList(flagEncoder), BYTES_FOR_EDGE_FLAGS));
 
