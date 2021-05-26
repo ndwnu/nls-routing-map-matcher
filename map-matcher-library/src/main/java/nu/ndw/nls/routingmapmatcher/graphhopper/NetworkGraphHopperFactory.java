@@ -9,14 +9,14 @@ public class NetworkGraphHopperFactory {
 
   private static final int BYTES_FOR_EDGE_FLAGS = 12;
 
-  public NetworkGraphHopper createNetworkGraphHopper(RoutingNetwork routingNetwork) {
+  public NetworkGraphHopper createNetworkGraphHopper(final RoutingNetwork routingNetwork) {
     final NetworkGraphHopper graphHopper = new NetworkGraphHopper(routingNetwork.getLinkSupplier());
     graphHopper.setStoreOnFlush(false);
     graphHopper.setElevation(false);
     graphHopper.setCHEnabled(false);
     graphHopper.setMinNetworkSize(0, 0);
-    graphHopper.setDataReaderFile("graphhopper_"+routingNetwork.getNetworkVersion());
-    graphHopper.setGraphHopperLocation("graphhopper_"+routingNetwork.getNetworkVersion());
+    graphHopper.setDataReaderFile("graphhopper_" + routingNetwork.getNetworkNameAndVersion());
+    graphHopper.setGraphHopperLocation("graphhopper_" + routingNetwork.getNetworkNameAndVersion());
     final LinkFlagEncoder flagEncoder = new LinkFlagEncoder();
     graphHopper.setEncodingManager(EncodingManager.create(Arrays.asList(flagEncoder), BYTES_FOR_EDGE_FLAGS));
 
