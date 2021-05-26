@@ -1,6 +1,5 @@
 package nu.ndw.nls.routingmapmatcher.graphhopper;
 
-import com.google.common.base.Supplier;
 import com.graphhopper.GraphHopper;
 import com.graphhopper.coll.GHLongIntBTree;
 import com.graphhopper.coll.LongIntMap;
@@ -9,6 +8,7 @@ import com.graphhopper.storage.GraphHopperStorage;
 import nu.ndw.nls.routingmapmatcher.domain.model.Link;
 
 import java.util.Iterator;
+import java.util.function.Supplier;
 
 public class NetworkGraphHopper extends GraphHopper {
 

@@ -105,7 +105,6 @@ public class ViterbiLineStringMapMatcher implements LineStringMapMatcher {
     mapMatching.setDistanceCalc(distanceCalc);
     this.locationIndexTree = (LocationIndexTree) network.getLocationIndex();
     this.edgeFilter = EdgeFilter.ALL_EDGES;
-
     this.geometryFactory = new GeometryFactory(new PrecisionModel(), GlobalConstants.WGS84_SRID);
     this.pathUtil = new PathUtil(geometryFactory);
     this.queryGraphExtractor = new QueryGraphExtractor();

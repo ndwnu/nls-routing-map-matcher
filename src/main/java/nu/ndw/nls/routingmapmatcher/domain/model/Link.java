@@ -1,8 +1,10 @@
 package nu.ndw.nls.routingmapmatcher.domain.model;
 
 import com.graphhopper.reader.ReaderWay;
+import lombok.Getter;
 import org.locationtech.jts.geom.LineString;
 
+@Getter
 public class Link extends ReaderWay {
 
   private final long fromNodeId;
@@ -23,27 +25,4 @@ public class Link extends ReaderWay {
     this.geometry = geometry;
   }
 
-  public long getFromNodeId() {
-    return fromNodeId;
-  }
-
-  public long getToNodeId() {
-    return toNodeId;
-  }
-
-  public double getSpeedInKilometersPerHour() {
-    return speedInKilometersPerHour;
-  }
-
-  public double getReverseSpeedInKilometersPerHour() {
-    return reverseSpeedInKilometersPerHour;
-  }
-
-  public double getDistanceInMeters() {
-    return distanceInMeters;
-  }
-
-  public LineString getGeometry() {
-    return geometry;
-  }
 }

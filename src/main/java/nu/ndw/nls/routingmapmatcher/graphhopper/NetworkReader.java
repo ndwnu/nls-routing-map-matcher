@@ -1,7 +1,7 @@
 package nu.ndw.nls.routingmapmatcher.graphhopper;
 
 import com.google.common.base.Preconditions;
-import com.google.common.base.Supplier;
+
 import com.graphhopper.coll.LongIntMap;
 import com.graphhopper.reader.DataReader;
 import com.graphhopper.reader.dem.ElevationProvider;
@@ -18,6 +18,7 @@ import org.slf4j.LoggerFactory;
 import java.io.File;
 import java.util.Date;
 import java.util.Iterator;
+import java.util.function.Supplier;
 
 class NetworkReader implements DataReader {
 
