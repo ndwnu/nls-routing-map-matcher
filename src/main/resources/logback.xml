@@ -10,8 +10,6 @@
 
 	<!-- Special treatment -->
 	<logger name="com.graphhopper.matching.MapMatching" level="info" />
-	<logger name="nl.dat.routingmapmatcher.dataaccess.repository.SituationRecordRepository" level="info" />
-
 	<root level="debug">
 		<appender-ref ref="STDOUT" />
 	</root>
