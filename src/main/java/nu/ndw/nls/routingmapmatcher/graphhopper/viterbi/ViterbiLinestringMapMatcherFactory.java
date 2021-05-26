@@ -1,30 +1,30 @@
 package nu.ndw.nls.routingmapmatcher.graphhopper.viterbi;
 
-import com.google.common.base.Supplier;
 import nu.ndw.nls.routingmapmatcher.domain.LineStringMapMatcher;
 import nu.ndw.nls.routingmapmatcher.domain.LineStringMapMatcherFactory;
-import nu.ndw.nls.routingmapmatcher.domain.model.Link;
+import nu.ndw.nls.routingmapmatcher.domain.model.RoutingNetwork;
 import nu.ndw.nls.routingmapmatcher.graphhopper.NetworkGraphHopper;
-import nu.ndw.nls.routingmapmatcher.graphhopper.NetworkRepository;
+import nu.ndw.nls.routingmapmatcher.graphhopper.NetworkGraphHopperFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.Iterator;
 
 public class ViterbiLinestringMapMatcherFactory  implements LineStringMapMatcherFactory {
 
 
     private static final Logger logger = LoggerFactory.getLogger(ViterbiLinestringMapMatcherFactory.class);
+    private final NetworkGraphHopperFactory networkGraphHopperFactory;
 
-
-    @Override
-    public LineStringMapMatcher createLineStringMapMatcher(Supplier<Iterator<Link>> linkSupplier) {
-        return new ViterbiLineStringMapMatcher(readNetwork(linkSupplier));
+    public ViterbiLinestringMapMatcherFactory() {
+        networkGraphHopperFactory = new NetworkGraphHopperFactory();
     }
 
-    private NetworkGraphHopper readNetwork(Supplier<Iterator<Link>> linkSupplier) {
-        //logger.info("Start reading network with version {}", networkVersion);
-        final NetworkRepository networkRepository = new NetworkRepository();
-        return networkRepository.getNetwork(linkSupplier);
+    @Override
+    public LineStringMapMatcher createLineStringMapMatcher(RoutingNetwork routingNetwork) {
+        return new ViterbiLineStringMapMatcher(readNetwork(routingNetwork));
+    }
+
+    private NetworkGraphHopper readNetwork(RoutingNetwork routingNetwork) {
+        logger.info("Start reading network with version {}", routingNetwork.getNetworkVersion());
+        return  networkGraphHopperFactory.createNetworkGraphHopper(routingNetwork);
     }
 }

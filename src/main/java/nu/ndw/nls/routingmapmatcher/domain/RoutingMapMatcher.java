@@ -3,6 +3,7 @@ package nu.ndw.nls.routingmapmatcher.domain;
 import com.google.common.base.Supplier;
 import nu.ndw.nls.routingmapmatcher.domain.model.Link;
 import nu.ndw.nls.routingmapmatcher.domain.model.MatchStatus;
+import nu.ndw.nls.routingmapmatcher.domain.model.RoutingNetwork;
 import nu.ndw.nls.routingmapmatcher.domain.model.linestring.LineStringLocation;
 import nu.ndw.nls.routingmapmatcher.domain.model.linestring.LineStringMatch;
 import org.slf4j.Logger;
@@ -23,11 +24,12 @@ public class RoutingMapMatcher {
         this.lineStringMapMatcherFactory = lineStringMapMatcherFactory;
     }
 
-    public Stream<LineStringMatch> matchLocations(Supplier<Iterator<Link>> linkSupplier, Supplier<List<LineStringLocation>> locationsSupplier) {
+    public Stream<LineStringMatch> matchLocations(RoutingNetwork routingNetwork,
+                                                  Supplier<List<LineStringLocation>> locationsSupplier) {
         final List<LineStringLocation> locations = locationsSupplier.get();
         final int numLocations = locations.size();
         final LineStringMapMatcher lineStringMapMatcher = lineStringMapMatcherFactory
-                .createLineStringMapMatcher(linkSupplier);
+                .createLineStringMapMatcher(routingNetwork);
         AtomicInteger matched = new AtomicInteger();
         AtomicInteger processed = new AtomicInteger();
         return locations
