@@ -16,7 +16,7 @@ public class NetworkGraphHopper extends GraphHopper {
 
     private final LongIntMap nodeIdToInternalNodeIdMap;
 
-    public NetworkGraphHopper(Supplier<Iterator<Link>> linkSupplier) {
+    public NetworkGraphHopper(final Supplier<Iterator<Link>> linkSupplier) {
         this.linkSupplier = linkSupplier;
         this.nodeIdToInternalNodeIdMap = new GHLongIntBTree(200);
     }
