@@ -3,7 +3,7 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
 	<modelVersion>4.0.0</modelVersion>
-	<groupId>nl.dat</groupId>
+	<groupId>nu.ndw.nls</groupId>
 	<artifactId>routing-map-matcher</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<name>Routing Map Matcher</name>
@@ -12,12 +12,8 @@
 	<properties>
 		<maven.compiler.source>1.8</maven.compiler.source>
 		<maven.compiler.target>1.8</maven.compiler.target>
-
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-
 		<maven.javadoc.failOnError>false</maven.javadoc.failOnError>
-    
-		<jdbi.version>3.3.0</jdbi.version>    
 	</properties>
 
 	<dependencies>
@@ -44,33 +40,6 @@
 			<groupId>org.locationtech.jts</groupId>
 			<artifactId>jts-core</artifactId>
 			<version>1.15.1</version>
-		</dependency>
-
-		<!-- Database connection -->
-		<dependency>
-			<groupId>com.zaxxer</groupId>
-			<artifactId>HikariCP</artifactId>
-			<version>3.2.0</version>
-		</dependency>
-		<dependency>
-			<groupId>org.postgresql</groupId>
-			<artifactId>postgresql</artifactId>
-			<version>42.2.2</version>
-		</dependency>
-		<dependency>
-			<groupId>org.jdbi</groupId>
-			<artifactId>jdbi3-core</artifactId>
-			<version>${jdbi.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.jdbi</groupId>
-			<artifactId>jdbi3-postgres</artifactId>
-			<version>${jdbi.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.jdbi</groupId>
-			<artifactId>jdbi3-sqlobject</artifactId>
-			<version>${jdbi.version}</version>
 		</dependency>
 
 		<!-- Utilities -->
