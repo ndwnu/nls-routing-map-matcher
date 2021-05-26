@@ -16,12 +16,12 @@ public class ViterbiLinestringMapMatcherFactory  implements LineStringMapMatcher
     private final NetworkGraphHopperFactory networkGraphHopperFactory;
 
     @Override
-    public LineStringMapMatcher createLineStringMapMatcher(RoutingNetwork routingNetwork) {
+    public LineStringMapMatcher createLineStringMapMatcher(final RoutingNetwork routingNetwork) {
         return new ViterbiLineStringMapMatcher(readNetwork(routingNetwork));
     }
 
-    private NetworkGraphHopper readNetwork(RoutingNetwork routingNetwork) {
+    private NetworkGraphHopper readNetwork(final RoutingNetwork routingNetwork) {
         logger.info("Start reading network with version {}", routingNetwork.getNetworkVersion());
-        return  networkGraphHopperFactory.createNetworkGraphHopper(routingNetwork);
+        return networkGraphHopperFactory.createNetworkGraphHopper(routingNetwork);
     }
 }

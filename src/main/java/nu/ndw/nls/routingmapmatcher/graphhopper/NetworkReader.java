@@ -29,7 +29,7 @@ class NetworkReader implements DataReader {
     private final EncodingManager encodingManager;
 
     public NetworkReader(final GraphHopperStorage ghStorage,
-                         Supplier<Iterator<Link>> linkSupplier,
+                         final Supplier<Iterator<Link>> linkSupplier,
                          final LongIntMap nodeIdToInternalNodeIdMap) {
         this.ghStorage = Preconditions.checkNotNull(ghStorage);
         this.linkSupplier = linkSupplier;

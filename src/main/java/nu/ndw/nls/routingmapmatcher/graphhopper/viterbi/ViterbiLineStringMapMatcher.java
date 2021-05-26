@@ -103,7 +103,7 @@ public class ViterbiLineStringMapMatcher implements LineStringMapMatcher {
     mapMatching.setDistanceCalc(distanceCalc);
     this.locationIndexTree = (LocationIndexTree) network.getLocationIndex();
     this.edgeFilter = EdgeFilter.ALL_EDGES;
-    GeometryFactory geometryFactory = new GeometryFactory(new PrecisionModel(), GlobalConstants.WGS84_SRID);
+    final GeometryFactory geometryFactory = new GeometryFactory(new PrecisionModel(), GlobalConstants.WGS84_SRID);
     this.pathUtil = new PathUtil(geometryFactory);
     this.queryGraphExtractor = new QueryGraphExtractor();
   }
@@ -195,7 +195,7 @@ public class ViterbiLineStringMapMatcher implements LineStringMapMatcher {
     final QueryGraph queryGraph = queryGraphExtractor.extractQueryGraph(path);
     final double startLinkFraction = pathUtil.determineStartLinkFraction(edges.get(0), queryGraph);
     final double endLinkFraction = pathUtil.determineEndLinkFraction(edges.get(edges.size() - 1), queryGraph);
-    double reliability;
+    final double reliability;
     if (lineStringLocation.getReliabilityCalculationType().equals(ReliabilityCalculationType.POINT_OBSERVATIONS)) {
       reliability = calculateCandidatePathScoreOnlyPoints(path, lineStringLocation);
     } else {
