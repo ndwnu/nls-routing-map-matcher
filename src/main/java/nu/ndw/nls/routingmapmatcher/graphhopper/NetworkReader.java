@@ -1,7 +1,6 @@
 package nu.ndw.nls.routingmapmatcher.graphhopper;
 
 import com.google.common.base.Preconditions;
-
 import com.graphhopper.coll.LongIntMap;
 import com.graphhopper.reader.DataReader;
 import com.graphhopper.reader.dem.ElevationProvider;
