@@ -52,7 +52,7 @@ public class ViterbiLineStringMapMatcher implements LineStringMapMatcher {
   private static final double MEASUREMENT_ERROR_SIGMA_IN_METERS = 20.0;
 
   /**
-   * The beta (1/lamdba) parameter used for the exponential distribution to determine the
+   * The beta (1/lambda) parameter used for the exponential distribution to determine the
    * probability that the
    * length of a route between two successive GPS observations is the same as the distance as the
    * crow flies
@@ -85,7 +85,6 @@ public class ViterbiLineStringMapMatcher implements LineStringMapMatcher {
   private final LocationIndexTree locationIndexTree;
   private final EdgeFilter edgeFilter;
 
-  private final GeometryFactory geometryFactory;
   private final PathUtil pathUtil;
   private final QueryGraphExtractor queryGraphExtractor;
 
@@ -95,7 +94,6 @@ public class ViterbiLineStringMapMatcher implements LineStringMapMatcher {
     Preconditions.checkArgument(flagEncoders.size() == 1);
     Preconditions.checkArgument(flagEncoders.get(0) instanceof LinkFlagEncoder);
     this.flagEncoder = (LinkFlagEncoder) flagEncoders.get(0);
-
     final String algorithm = Parameters.Algorithms.DIJKSTRA_BI;
     final Weighting weighting = new ShortestWeighting(flagEncoder);
     this.mapMatching = new MapMatching(network, new AlgorithmOptions(algorithm, weighting));
@@ -105,7 +103,7 @@ public class ViterbiLineStringMapMatcher implements LineStringMapMatcher {
     mapMatching.setDistanceCalc(distanceCalc);
     this.locationIndexTree = (LocationIndexTree) network.getLocationIndex();
     this.edgeFilter = EdgeFilter.ALL_EDGES;
-    this.geometryFactory = new GeometryFactory(new PrecisionModel(), GlobalConstants.WGS84_SRID);
+    GeometryFactory geometryFactory = new GeometryFactory(new PrecisionModel(), GlobalConstants.WGS84_SRID);
     this.pathUtil = new PathUtil(geometryFactory);
     this.queryGraphExtractor = new QueryGraphExtractor();
   }
