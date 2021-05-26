@@ -60,7 +60,7 @@ public class PathUtil {
   }
 
   public double determineStartLinkFraction(final EdgeIteratorState firstEdge, final QueryGraph queryGraph) {
-    double startLinkFraction;
+    final double startLinkFraction;
     if (queryGraph.isVirtualNode(firstEdge.getBaseNode())) {
       final EdgeIteratorState originalEdge = findOriginalEdge(firstEdge, queryGraph);
 
@@ -130,7 +130,7 @@ public class PathUtil {
   }
 
   public double determineEndLinkFraction(final EdgeIteratorState lastEdge, final QueryGraph queryGraph) {
-    double endLinkFraction;
+    final double endLinkFraction;
     if (queryGraph.isVirtualNode(lastEdge.getAdjNode())) {
       final EdgeIteratorState originalEdge = findOriginalEdge(lastEdge, queryGraph);
 
