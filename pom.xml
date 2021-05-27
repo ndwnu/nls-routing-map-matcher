@@ -28,7 +28,6 @@
         <spring-boot.version>2.3.7.RELEASE</spring-boot.version>
         <jacoco.version>0.8.5</jacoco.version>
         <maven-failsafe-plugin.version>2.22.2</maven-failsafe-plugin.version>
-        <sonar.projectKey>${project.groupId}:nls-routing-map-matcher</sonar.projectKey>
         <sonar.projectName>nls-routing-map-matcher</sonar.projectName>
     </properties>
     <repositories>
