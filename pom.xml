@@ -4,11 +4,16 @@
 
     <modelVersion>4.0.0</modelVersion>
     <groupId>nu.ndw.nls</groupId>
-    <artifactId>routing-map-matcher</artifactId>
+    <artifactId>routing-map-matcher-parent</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <name>Routing Map Matcher</name>
-    <description>Map match data to a routable network using routing</description>
-
+    <name>routing map matcher parent</name>
+    <description>Routing Map Matcher modules containing the core library and spring boot starter modules</description>
+    <packaging>pom</packaging>
+    <modules>
+        <module>map-matcher-library</module>
+        <module>map-matcher-spring-boot-autoconfigure</module>
+        <module>map-matcher-spring-boot-starter</module>
+    </modules>
     <properties>
         <maven.compiler.source>11</maven.compiler.source>
         <maven.compiler.target>11</maven.compiler.target>
@@ -20,84 +25,70 @@
         <jts-core.version>1.15.1</jts-core.version>
         <guava.version>23.6-jre</guava.version>
         <logback-classic.version>1.1.7</logback-classic.version>
-        <junit-jupiter.version>5.7.2</junit-jupiter.version>
         <hamcrest.version>2.2</hamcrest.version>
         <mockito-junit-jupiter.version>3.10.0</mockito-junit-jupiter.version>
+        <spring-boot.version>2.3.7.RELEASE</spring-boot.version>
     </properties>
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-dependencies</artifactId>
+                <version>${spring-boot.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+            <!-- Graphhopper -->
+            <dependency>
+                <groupId>com.graphhopper</groupId>
+                <artifactId>graphhopper-core</artifactId>
+                <version>${graphhopper-core.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.graphhopper</groupId>
+                <artifactId>graphhopper-map-matching-core</artifactId>
+                <version>${graphhopper-map-matching-core.version}</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>com.graphhopper</groupId>
+                        <artifactId>graphhopper-reader-osm</artifactId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
+            <dependency>
+                <groupId>org.projectlombok</groupId>
+                <artifactId>lombok</artifactId>
+                <version>${lombok.version}</version>
+            </dependency>
+            <!-- JTS -->
+            <dependency>
+                <groupId>org.locationtech.jts</groupId>
+                <artifactId>jts-core</artifactId>
+                <version>${jts-core.version}</version>
+            </dependency>
+            <!-- Utilities -->
+            <dependency>
+                <groupId>com.google.guava</groupId>
+                <artifactId>guava</artifactId>
+                <version>${guava.version}</version>
+            </dependency>
 
+            <dependency>
+                <groupId>org.hamcrest</groupId>
+                <artifactId>hamcrest-library</artifactId>
+                <version>${hamcrest.version}</version>
+                <scope>test</scope>
+            </dependency>
+
+        </dependencies>
+
+    </dependencyManagement>
     <dependencies>
-        <!-- Graphhopper -->
-        <dependency>
-            <groupId>com.graphhopper</groupId>
-            <artifactId>graphhopper-core</artifactId>
-            <version>${graphhopper-core.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.graphhopper</groupId>
-            <artifactId>graphhopper-map-matching-core</artifactId>
-            <version>${graphhopper-map-matching-core.version}</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>com.graphhopper</groupId>
-                    <artifactId>graphhopper-reader-osm</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-        <!-- https://mvnrepository.com/artifact/org.springframework/spring-context -->
-        <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-context</artifactId>
-            <version>5.3.7</version>
-        </dependency>
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
-            <version>${lombok.version}</version>
+            <scope>provided</scope>
         </dependency>
-        <!-- JTS -->
-        <dependency>
-            <groupId>org.locationtech.jts</groupId>
-            <artifactId>jts-core</artifactId>
-            <version>${jts-core.version}</version>
-        </dependency>
-        <!-- Utilities -->
-        <dependency>
-            <groupId>com.google.guava</groupId>
-            <artifactId>guava</artifactId>
-            <version>${guava.version}</version>
-        </dependency>
-        <!-- Logging -->
-        <dependency>
-            <groupId>ch.qos.logback</groupId>
-            <artifactId>logback-classic</artifactId>
-            <version>${logback-classic.version}</version>
-        </dependency>
-        <!-- Testing -->
-        <dependency>
-            <groupId>org.junit.jupiter</groupId>
-            <artifactId>junit-jupiter-engine</artifactId>
-            <version>${junit-jupiter.version}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.junit.jupiter</groupId>
-            <artifactId>junit-jupiter-params</artifactId>
-            <version>${junit-jupiter.version}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.mockito</groupId>
-            <artifactId>mockito-junit-jupiter</artifactId>
-            <version>${mockito-junit-jupiter.version}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.hamcrest</groupId>
-            <artifactId>hamcrest-library</artifactId>
-            <version>${hamcrest.version}</version>
-            <scope>test</scope>
-        </dependency>
-
     </dependencies>
     <build>
         <defaultGoal>clean verify</defaultGoal>

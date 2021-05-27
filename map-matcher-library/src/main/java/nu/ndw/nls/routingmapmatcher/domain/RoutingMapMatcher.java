@@ -36,7 +36,8 @@ public class RoutingMapMatcher {
                 );
     }
 
-    private static LineStringMatch getLineStringMatch(final int numLocations, final LineStringMapMatcher lineStringMapMatcher,
+    private static LineStringMatch getLineStringMatch(final int numLocations,
+                                                      final LineStringMapMatcher lineStringMapMatcher,
                                                       final AtomicInteger matched,
                                                       final AtomicInteger processed,
                                                       final LineStringLocation lineStringLocation) {

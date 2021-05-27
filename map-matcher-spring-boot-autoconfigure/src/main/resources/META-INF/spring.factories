@@ -1,0 +1,2 @@
+org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
+nu.ndw.nls.routingmapmatcher.config.MapMatcherAutoConfiguration
