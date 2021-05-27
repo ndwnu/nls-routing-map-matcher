@@ -9,6 +9,7 @@ pool:
   vmImage: 'ubuntu-latest'
 
 steps:
+
   - task: SonarQubePrepare@4
     displayName: Prepare Sonar analysis
     inputs:
@@ -31,4 +32,4 @@ steps:
         goals: 'clean verify'
 
   - task: SonarQubePublish@4
-      displayName: Publish Sonar analysis results
+    displayName: Publish Sonar analysis results
