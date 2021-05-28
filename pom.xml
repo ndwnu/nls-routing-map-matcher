@@ -41,6 +41,12 @@
             </snapshots>
         </repository>
     </repositories>
+    <distributionManagement>
+        <repository>
+            <id>CBM</id>
+            <url>https://pkgs.dev.azure.com/ndwnu/CBM/_packaging/CBM/maven/v1</url>
+        </repository>
+    </distributionManagement>
     <dependencyManagement>
         <dependencies>
             <dependency>
