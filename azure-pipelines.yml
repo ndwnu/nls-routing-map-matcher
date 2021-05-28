@@ -9,17 +9,16 @@ pool:
   vmImage: 'ubuntu-latest'
 
 steps:
+
   - task: Maven@3
+    displayName: Maven build
     inputs:
-      mavenPomFile: 'pom.xml'
-      mavenOptions: '-Xmx3072m'
-      javaHomeOption: 'JDKVersion'
-      jdkVersionOption: '1.11'
-      jdkArchitectureOption: 'x64'
-      publishJUnitResults: true
-      testResultsFiles: '**/surefire-reports/TEST-*.xml'
+      publishJUnitResults: false
+      sonarQubeRunAnalysis: false
+      jdkVersionOption: 1.11
       ${{ if eq( variables['Build.SourceBranch'], 'refs/heads/master') }}:
         mavenAuthenticateFeed: true
         goals: 'deploy'
       ${{ if ne( variables['Build.SourceBranch'], 'refs/heads/master') }}:
-        goals: 'verify'
+        goals: 'clean verify'
+
