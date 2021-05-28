@@ -11,6 +11,9 @@
     <artifactId>routing-map-matcher-spring-boot-starter</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <name>routing-map-matcher-spring-boot-starter</name>
+    <properties>
+        <sonar.skip>true</sonar.skip>
+    </properties>
     <dependencies>
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -27,4 +30,12 @@
             <version>${project.version}</version>
         </dependency>
     </dependencies>
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+            </plugin>
+        </plugins>
+    </build>
 </project>
