@@ -11,7 +11,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = MapMatcherAutoConfiguration.class)
-class MapMatcherAutoConfigurationTest {
+class MapMatcherAutoConfigurationIT {
 
     @Autowired
     private RoutingMapMatcher routingMapMatcher;
