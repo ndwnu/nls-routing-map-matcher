@@ -9,27 +9,14 @@ pool:
   vmImage: 'ubuntu-latest'
 
 steps:
-
-  - task: SonarQubePrepare@4
-    displayName: Prepare Sonar analysis
-    inputs:
-      SonarQube: Sonar
-      scannerMode: Other
-      extraProperties: |
-        sonar.coverage.jacoco.xmlReportPaths=target/site/jacoco/jacoco.xml,target/site/jacoco-it/jacoco.xml
-        sonar.coverage.exclusions=**/config/**,**/properties/**
-
   - task: Maven@3
-    displayName: Maven build
-    inputs:
-      publishJUnitResults: false
-      sonarQubeRunAnalysis: true
-      jdkVersionOption: 1.11
-      ${{ if eq( variables['Build.SourceBranch'], 'refs/heads/master') }}:
-        mavenAuthenticateFeed: true
-        goals: 'deploy'
-      ${{ if ne( variables['Build.SourceBranch'], 'refs/heads/master') }}:
-        goals: 'clean verify'
-
-  - task: SonarQubePublish@4
-    displayName: Publish Sonar analysis results
+      displayName: Maven build
+      inputs:
+        publishJUnitResults: false
+        sonarQubeRunAnalysis: false
+        jdkVersionOption: 1.11
+        ${{ if eq( variables['Build.SourceBranch'], 'refs/heads/master') }}:
+          mavenAuthenticateFeed: true
+          goals: 'deploy'
+        ${{ if ne( variables['Build.SourceBranch'], 'refs/heads/master') }}:
+          goals: 'clean verify'
