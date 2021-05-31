@@ -16,27 +16,11 @@ public class RoutingMapMatcher {
 
     private static final int REPORT_PROGRESS_INTERVAL = 100;
     private static final double HUNDRED_PERCENT = 100.0;
-    
+
     private final LineStringMapMatcherFactory lineStringMapMatcherFactory;
 
     public RoutingMapMatcher(final LineStringMapMatcherFactory lineStringMapMatcherFactory) {
         this.lineStringMapMatcherFactory = lineStringMapMatcherFactory;
-    }
-
-    public Stream<LineStringMatch> matchLocations(final RoutingNetwork routingNetwork,
-                                                  final MapMatchingRequest mapMatchingRequest) {
-        final List<LineStringLocation> locations = mapMatchingRequest.getLocationSupplier().get();
-        final int numLocations = locations.size();
-        final LineStringMapMatcher lineStringMapMatcher = lineStringMapMatcherFactory
-                .createLineStringMapMatcher(routingNetwork);
-        final AtomicInteger matched = new AtomicInteger();
-        final AtomicInteger processed = new AtomicInteger();
-        log.info("Start map matching for {}, count = {}", mapMatchingRequest.getLocationTypeName(), numLocations);
-        return locations
-                .stream()
-                .map(lineStringLocation ->
-                        getLineStringMatch(numLocations, lineStringMapMatcher, matched, processed, lineStringLocation)
-                );
     }
 
     private static LineStringMatch getLineStringMatch(final int numLocations,
@@ -54,8 +38,24 @@ public class RoutingMapMatcher {
         }
         if (processed.intValue() == numLocations) {
             log.info("Done. Processed {} locations, {} successfully matched ({}%)", numLocations, matched.get(),
-                    (HUNDRED_PERCENT* matched.get()) / numLocations);
+                    (HUNDRED_PERCENT * matched.get()) / numLocations);
         }
         return match;
+    }
+
+    public Stream<LineStringMatch> matchLocations(final RoutingNetwork routingNetwork,
+                                                  final MapMatchingRequest mapMatchingRequest) {
+        final List<LineStringLocation> locations = mapMatchingRequest.getLocationSupplier().get();
+        final int numLocations = locations.size();
+        final LineStringMapMatcher lineStringMapMatcher = lineStringMapMatcherFactory
+                .createLineStringMapMatcher(routingNetwork);
+        final AtomicInteger matched = new AtomicInteger();
+        final AtomicInteger processed = new AtomicInteger();
+        log.info("Start map matching for {}, count = {}", mapMatchingRequest.getLocationTypeName(), numLocations);
+        return locations
+                .stream()
+                .map(lineStringLocation ->
+                        getLineStringMatch(numLocations, lineStringMapMatcher, matched, processed, lineStringLocation)
+                );
     }
 }
