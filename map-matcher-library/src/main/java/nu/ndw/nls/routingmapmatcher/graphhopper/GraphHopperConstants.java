@@ -6,11 +6,11 @@ import com.graphhopper.util.DistancePlaneProjection;
 
 public class GraphHopperConstants {
 
-  public static final AngleCalc angleCalculation = new AngleCalc();
-  public static final DistanceCalc distanceCalculation = new DistancePlaneProjection();
+    public static final AngleCalc angleCalculation = new AngleCalc();
+    public static final DistanceCalc distanceCalculation = new DistancePlaneProjection();
 
-  private GraphHopperConstants() {
-    // Prevent instantiation
-  }
+    private GraphHopperConstants() {
+        // Prevent instantiation
+    }
 
 }

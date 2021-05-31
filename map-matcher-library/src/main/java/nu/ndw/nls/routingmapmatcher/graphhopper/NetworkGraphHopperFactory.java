@@ -7,22 +7,22 @@ import java.util.Arrays;
 
 public class NetworkGraphHopperFactory {
 
-  private static final int BYTES_FOR_EDGE_FLAGS = 12;
+    private static final int BYTES_FOR_EDGE_FLAGS = 12;
 
-  public NetworkGraphHopper createNetworkGraphHopper(final RoutingNetwork routingNetwork) {
-    final NetworkGraphHopper graphHopper = new NetworkGraphHopper(routingNetwork.getLinkSupplier());
-    graphHopper.setStoreOnFlush(false);
-    graphHopper.setElevation(false);
-    graphHopper.setCHEnabled(false);
-    graphHopper.setMinNetworkSize(0, 0);
-    graphHopper.setDataReaderFile("graphhopper_" + routingNetwork.getNetworkNameAndVersion());
-    graphHopper.setGraphHopperLocation("graphhopper_" + routingNetwork.getNetworkNameAndVersion());
-    final LinkFlagEncoder flagEncoder = new LinkFlagEncoder();
-    graphHopper.setEncodingManager(EncodingManager.create(Arrays.asList(flagEncoder), BYTES_FOR_EDGE_FLAGS));
+    public NetworkGraphHopper createNetworkGraphHopper(final RoutingNetwork routingNetwork) {
+        final NetworkGraphHopper graphHopper = new NetworkGraphHopper(routingNetwork.getLinkSupplier());
+        graphHopper.setStoreOnFlush(false);
+        graphHopper.setElevation(false);
+        graphHopper.setCHEnabled(false);
+        graphHopper.setMinNetworkSize(0, 0);
+        graphHopper.setDataReaderFile("graphhopper_" + routingNetwork.getNetworkNameAndVersion());
+        graphHopper.setGraphHopperLocation("graphhopper_" + routingNetwork.getNetworkNameAndVersion());
+        final LinkFlagEncoder flagEncoder = new LinkFlagEncoder();
+        graphHopper.setEncodingManager(EncodingManager.create(Arrays.asList(flagEncoder), BYTES_FOR_EDGE_FLAGS));
 
-    graphHopper.importOrLoad();
-    graphHopper.setAllowWrites(false);
+        graphHopper.importOrLoad();
+        graphHopper.setAllowWrites(false);
 
-    return graphHopper;
-  }
+        return graphHopper;
+    }
 }
