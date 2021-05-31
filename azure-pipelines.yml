@@ -16,7 +16,7 @@ steps:
       SonarQube: Sonar
       scannerMode: Other
       extraProperties: |
-        sonar.coverage.jacoco.xmlReportPaths=target/site/jacoco/jacoco.xml,target/site/jacoco-it/jacoco.xml
+        sonar.coverage.jacoco.xmlReportPaths=**/target/site/jacoco/jacoco.xml,target/site/jacoco-it/jacoco.xml
         sonar.coverage.exclusions=**/config/**,**/properties/**
 
   - task: Maven@3
