@@ -14,6 +14,9 @@ import java.util.stream.Stream;
 @Slf4j
 public class RoutingMapMatcher {
 
+    private static final int REPORT_PROGRESS_INTERVAL = 100;
+    private static final double HUNDRED_PERCENT = 100.0;
+    
     private final LineStringMapMatcherFactory lineStringMapMatcherFactory;
 
     public RoutingMapMatcher(final LineStringMapMatcherFactory lineStringMapMatcherFactory) {
@@ -43,15 +46,15 @@ public class RoutingMapMatcher {
                                                       final LineStringLocation lineStringLocation) {
         final LineStringMatch match = lineStringMapMatcher.match(lineStringLocation);
         processed.incrementAndGet();
-        if (MatchStatus.MATCH.equals(match.getStatus())) {
+        if (match.getStatus() == MatchStatus.MATCH) {
             matched.incrementAndGet();
         }
-        if ((processed.get() + 1) % 100 == 0) {
+        if ((processed.get() + 1) % REPORT_PROGRESS_INTERVAL == 0) {
             log.info("Processed {} of {} total", processed.get() + 1, numLocations);
         }
         if (processed.intValue() == numLocations) {
             log.info("Done. Processed {} locations, {} successfully matched ({}%)", numLocations, matched.get(),
-                    matched.get() * 10000 / numLocations / 100.0);
+                    (HUNDRED_PERCENT* matched.get()) / numLocations);
         }
         return match;
     }
