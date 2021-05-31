@@ -97,12 +97,17 @@ public class PathUtil {
 
     double distanceInOtherDirection = 0.0;
     boolean distanceInOtherDirectionCalculated = false;
-
+    boolean distanceInOtherDirectionIsPositive = false;
+    
     EdgeIterator edges = edgeExplorer.setBaseNode(virtualNode);
     int currentNodeToAvoid = nodeToAvoid;
     while (edges.next()) {
       if (edges.getAdjNode() != currentNodeToAvoid) {
         distanceInOtherDirection += edges.getDistance();
+        
+        // This assumes all edge lengths are > 0.0! 
+        distanceInOtherDirectionIsPositive = true;
+        
         if (queryGraph.isVirtualNode(edges.getAdjNode())) {
           // Search further
           currentNodeToAvoid = edges.getBaseNode();
@@ -118,7 +123,7 @@ public class PathUtil {
     if (!distanceInOtherDirectionCalculated) {
       // This could be the case when an edge has exactly one virtual node and that edge has the same node as
       // start node and end node; in this situation the value of distanceInOtherDirection should be 0.0
-      if (distanceInOtherDirection == 0.0) {
+      if (!distanceInOtherDirectionIsPositive) {
         distanceInOtherDirection = queryGraph.getOriginalEdgeFromVirtNode(virtualNode).getDistance() -
             pathEdge.getDistance();
       } else {
