@@ -23,7 +23,7 @@ steps:
     displayName: Maven build
     inputs:
       publishJUnitResults: false
-      sonarQubeRunAnalysis: false
+      sonarQubeRunAnalysis: true
       jdkVersionOption: 1.11
       ${{ if eq( variables['Build.SourceBranch'], 'refs/heads/master') }}:
         mavenAuthenticateFeed: true
