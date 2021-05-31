@@ -19,10 +19,8 @@ public class NetworkGraphHopperFactory {
     graphHopper.setGraphHopperLocation("graphhopper_" + routingNetwork.getNetworkNameAndVersion());
     final LinkFlagEncoder flagEncoder = new LinkFlagEncoder();
     graphHopper.setEncodingManager(EncodingManager.create(Arrays.asList(flagEncoder), BYTES_FOR_EDGE_FLAGS));
-
     graphHopper.importOrLoad();
     graphHopper.setAllowWrites(false);
-
     return graphHopper;
   }
 }
