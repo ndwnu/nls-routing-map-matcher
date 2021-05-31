@@ -15,7 +15,8 @@ public class LineStringLocation {
     private final ReliabilityCalculationType reliabilityCalculationType;
 
     public LineStringLocation(final int id, final Optional<Integer> locationIndex, final Optional<Boolean> reversed,
-                              final double lengthInMeters, final LineString geometry, final ReliabilityCalculationType reliabilityCalculationType) {
+                              final double lengthInMeters, final LineString geometry,
+                              final ReliabilityCalculationType reliabilityCalculationType) {
         this.id = id;
         this.locationIndex = locationIndex;
         this.reversed = reversed;
