@@ -135,6 +135,7 @@ class NetworkReader implements DataReader {
         return pointList;
     }
 
+    @SuppressWarnings("squid:S109")
     private void logCount(final int count) {
         boolean log = count <= 10 && count % 5 == 0;
         log = log || count <= 100 && count % 50 == 0;
