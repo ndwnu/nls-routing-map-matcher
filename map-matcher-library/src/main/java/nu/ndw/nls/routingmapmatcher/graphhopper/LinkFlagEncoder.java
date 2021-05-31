@@ -14,6 +14,12 @@ import java.util.List;
 
 public class LinkFlagEncoder extends AbstractFlagEncoder {
 
+    private static final int TOTAL_BITS = 31;
+    private static final int SPEED_BITS = 24;
+    private static final double SPEED_FACTOR = 0.0001;
+    private static final double MAXIMUM_SPEED = 1500;
+    
+
     public static final String NAME = "links";
 
     private final boolean speedInTwoDirections;
@@ -22,7 +28,7 @@ public class LinkFlagEncoder extends AbstractFlagEncoder {
     private SimpleIntEncodedValue idEncoder;
 
     public LinkFlagEncoder() {
-        this(24, 0.0001, 1500, true, 0);
+        this(SPEED_BITS, SPEED_FACTOR, MAXIMUM_SPEED, true, 0);
     }
 
     public LinkFlagEncoder(final int speedBits, final double speedFactor, final double maximumSpeed,
@@ -69,7 +75,7 @@ public class LinkFlagEncoder extends AbstractFlagEncoder {
         registerNewEncodedValue.add(speedEncoder);
 
         final boolean idInTwoDirections = false;
-        idEncoder = new SimpleIntEncodedValue(prefix + "id", 31, idInTwoDirections);
+        idEncoder = new SimpleIntEncodedValue(prefix + "id", TOTAL_BITS, idInTwoDirections);
         registerNewEncodedValue.add(idEncoder);
     }
 
