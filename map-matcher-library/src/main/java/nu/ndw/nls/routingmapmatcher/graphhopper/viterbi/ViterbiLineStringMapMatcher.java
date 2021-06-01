@@ -42,6 +42,7 @@ import java.util.List;
 
 public class ViterbiLineStringMapMatcher implements LineStringMapMatcher {
 
+
     private static final Logger logger = LoggerFactory.getLogger(ViterbiLineStringMapMatcher.class);
 
     /**
@@ -79,6 +80,10 @@ public class ViterbiLineStringMapMatcher implements LineStringMapMatcher {
 
     private static final int MILLIS_PER_SECOND = 1000;
 
+    private static final int MAX_RELIABILITY_SCORE = 100;
+    private static final double DISTANCE_PENALTY_FACTOR = 1.5;
+    private static final double PATH_LENGTH_DIFFERENCE_PENALTY_FACTOR = 0.1;
+    
     private final LinkFlagEncoder flagEncoder;
     private final MapMatching mapMatching;
     private final CustomDistanceCalc distanceCalc;
@@ -196,7 +201,7 @@ public class ViterbiLineStringMapMatcher implements LineStringMapMatcher {
         final double startLinkFraction = pathUtil.determineStartLinkFraction(edges.get(0), queryGraph);
         final double endLinkFraction = pathUtil.determineEndLinkFraction(edges.get(edges.size() - 1), queryGraph);
         final double reliability;
-        if (lineStringLocation.getReliabilityCalculationType().equals(ReliabilityCalculationType.POINT_OBSERVATIONS)) {
+        if (ReliabilityCalculationType.POINT_OBSERVATIONS == lineStringLocation.getReliabilityCalculationType()) {
             reliability = calculateCandidatePathScoreOnlyPoints(path, lineStringLocation);
         } else {
             reliability = calculateCandidatePathScore(path, lineStringLocation);
@@ -216,7 +221,7 @@ public class ViterbiLineStringMapMatcher implements LineStringMapMatcher {
             pointDistancesToMatch.add(calculateSmallestDistanceToPointList(latitude, longitude,
                     pathPointList));
         }
-        return Math.max(0, 100 - Collections.min(pointDistancesToMatch) - Collections.max(pointDistancesToMatch));
+        return Math.max(0, MAX_RELIABILITY_SCORE - Collections.min(pointDistancesToMatch) - Collections.max(pointDistancesToMatch));
     }
 
     private double calculateCandidatePathScore(final Path path, final LineStringLocation lineStringLocation) {
@@ -225,7 +230,9 @@ public class ViterbiLineStringMapMatcher implements LineStringMapMatcher {
         final double lengthInMeters = lineStringLocation.getLengthInMeters();
         final double pathDistanceLengthDifferenceInMeters = Math.abs(path.getDistance() - lengthInMeters);
 
-        return Math.max(0, 100 - (1.5 * maximumDistanceInMeters) - (0.1 * pathDistanceLengthDifferenceInMeters));
+        return Math.max(0, MAX_RELIABILITY_SCORE
+                - (DISTANCE_PENALTY_FACTOR * maximumDistanceInMeters)
+                - (PATH_LENGTH_DIFFERENCE_PENALTY_FACTOR * pathDistanceLengthDifferenceInMeters));
     }
 
     private double calculateMaximumDistanceInMeters(final Path path, final LineString geometry) {
@@ -281,7 +288,7 @@ public class ViterbiLineStringMapMatcher implements LineStringMapMatcher {
         final double endLinkFraction = 0.0;
         final double reliability = 0.0;
         final LineString lineString = lineStringLocation.getGeometry();
-        return new LineStringMatch(lineStringLocation, ndwLinkIds, startLinkFraction, endLinkFraction, reliability, status,
-                lineString);
+        return new LineStringMatch(lineStringLocation, ndwLinkIds, startLinkFraction, endLinkFraction, reliability, 
+                status, lineString);
     }
 }
