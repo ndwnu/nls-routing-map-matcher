@@ -221,7 +221,9 @@ public class ViterbiLineStringMapMatcher implements LineStringMapMatcher {
             pointDistancesToMatch.add(calculateSmallestDistanceToPointList(latitude, longitude,
                     pathPointList));
         }
-        return Math.max(0, MAX_RELIABILITY_SCORE - Collections.min(pointDistancesToMatch) - Collections.max(pointDistancesToMatch));
+        return Math.max(0, MAX_RELIABILITY_SCORE
+                - Collections.min(pointDistancesToMatch)
+                - Collections.max(pointDistancesToMatch));
     }
 
     private double calculateCandidatePathScore(final Path path, final LineStringLocation lineStringLocation) {
