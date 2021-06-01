@@ -1,6 +1,7 @@
 package nu.ndw.nls.routingmapmatcher.graphhopper.viterbi;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import nu.ndw.nls.routingmapmatcher.domain.LineStringMapMatcher;
 import nu.ndw.nls.routingmapmatcher.domain.LineStringMapMatcherFactory;
 import nu.ndw.nls.routingmapmatcher.domain.model.RoutingNetwork;
@@ -10,9 +11,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @RequiredArgsConstructor
+@Slf4j
 public class ViterbiLinestringMapMatcherFactory implements LineStringMapMatcherFactory {
 
-    private static final Logger logger = LoggerFactory.getLogger(ViterbiLinestringMapMatcherFactory.class);
     private final NetworkGraphHopperFactory networkGraphHopperFactory;
 
     @Override
@@ -21,7 +22,7 @@ public class ViterbiLinestringMapMatcherFactory implements LineStringMapMatcherF
     }
 
     private NetworkGraphHopper readNetwork(final RoutingNetwork routingNetwork) {
-        logger.info("Start reading network with version {}", routingNetwork.getNetworkNameAndVersion());
+        log.info("Start reading network with version {}", routingNetwork.getNetworkNameAndVersion());
         return networkGraphHopperFactory.createNetworkGraphHopper(routingNetwork);
     }
 }
