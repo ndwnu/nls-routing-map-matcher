@@ -26,7 +26,8 @@ public class PathUtil {
     public LineString createLineString(final PointList points) {
         final LineString lineString;
         if (points.size() > 1) {
-            final PackedCoordinateSequence.Double coordinateSequence = new PackedCoordinateSequence.Double(points.size(), 2);
+            final PackedCoordinateSequence.Double coordinateSequence = 
+                    new PackedCoordinateSequence.Double(points.size(), 2);
             for (int index = 0; index < points.size(); index++) {
                 coordinateSequence.setOrdinate(index, 0, points.getLongitude(index));
                 coordinateSequence.setOrdinate(index, 1, points.getLatitude(index));
@@ -83,7 +84,8 @@ public class PathUtil {
             } else if (queryGraph.isVirtualNode(edge.getAdjNode())) {
                 originalEdge = queryGraph.getOriginalEdgeFromVirtNode(edge.getAdjNode());
             } else {
-                throw new IllegalStateException("Unexpected state: at least one node of a virtual edge should be virtual");
+                throw new IllegalStateException
+                    ("Unexpected state: at least one node of a virtual edge should be virtual");
             }
         } else {
             originalEdge = edge;
@@ -92,7 +94,8 @@ public class PathUtil {
     }
 
     private double calculateDistanceFromVirtualNodeToNonVirtualNode(final QueryGraph queryGraph, final int virtualNode,
-                                                                    final int nodeToAvoid, final EdgeIteratorState pathEdge) {
+                                                                    final int nodeToAvoid,
+                                                                    final EdgeIteratorState pathEdge) {
         final EdgeExplorer edgeExplorer = queryGraph.createEdgeExplorer();
 
         double distanceInOtherDirection = 0.0;
