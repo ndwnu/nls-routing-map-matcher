@@ -18,6 +18,8 @@ import com.graphhopper.util.EdgeIteratorState;
 import com.graphhopper.util.GPXEntry;
 import com.graphhopper.util.Parameters;
 import com.graphhopper.util.PointList;
+
+import lombok.extern.slf4j.Slf4j;
 import nu.ndw.nls.routingmapmatcher.constants.GlobalConstants;
 import nu.ndw.nls.routingmapmatcher.domain.LineStringMapMatcher;
 import nu.ndw.nls.routingmapmatcher.domain.exception.RoutingMapMatcherException;
@@ -33,17 +35,15 @@ import org.locationtech.jts.geom.CoordinateSequence;
 import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.LineString;
 import org.locationtech.jts.geom.PrecisionModel;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+
+@Slf4j
 public class ViterbiLineStringMapMatcher implements LineStringMapMatcher {
 
-
-    private static final Logger logger = LoggerFactory.getLogger(ViterbiLineStringMapMatcher.class);
 
     /**
      * The standard deviation of GPS observations.
@@ -130,7 +130,7 @@ public class ViterbiLineStringMapMatcher implements LineStringMapMatcher {
                     lineStringMatch = createFailedMatch(lineStringLocation, MatchStatus.NO_PATH);
                 }
             } catch (final Exception e) {
-                logger.debug("Exception while map matching, creating failed result for {}", lineStringLocation, e);
+                log.debug("Exception while map matching, creating failed result for {}", lineStringLocation, e);
                 lineStringMatch = createFailedMatch(lineStringLocation, MatchStatus.EXCEPTION);
             }
         } else {
