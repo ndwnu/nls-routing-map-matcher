@@ -7,8 +7,6 @@ import nu.ndw.nls.routingmapmatcher.domain.LineStringMapMatcherFactory;
 import nu.ndw.nls.routingmapmatcher.domain.model.RoutingNetwork;
 import nu.ndw.nls.routingmapmatcher.graphhopper.NetworkGraphHopper;
 import nu.ndw.nls.routingmapmatcher.graphhopper.NetworkGraphHopperFactory;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 @RequiredArgsConstructor
 @Slf4j
