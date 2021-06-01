@@ -138,10 +138,10 @@ class NetworkReader implements DataReader {
     @SuppressWarnings("squid:S109")
     private void logCount(final int count) {
         boolean log = count <= 10 && count % 5 == 0;
-        log = log || count <= 100 && count % 50 == 0;
-        log = log || count <= 1_000 && count % 500 == 0;
-        log = log || count <= 10_000 && count % 5_000 == 0;
-        log = log || count <= 100_000 && count % 50_000 == 0;
+        log = log || (count <= 100 && count % 50 == 0);
+        log = log || (count <= 1_000 && count % 500 == 0);
+        log = log || (count <= 10_000 && count % 5_000 == 0);
+        log = log || (count <= 100_000 && count % 50_000 == 0);
         log = log || count % 500_000 == 0;
         if (log) {
             logger.debug("Read {} links", count);
