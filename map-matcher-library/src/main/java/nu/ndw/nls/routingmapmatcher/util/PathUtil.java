@@ -13,6 +13,7 @@ import org.locationtech.jts.geom.LineString;
 import org.locationtech.jts.geom.impl.PackedCoordinateSequence;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 public class PathUtil {
@@ -46,7 +47,7 @@ public class PathUtil {
         return lineString;
     }
 
-    public List<Integer> determineNdwLinkIds(final LinkFlagEncoder flagEncoder, final List<EdgeIteratorState> edges) {
+    public List<Integer> determineNdwLinkIds(final LinkFlagEncoder flagEncoder, final Collection<EdgeIteratorState> edges) {
         final List<Integer> ndwLinkIds = new ArrayList<>(edges.size());
         Integer previousNdwLinkId = null;
         for (final EdgeIteratorState edge : edges) {

@@ -5,8 +5,8 @@ import com.graphhopper.util.DistancePlaneProjection;
 
 public class CustomDistanceCalc extends DistancePlaneProjection {
 
-    private double customDistance = 0.0;
-    private int customDistanceCounter = 0;
+    private double customDistance;
+    private int customDistanceCounter;
 
     public void returnCustomDistanceForNextCalls(final double customDistance, final int numberOfCalls) {
         Preconditions.checkArgument(customDistance >= 0.0);
