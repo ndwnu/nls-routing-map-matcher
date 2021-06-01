@@ -47,7 +47,8 @@ public class PathUtil {
         return lineString;
     }
 
-    public List<Integer> determineNdwLinkIds(final LinkFlagEncoder flagEncoder, final Collection<EdgeIteratorState> edges) {
+    public List<Integer> determineNdwLinkIds(final LinkFlagEncoder flagEncoder, 
+            final Collection<EdgeIteratorState> edges) {
         final List<Integer> ndwLinkIds = new ArrayList<>(edges.size());
         Integer previousNdwLinkId = null;
         for (final EdgeIteratorState edge : edges) {
