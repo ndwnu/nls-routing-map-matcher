@@ -52,7 +52,7 @@ public class RoutingMapMatcher {
         if (processed.intValue() == numLocations) {
             double percentage = HUNDRED_PERCENT * matched.get() / numLocations;
             log.info("Done. Processed {} locations, {} successfully matched ({}%)", numLocations, matched.get(),
-                    String.format("%2.f", percentage));
+                    String.format("%.2f", percentage));
         }
         
         return match;
