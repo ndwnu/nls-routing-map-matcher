@@ -8,6 +8,7 @@ import nu.ndw.nls.routingmapmatcher.domain.model.linestring.LineStringLocation;
 import nu.ndw.nls.routingmapmatcher.domain.model.linestring.LineStringMatch;
 
 import java.util.List;
+import java.util.Locale;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Stream;
 
@@ -52,7 +53,7 @@ public class RoutingMapMatcher {
         if (processed.intValue() == numLocations) {
             double percentage = HUNDRED_PERCENT * matched.get() / numLocations;
             log.info("Done. Processed {} locations, {} successfully matched ({}%)", numLocations, matched.get(),
-                    String.format("%.2f", percentage));
+                    String.format(Locale.getDefault(), "%.2f", percentage));
         }
         
         return match;
