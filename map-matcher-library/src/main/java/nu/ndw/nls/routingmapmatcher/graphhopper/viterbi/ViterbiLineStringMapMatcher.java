@@ -44,7 +44,6 @@ import java.util.List;
 @Slf4j
 public class ViterbiLineStringMapMatcher implements LineStringMapMatcher {
 
-
     /**
      * The standard deviation of GPS observations.
      * <p>
@@ -83,7 +82,9 @@ public class ViterbiLineStringMapMatcher implements LineStringMapMatcher {
     private static final int MAX_RELIABILITY_SCORE = 100;
     private static final double DISTANCE_PENALTY_FACTOR = 1.5;
     private static final double PATH_LENGTH_DIFFERENCE_PENALTY_FACTOR = 0.1;
-    
+    private static final int NEEDED_GPS_TRACK_ENTRIES = 2;
+
+
     private final LinkFlagEncoder flagEncoder;
     private final MapMatching mapMatching;
     private final CustomDistanceCalc distanceCalc;
@@ -120,7 +121,7 @@ public class ViterbiLineStringMapMatcher implements LineStringMapMatcher {
         final List<GPXEntry> gpsTrack = createGpsTrack(lineStringLocation.getGeometry());
 
         LineStringMatch lineStringMatch;
-        if (gpsTrack.size() >= 2) {
+        if (gpsTrack.size() >= NEEDED_GPS_TRACK_ENTRIES) {
             try {
                 preventFilteringWhileMapMatching(gpsTrack);
                 final MatchResult matchResult = mapMatching.doWork(gpsTrack);
