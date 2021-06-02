@@ -22,6 +22,9 @@ import java.util.function.Supplier;
 @Slf4j
 class NetworkReader implements DataReader {
 
+    private static final int STORAGE_BYTE_COUNT = 1000;
+    private static final int COORDINATES_LENGTH_FOR_START_AND_END_ONLY = 2;
+
     private final GraphHopperStorage ghStorage;
     private final Supplier<Iterator<Link>> linkSupplier;
     private final LongIntMap nodeIdToInternalNodeIdMap;
@@ -69,7 +72,7 @@ class NetworkReader implements DataReader {
     @Override
     public void readGraph() {
         log.info("Start reading links");
-        ghStorage.create(1000);
+        ghStorage.create(STORAGE_BYTE_COUNT);
         final Iterator<Link> links = linkSupplier.get();
         readLinks(links);
         log.info("Finished reading links");
@@ -87,7 +90,7 @@ class NetworkReader implements DataReader {
 
     private void addLink(final Link link) {
         final Coordinate[] coordinates = link.getGeometry().getCoordinates();
-        if (coordinates.length < 2) {
+        if (coordinates.length < COORDINATES_LENGTH_FOR_START_AND_END_ONLY) {
             throw new IllegalStateException("Invalid geometry");
         }
         final int internalFromNodeId = addNodeIfNeeded(link.getFromNodeId(), coordinates[0].y,
@@ -98,7 +101,7 @@ class NetworkReader implements DataReader {
         final EdgeIteratorState edge = ghStorage.edge(internalFromNodeId, internalToNodeId)
                 .setDistance(link.getDistanceInMeters())
                 .setFlags(wayFlags);
-        if (coordinates.length > 2) {
+        if (coordinates.length > COORDINATES_LENGTH_FOR_START_AND_END_ONLY) {
             final PointList geometry = createPointListWithoutStartAndEndPoint(coordinates);
             edge.setWayGeometry(geometry);
         }

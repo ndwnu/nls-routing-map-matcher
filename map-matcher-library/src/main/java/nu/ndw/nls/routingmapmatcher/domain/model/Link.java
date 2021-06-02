@@ -14,8 +14,10 @@ public class Link extends ReaderWay {
     private final double distanceInMeters;
     private final LineString geometry;
 
-    public Link(final long id, final long fromNodeId, final long toNodeId, final double speedInKilometersPerHour,
-                final double reverseSpeedInKilometersPerHour, final double distanceInMeters, final LineString geometry) {
+    public Link(final long id, 
+                final long fromNodeId, final long toNodeId,
+                final double speedInKilometersPerHour, final double reverseSpeedInKilometersPerHour,
+                final double distanceInMeters, final LineString geometry) {
         super(id);
         this.fromNodeId = fromNodeId;
         this.toNodeId = toNodeId;
