@@ -17,7 +17,8 @@ public class LineStringMatch {
     private final LineString lineString;
 
     public LineStringMatch(final LineStringLocation location, final List<Integer> ndwLinkIds,
-                           final double startLinkFraction, final double endLinkFraction, final double reliability, final MatchStatus status,
+                           final double startLinkFraction, final double endLinkFraction, 
+                           final double reliability, final MatchStatus status,
                            final LineString lineString) {
         this.location = location;
         this.ndwLinkIds = ndwLinkIds;
