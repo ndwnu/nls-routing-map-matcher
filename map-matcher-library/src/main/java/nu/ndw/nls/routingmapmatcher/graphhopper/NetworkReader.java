@@ -9,19 +9,18 @@ import com.graphhopper.storage.GraphHopperStorage;
 import com.graphhopper.storage.IntsRef;
 import com.graphhopper.util.EdgeIteratorState;
 import com.graphhopper.util.PointList;
+
+import lombok.extern.slf4j.Slf4j;
 import nu.ndw.nls.routingmapmatcher.domain.model.Link;
 import org.locationtech.jts.geom.Coordinate;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.function.Supplier;
 
+@Slf4j
 class NetworkReader implements DataReader {
-
-    private static final Logger logger = LoggerFactory.getLogger(NetworkReader.class);
 
     private final GraphHopperStorage ghStorage;
     private final Supplier<Iterator<Link>> linkSupplier;
@@ -69,11 +68,11 @@ class NetworkReader implements DataReader {
 
     @Override
     public void readGraph() {
-        logger.info("Start reading links");
+        log.info("Start reading links");
         ghStorage.create(1000);
         final Iterator<Link> links = linkSupplier.get();
         readLinks(links);
-        logger.info("Finished reading links");
+        log.info("Finished reading links");
     }
 
     private void readLinks(final Iterator<Link> links) {
@@ -135,15 +134,16 @@ class NetworkReader implements DataReader {
         return pointList;
     }
 
+    @SuppressWarnings("squid:S109")
     private void logCount(final int count) {
-        boolean log = count <= 10 && count % 5 == 0;
-        log = log || count <= 100 && count % 50 == 0;
-        log = log || count <= 1_000 && count % 500 == 0;
-        log = log || count <= 10_000 && count % 5_000 == 0;
-        log = log || count <= 100_000 && count % 50_000 == 0;
-        log = log || count % 500_000 == 0;
-        if (log) {
-            logger.debug("Read {} links", count);
+        boolean shouldLog = count <= 10 && count % 5 == 0;
+        shouldLog = shouldLog || (count <= 100 && count % 50 == 0);
+        shouldLog = shouldLog || (count <= 1_000 && count % 500 == 0);
+        shouldLog = shouldLog || (count <= 10_000 && count % 5_000 == 0);
+        shouldLog = shouldLog || (count <= 100_000 && count % 50_000 == 0);
+        shouldLog = shouldLog || count % 500_000 == 0;
+        if (shouldLog) {
+            log.debug("Read {} links", count);
         }
     }
 
