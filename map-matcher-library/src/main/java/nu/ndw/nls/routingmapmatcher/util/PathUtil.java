@@ -27,7 +27,7 @@ public class PathUtil {
     public LineString createLineString(final PointList points) {
         final LineString lineString;
         if (points.size() > 1) {
-            final PackedCoordinateSequence.Double coordinateSequence = 
+            final PackedCoordinateSequence.Double coordinateSequence =
                     new PackedCoordinateSequence.Double(points.size(), 2);
             for (int index = 0; index < points.size(); index++) {
                 coordinateSequence.setOrdinate(index, 0, points.getLongitude(index));
@@ -35,7 +35,8 @@ public class PathUtil {
             }
             lineString = geometryFactory.createLineString(coordinateSequence);
         } else if (points.size() == 1) {
-            final PackedCoordinateSequence.Double coordinateSequence = new PackedCoordinateSequence.Double(2, 2);
+            final PackedCoordinateSequence.Double coordinateSequence =
+                    new PackedCoordinateSequence.Double(2, 2);
             coordinateSequence.setOrdinate(0, 0, points.getLongitude(0));
             coordinateSequence.setOrdinate(0, 1, points.getLatitude(0));
             coordinateSequence.setOrdinate(1, 0, points.getLongitude(0));
@@ -47,19 +48,19 @@ public class PathUtil {
         return lineString;
     }
 
-    public List<Integer> determineNdwLinkIds(final LinkFlagEncoder flagEncoder, 
-            final Collection<EdgeIteratorState> edges) {
-        final List<Integer> ndwLinkIds = new ArrayList<>(edges.size());
-        Integer previousNdwLinkId = null;
+    public List<Integer> determineMatchedLinkIds(final LinkFlagEncoder flagEncoder,
+                                                 final Collection<EdgeIteratorState> edges) {
+        final List<Integer> matchedLinkIds = new ArrayList<>(edges.size());
+        Integer previousMatchedLinkId = null;
         for (final EdgeIteratorState edge : edges) {
             final IntsRef flags = edge.getFlags();
-            final Integer ndwLinkId = flagEncoder.getId(flags);
-            if (previousNdwLinkId == null || !previousNdwLinkId.equals(ndwLinkId)) {
-                ndwLinkIds.add(ndwLinkId);
+            final Integer matchedLinkId = flagEncoder.getId(flags);
+            if (previousMatchedLinkId == null || !previousMatchedLinkId.equals(matchedLinkId)) {
+                matchedLinkIds.add(matchedLinkId);
             }
-            previousNdwLinkId = ndwLinkId;
+            previousMatchedLinkId = matchedLinkId;
         }
-        return ndwLinkIds;
+        return matchedLinkIds;
     }
 
     public double determineStartLinkFraction(final EdgeIteratorState firstEdge, final QueryGraph queryGraph) {
@@ -87,7 +88,7 @@ public class PathUtil {
                 originalEdge = queryGraph.getOriginalEdgeFromVirtNode(edge.getAdjNode());
             } else {
                 throw new IllegalStateException
-                    ("Unexpected state: at least one node of a virtual edge should be virtual");
+                        ("Unexpected state: at least one node of a virtual edge should be virtual");
             }
         } else {
             originalEdge = edge;

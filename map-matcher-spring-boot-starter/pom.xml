@@ -5,11 +5,10 @@
     <parent>
         <groupId>nu.ndw.nls</groupId>
         <artifactId>routing-map-matcher-parent</artifactId>
-        <version>0.0.1-SNAPSHOT</version>
+        <version>0.0.1-RELEASE</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <artifactId>routing-map-matcher-spring-boot-starter</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
     <name>routing-map-matcher-spring-boot-starter</name>
     <properties>
         <sonar.skip>true</sonar.skip>

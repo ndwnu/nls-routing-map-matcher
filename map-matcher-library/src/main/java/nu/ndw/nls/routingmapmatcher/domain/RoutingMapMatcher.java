@@ -25,7 +25,7 @@ public class RoutingMapMatcher {
     }
 
     public Stream<LineStringMatch> matchLocations(final RoutingNetwork routingNetwork,
-            final MapMatchingRequest mapMatchingRequest) {
+                                                  final MapMatchingRequest mapMatchingRequest) {
         final List<LineStringLocation> locations = mapMatchingRequest.getLocationSupplier().get();
         final int numLocations = locations.size();
         final LineStringMapMatcher lineStringMapMatcher = lineStringMapMatcherFactory
@@ -55,8 +55,9 @@ public class RoutingMapMatcher {
             log.info("Done. Processed {} locations, {} successfully matched ({}%)", numLocations, matched.get(),
                     String.format(Locale.getDefault(), "%.2f", percentage));
         }
-        
+
         return match;
     }
+
 
 }
