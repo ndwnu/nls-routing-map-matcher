@@ -11,12 +11,12 @@ import java.util.List;
 @Getter
 public class LineStringMatch {
 
-  private final LineStringLocation location;
-  private final List<Integer> matchedLinkIds;
-  private final double startLinkFraction;
-  private final double endLinkFraction;
-  private final double reliability;
-  private final MatchStatus status;
-  private final LineString lineString;
+    private final LineStringLocation location;
+    private final List<Integer> matchedLinkIds;
+    private final double startLinkFraction;
+    private final double endLinkFraction;
+    private final double reliability;
+    private final MatchStatus status;
+    private final LineString lineString;
 
 }
