@@ -13,6 +13,7 @@ import org.locationtech.jts.geom.LineString;
 import org.locationtech.jts.geom.impl.PackedCoordinateSequence;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 public class PathUtil {
@@ -48,7 +49,7 @@ public class PathUtil {
     }
 
     public List<Integer> determineMatchedLinkIds(final LinkFlagEncoder flagEncoder,
-                                                 final List<EdgeIteratorState> edges) {
+                                                 final Collection<EdgeIteratorState> edges) {
         final List<Integer> matchedLinkIds = new ArrayList<>(edges.size());
         Integer previousMatchedLinkId = null;
         for (final EdgeIteratorState edge : edges) {

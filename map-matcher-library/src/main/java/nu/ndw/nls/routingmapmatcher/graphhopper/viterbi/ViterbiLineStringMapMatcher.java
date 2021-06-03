@@ -290,7 +290,12 @@ public class ViterbiLineStringMapMatcher implements LineStringMapMatcher {
         final double endLinkFraction = 0.0;
         final double reliability = 0.0;
         final LineString lineString = lineStringLocation.getGeometry();
-        return new LineStringMatch(lineStringLocation, matchedLinkIds, startLinkFraction, endLinkFraction, reliability, status,
+        return new LineStringMatch(lineStringLocation,
+                matchedLinkIds,
+                startLinkFraction,
+                endLinkFraction,
+                reliability,
+                status,
                 lineString);
     }
 }
