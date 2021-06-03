@@ -18,7 +18,6 @@ import com.graphhopper.util.EdgeIteratorState;
 import com.graphhopper.util.GPXEntry;
 import com.graphhopper.util.Parameters;
 import com.graphhopper.util.PointList;
-
 import lombok.extern.slf4j.Slf4j;
 import nu.ndw.nls.routingmapmatcher.constants.GlobalConstants;
 import nu.ndw.nls.routingmapmatcher.domain.LineStringMapMatcher;
@@ -190,27 +189,27 @@ public class ViterbiLineStringMapMatcher implements LineStringMapMatcher {
         distanceCalc.returnCustomDistanceForNextCalls(customDistance, numberOfCalls);
     }
 
-  private LineStringMatch createMatch(final MatchResult matchResult,
-      final LineStringLocation lineStringLocation) {
-    final Path path = matchResult.getMergedPath();
-    final List<EdgeIteratorState> edges = path.calcEdges();
-    if (edges.isEmpty()) {
-      throw new RoutingMapMatcherException("Unexpected: path has no edges");
+    private LineStringMatch createMatch(final MatchResult matchResult,
+                                        final LineStringLocation lineStringLocation) {
+        final Path path = matchResult.getMergedPath();
+        final List<EdgeIteratorState> edges = path.calcEdges();
+        if (edges.isEmpty()) {
+            throw new RoutingMapMatcherException("Unexpected: path has no edges");
+        }
+        final List<Integer> matchedLinkIds = pathUtil.determineMatchedLinkIds(flagEncoder, edges);
+        final QueryGraph queryGraph = queryGraphExtractor.extractQueryGraph(path);
+        final double startLinkFraction = pathUtil.determineStartLinkFraction(edges.get(0), queryGraph);
+        final double endLinkFraction = pathUtil.determineEndLinkFraction(edges.get(edges.size() - 1), queryGraph);
+        final double reliability;
+        if (ReliabilityCalculationType.POINT_OBSERVATIONS == lineStringLocation.getReliabilityCalculationType()) {
+            reliability = calculateCandidatePathScoreOnlyPoints(path, lineStringLocation);
+        } else {
+            reliability = calculateCandidatePathScore(path, lineStringLocation);
+        }
+        final LineString lineString = pathUtil.createLineString(path.calcPoints());
+        return new LineStringMatch(lineStringLocation, matchedLinkIds, startLinkFraction, endLinkFraction, reliability,
+                MatchStatus.MATCH, lineString);
     }
-    final List<Integer> matchedLinkIds = pathUtil.determineMatchedLinkIds(flagEncoder, edges);
-    final QueryGraph queryGraph = queryGraphExtractor.extractQueryGraph(path);
-    final double startLinkFraction = pathUtil.determineStartLinkFraction(edges.get(0), queryGraph);
-    final double endLinkFraction = pathUtil.determineEndLinkFraction(edges.get(edges.size() - 1), queryGraph);
-    final double reliability;
-    if (lineStringLocation.getReliabilityCalculationType().equals(ReliabilityCalculationType.POINT_OBSERVATIONS)) {
-      reliability = calculateCandidatePathScoreOnlyPoints(path, lineStringLocation);
-    } else {
-      reliability = calculateCandidatePathScore(path, lineStringLocation);
-    }
-    final LineString lineString = pathUtil.createLineString(path.calcPoints());
-    return new LineStringMatch(lineStringLocation, matchedLinkIds, startLinkFraction, endLinkFraction, reliability,
-            MatchStatus.MATCH, lineString);
-  }
 
     private double calculateCandidatePathScoreOnlyPoints(final Path path, final LineStringLocation lineStringLocation) {
         final PointList pathPointList = path.calcPoints();
@@ -285,13 +284,13 @@ public class ViterbiLineStringMapMatcher implements LineStringMapMatcher {
         return smallestDistanceToLtcLink;
     }
 
-  private LineStringMatch createFailedMatch(final LineStringLocation lineStringLocation, final MatchStatus status) {
-    final List<Integer> matchedLinkIds = Lists.newArrayList();
-    final double startLinkFraction = 0.0;
-    final double endLinkFraction = 0.0;
-    final double reliability = 0.0;
-    final LineString lineString = lineStringLocation.getGeometry();
-    return new LineStringMatch(lineStringLocation, matchedLinkIds, startLinkFraction, endLinkFraction, reliability, status,
-            lineString);
-  }
+    private LineStringMatch createFailedMatch(final LineStringLocation lineStringLocation, final MatchStatus status) {
+        final List<Integer> matchedLinkIds = Lists.newArrayList();
+        final double startLinkFraction = 0.0;
+        final double endLinkFraction = 0.0;
+        final double reliability = 0.0;
+        final LineString lineString = lineStringLocation.getGeometry();
+        return new LineStringMatch(lineStringLocation, matchedLinkIds, startLinkFraction, endLinkFraction, reliability, status,
+                lineString);
+    }
 }
