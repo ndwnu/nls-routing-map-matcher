@@ -45,18 +45,18 @@ public class PathUtil {
     return lineString;
   }
 
-  public List<Integer> determineNdwLinkIds(final LinkFlagEncoder flagEncoder, final List<EdgeIteratorState> edges) {
-    final List<Integer> ndwLinkIds = new ArrayList<>(edges.size());
-    Integer previousNdwLinkId = null;
+  public List<Integer> determineMatchedLinkIds(final LinkFlagEncoder flagEncoder, final List<EdgeIteratorState> edges) {
+    final List<Integer> matchedLinkIds = new ArrayList<>(edges.size());
+    Integer previousMatchedLinkId = null;
     for (final EdgeIteratorState edge : edges) {
       final IntsRef flags = edge.getFlags();
-      final Integer ndwLinkId = flagEncoder.getId(flags);
-      if (previousNdwLinkId == null || !previousNdwLinkId.equals(ndwLinkId)) {
-        ndwLinkIds.add(ndwLinkId);
+      final Integer matchedLinkId = flagEncoder.getId(flags);
+      if (previousMatchedLinkId == null || !previousMatchedLinkId.equals(matchedLinkId)) {
+        matchedLinkIds.add(matchedLinkId);
       }
-      previousNdwLinkId = ndwLinkId;
+      previousMatchedLinkId = matchedLinkId;
     }
-    return ndwLinkIds;
+    return matchedLinkIds;
   }
 
   public double determineStartLinkFraction(final EdgeIteratorState firstEdge, final QueryGraph queryGraph) {
