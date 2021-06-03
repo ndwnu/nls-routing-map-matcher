@@ -42,8 +42,6 @@ class NetworkGraphHopperFactoryTest {
     private LineString lineString;
 
 
-
-
     private NetworkGraphHopperFactory networkGraphHopperFactory;
 
     @BeforeEach
@@ -65,6 +63,7 @@ class NetworkGraphHopperFactoryTest {
         assertThat(graphHopper.getGraphHopperLocation(), is("graphhopper_" + TEST_NETWORK));
         assertFalse(graphHopper.isCHEnabled());
         assertFalse(graphHopper.isAllowWrites());
+        assertFalse(graphHopper.hasElevation());
     }
 
 }
