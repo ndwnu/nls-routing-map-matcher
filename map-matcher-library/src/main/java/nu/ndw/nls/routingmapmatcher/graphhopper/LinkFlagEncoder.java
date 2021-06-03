@@ -14,14 +14,11 @@ import java.util.List;
 
 public class LinkFlagEncoder extends AbstractFlagEncoder {
 
+    public static final String NAME = "links";
     private static final int TOTAL_BITS_FOR_ENCODING_INTS = 31;
     private static final int DEFAULT_SPEED_BITS = 24;
     private static final double DEFAULT_SPEED_FACTOR = 0.0001;
     private static final double DEFAULT_MAXIMUM_SPEED = 1500;
-    
-
-    public static final String NAME = "links";
-
     private final boolean speedInTwoDirections;
     private final double maximumSpeed;
 
