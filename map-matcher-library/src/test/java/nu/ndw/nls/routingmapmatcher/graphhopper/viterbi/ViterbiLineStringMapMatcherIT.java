@@ -22,14 +22,14 @@ import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.sameInstance;
 
-class ViterbiLineStringMapMatcherTest {
+class ViterbiLineStringMapMatcherIT {
     private LineStringMapMatcher viterbiLineStringMapMatcher;
     private ObjectMapper mapper;
 
-    private
+
     @SneakyThrows
     @BeforeEach
-    void setup() {
+    private void setup() {
         String linksJson = IOUtils.toString(getClass().getResourceAsStream("/test-data/links.json"));
         mapper = new ObjectMapper();
         SimpleModule module = new SimpleModule();
