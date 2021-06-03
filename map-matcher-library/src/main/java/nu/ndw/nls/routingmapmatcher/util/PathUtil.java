@@ -34,7 +34,8 @@ public class PathUtil {
             }
             lineString = geometryFactory.createLineString(coordinateSequence);
         } else if (points.size() == 1) {
-            final PackedCoordinateSequence.Double coordinateSequence = new PackedCoordinateSequence.Double(2, 2);
+            final PackedCoordinateSequence.Double coordinateSequence =
+                    new PackedCoordinateSequence.Double(2, 2);
             coordinateSequence.setOrdinate(0, 0, points.getLongitude(0));
             coordinateSequence.setOrdinate(0, 1, points.getLatitude(0));
             coordinateSequence.setOrdinate(1, 0, points.getLongitude(0));
@@ -46,7 +47,8 @@ public class PathUtil {
         return lineString;
     }
 
-    public List<Integer> determineMatchedLinkIds(final LinkFlagEncoder flagEncoder, final List<EdgeIteratorState> edges) {
+    public List<Integer> determineMatchedLinkIds(final LinkFlagEncoder flagEncoder,
+                                                 final List<EdgeIteratorState> edges) {
         final List<Integer> matchedLinkIds = new ArrayList<>(edges.size());
         Integer previousMatchedLinkId = null;
         for (final EdgeIteratorState edge : edges) {
