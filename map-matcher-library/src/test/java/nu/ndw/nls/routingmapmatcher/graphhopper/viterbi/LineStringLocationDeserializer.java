@@ -1,33 +1,32 @@
 package nu.ndw.nls.routingmapmatcher.graphhopper.viterbi;
 
 import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
 import nu.ndw.nls.routingmapmatcher.domain.model.linestring.LineStringLocation;
 import nu.ndw.nls.routingmapmatcher.domain.model.linestring.ReliabilityCalculationType;
+import nu.ndw.nls.routingmapmatcher.util.GeometryHelper;
 import org.locationtech.jts.geom.LineString;
 
 import java.io.IOException;
 import java.util.Optional;
 
-import static nu.ndw.nls.routingmapmatcher.graphhopper.viterbi.GeometryHelper.convertToLinestring;
-
 public class LineStringLocationDeserializer extends StdDeserializer<LineStringLocation> {
 
+    private final GeometryHelper geometryHelper = new GeometryHelper();
 
     public LineStringLocationDeserializer() {
         this(null);
     }
 
-    protected LineStringLocationDeserializer(Class<?> vc) {
+    protected LineStringLocationDeserializer(final Class<?> vc) {
         super(vc);
     }
 
     @Override
-    public LineStringLocation deserialize(JsonParser jsonParser, DeserializationContext deserializationContext)
-            throws IOException, JsonProcessingException {
+    public LineStringLocation deserialize(final JsonParser jsonParser, final DeserializationContext deserializationContext)
+            throws IOException {
 
         final JsonNode node = jsonParser.getCodec()
                 .readTree(jsonParser);
@@ -37,7 +36,7 @@ public class LineStringLocationDeserializer extends StdDeserializer<LineStringLo
         final ReliabilityCalculationType reliabilityCalculationType = ReliabilityCalculationType
                 .valueOf(node.get("reliabilityCalculationType").textValue());
         final byte[] geometryWkb = node.get("geometry").binaryValue();
-        final LineString lineString = convertToLinestring(geometryWkb);
+        final LineString lineString = geometryHelper.convertToLinestring(geometryWkb);
         return new LineStringLocation(id,
                 Optional.empty(),
                 Optional.of(reversed),

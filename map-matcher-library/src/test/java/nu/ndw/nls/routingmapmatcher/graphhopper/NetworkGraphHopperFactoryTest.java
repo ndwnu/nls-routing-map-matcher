@@ -14,6 +14,7 @@ import java.util.Collections;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -27,6 +28,10 @@ class NetworkGraphHopperFactoryTest {
     private static final String TEST_NETWORK = "test network";
     private static final long FROM_NODE_ID = 1;
     private static final long TO_NODE_ID = 2;
+    private static final Coordinate coordinateA1 = new Coordinate(LONG_1, LAT_1);
+    private static final Coordinate coordinateA2 = new Coordinate(LONG_2, LAT_2);
+    private static final Coordinate coordinateA3 = new Coordinate(LONG_3, LAT_3);
+
     @Mock
     private RoutingNetwork routingNetwork;
 
@@ -36,11 +41,7 @@ class NetworkGraphHopperFactoryTest {
     @Mock
     private LineString lineString;
 
-    private Coordinate coordinateA1;
 
-    private Coordinate coordinateA2;
-
-    private Coordinate coordinateA3;
 
 
     private NetworkGraphHopperFactory networkGraphHopperFactory;
@@ -48,28 +49,22 @@ class NetworkGraphHopperFactoryTest {
     @BeforeEach
     void setup() {
         networkGraphHopperFactory = new NetworkGraphHopperFactory();
-        when(link.getFromNodeId()).thenReturn(FROM_NODE_ID);
-        when(link.getToNodeId()).thenReturn(TO_NODE_ID);
-        createCoordinates();
-        final Coordinate[] coordinates = {coordinateA1, coordinateA2, coordinateA3};
-        when(lineString.getCoordinates()).thenReturn(coordinates);
-        when(link.getGeometry()).thenReturn(lineString);
-
     }
 
     @Test
     void testCreateNetworkGraphHopper() {
+        when(link.getFromNodeId()).thenReturn(FROM_NODE_ID);
+        when(link.getToNodeId()).thenReturn(TO_NODE_ID);
+        final Coordinate[] coordinates = {coordinateA1, coordinateA2, coordinateA3};
+        when(lineString.getCoordinates()).thenReturn(coordinates);
+        when(link.getGeometry()).thenReturn(lineString);
         when(routingNetwork.getNetworkNameAndVersion()).thenReturn(TEST_NETWORK);
         when(routingNetwork.getLinkSupplier()).thenReturn(() -> Collections.singletonList(link).iterator());
         NetworkGraphHopper graphHopper = networkGraphHopperFactory.createNetworkGraphHopper(routingNetwork);
         assertThat(graphHopper.getDataReaderFile(), is("graphhopper_" + TEST_NETWORK));
         assertThat(graphHopper.getGraphHopperLocation(), is("graphhopper_" + TEST_NETWORK));
-
+        assertFalse(graphHopper.isCHEnabled());
+        assertFalse(graphHopper.isAllowWrites());
     }
 
-    void createCoordinates() {
-        coordinateA1 = new Coordinate(LONG_1, LAT_1);
-        coordinateA2 = new Coordinate(LONG_2, LAT_2);
-        coordinateA3 = new Coordinate(LONG_3, LAT_3);
-    }
 }

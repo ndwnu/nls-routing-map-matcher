@@ -1,4 +1,4 @@
-package nu.ndw.nls.routingmapmatcher.graphhopper.viterbi;
+package nu.ndw.nls.routingmapmatcher.util;
 
 import nu.ndw.nls.routingmapmatcher.constants.GlobalConstants;
 import org.locationtech.jts.geom.Geometry;
@@ -11,12 +11,12 @@ import org.locationtech.jts.io.WKBReader;
 import java.io.IOException;
 
 public class GeometryHelper {
-    private GeometryHelper() {
-    }
+    private final WKBReader wkbReader = new WKBReader(
+            new GeometryFactory(new PrecisionModel(),
+                    GlobalConstants.WGS84_SRID));
 
-    public static LineString convertToLinestring(final byte[] geometryWkb) throws IOException {
+    public LineString convertToLinestring(final byte[] geometryWkb) throws IOException {
         try {
-            WKBReader wkbReader = new WKBReader(new GeometryFactory(new PrecisionModel(), GlobalConstants.WGS84_SRID));
             final Geometry geometry = wkbReader.read(geometryWkb);
             if (!(geometry instanceof LineString)) {
                 throw new IOException("Unexpected geometry type: expected LineString");
