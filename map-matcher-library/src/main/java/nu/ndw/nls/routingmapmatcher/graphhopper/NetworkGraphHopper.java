@@ -12,13 +12,15 @@ import java.util.function.Supplier;
 
 public class NetworkGraphHopper extends GraphHopper {
 
+    private static final int MAX_LEAF_ENTRIES = 200;
+
     private final Supplier<Iterator<Link>> linkSupplier;
 
     private final LongIntMap nodeIdToInternalNodeIdMap;
 
     public NetworkGraphHopper(final Supplier<Iterator<Link>> linkSupplier) {
         this.linkSupplier = linkSupplier;
-        this.nodeIdToInternalNodeIdMap = new GHLongIntBTree(200);
+        this.nodeIdToInternalNodeIdMap = new GHLongIntBTree(MAX_LEAF_ENTRIES);
     }
 
     @Override
