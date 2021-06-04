@@ -5,9 +5,9 @@ project. From this project the code from the [graphhopper](https://www.graphhopp
 used as a basis for this library.
 
 The routing map matcher uses route search algorithms to map linestring geometries on a target map's network. This allows
-for direct mapping between different maps without the need for an intermediate '
-basemap'. In order to do this the client applications need to create linestring geometries for their sourcemap and use
-those to match them with the target network.
+for direct mapping between different maps without the need for an intermediate 'basemap'. In order to do this the client
+applications need to create linestring geometries for their sourcemap and use those to match them with the target
+network.
 
 ## Project setup
 
@@ -33,8 +33,8 @@ The project is a multi-module maven project.
 ## General usage
 
 The routing map matcher requires the client application to create a RoutingNetwork entity for the target network as well
-as a MapMatchingRequest entity for the source map to match with the target network. Both these entities can be used to
-call the RoutingMapMatcher,s
+as a MapMatchingRequest entity for the source linestrings to match with the target network. Both these entities can be
+used to call the RoutingMapMatcher's
 "*matchLocations*" method. This method will return a java stream of LineStringMatch entities. See source code for more
 information on the entity's attributes.
 
@@ -54,6 +54,8 @@ public class RoutingNetwork {
 
   A client application's unique name version combination for this network.
 
+  Provide alphanumeric characters with no spaces ( '_' or '-' are allowed to indicate spaces)
+
 
 * linkSupplier:
 
@@ -70,8 +72,8 @@ RoutingNetwork routingNetwork = RoutingNetwork.builder()
 
 ### MapMatchingRequest
 
-The MapMatchingRequest provides the routing map matcher library with the source map's linestring geometries to do the
-matching on the target network.
+The MapMatchingRequest provides the routing map matcher library with the source linestring geometries to do the matching
+on the target network.
 
 The MapMatchingRequest has the following attributes:
 
@@ -84,7 +86,9 @@ public class MapMatchingRequest {
 
 * locationTypeName:
 
-  A client application's unique name for the source map matching.
+  A client application's unique name for the source linestring matching.
+
+  Only used for logging purposes.
 
 
 * locationSupplier:
@@ -111,7 +115,7 @@ library:
 
 <dependency>
   <groupId>nu.ndw.nls</groupId>
-  <artifactId>routing-map-matcher-spring-boot-autoconfigure</artifactId>
+  <artifactId>routing-map-matcher-spring-boot-starter</artifactId>
   <version>${routing-map-matcher.version}</version>
 </dependency>
 ```
@@ -136,7 +140,8 @@ RoutingMapMatcher can be used as a singleton in your application.
 
 ```java
 public RoutingMapMatcher routingMapMatcher(){
-        return new RoutingMapMatcher(new ViterbiLinestringMapMatcherFactory(
-        new NetworkGraphHopperFactory());
+
+        return new RoutingMapMatcher(new ViterbiLinestringMapMatcherFactory(new NetworkGraphHopperFactory()));
+
         }
 ```
