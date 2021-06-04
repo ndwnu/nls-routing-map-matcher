@@ -65,9 +65,9 @@ Example usage:
 
 ```java 
 RoutingNetwork routingNetwork = RoutingNetwork.builder()
-                      .networkNameAndVersion("FCD_" + fcdVersion)
-                        .linkSupplier(() -> linksIterator)
-                        .build();
+        .networkNameAndVersion("FCD_" + fcdVersion)
+        .linkSupplier(() -> linksIterator)
+        .build();
 ```
 
 ### MapMatchingRequest
@@ -98,8 +98,8 @@ public class MapMatchingRequest {
 Example usage:
 
 ```java
-MapMatchingRequest mapMatchingRequest=MapMatchingRequest.builder()
-        .locationSupplier(()->basemapRepository.getTrajectories(handle,nwbVersion,fcdVersion))
+MapMatchingRequest mapMatchingRequest = MapMatchingRequest.builder()
+        .locationSupplier(() -> basemapRepository.getTrajectories(handle, nwbVersion, fcdVersion))
         .locationTypeName("NWB trajectories")
         .build();
 ```
@@ -112,7 +112,6 @@ When using spring boot in your project, you can use the spring boot starter depe
 library:
 
 ```xml
-
 <dependency>
   <groupId>nu.ndw.nls</groupId>
   <artifactId>routing-map-matcher-spring-boot-starter</artifactId>
@@ -127,7 +126,6 @@ This will give you a pre-configured bean called "*RoutingMapMatcher*" to use in 
 If your application does not use spring boot you can use the maven routing-map-matcher-library dependency:
 
 ```xml
-
 <dependency>
   <groupId>nu.ndw.nls</groupId>
   <artifactId>routing-map-matcher-library</artifactId>
@@ -139,9 +137,8 @@ In order to use the routing map matcher library in your application the followin
 RoutingMapMatcher can be used as a singleton in your application.
 
 ```java
-public RoutingMapMatcher routingMapMatcher(){
-
-        return new RoutingMapMatcher(new ViterbiLinestringMapMatcherFactory(new NetworkGraphHopperFactory()));
-
-        }
+public RoutingMapMatcher routingMapMatcher() {
+        return new RoutingMapMatcher(new ViterbiLinestringMapMatcherFactory(
+                new NetworkGraphHopperFactory());
+}
 ```
