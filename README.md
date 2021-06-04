@@ -50,10 +50,12 @@ public class RoutingNetwork {
 }
 ```
 
-* networkNameAndVersion
+* networkNameAndVersion:
 
   A client application's unique name version combination for this network.
-* linkSupplier
+
+
+* linkSupplier:
 
   A supplier lambda function providing the network's link entities.
 
@@ -80,8 +82,14 @@ public class MapMatchingRequest {
 }
 ```
 
-* locationTypeName a client application's unique name for the source map matching .
-* locationSupplier a supplier lambda function providing the map matching linestring geometries
+* locationTypeName:
+
+  A client application's unique name for the source map matching.
+
+
+* locationSupplier:
+
+  A supplier lambda function providing the map matching linestring geometries.
 
 Example usage:
 
