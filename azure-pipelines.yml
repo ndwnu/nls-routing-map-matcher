@@ -8,8 +8,10 @@ trigger:
 pool:
   vmImage: 'ubuntu-latest'
 
-steps:
+variables:
+  isMain: true #${{ eq(variables['Build.SourceBranch'], 'refs/heads/master') }}
 
+steps:
   - task: SonarQubePrepare@4
     displayName: Prepare Sonar analysis
     inputs:
@@ -25,10 +27,10 @@ steps:
       publishJUnitResults: false
       sonarQubeRunAnalysis: true
       jdkVersionOption: 1.11
-      ${{ if eq( variables['Build.SourceBranch'], 'refs/heads/master') }}:
+      ${{ if eq(variables.isMain, true) }}:
         mavenAuthenticateFeed: true
         goals: 'deploy'
-      ${{ if ne( variables['Build.SourceBranch'], 'refs/heads/master') }}:
+      ${{ if ne(variables.isMain, true) }}:
         goals: 'clean verify'
 
   - task: SonarQubePublish@4
