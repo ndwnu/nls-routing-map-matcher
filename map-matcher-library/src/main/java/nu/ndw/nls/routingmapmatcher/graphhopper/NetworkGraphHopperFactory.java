@@ -7,7 +7,7 @@ import java.util.Arrays;
 
 public class NetworkGraphHopperFactory {
 
-    private static final String DEFAULT_FOLDER_PREFIX = "graphhopper";
+    private static final String DEFAULT_FOLDER_PREFIX = "graphhopper_";
     private static final int BYTES_FOR_EDGE_FLAGS = 12;
 
     public NetworkGraphHopper createNetworkGraphHopper(final RoutingNetwork routingNetwork) {
@@ -21,7 +21,7 @@ public class NetworkGraphHopperFactory {
         graphHopper.setElevation(false);
         graphHopper.setCHEnabled(false);
         graphHopper.setMinNetworkSize(0, 0);
-        final String networkFolder = folderPrefix + "_" + routingNetwork.getNetworkNameAndVersion();
+        final String networkFolder = folderPrefix + routingNetwork.getNetworkNameAndVersion();
         graphHopper.setDataReaderFile(networkFolder);
         graphHopper.setGraphHopperLocation(networkFolder);
         final LinkFlagEncoder flagEncoder = new LinkFlagEncoder();
