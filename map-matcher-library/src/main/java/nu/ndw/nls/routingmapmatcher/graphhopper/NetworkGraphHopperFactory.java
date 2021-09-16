@@ -7,16 +7,23 @@ import java.util.Arrays;
 
 public class NetworkGraphHopperFactory {
 
+    private static final String DEFAULT_FOLDER_PREFIX = "graphhopper_";
     private static final int BYTES_FOR_EDGE_FLAGS = 12;
 
     public NetworkGraphHopper createNetworkGraphHopper(final RoutingNetwork routingNetwork) {
+        return createNetworkGraphHopper(routingNetwork, false, DEFAULT_FOLDER_PREFIX);
+    }
+
+    public NetworkGraphHopper createNetworkGraphHopper(final RoutingNetwork routingNetwork, final boolean storeOnDisk,
+            final String folderPrefix) {
         final NetworkGraphHopper graphHopper = new NetworkGraphHopper(routingNetwork.getLinkSupplier());
-        graphHopper.setStoreOnFlush(false);
+        graphHopper.setStoreOnFlush(storeOnDisk);
         graphHopper.setElevation(false);
         graphHopper.setCHEnabled(false);
         graphHopper.setMinNetworkSize(0, 0);
-        graphHopper.setDataReaderFile("graphhopper_" + routingNetwork.getNetworkNameAndVersion());
-        graphHopper.setGraphHopperLocation("graphhopper_" + routingNetwork.getNetworkNameAndVersion());
+        final String networkFolder = folderPrefix + routingNetwork.getNetworkNameAndVersion();
+        graphHopper.setDataReaderFile(networkFolder);
+        graphHopper.setGraphHopperLocation(networkFolder);
         final LinkFlagEncoder flagEncoder = new LinkFlagEncoder();
         graphHopper.setEncodingManager(EncodingManager.create(Arrays.asList(flagEncoder), BYTES_FOR_EDGE_FLAGS));
         graphHopper.importOrLoad();
