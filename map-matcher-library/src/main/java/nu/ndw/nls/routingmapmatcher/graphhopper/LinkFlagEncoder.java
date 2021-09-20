@@ -29,7 +29,7 @@ public class LinkFlagEncoder extends AbstractFlagEncoder {
     }
 
     public LinkFlagEncoder(final int speedBits, final double speedFactor, final double maximumSpeed,
-                           final boolean speedInTwoDirections, final int maxTurnCosts) {
+            final boolean speedInTwoDirections, final int maxTurnCosts) {
         super(speedBits, speedFactor, maxTurnCosts);
         final double maximumEncodedSpeed = ((1L << speedBits) - 1) * speedFactor;
         this.maximumSpeed = Math.max(maximumSpeed, maximumEncodedSpeed);
@@ -64,7 +64,7 @@ public class LinkFlagEncoder extends AbstractFlagEncoder {
 
     @Override
     public void createEncodedValues(final List<EncodedValue> registerNewEncodedValue, final String prefix,
-                                    final int index) {
+            final int index) {
         super.createEncodedValues(registerNewEncodedValue, prefix, index);
 
         speedEncoder = new FactorizedDecimalEncodedValue(prefix + "average_speed", speedBits, speedFactor,
@@ -78,7 +78,7 @@ public class LinkFlagEncoder extends AbstractFlagEncoder {
 
     @Override
     public IntsRef handleWayTags(final IntsRef edgeFlags, final ReaderWay way, final EncodingManager.Access accept,
-                                 final long relationFlags) {
+            final long relationFlags) {
         if (accept.canSkip()) {
             return edgeFlags;
         }

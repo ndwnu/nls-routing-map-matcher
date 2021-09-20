@@ -11,13 +11,13 @@ import org.locationtech.jts.io.WKBReader;
 import java.io.IOException;
 
 public class GeometryHelper {
+
     /*
         Warning This class is not thread-safe; each thread should create its own instance.
         https://locationtech.github.io/jts/javadoc/org/locationtech/jts/io/WKBReader.html
      */
-    private final WKBReader wkbReader = new WKBReader(
-            new GeometryFactory(new PrecisionModel(),
-                    GlobalConstants.WGS84_SRID));
+    private final WKBReader wkbReader = new WKBReader(new GeometryFactory(new PrecisionModel(),
+            GlobalConstants.WGS84_SRID));
 
     public LineString convertToLinestring(final byte[] geometryWkb) throws IOException {
         try {

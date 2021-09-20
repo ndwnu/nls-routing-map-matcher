@@ -58,7 +58,7 @@ class NetworkGraphHopperFactoryTest {
         when(link.getGeometry()).thenReturn(lineString);
         when(routingNetwork.getNetworkNameAndVersion()).thenReturn(TEST_NETWORK);
         when(routingNetwork.getLinkSupplier()).thenReturn(() -> Collections.singletonList(link).iterator());
-        NetworkGraphHopper graphHopper = networkGraphHopperFactory.createNetworkGraphHopper(routingNetwork);
+        final NetworkGraphHopper graphHopper = networkGraphHopperFactory.createNetwork(routingNetwork);
         assertThat(graphHopper.getDataReaderFile(), is("graphhopper_" + TEST_NETWORK));
         assertThat(graphHopper.getGraphHopperLocation(), is("graphhopper_" + TEST_NETWORK));
         assertFalse(graphHopper.isCHEnabled());

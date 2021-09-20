@@ -25,5 +25,4 @@ public class CustomDistanceCalc extends DistancePlaneProjection {
             return super.calcDist(fromLat, fromLon, toLat, toLon);
         }
     }
-
 }

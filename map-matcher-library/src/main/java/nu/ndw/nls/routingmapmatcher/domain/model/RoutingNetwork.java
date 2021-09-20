@@ -9,6 +9,7 @@ import java.util.function.Supplier;
 @Value
 @Builder
 public class RoutingNetwork {
+
     String networkNameAndVersion;
     Supplier<Iterator<Link>> linkSupplier;
 }

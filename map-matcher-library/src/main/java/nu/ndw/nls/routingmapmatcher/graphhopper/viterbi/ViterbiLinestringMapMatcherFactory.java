@@ -1,26 +1,29 @@
 package nu.ndw.nls.routingmapmatcher.graphhopper.viterbi;
 
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import nu.ndw.nls.routingmapmatcher.domain.LineStringMapMatcher;
-import nu.ndw.nls.routingmapmatcher.domain.LineStringMapMatcherFactory;
+import nu.ndw.nls.routingmapmatcher.domain.MapMatcherFactory;
+import nu.ndw.nls.routingmapmatcher.domain.Network;
 import nu.ndw.nls.routingmapmatcher.domain.model.RoutingNetwork;
+import nu.ndw.nls.routingmapmatcher.graphhopper.AbstractMapMatcherFactory;
 import nu.ndw.nls.routingmapmatcher.graphhopper.NetworkGraphHopper;
 import nu.ndw.nls.routingmapmatcher.graphhopper.NetworkGraphHopperFactory;
 
-@RequiredArgsConstructor
 @Slf4j
-public class ViterbiLinestringMapMatcherFactory implements LineStringMapMatcherFactory {
+public class ViterbiLinestringMapMatcherFactory extends AbstractMapMatcherFactory
+        implements MapMatcherFactory<LineStringMapMatcher> {
 
-    private final NetworkGraphHopperFactory networkGraphHopperFactory;
+    public ViterbiLinestringMapMatcherFactory(final NetworkGraphHopperFactory networkGraphHopperFactory) {
+        super(networkGraphHopperFactory);
+    }
 
     @Override
-    public LineStringMapMatcher createLineStringMapMatcher(final RoutingNetwork routingNetwork) {
+    public LineStringMapMatcher createMapMatcher(final RoutingNetwork routingNetwork) {
         return new ViterbiLineStringMapMatcher(readNetwork(routingNetwork));
     }
 
-    private NetworkGraphHopper readNetwork(final RoutingNetwork routingNetwork) {
-        log.info("Start reading network with version {}", routingNetwork.getNetworkNameAndVersion());
-        return networkGraphHopperFactory.createNetworkGraphHopper(routingNetwork);
+    @Override
+    public LineStringMapMatcher createMapMatcher(final Network preInitializedNetwork) {
+        return new ViterbiLineStringMapMatcher((NetworkGraphHopper) preInitializedNetwork);
     }
 }

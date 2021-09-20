@@ -25,7 +25,7 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class)
 class RoutingMapMatcherTest {
     @Mock
-    private LineStringMapMatcherFactory lineStringMapMatcherFactory;
+    private MapMatcherFactory<LineStringMapMatcher> lineStringMapMatcherFactory;
 
     @Mock
     private LineStringMapMatcher lineStringMapMatcher;
@@ -60,7 +60,7 @@ class RoutingMapMatcherTest {
 
     @Test
     void testMatchLocations() {
-        when(lineStringMapMatcherFactory.createLineStringMapMatcher(routingNetwork))
+        when(lineStringMapMatcherFactory.createMapMatcher(routingNetwork))
                 .thenReturn(lineStringMapMatcher);
         when(lineStringMapMatcher.match(lineStringLocation)).thenReturn(lineStringMatch);
         when(lineStringMatch.getStatus()).thenReturn(MatchStatus.MATCH);

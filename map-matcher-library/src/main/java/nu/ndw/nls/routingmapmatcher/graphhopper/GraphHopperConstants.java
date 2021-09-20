@@ -12,5 +12,4 @@ public final class GraphHopperConstants {
     private GraphHopperConstants() {
         // Prevent instantiation
     }
-
 }
