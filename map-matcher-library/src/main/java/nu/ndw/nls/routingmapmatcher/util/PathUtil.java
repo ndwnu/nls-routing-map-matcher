@@ -49,7 +49,7 @@ public class PathUtil {
     }
 
     public List<Integer> determineMatchedLinkIds(final LinkFlagEncoder flagEncoder,
-                                                 final Collection<EdgeIteratorState> edges) {
+            final Collection<EdgeIteratorState> edges) {
         final List<Integer> matchedLinkIds = new ArrayList<>(edges.size());
         Integer previousMatchedLinkId = null;
         for (final EdgeIteratorState edge : edges) {
@@ -97,8 +97,7 @@ public class PathUtil {
     }
 
     private double calculateDistanceFromVirtualNodeToNonVirtualNode(final QueryGraph queryGraph, final int virtualNode,
-                                                                    final int nodeToAvoid,
-                                                                    final EdgeIteratorState pathEdge) {
+            final int nodeToAvoid, final EdgeIteratorState pathEdge) {
         final EdgeExplorer edgeExplorer = queryGraph.createEdgeExplorer();
 
         double distanceInOtherDirection = 0.0;

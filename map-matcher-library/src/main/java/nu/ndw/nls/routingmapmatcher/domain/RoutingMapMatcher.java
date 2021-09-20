@@ -18,18 +18,18 @@ public class RoutingMapMatcher {
     private static final int REPORT_PROGRESS_INTERVAL = 100;
     private static final double HUNDRED_PERCENT = 100.0;
 
-    private final LineStringMapMatcherFactory lineStringMapMatcherFactory;
+    private final MapMatcherFactory<LineStringMapMatcher> lineStringMapMatcherFactory;
 
-    public RoutingMapMatcher(final LineStringMapMatcherFactory lineStringMapMatcherFactory) {
+    public RoutingMapMatcher(final MapMatcherFactory<LineStringMapMatcher> lineStringMapMatcherFactory) {
         this.lineStringMapMatcherFactory = lineStringMapMatcherFactory;
     }
 
     public Stream<LineStringMatch> matchLocations(final RoutingNetwork routingNetwork,
-                                                  final MapMatchingRequest mapMatchingRequest) {
+            final MapMatchingRequest mapMatchingRequest) {
         final List<LineStringLocation> locations = mapMatchingRequest.getLocationSupplier().get();
         final int numLocations = locations.size();
         final LineStringMapMatcher lineStringMapMatcher = lineStringMapMatcherFactory
-                .createLineStringMapMatcher(routingNetwork);
+                .createMapMatcher(routingNetwork);
         final AtomicInteger matched = new AtomicInteger();
         final AtomicInteger processed = new AtomicInteger();
         log.info("Start map matching for {}, count = {}", mapMatchingRequest.getLocationTypeName(), numLocations);
@@ -38,10 +38,8 @@ public class RoutingMapMatcher {
     }
 
     private static LineStringMatch getLineStringMatch(final int numLocations,
-                                                      final LineStringMapMatcher lineStringMapMatcher,
-                                                      final AtomicInteger matched,
-                                                      final AtomicInteger processed,
-                                                      final LineStringLocation lineStringLocation) {
+            final LineStringMapMatcher lineStringMapMatcher, final AtomicInteger matched, final AtomicInteger processed,
+            final LineStringLocation lineStringLocation) {
         final LineStringMatch match = lineStringMapMatcher.match(lineStringLocation);
         processed.incrementAndGet();
         if (match.getStatus() == MatchStatus.MATCH) {
@@ -51,13 +49,11 @@ public class RoutingMapMatcher {
             log.info("Processed {} of {} total", processed.get() + 1, numLocations);
         }
         if (processed.intValue() == numLocations) {
-            double percentage = HUNDRED_PERCENT * matched.get() / numLocations;
+            final double percentage = HUNDRED_PERCENT * matched.get() / numLocations;
             log.info("Done. Processed {} locations, {} successfully matched ({}%)", numLocations, matched.get(),
                     String.format(Locale.getDefault(), "%.2f", percentage));
         }
 
         return match;
     }
-
-
 }

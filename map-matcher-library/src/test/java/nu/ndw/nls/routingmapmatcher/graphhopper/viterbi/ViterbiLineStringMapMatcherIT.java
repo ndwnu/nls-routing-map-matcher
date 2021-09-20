@@ -43,7 +43,7 @@ class ViterbiLineStringMapMatcherIT {
                 .linkSupplier(() -> links.iterator()).build();
         ViterbiLinestringMapMatcherFactory viterbiLinestringMapMatcherFactory =
                 new ViterbiLinestringMapMatcherFactory(new NetworkGraphHopperFactory());
-        viterbiLineStringMapMatcher = viterbiLinestringMapMatcherFactory.createLineStringMapMatcher(routingNetwork);
+        viterbiLineStringMapMatcher = viterbiLinestringMapMatcherFactory.createMapMatcher(routingNetwork);
 
     }
 

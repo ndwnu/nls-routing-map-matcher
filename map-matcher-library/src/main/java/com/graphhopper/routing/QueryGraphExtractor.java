@@ -15,5 +15,4 @@ public class QueryGraphExtractor {
         }
         return (QueryGraph) path.graph;
     }
-
 }

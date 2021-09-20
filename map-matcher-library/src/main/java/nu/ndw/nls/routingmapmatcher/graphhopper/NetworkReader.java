@@ -29,9 +29,8 @@ class NetworkReader implements DataReader {
     private final LongIntMap nodeIdToInternalNodeIdMap;
     private final EncodingManager encodingManager;
 
-    public NetworkReader(final GraphHopperStorage ghStorage,
-                         final Supplier<Iterator<Link>> linkSupplier,
-                         final LongIntMap nodeIdToInternalNodeIdMap) {
+    public NetworkReader(final GraphHopperStorage ghStorage, final Supplier<Iterator<Link>> linkSupplier,
+            final LongIntMap nodeIdToInternalNodeIdMap) {
         this.ghStorage = Preconditions.checkNotNull(ghStorage);
         this.linkSupplier = linkSupplier;
         this.nodeIdToInternalNodeIdMap = Preconditions.checkNotNull(nodeIdToInternalNodeIdMap);

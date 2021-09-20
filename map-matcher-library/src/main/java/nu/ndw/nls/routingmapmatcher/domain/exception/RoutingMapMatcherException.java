@@ -15,5 +15,4 @@ public class RoutingMapMatcherException extends RuntimeException {
     public RoutingMapMatcherException(final String message, final Throwable cause) {
         super(message, cause);
     }
-
 }
