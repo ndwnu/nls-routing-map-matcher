@@ -81,7 +81,7 @@ class GraphHopperStartToEndMapMatcherIT {
             new StartToEndLocation(1, 1, 130.0, startPoint, endPoint);
         StartToEndMatch startToEndMatch = startToEndMapMatcher.match(startToEndLocation);
         assertThat(startToEndMatch, is(notNullValue()));
-        assertThat(startToEndMatch.getStatus(), is(MatchStatus.NO_PATH));
+        assertThat(startToEndMatch.getStatus(), is(MatchStatus.NO_MATCH));
         assertThat(startToEndMatch.getMatchedLinkIds(), hasSize(0));
         assertThat(startToEndMatch.getStartLinkFraction(), is(0.0));
         assertThat(startToEndMatch.getEndLinkFraction(), is(0.0));

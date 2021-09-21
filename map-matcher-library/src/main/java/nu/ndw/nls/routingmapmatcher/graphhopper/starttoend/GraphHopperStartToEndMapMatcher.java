@@ -175,7 +175,7 @@ public class GraphHopperStartToEndMapMatcher implements StartToEndMapMatcher {
             final Path path = chooseBestCandidatePath(candidatePaths, startToEndLocation);
             match = createMatch(startToEndLocation, path, queryGraph);
         } else {
-            match = createFailedMatch(startToEndLocation, MatchStatus.NO_PATH);
+            match = createFailedMatch(startToEndLocation, MatchStatus.NO_MATCH);
         }
 
         return match;

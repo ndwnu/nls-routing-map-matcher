@@ -69,7 +69,7 @@ class ViterbiLineStringMapMatcherIT {
                 .toString(getClass().getResourceAsStream("/test-data/unmatched_linestring_location.json"));
         LineStringLocation lineStringLocation = mapper.readValue(locationJson, LineStringLocation.class);
         LineStringMatch lineStringMatch = viterbiLineStringMapMatcher.match(lineStringLocation);
-        assertThat(lineStringMatch.getStatus(), is(MatchStatus.NO_PATH));
+        assertThat(lineStringMatch.getStatus(), is(MatchStatus.NO_MATCH));
         assertThat(lineStringMatch.getMatchedLinkIds(), hasSize(0));
         assertThat(lineStringMatch.getStartLinkFraction(), is(0.0));
         assertThat(lineStringMatch.getEndLinkFraction(), is(0.0));
