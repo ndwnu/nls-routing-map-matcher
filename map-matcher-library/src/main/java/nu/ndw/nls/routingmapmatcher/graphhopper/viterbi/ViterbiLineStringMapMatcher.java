@@ -126,14 +126,14 @@ public class ViterbiLineStringMapMatcher implements LineStringMapMatcher {
                 if (matchResult.getMergedPath().getEdgeCount() > 0) {
                     lineStringMatch = createMatch(matchResult, lineStringLocation);
                 } else {
-                    lineStringMatch = createFailedMatch(lineStringLocation, MatchStatus.NO_PATH);
+                    lineStringMatch = createFailedMatch(lineStringLocation, MatchStatus.NO_MATCH);
                 }
             } catch (final Exception e) {
                 log.debug("Exception while map matching, creating failed result for {}", lineStringLocation, e);
                 lineStringMatch = createFailedMatch(lineStringLocation, MatchStatus.EXCEPTION);
             }
         } else {
-            lineStringMatch = createFailedMatch(lineStringLocation, MatchStatus.NO_PATH);
+            lineStringMatch = createFailedMatch(lineStringLocation, MatchStatus.NO_MATCH);
         }
         return lineStringMatch;
     }

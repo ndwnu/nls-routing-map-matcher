@@ -6,7 +6,7 @@ public enum MatchStatus {
 
     EXCEPTION,
     INVALID_INPUT,
-    NO_PATH,
+    NO_MATCH,
     MATCH;
 
     @Override
