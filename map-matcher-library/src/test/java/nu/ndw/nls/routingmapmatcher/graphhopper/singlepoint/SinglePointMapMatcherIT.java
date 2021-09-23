@@ -64,7 +64,7 @@ public class SinglePointMapMatcherIT {
         assertThat(singlePointMatch.getStatus(), is(MatchStatus.MATCH));
         assertThat(singlePointMatch.getMatchedLinkIds(), hasSize(1));
         assertThat(singlePointMatch.getSnappedPoints(), hasSize(1));
-        assertThat(singlePointMatch.getReliability(), is(67.0));
+        assertThat(singlePointMatch.getReliability(), is(66.88548778816732));
     }
 
     @SneakyThrows
@@ -77,7 +77,7 @@ public class SinglePointMapMatcherIT {
         assertThat(singlePointMatch.getStatus(), is(MatchStatus.MATCH));
         assertThat(singlePointMatch.getMatchedLinkIds(), hasSize(2));
         assertThat(singlePointMatch.getSnappedPoints(), hasSize(1));
-        assertThat(singlePointMatch.getReliability(), is(84.5));
+        assertThat(singlePointMatch.getReliability(), is(84.57339517842584));
     }
 
     @SneakyThrows
@@ -90,7 +90,7 @@ public class SinglePointMapMatcherIT {
         assertThat(singlePointMatch.getStatus(), is(MatchStatus.MATCH));
         assertThat(singlePointMatch.getMatchedLinkIds(), hasSize(8));
         assertThat(singlePointMatch.getSnappedPoints(), hasSize(3));
-        assertThat(singlePointMatch.getReliability(), is(100.0));
+        assertThat(singlePointMatch.getReliability(), is(99.99626435572263));
     }
 
     @SneakyThrows
@@ -103,7 +103,7 @@ public class SinglePointMapMatcherIT {
         assertThat(singlePointMatch.getStatus(), is(MatchStatus.MATCH));
         assertThat(singlePointMatch.getMatchedLinkIds(), hasSize(2));
         assertThat(singlePointMatch.getSnappedPoints(), hasSize(2));
-        assertThat(singlePointMatch.getReliability(), is(95.5));
+        assertThat(singlePointMatch.getReliability(), is(95.46127866694087));
     }
 
     @SneakyThrows

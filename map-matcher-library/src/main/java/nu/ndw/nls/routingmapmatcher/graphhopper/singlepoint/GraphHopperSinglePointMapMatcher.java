@@ -29,9 +29,10 @@ public class GraphHopperSinglePointMapMatcher implements SinglePointMapMatcher {
     private static final double MAXIMUM_CANDIDATE_DISTANCE_IN_METERS = 20.0;
 
     /**
-     * To specify 1 decimal places of precision, use a scale factor of 10 (i.e. rounding to the nearest 10).
+     * Distances returned by GraphHopper contain floating point errors compared to the source data, so a delta needs to
+     * be used when comparing distances to find all segments that are equally far in the source data.
      */
-    private static final double DISTANCE_SCALE_FACTOR = 10.0;
+    private static final double DISTANCE_ROUNDING_ERROR = 0.1;
 
     private static final int MAX_RELIABILITY_SCORE = 100;
 
@@ -88,19 +89,11 @@ public class GraphHopperSinglePointMapMatcher implements SinglePointMapMatcher {
     private SinglePointMatch createMatch(final List<QueryResult> queryResults) {
         final List<Integer> matchedLinkIds = Lists.newArrayList();
         final List<Point> snappedPoints = Lists.newArrayList();
-        double closestDistance = MAXIMUM_CANDIDATE_DISTANCE_IN_METERS;
+        final double closestDistance = queryResults.stream().mapToDouble(QueryResult::getQueryDistance).min()
+            .orElse(MAXIMUM_CANDIDATE_DISTANCE_IN_METERS);
 
         for (final QueryResult queryResult : queryResults) {
-            final double distance =
-                Math.round(queryResult.getQueryDistance() * DISTANCE_SCALE_FACTOR) / DISTANCE_SCALE_FACTOR;
-            if (distance <= closestDistance) {
-
-                if (distance < closestDistance) {
-                    matchedLinkIds.clear();
-                    snappedPoints.clear();
-                    closestDistance = distance;
-                }
-
+            if (queryResult.getQueryDistance() < closestDistance + DISTANCE_ROUNDING_ERROR) {
                 final IntsRef flags = queryResult.getClosestEdge().getFlags();
                 matchedLinkIds.add(flagEncoder.getId(flags));
 
