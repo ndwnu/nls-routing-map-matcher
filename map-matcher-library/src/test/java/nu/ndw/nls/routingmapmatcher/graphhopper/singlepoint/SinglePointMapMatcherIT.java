@@ -43,15 +43,15 @@ public class SinglePointMapMatcherIT {
         module.addDeserializer(Link.class, new LinkDeserializer());
         module.addDeserializer(LineStringLocation.class, new LineStringLocationDeserializer());
         mapper.registerModule(module);
-        List<Link> links = mapper.readValue(linksJson, new TypeReference<List<Link>>() {});
+        List<Link> links = mapper.readValue(linksJson, new TypeReference<>() {
+        });
         RoutingNetwork routingNetwork = RoutingNetwork.builder()
             .networkNameAndVersion("test_network")
-            .linkSupplier(() -> links.iterator()).build();
+            .linkSupplier(links::iterator).build();
         GraphHopperSinglePointMapMatcherFactory graphHopperSinglePointMapMatcherFactory =
             new GraphHopperSinglePointMapMatcherFactory(new NetworkGraphHopperFactory());
         singlePointMapMatcher = graphHopperSinglePointMapMatcherFactory.createMapMatcher(routingNetwork);
-        geometryFactory = new GeometryFactory(new PrecisionModel(),
-            GlobalConstants.WGS84_SRID);
+        geometryFactory = new GeometryFactory(new PrecisionModel(), GlobalConstants.WGS84_SRID);
     }
 
     @SneakyThrows
@@ -64,7 +64,7 @@ public class SinglePointMapMatcherIT {
         assertThat(singlePointMatch.getStatus(), is(MatchStatus.MATCH));
         assertThat(singlePointMatch.getMatchedLinkIds(), hasSize(1));
         assertThat(singlePointMatch.getSnappedPoints(), hasSize(1));
-        assertThat(singlePointMatch.getDistance(), is(6.6));
+        assertThat(singlePointMatch.getReliability(), is(67.0));
     }
 
     @SneakyThrows
@@ -77,7 +77,7 @@ public class SinglePointMapMatcherIT {
         assertThat(singlePointMatch.getStatus(), is(MatchStatus.MATCH));
         assertThat(singlePointMatch.getMatchedLinkIds(), hasSize(2));
         assertThat(singlePointMatch.getSnappedPoints(), hasSize(1));
-        assertThat(singlePointMatch.getDistance(), is(3.1));
+        assertThat(singlePointMatch.getReliability(), is(84.5));
     }
 
     @SneakyThrows
@@ -90,20 +90,20 @@ public class SinglePointMapMatcherIT {
         assertThat(singlePointMatch.getStatus(), is(MatchStatus.MATCH));
         assertThat(singlePointMatch.getMatchedLinkIds(), hasSize(8));
         assertThat(singlePointMatch.getSnappedPoints(), hasSize(3));
-        assertThat(singlePointMatch.getDistance(), is(0.0));
+        assertThat(singlePointMatch.getReliability(), is(100.0));
     }
 
     @SneakyThrows
     @Test
     void testDoubleMatch() {
         // The given point is near two one-way roads.
-        Point point = geometryFactory.createPoint(new Coordinate(5.424633,52.178623));
+        Point point = geometryFactory.createPoint(new Coordinate(5.424633, 52.178623));
         SinglePointMatch singlePointMatch = singlePointMapMatcher.match(point);
         assertThat(singlePointMatch, is(notNullValue()));
         assertThat(singlePointMatch.getStatus(), is(MatchStatus.MATCH));
         assertThat(singlePointMatch.getMatchedLinkIds(), hasSize(2));
         assertThat(singlePointMatch.getSnappedPoints(), hasSize(2));
-        assertThat(singlePointMatch.getDistance(), is(0.9));
+        assertThat(singlePointMatch.getReliability(), is(95.5));
     }
 
     @SneakyThrows
@@ -115,6 +115,6 @@ public class SinglePointMapMatcherIT {
         assertThat(singlePointMatch.getStatus(), is(MatchStatus.NO_MATCH));
         assertThat(singlePointMatch.getMatchedLinkIds(), hasSize(0));
         assertThat(singlePointMatch.getSnappedPoints(), hasSize(0));
-        assertThat(singlePointMatch.getDistance(), is(0.0));
+        assertThat(singlePointMatch.getReliability(), is(0.0));
     }
 }

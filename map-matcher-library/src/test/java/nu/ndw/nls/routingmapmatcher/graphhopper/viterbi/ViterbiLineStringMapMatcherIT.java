@@ -23,9 +23,9 @@ import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.sameInstance;
 
 class ViterbiLineStringMapMatcherIT {
+
     private LineStringMapMatcher viterbiLineStringMapMatcher;
     private ObjectMapper mapper;
-
 
     @SneakyThrows
     @BeforeEach
@@ -36,11 +36,11 @@ class ViterbiLineStringMapMatcherIT {
         module.addDeserializer(Link.class, new LinkDeserializer());
         module.addDeserializer(LineStringLocation.class, new LineStringLocationDeserializer());
         mapper.registerModule(module);
-        List<Link> links = mapper.readValue(linksJson, new TypeReference<List<Link>>() {
+        List<Link> links = mapper.readValue(linksJson, new TypeReference<>() {
         });
         RoutingNetwork routingNetwork = RoutingNetwork.builder()
                 .networkNameAndVersion("test_network")
-                .linkSupplier(() -> links.iterator()).build();
+                .linkSupplier(links::iterator).build();
         ViterbiLinestringMapMatcherFactory viterbiLinestringMapMatcherFactory =
                 new ViterbiLinestringMapMatcherFactory(new NetworkGraphHopperFactory());
         viterbiLineStringMapMatcher = viterbiLinestringMapMatcherFactory.createMapMatcher(routingNetwork);
@@ -76,5 +76,4 @@ class ViterbiLineStringMapMatcherIT {
         assertThat(lineStringMatch.getReliability(), is(0.0));
         assertThat(lineStringMatch.getLocation(), sameInstance(lineStringLocation));
     }
-
 }

@@ -45,15 +45,15 @@ class GraphHopperStartToEndMapMatcherIT {
         module.addDeserializer(Link.class, new LinkDeserializer());
         module.addDeserializer(LineStringLocation.class, new LineStringLocationDeserializer());
         mapper.registerModule(module);
-        List<Link> links = mapper.readValue(linksJson, new TypeReference<List<Link>>() {});
+        List<Link> links = mapper.readValue(linksJson, new TypeReference<>() {
+        });
         RoutingNetwork routingNetwork = RoutingNetwork.builder()
             .networkNameAndVersion("test_network")
-            .linkSupplier(() -> links.iterator()).build();
+            .linkSupplier(links::iterator).build();
         GraphHopperStartToEndMapMatcherFactory graphHopperStartToEndMapMatcherFactory =
             new GraphHopperStartToEndMapMatcherFactory(new NetworkGraphHopperFactory());
         startToEndMapMatcher = graphHopperStartToEndMapMatcherFactory.createMapMatcher(routingNetwork);
-        geometryFactory = new GeometryFactory(new PrecisionModel(),
-            GlobalConstants.WGS84_SRID);
+        geometryFactory = new GeometryFactory(new PrecisionModel(), GlobalConstants.WGS84_SRID);
     }
 
     @SneakyThrows
@@ -61,8 +61,7 @@ class GraphHopperStartToEndMapMatcherIT {
     void testMatch() {
         Point startPoint = geometryFactory.createPoint(new Coordinate(5.431, 52.181));
         Point endPoint = geometryFactory.createPoint(new Coordinate(5.423, 52.181));
-        StartToEndLocation startToEndLocation
-            = new StartToEndLocation(1, 1, 543.0, startPoint, endPoint);
+        StartToEndLocation startToEndLocation = new StartToEndLocation(1, 1, 543.0, startPoint, endPoint);
         StartToEndMatch startToEndMatch = startToEndMapMatcher.match(startToEndLocation);
         assertThat(startToEndMatch, is(notNullValue()));
         assertThat(startToEndMatch.getStatus(), is(MatchStatus.MATCH));
@@ -77,8 +76,7 @@ class GraphHopperStartToEndMapMatcherIT {
     void testNoMatch() {
         Point startPoint = geometryFactory.createPoint(new Coordinate(5.430, 52.180));
         Point endPoint = geometryFactory.createPoint(new Coordinate(5.431, 52.181));
-        StartToEndLocation startToEndLocation =
-            new StartToEndLocation(1, 1, 130.0, startPoint, endPoint);
+        StartToEndLocation startToEndLocation = new StartToEndLocation(1, 1, 130.0, startPoint, endPoint);
         StartToEndMatch startToEndMatch = startToEndMapMatcher.match(startToEndLocation);
         assertThat(startToEndMatch, is(notNullValue()));
         assertThat(startToEndMatch.getStatus(), is(MatchStatus.NO_MATCH));
