@@ -33,6 +33,8 @@ public class GraphHopperSinglePointMapMatcher implements SinglePointMapMatcher {
      */
     private static final double DISTANCE_SCALE_FACTOR = 10.0;
 
+    private static final int MAX_RELIABILITY_SCORE = 100;
+
     private final LinkFlagEncoder flagEncoder;
     private final LocationIndexTree locationIndexTree;
     private final EdgeFilter edgeFilter;
@@ -83,13 +85,13 @@ public class GraphHopperSinglePointMapMatcher implements SinglePointMapMatcher {
         return candidates;
     }
 
-    private SinglePointMatch createMatch(List<QueryResult> queryResults) {
+    private SinglePointMatch createMatch(final List<QueryResult> queryResults) {
         final List<Integer> matchedLinkIds = Lists.newArrayList();
         final List<Point> snappedPoints = Lists.newArrayList();
         double closestDistance = MAXIMUM_CANDIDATE_DISTANCE_IN_METERS;
 
         for (final QueryResult queryResult : queryResults) {
-            double distance =
+            final double distance =
                 Math.round(queryResult.getQueryDistance() * DISTANCE_SCALE_FACTOR) / DISTANCE_SCALE_FACTOR;
             if (distance <= closestDistance) {
 
@@ -102,8 +104,8 @@ public class GraphHopperSinglePointMapMatcher implements SinglePointMapMatcher {
                 final IntsRef flags = queryResult.getClosestEdge().getFlags();
                 matchedLinkIds.add(flagEncoder.getId(flags));
 
-                GHPoint3D ghSnappedPoint = queryResult.getSnappedPoint();
-                Point snappedPoint = geometryFactory.createPoint(
+                final GHPoint3D ghSnappedPoint = queryResult.getSnappedPoint();
+                final Point snappedPoint = geometryFactory.createPoint(
                     new Coordinate(ghSnappedPoint.getLon(), ghSnappedPoint.getLat()));
                 if (!snappedPoints.contains(snappedPoint)) {
                     snappedPoints.add(snappedPoint);
@@ -111,14 +113,15 @@ public class GraphHopperSinglePointMapMatcher implements SinglePointMapMatcher {
             }
         }
 
-        return new SinglePointMatch(matchedLinkIds, MatchStatus.MATCH, snappedPoints, closestDistance);
+        final double reliability = (1 - closestDistance / MAXIMUM_CANDIDATE_DISTANCE_IN_METERS) * MAX_RELIABILITY_SCORE;
+        return new SinglePointMatch(matchedLinkIds, reliability, MatchStatus.MATCH, snappedPoints);
     }
 
     private SinglePointMatch createFailedMatch() {
         final List<Integer> matchedLinkIds = Lists.newArrayList();
         final List<Point> snappedPoints = Lists.newArrayList();
         final MatchStatus matchStatus = MatchStatus.NO_MATCH;
-        final double distance = 0.0;
-        return new SinglePointMatch(matchedLinkIds, matchStatus, snappedPoints, distance);
+        final double reliability = 0.0;
+        return new SinglePointMatch(matchedLinkIds, reliability, matchStatus, snappedPoints);
     }
 }
