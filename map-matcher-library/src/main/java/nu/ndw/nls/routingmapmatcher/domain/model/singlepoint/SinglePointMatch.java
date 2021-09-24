@@ -9,8 +9,9 @@ import org.locationtech.jts.geom.Point;
 @RequiredArgsConstructor
 @Getter
 public class SinglePointMatch {
+
     private final List<Integer> matchedLinkIds;
+    private final double reliability;
     private final MatchStatus status;
     private final List<Point> snappedPoints;
-    private final double distance;
 }
