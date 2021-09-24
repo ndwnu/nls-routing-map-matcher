@@ -29,9 +29,12 @@ public class GraphHopperSinglePointMapMatcher implements SinglePointMapMatcher {
     private static final double MAXIMUM_CANDIDATE_DISTANCE_IN_METERS = 20.0;
 
     /**
-     * To specify 1 decimal places of precision, use a scale factor of 10 (i.e. rounding to the nearest 10).
+     * Distances returned by GraphHopper contain floating point errors compared to the source data, so a delta needs to
+     * be used when comparing distances to find all segments that are equally far in the source data.
      */
-    private static final double DISTANCE_SCALE_FACTOR = 10.0;
+    private static final double DISTANCE_ROUNDING_ERROR = 0.1;
+
+    private static final int MAX_RELIABILITY_SCORE = 100;
 
     private final LinkFlagEncoder flagEncoder;
     private final LocationIndexTree locationIndexTree;
@@ -83,27 +86,19 @@ public class GraphHopperSinglePointMapMatcher implements SinglePointMapMatcher {
         return candidates;
     }
 
-    private SinglePointMatch createMatch(List<QueryResult> queryResults) {
+    private SinglePointMatch createMatch(final List<QueryResult> queryResults) {
         final List<Integer> matchedLinkIds = Lists.newArrayList();
         final List<Point> snappedPoints = Lists.newArrayList();
-        double closestDistance = MAXIMUM_CANDIDATE_DISTANCE_IN_METERS;
+        final double closestDistance = queryResults.stream().mapToDouble(QueryResult::getQueryDistance).min()
+            .orElse(MAXIMUM_CANDIDATE_DISTANCE_IN_METERS);
 
         for (final QueryResult queryResult : queryResults) {
-            double distance =
-                Math.round(queryResult.getQueryDistance() * DISTANCE_SCALE_FACTOR) / DISTANCE_SCALE_FACTOR;
-            if (distance <= closestDistance) {
-
-                if (distance < closestDistance) {
-                    matchedLinkIds.clear();
-                    snappedPoints.clear();
-                    closestDistance = distance;
-                }
-
+            if (queryResult.getQueryDistance() < closestDistance + DISTANCE_ROUNDING_ERROR) {
                 final IntsRef flags = queryResult.getClosestEdge().getFlags();
                 matchedLinkIds.add(flagEncoder.getId(flags));
 
-                GHPoint3D ghSnappedPoint = queryResult.getSnappedPoint();
-                Point snappedPoint = geometryFactory.createPoint(
+                final GHPoint3D ghSnappedPoint = queryResult.getSnappedPoint();
+                final Point snappedPoint = geometryFactory.createPoint(
                     new Coordinate(ghSnappedPoint.getLon(), ghSnappedPoint.getLat()));
                 if (!snappedPoints.contains(snappedPoint)) {
                     snappedPoints.add(snappedPoint);
@@ -111,14 +106,15 @@ public class GraphHopperSinglePointMapMatcher implements SinglePointMapMatcher {
             }
         }
 
-        return new SinglePointMatch(matchedLinkIds, MatchStatus.MATCH, snappedPoints, closestDistance);
+        final double reliability = (1 - closestDistance / MAXIMUM_CANDIDATE_DISTANCE_IN_METERS) * MAX_RELIABILITY_SCORE;
+        return new SinglePointMatch(matchedLinkIds, reliability, MatchStatus.MATCH, snappedPoints);
     }
 
     private SinglePointMatch createFailedMatch() {
         final List<Integer> matchedLinkIds = Lists.newArrayList();
         final List<Point> snappedPoints = Lists.newArrayList();
         final MatchStatus matchStatus = MatchStatus.NO_MATCH;
-        final double distance = 0.0;
-        return new SinglePointMatch(matchedLinkIds, matchStatus, snappedPoints, distance);
+        final double reliability = 0.0;
+        return new SinglePointMatch(matchedLinkIds, reliability, matchStatus, snappedPoints);
     }
 }
