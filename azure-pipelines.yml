@@ -19,7 +19,8 @@ steps:
       scannerMode: Other
       extraProperties: |
         sonar.coverage.jacoco.xmlReportPaths=**/target/site/jacoco/jacoco.xml,**/target/site/jacoco-it/jacoco.xml
-        sonar.coverage.exclusions=**/config/**,**/properties/**
+        sonar.coverage.exclusions=**/config/**
+        sonar.exclusions=**/graphhopper/isochrone/Isochrone.java
 
   - task: Maven@3
     displayName: Maven build
