@@ -28,6 +28,7 @@ import nu.ndw.nls.routingmapmatcher.domain.model.linestring.LineStringMatch;
 import nu.ndw.nls.routingmapmatcher.domain.model.linestring.ReliabilityCalculationType;
 import nu.ndw.nls.routingmapmatcher.graphhopper.LinkFlagEncoder;
 import nu.ndw.nls.routingmapmatcher.graphhopper.NetworkGraphHopper;
+import nu.ndw.nls.routingmapmatcher.graphhopper.isochrone.IsochroneService;
 import nu.ndw.nls.routingmapmatcher.graphhopper.model.CustomDistanceCalc;
 import nu.ndw.nls.routingmapmatcher.util.PathUtil;
 import org.locationtech.jts.geom.CoordinateSequence;
@@ -38,6 +39,7 @@ import org.locationtech.jts.geom.PrecisionModel;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 
 @Slf4j
 public class ViterbiLineStringMapMatcher implements LineStringMapMatcher {
@@ -88,9 +90,9 @@ public class ViterbiLineStringMapMatcher implements LineStringMapMatcher {
     private final CustomDistanceCalc distanceCalc;
     private final LocationIndexTree locationIndexTree;
     private final EdgeFilter edgeFilter;
-
     private final PathUtil pathUtil;
     private final QueryGraphExtractor queryGraphExtractor;
+    private final IsochroneService isochroneService;
 
     public ViterbiLineStringMapMatcher(final NetworkGraphHopper network) {
         Preconditions.checkNotNull(network);
@@ -110,6 +112,7 @@ public class ViterbiLineStringMapMatcher implements LineStringMapMatcher {
         final GeometryFactory geometryFactory = new GeometryFactory(new PrecisionModel(), GlobalConstants.WGS84_SRID);
         this.pathUtil = new PathUtil(geometryFactory);
         this.queryGraphExtractor = new QueryGraphExtractor();
+        this.isochroneService = new IsochroneService(flagEncoder, weighting);
     }
 
     @Override
@@ -196,6 +199,14 @@ public class ViterbiLineStringMapMatcher implements LineStringMapMatcher {
         }
         final List<Integer> matchedLinkIds = pathUtil.determineMatchedLinkIds(flagEncoder, edges);
         final QueryGraph queryGraph = queryGraphExtractor.extractQueryGraph(path);
+
+        final int startNode = edges.get(0).getBaseNode();
+        final Set<Integer> upstreamLinkIds = lineStringLocation.getUpstreamIsochroneUnit() != null ?
+                isochroneService.getUpstreamLinkIds(queryGraph, lineStringLocation, startNode) : null;
+        final int endNode = edges.get(edges.size() - 1).getAdjNode();
+        final Set<Integer> downstreamLinkIds = lineStringLocation.getDownstreamIsochroneUnit() != null ?
+                isochroneService.getDownstreamLinkIds(queryGraph, lineStringLocation, endNode) : null;
+
         final double startLinkFraction = pathUtil.determineStartLinkFraction(edges.get(0), queryGraph);
         final double endLinkFraction = pathUtil.determineEndLinkFraction(edges.get(edges.size() - 1), queryGraph);
         final double reliability;
@@ -205,8 +216,9 @@ public class ViterbiLineStringMapMatcher implements LineStringMapMatcher {
             reliability = calculateCandidatePathScore(path, lineStringLocation);
         }
         final LineString lineString = pathUtil.createLineString(path.calcPoints());
-        return new LineStringMatch(lineStringLocation, matchedLinkIds, startLinkFraction, endLinkFraction, reliability,
-                MatchStatus.MATCH, lineString);
+        return new LineStringMatch(lineStringLocation.getId(), lineStringLocation.getLocationIndex(),
+                lineStringLocation.isReversed(), matchedLinkIds, upstreamLinkIds, downstreamLinkIds, startLinkFraction,
+                endLinkFraction, reliability, MatchStatus.MATCH, lineString);
     }
 
     private double calculateCandidatePathScoreOnlyPoints(final Path path, final LineStringLocation lineStringLocation) {
@@ -288,12 +300,8 @@ public class ViterbiLineStringMapMatcher implements LineStringMapMatcher {
         final double endLinkFraction = 0.0;
         final double reliability = 0.0;
         final LineString lineString = lineStringLocation.getGeometry();
-        return new LineStringMatch(lineStringLocation,
-                matchedLinkIds,
-                startLinkFraction,
-                endLinkFraction,
-                reliability,
-                status,
-                lineString);
+        return new LineStringMatch(lineStringLocation.getId(), lineStringLocation.getLocationIndex(),
+                lineStringLocation.isReversed(), matchedLinkIds, null, null, startLinkFraction, endLinkFraction,
+                reliability, status, lineString);
     }
 }

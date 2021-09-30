@@ -18,9 +18,10 @@ import org.junit.jupiter.api.Test;
 import java.util.List;
 
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.sameInstance;
 
 class ViterbiLineStringMapMatcherIT {
 
@@ -44,7 +45,6 @@ class ViterbiLineStringMapMatcherIT {
         ViterbiLinestringMapMatcherFactory viterbiLinestringMapMatcherFactory =
                 new ViterbiLinestringMapMatcherFactory(new NetworkGraphHopperFactory());
         viterbiLineStringMapMatcher = viterbiLinestringMapMatcherFactory.createMapMatcher(routingNetwork);
-
     }
 
     @SneakyThrows
@@ -55,11 +55,18 @@ class ViterbiLineStringMapMatcherIT {
         LineStringLocation lineStringLocation = mapper.readValue(locationJson, LineStringLocation.class);
         LineStringMatch lineStringMatch = viterbiLineStringMapMatcher.match(lineStringLocation);
         assertThat(lineStringMatch.getStatus(), is(MatchStatus.MATCH));
-        assertThat(lineStringMatch.getMatchedLinkIds(), hasSize(12));
+        assertThat(lineStringMatch.getMatchedLinkIds(), contains(3666097, 3666076, 3666077, 3666078, 3666079, 3666080,
+                3666081, 3666082, 3666083, 3666084, 3666085, 3666086));
+        assertThat(lineStringMatch.getUpstreamLinkIds(),
+                containsInAnyOrder(3666097, 3666096, 3666095, 3666094, 7223062, 7223061));
+        assertThat(lineStringMatch.getDownstreamLinkIds(),
+                containsInAnyOrder(3666086, 3666105, 3666106, 3666107, 3666108, 3666109, 3686216, 3686217));
         assertThat(lineStringMatch.getStartLinkFraction(), is(0.8802584207113416));
         assertThat(lineStringMatch.getEndLinkFraction(), is(0.45984987610479167));
         assertThat(lineStringMatch.getReliability(), is(93.18054557296587));
-        assertThat(lineStringMatch.getLocation(), sameInstance(lineStringLocation));
+        assertThat(lineStringMatch.getId(), is(29));
+        assertThat(lineStringMatch.getLocationIndex(), is(-1));
+        assertThat(lineStringMatch.isReversed(), is(true));
     }
 
     @SneakyThrows
@@ -74,6 +81,8 @@ class ViterbiLineStringMapMatcherIT {
         assertThat(lineStringMatch.getStartLinkFraction(), is(0.0));
         assertThat(lineStringMatch.getEndLinkFraction(), is(0.0));
         assertThat(lineStringMatch.getReliability(), is(0.0));
-        assertThat(lineStringMatch.getLocation(), sameInstance(lineStringLocation));
+        assertThat(lineStringMatch.getId(), is(15));
+        assertThat(lineStringMatch.getLocationIndex(), is(0));
+        assertThat(lineStringMatch.isReversed(), is(false));
     }
 }
