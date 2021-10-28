@@ -74,7 +74,7 @@ public class GraphHopperSinglePointMapMatcher implements SinglePointMapMatcher {
 
         final SinglePointMatch match;
         if (queryResults.isEmpty()) {
-            match = createFailedMatch();
+            match = createFailedMatch(singlePointLocation);
         } else {
             match = createMatch(queryResults, singlePointLocation);
         }
@@ -131,13 +131,13 @@ public class GraphHopperSinglePointMapMatcher implements SinglePointMapMatcher {
         }
 
         final double reliability = (1 - closestDistance / MAXIMUM_CANDIDATE_DISTANCE_IN_METERS) * MAX_RELIABILITY_SCORE;
-        return new SinglePointMatch(candidateMatches, reliability, MatchStatus.MATCH);
+        return new SinglePointMatch(singlePointLocation.getId(), candidateMatches, reliability, MatchStatus.MATCH);
     }
 
-    private SinglePointMatch createFailedMatch() {
+    private SinglePointMatch createFailedMatch(SinglePointLocation singlePointLocation) {
         final List<SinglePointMatch.CandidateMatch> candidateMatches = Lists.newArrayList();
         final MatchStatus matchStatus = MatchStatus.NO_MATCH;
         final double reliability = 0.0;
-        return new SinglePointMatch(candidateMatches, reliability, matchStatus);
+        return new SinglePointMatch(singlePointLocation.getId(),candidateMatches, reliability, matchStatus);
     }
 }

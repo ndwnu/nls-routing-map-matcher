@@ -9,12 +9,15 @@ import lombok.ToString;
 @ToString
 public abstract class BaseLocation {
 
+    private final int id;
+
     private final double upstreamIsochrone;
     private final IsochroneUnit upstreamIsochroneUnit;
     private final double downstreamIsochrone;
     private final IsochroneUnit downstreamIsochroneUnit;
 
-    public BaseLocation() {
+    protected BaseLocation(int id) {
+        this.id = id;
         upstreamIsochrone = 0;
         upstreamIsochroneUnit = null;
         downstreamIsochrone = 0;

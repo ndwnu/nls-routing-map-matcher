@@ -21,8 +21,9 @@ public class MapMatcherAutoConfiguration {
     @Bean
     @ConditionalOnMissingBean
     public RoutingMapMatcher routingMapMatcher(
-            final MapMatcherFactory<LineStringMapMatcher> lineStringMapMatcherFactory) {
-        return new RoutingMapMatcher(lineStringMapMatcherFactory);
+            final MapMatcherFactory<LineStringMapMatcher> lineStringMapMatcherFactory,
+            final MapMatcherFactory<SinglePointMapMatcher> singlePointMapMatcherMapMatcherFactory) {
+        return new RoutingMapMatcher(lineStringMapMatcherFactory, singlePointMapMatcherMapMatcherFactory);
     }
 
     @Bean

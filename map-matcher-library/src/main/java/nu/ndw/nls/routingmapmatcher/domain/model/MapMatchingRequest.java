@@ -1,16 +1,14 @@
 package nu.ndw.nls.routingmapmatcher.domain.model;
 
-import lombok.Builder;
-import lombok.Value;
-import nu.ndw.nls.routingmapmatcher.domain.model.linestring.LineStringLocation;
-
 import java.util.List;
 import java.util.function.Supplier;
+import lombok.Data;
+import lombok.RequiredArgsConstructor;
 
-@Value
-@Builder
-public class MapMatchingRequest {
+@Data
+@RequiredArgsConstructor
+public class MapMatchingRequest<T extends BaseLocation> {
 
-    String locationTypeName;
-    Supplier<List<LineStringLocation>> locationSupplier;
+    private final String locationTypeName;
+    private final Supplier<List<T>> locationSupplier;
 }

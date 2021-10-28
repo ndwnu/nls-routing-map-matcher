@@ -6,6 +6,7 @@ import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.nullValue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -37,6 +38,7 @@ import org.locationtech.jts.geom.PrecisionModel;
 
 public class SinglePointMapMatcherIT {
 
+    public static final int ID = 123;
     private SinglePointMapMatcher singlePointMapMatcher;
     private ObjectMapper mapper;
     private GeometryFactory geometryFactory;
@@ -66,8 +68,9 @@ public class SinglePointMapMatcherIT {
     void testOneWayMatch() {
         // The given point is near a one-way road.
         Point point = geometryFactory.createPoint(new Coordinate(5.427, 52.177));
-        SinglePointMatch singlePointMatch = singlePointMapMatcher.match(new SinglePointLocation(point));
+        SinglePointMatch singlePointMatch = singlePointMapMatcher.match(new SinglePointLocation(ID, point));
         assertThat(singlePointMatch, is(notNullValue()));
+        assertEquals(ID, singlePointMatch.getId());
         assertThat(singlePointMatch.getStatus(), is(MatchStatus.MATCH));
         assertThat(singlePointMatch.getCandidateMatches(), hasSize(1));
         assertThatUpstreamAndDownstreamAreNull(singlePointMatch);
@@ -80,8 +83,9 @@ public class SinglePointMapMatcherIT {
     void testBidirectionalWayMatch() {
         // The given point is near a bidirectional road.
         Point point = geometryFactory.createPoint(new Coordinate(5.4280, 52.1798));
-        SinglePointMatch singlePointMatch = singlePointMapMatcher.match(new SinglePointLocation(point));
+        SinglePointMatch singlePointMatch = singlePointMapMatcher.match(new SinglePointLocation(ID, point));
         assertThat(singlePointMatch, is(notNullValue()));
+        assertEquals(ID, singlePointMatch.getId());
         assertThat(singlePointMatch.getStatus(), is(MatchStatus.MATCH));
         assertThat(singlePointMatch.getCandidateMatches(), hasSize(2));
         assertThatUpstreamAndDownstreamAreNull(singlePointMatch);
@@ -94,8 +98,9 @@ public class SinglePointMapMatcherIT {
     void testNodeMatch() {
         // The given point is located at the center of a crossroad.
         Point point = geometryFactory.createPoint(new Coordinate(5.426228, 52.18103));
-        SinglePointMatch singlePointMatch = singlePointMapMatcher.match(new SinglePointLocation(point));
+        SinglePointMatch singlePointMatch = singlePointMapMatcher.match(new SinglePointLocation(ID, point));
         assertThat(singlePointMatch, is(notNullValue()));
+        assertEquals(ID, singlePointMatch.getId());
         assertThat(singlePointMatch.getStatus(), is(MatchStatus.MATCH));
         assertThat(singlePointMatch.getCandidateMatches(), hasSize(8));
         assertThatUpstreamAndDownstreamAreNull(singlePointMatch);
@@ -108,8 +113,9 @@ public class SinglePointMapMatcherIT {
     void testDoubleMatch() {
         // The given point is near two one-way roads.
         Point point = geometryFactory.createPoint(new Coordinate(5.424633, 52.178623));
-        SinglePointMatch singlePointMatch = singlePointMapMatcher.match(new SinglePointLocation(point));
+        SinglePointMatch singlePointMatch = singlePointMapMatcher.match(new SinglePointLocation(ID, point));
         assertThat(singlePointMatch, is(notNullValue()));
+        assertEquals(ID, singlePointMatch.getId());
         assertThat(singlePointMatch.getStatus(), is(MatchStatus.MATCH));
         assertThat(singlePointMatch.getCandidateMatches(), hasSize(2));
         assertThatUpstreamAndDownstreamAreNull(singlePointMatch);
@@ -121,8 +127,9 @@ public class SinglePointMapMatcherIT {
     @Test
     void testNoMatch() {
         Point point = geometryFactory.createPoint(new Coordinate(5.420, 52.190));
-        SinglePointMatch singlePointMatch = singlePointMapMatcher.match(new SinglePointLocation(point));
+        SinglePointMatch singlePointMatch = singlePointMapMatcher.match(new SinglePointLocation(ID, point));
         assertThat(singlePointMatch, is(notNullValue()));
+        assertEquals(ID, singlePointMatch.getId());
         assertThat(singlePointMatch.getStatus(), is(MatchStatus.NO_MATCH));
         assertThat(singlePointMatch.getCandidateMatches(), hasSize(0));
         assertThat(singlePointMatch.getReliability(), is(0.0));
@@ -132,9 +139,10 @@ public class SinglePointMapMatcherIT {
     @Test
     void testUpstreamDownstream() {
         Point point = geometryFactory.createPoint(new Coordinate(5.4278, 52.1764));
-        SinglePointMatch singlePointMatch = singlePointMapMatcher.match(new SinglePointLocation(point, 1000,
+        SinglePointMatch singlePointMatch = singlePointMapMatcher.match(new SinglePointLocation(ID, point, 1000,
                 IsochroneUnit.METERS, 30, IsochroneUnit.SECONDS));
         assertThat(singlePointMatch, is(notNullValue()));
+        assertEquals(ID, singlePointMatch.getId());
         assertThat(singlePointMatch.getStatus(), is(MatchStatus.MATCH));
         assertThat(singlePointMatch.getCandidateMatches(), hasSize(1));
         assertThat(getSnappedPoints(singlePointMatch), hasSize(1));
