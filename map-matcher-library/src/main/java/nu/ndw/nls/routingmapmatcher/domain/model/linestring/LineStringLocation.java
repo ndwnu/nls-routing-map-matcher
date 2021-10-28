@@ -1,18 +1,15 @@
 package nu.ndw.nls.routingmapmatcher.domain.model.linestring;
 
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 import lombok.ToString;
 import nu.ndw.nls.routingmapmatcher.domain.model.BaseLocation;
 import nu.ndw.nls.routingmapmatcher.domain.model.IsochroneUnit;
 import org.locationtech.jts.geom.LineString;
 
-@RequiredArgsConstructor
 @Getter
 @ToString(callSuper = true)
 public class LineStringLocation extends BaseLocation {
 
-    private final int id;
     private final int locationIndex;
     private final boolean reversed;
     private final double lengthInMeters;
@@ -25,8 +22,7 @@ public class LineStringLocation extends BaseLocation {
             final ReliabilityCalculationType reliabilityCalculationType, final double upstreamIsochrone,
             final IsochroneUnit upstreamIsochroneUnit, final double downstreamIsochrone,
             final IsochroneUnit downstreamIsochroneUnit) {
-        super(upstreamIsochrone, upstreamIsochroneUnit, downstreamIsochrone, downstreamIsochroneUnit);
-        this.id = id;
+        super(id, upstreamIsochrone, upstreamIsochroneUnit, downstreamIsochrone, downstreamIsochroneUnit);
         this.locationIndex = locationIndex;
         this.reversed = reversed;
         this.lengthInMeters = lengthInMeters;

@@ -1,6 +1,7 @@
 package nu.ndw.nls.routingmapmatcher.domain;
 
 import nu.ndw.nls.routingmapmatcher.domain.model.Link;
+import nu.ndw.nls.routingmapmatcher.domain.model.MapMatchingLineRequest;
 import nu.ndw.nls.routingmapmatcher.domain.model.MapMatchingRequest;
 import nu.ndw.nls.routingmapmatcher.domain.model.MatchStatus;
 import nu.ndw.nls.routingmapmatcher.domain.model.RoutingNetwork;
@@ -23,7 +24,7 @@ import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-class RoutingMapMatcherTest {
+class RoutingMapMatcherLineTest {
     @Mock
     private MapMatcherFactory<LineStringMapMatcher> lineStringMapMatcherFactory;
 
@@ -38,7 +39,7 @@ class RoutingMapMatcherTest {
 
     private RoutingNetwork routingNetwork;
 
-    private MapMatchingRequest mapMatchingRequest;
+    private MapMatchingLineRequest mapMatchingRequest;
 
     @InjectMocks
     private RoutingMapMatcher routingMapMatcher;
@@ -52,7 +53,7 @@ class RoutingMapMatcherTest {
                 .networkNameAndVersion("test network")
                 .linkSupplier(() -> links)
                 .build();
-        mapMatchingRequest = MapMatchingRequest.builder()
+        mapMatchingRequest = MapMatchingLineRequest.builder()
                 .locationTypeName("test location type")
                 .locationSupplier(() -> lineStringLocations)
                 .build();
