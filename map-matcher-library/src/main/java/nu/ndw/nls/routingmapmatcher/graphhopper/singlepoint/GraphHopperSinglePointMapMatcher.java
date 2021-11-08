@@ -10,6 +10,8 @@ import com.graphhopper.routing.weighting.Weighting;
 import com.graphhopper.storage.IntsRef;
 import com.graphhopper.storage.index.LocationIndexTree;
 import com.graphhopper.storage.index.QueryResult;
+import com.graphhopper.util.DistanceCalc;
+import com.graphhopper.util.DistanceCalcEarth;
 import com.graphhopper.util.shapes.GHPoint3D;
 import java.util.ArrayList;
 import java.util.List;
@@ -23,6 +25,7 @@ import nu.ndw.nls.routingmapmatcher.domain.model.singlepoint.SinglePointMatch;
 import nu.ndw.nls.routingmapmatcher.graphhopper.LinkFlagEncoder;
 import nu.ndw.nls.routingmapmatcher.graphhopper.NetworkGraphHopper;
 import nu.ndw.nls.routingmapmatcher.graphhopper.isochrone.IsochroneService;
+import nu.ndw.nls.routingmapmatcher.util.PathUtil;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.Point;
@@ -47,8 +50,10 @@ public class GraphHopperSinglePointMapMatcher implements SinglePointMapMatcher {
     private final LocationIndexTree locationIndexTree;
     private final EdgeFilter edgeFilter;
     private final GeometryFactory geometryFactory;
+    private final PathUtil pathUtil;
     private final QueryGraph queryGraph;
     private final IsochroneService isochroneService;
+    private DistanceCalc distanceCalculator;
 
     public GraphHopperSinglePointMapMatcher(final NetworkGraphHopper network) {
         Preconditions.checkNotNull(network);
@@ -61,9 +66,12 @@ public class GraphHopperSinglePointMapMatcher implements SinglePointMapMatcher {
         this.edgeFilter = EdgeFilter.ALL_EDGES;
 
         this.geometryFactory = new GeometryFactory(new PrecisionModel(), GlobalConstants.WGS84_SRID);
+        this.pathUtil = new PathUtil(this.geometryFactory);
         this.queryGraph = new QueryGraph(network.getGraphHopperStorage());
         final Weighting weighting = new ShortestWeighting(flagEncoder);
         this.isochroneService = new IsochroneService(flagEncoder, weighting);
+
+        this.distanceCalculator = new DistanceCalcEarth();
     }
 
     @Override
@@ -114,7 +122,6 @@ public class GraphHopperSinglePointMapMatcher implements SinglePointMapMatcher {
             if (queryResult.getQueryDistance() < closestDistance + DISTANCE_ROUNDING_ERROR) {
                 final IntsRef flags = queryResult.getClosestEdge().getFlags();
                 final int matchedLinkId = flagEncoder.getId(flags);
-
                 final int nodeId = queryResult.getClosestNode();
                 final Set<Integer> upstreamLinkIds = singlePointLocation.getUpstreamIsochroneUnit() != null ?
                         isochroneService.getUpstreamLinkIds(queryGraph, singlePointLocation, nodeId) : null;
@@ -125,8 +132,11 @@ public class GraphHopperSinglePointMapMatcher implements SinglePointMapMatcher {
                 final Point snappedPoint = geometryFactory.createPoint(
                     new Coordinate(ghSnappedPoint.getLon(), ghSnappedPoint.getLat()));
 
+                final double fraction = this.pathUtil.determineSnappedPointFraction(queryResult,
+                        this.distanceCalculator);
+
                 candidateMatches.add(new SinglePointMatch.CandidateMatch(matchedLinkId, upstreamLinkIds,
-                        downstreamLinkIds, snappedPoint));
+                        downstreamLinkIds, snappedPoint, fraction));
             }
         }
 

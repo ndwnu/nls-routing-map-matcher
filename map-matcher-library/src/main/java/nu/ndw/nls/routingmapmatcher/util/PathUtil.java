@@ -2,10 +2,16 @@ package nu.ndw.nls.routingmapmatcher.util;
 
 import com.graphhopper.routing.QueryGraph;
 import com.graphhopper.storage.IntsRef;
+import com.graphhopper.storage.index.QueryResult;
+import com.graphhopper.storage.index.QueryResult.Position;
+import com.graphhopper.util.DistanceCalc;
 import com.graphhopper.util.EdgeExplorer;
 import com.graphhopper.util.EdgeIterator;
 import com.graphhopper.util.EdgeIteratorState;
 import com.graphhopper.util.PointList;
+import com.graphhopper.util.shapes.GHPoint3D;
+import java.util.Iterator;
+import lombok.extern.slf4j.Slf4j;
 import nu.ndw.nls.routingmapmatcher.domain.exception.RoutingMapMatcherException;
 import nu.ndw.nls.routingmapmatcher.graphhopper.LinkFlagEncoder;
 import org.locationtech.jts.geom.GeometryFactory;
@@ -16,8 +22,11 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+@Slf4j
 public class PathUtil {
 
+    public static final int ALL_NODES_MODE = 3;
+    public static final int LINESTRING_MINIMUM_POINTS = 2;
     private final GeometryFactory geometryFactory;
 
     public PathUtil(final GeometryFactory geometryFactory) {
@@ -63,6 +72,109 @@ public class PathUtil {
         return matchedLinkIds;
     }
 
+
+
+    /**
+     * Calculates the fraction (relative normalized distance, a number between 0 start and 1 end) from the start of
+     * this segment (baseNode) to the snapped point on the path from the query result.
+     *
+     * First a check is performed on a tower node match, because then we can either return 0 or 1 based on the wayIndex.
+     * WayIndex indicates on which or after which node the snapped point is found on the edge, there for the start node
+     * is 0 and if a tower node is not wayIndex 0 then it must be the adjacent end node.
+     *
+     * Otherwise for each line segment the length is calculated, walking the edge path from base tower node (start) to
+     *  end adjacent node (total length)
+     *  snapped point (snapped point length)
+     *
+     *  Then the fraction is calculated by relating the snapped point length to the total length
+     *
+     * @param queryResult the query result
+     * @param distanceCalc the calculator to use
+     * @return the fraction, relative distance on edge beween start 0 and snapped point
+     */
+    public double determineSnappedPointFraction(QueryResult queryResult, DistanceCalc distanceCalc) {
+        // Find out after which point our snapped point snaps on the edge
+        final int wayIndex = queryResult.getWayIndex();
+
+        final Position snappedPosition = queryResult.getSnappedPosition();
+
+        // Tower means at start or end, we can determine this without calculations
+        if (snappedPosition == Position.TOWER) {
+            if (wayIndex == 0){
+                log.debug("Found snapped position at base tower node, fraction: 0");
+                return 0;
+            } else {
+                log.debug("Found snapped position at adjacent tower node, fraction: 1");
+                return 1.0D;
+            }
+        }
+
+        // Closest edge found for our search point
+        final EdgeIteratorState edge = queryResult.getClosestEdge();
+
+        // We want to use all nodes, Base, pillar and adjacent nodes
+        final PointList pointList = edge.fetchWayGeometry(ALL_NODES_MODE);
+
+        if (pointList.getSize() < LINESTRING_MINIMUM_POINTS) {
+            throw new IllegalStateException(
+                    "pointList should contain at least two points, but contains: " + pointList.size());
+        } else if (wayIndex >= pointList.getSize()) {
+            throw new IndexOutOfBoundsException(
+                    "Way index " + wayIndex + " out of bounds, point count: " + pointList.getSize());
+        }
+
+        final Iterator<GHPoint3D> it = pointList.iterator();
+        GHPoint3D previous = it.next();
+
+        double sumOfPathLenghts = 0D;
+
+        Double pathDistanceToSnappedPoint = null;
+
+        int startNodeIndex = 0;
+
+        // The closest point on our edge to our search point
+        final GHPoint3D snappedPoint = queryResult.getSnappedPoint();
+
+        while (it.hasNext()) {
+            GHPoint3D current = it.next();
+
+            // If the start node index is the one after which we found the snapped point, calculate distance from
+            // previous node to snapped point.
+            if (wayIndex == startNodeIndex) {
+                log.debug("Found snapped point after node {}", wayIndex);
+                double previousToSnappedPointDistance = distanceCalc.calcDist(  previous.getLat(), previous.getLon(),
+                        snappedPoint.getLat(), snappedPoint.getLon());
+
+                log.trace("Distance from previous node (lat/lon) ({},{}) to snapped point ({},{}): {}",
+                        previous.getLat(), previous.getLon(), snappedPoint.getLat(), snappedPoint.getLon(),
+                        previousToSnappedPointDistance);
+
+                pathDistanceToSnappedPoint = sumOfPathLenghts + previousToSnappedPointDistance;
+            }
+
+            // Calculate distance from previous to current tower/pillar node
+            sumOfPathLenghts += distanceCalc.calcDist( previous.getLat(), previous.getLon(),
+                                                        current.getLat(), current.getLon());
+
+            log.trace("Length from start node to node index {} is {}", startNodeIndex + 1, sumOfPathLenghts);
+
+            // Prepare for next loop
+            previous = current;
+            startNodeIndex++;
+        }
+
+        if (pathDistanceToSnappedPoint == null) {
+            throw new IllegalStateException("Failed to find path distance to snapped point");
+        }
+
+        double fraction = pathDistanceToSnappedPoint / sumOfPathLenghts;
+
+        log.trace("Total (geometrical) edge length: {}, snapped point path length {}. Fraction: {}", sumOfPathLenghts,
+                pathDistanceToSnappedPoint, fraction);
+
+        return fraction;
+    }
+
     public double determineStartLinkFraction(final EdgeIteratorState firstEdge, final QueryGraph queryGraph) {
         final double startLinkFraction;
         if (queryGraph.isVirtualNode(firstEdge.getBaseNode())) {
@@ -73,7 +185,7 @@ public class PathUtil {
 
             startLinkFraction = distanceInOtherDirection / originalEdge.getDistance();
         } else {
-            startLinkFraction = 0.0;
+            startLinkFraction = 0D;
         }
 
         return startLinkFraction;
@@ -100,7 +212,7 @@ public class PathUtil {
             final int nodeToAvoid, final EdgeIteratorState pathEdge) {
         final EdgeExplorer edgeExplorer = queryGraph.createEdgeExplorer();
 
-        double distanceInOtherDirection = 0.0;
+        double distanceInOtherDirection = 0D;
         boolean distanceInOtherDirectionCalculated = false;
         boolean distanceInOtherDirectionIsPositive = false;
 
@@ -110,7 +222,7 @@ public class PathUtil {
             if (edges.getAdjNode() != currentNodeToAvoid) {
                 distanceInOtherDirection += edges.getDistance();
 
-                // This assumes all edge lengths are > 0.0!
+                // This assumes all edge lengths are > 0!
                 distanceInOtherDirectionIsPositive = true;
 
                 if (queryGraph.isVirtualNode(edges.getAdjNode())) {
@@ -127,7 +239,7 @@ public class PathUtil {
 
         if (!distanceInOtherDirectionCalculated) {
             // This could be the case when an edge has exactly one virtual node and that edge has the same node as
-            // start node and end node; in this situation the value of distanceInOtherDirection should be 0.0
+            // start node and end node; in this situation the value of distanceInOtherDirection should be 0
             if (!distanceInOtherDirectionIsPositive) {
                 distanceInOtherDirection = queryGraph.getOriginalEdgeFromVirtNode(virtualNode).getDistance() -
                         pathEdge.getDistance();
@@ -147,9 +259,9 @@ public class PathUtil {
             final double distanceInOtherDirection = calculateDistanceFromVirtualNodeToNonVirtualNode(queryGraph,
                     lastEdge.getAdjNode(), lastEdge.getBaseNode(), lastEdge);
 
-            endLinkFraction = 1.0 - (distanceInOtherDirection / originalEdge.getDistance());
+            endLinkFraction = 1.0D - (distanceInOtherDirection / originalEdge.getDistance());
         } else {
-            endLinkFraction = 1.0;
+            endLinkFraction = 1.0D;
         }
 
         return endLinkFraction;
