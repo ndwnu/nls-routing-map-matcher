@@ -1,8 +1,9 @@
-package nu.ndw.nls.routingmapmatcher.domain.model;
+package nu.ndw.nls.routingmapmatcher.domain.model.base;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.ToString;
+import nu.ndw.nls.routingmapmatcher.domain.model.IsochroneUnit;
 
 @RequiredArgsConstructor
 @Getter
@@ -16,7 +17,7 @@ public abstract class BaseLocation {
     private final double downstreamIsochrone;
     private final IsochroneUnit downstreamIsochroneUnit;
 
-    protected BaseLocation(int id) {
+    protected BaseLocation(final int id) {
         this.id = id;
         upstreamIsochrone = 0;
         upstreamIsochroneUnit = null;

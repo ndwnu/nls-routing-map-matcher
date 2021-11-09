@@ -4,7 +4,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.stream.Stream;
 import lombok.extern.slf4j.Slf4j;
-import nu.ndw.nls.routingmapmatcher.domain.model.BaseLocation;
+import nu.ndw.nls.routingmapmatcher.domain.model.base.BaseLocation;
 import nu.ndw.nls.routingmapmatcher.domain.model.MapMatchingLineRequest;
 import nu.ndw.nls.routingmapmatcher.domain.model.MapMatchingRequest;
 import nu.ndw.nls.routingmapmatcher.domain.model.MapMatchingSinglePointRequest;
@@ -27,16 +27,17 @@ public class RoutingMapMatcher {
     private final MapMatcherFactory<SinglePointMapMatcher> singlePointMapMatcherMapMatcherFactory;
 
     private static final class MatchingContext<T extends BaseLocation, R extends MapMatch> {
+
         private int matched;
         private int processed;
 
         private final MapMatcher<T, R> mapMatcher;
 
-        private MatchingContext(MapMatcher<T, R> matcher) {
+        private MatchingContext(final MapMatcher<T, R> matcher) {
             this.mapMatcher = matcher;
         }
 
-        public Stream<R> matchLocations(MapMatchingRequest<T> mapMatchingRequest) {
+        public Stream<R> matchLocations(final MapMatchingRequest<T> mapMatchingRequest) {
             final List<T> locations = mapMatchingRequest.getLocationSupplier().get();
 
             final int numLocations = locations.size();
@@ -65,33 +66,30 @@ public class RoutingMapMatcher {
     }
 
     public RoutingMapMatcher(final MapMatcherFactory<LineStringMapMatcher> lineStringMapMatcherFactory,
-            MapMatcherFactory<SinglePointMapMatcher> singlePointMapMatcherMapMatcherFactory) {
+            final MapMatcherFactory<SinglePointMapMatcher> singlePointMapMatcherMapMatcherFactory) {
         this.lineStringMapMatcherFactory = lineStringMapMatcherFactory;
         this.singlePointMapMatcherMapMatcherFactory = singlePointMapMatcherMapMatcherFactory;
     }
 
     public Stream<SinglePointMatch> matchLocations(final RoutingNetwork routingNetwork,
             final MapMatchingSinglePointRequest mapMatchingSinglePointRequest) {
-
-        SinglePointMapMatcher singlePointMapMatcher =
+        final SinglePointMapMatcher singlePointMapMatcher =
                 this.singlePointMapMatcherMapMatcherFactory.createMapMatcher(routingNetwork);
 
-        MatchingContext<SinglePointLocation, SinglePointMatch> lineStringMapMatchingContext =
+        final MatchingContext<SinglePointLocation, SinglePointMatch> lineStringMapMatchingContext =
                 new MatchingContext<>(singlePointMapMatcher);
 
         return lineStringMapMatchingContext.matchLocations(mapMatchingSinglePointRequest);
     }
 
     public Stream<LineStringMatch> matchLocations(final RoutingNetwork routingNetwork,
-                                                    final MapMatchingLineRequest mapMatchingLineRequest) {
+            final MapMatchingLineRequest mapMatchingLineRequest) {
+        final LineStringMapMatcher lineStringMapMatcher =
+                this.lineStringMapMatcherFactory.createMapMatcher(routingNetwork);
 
-        LineStringMapMatcher lineStringMapMatcher = this.lineStringMapMatcherFactory.createMapMatcher(routingNetwork);
-
-        MatchingContext<LineStringLocation, LineStringMatch> lineStringMapMatchingContext =
+        final MatchingContext<LineStringLocation, LineStringMatch> lineStringMapMatchingContext =
                 new MatchingContext<>(lineStringMapMatcher);
 
         return lineStringMapMatchingContext.matchLocations(mapMatchingLineRequest);
     }
-
-
 }

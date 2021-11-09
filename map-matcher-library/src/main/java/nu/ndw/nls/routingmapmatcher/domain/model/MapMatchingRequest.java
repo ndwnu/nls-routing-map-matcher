@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.function.Supplier;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
+import nu.ndw.nls.routingmapmatcher.domain.model.base.BaseLocation;
 
 @Data
 @RequiredArgsConstructor

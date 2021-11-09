@@ -8,11 +8,9 @@ import nu.ndw.nls.routingmapmatcher.domain.model.MatchStatus;
 @ToString
 @Getter
 @RequiredArgsConstructor
-public class MapMatch {
+public abstract class MapMatch {
 
     private final int id;
     private final MatchStatus status;
     private final double reliability;
-
-
 }
