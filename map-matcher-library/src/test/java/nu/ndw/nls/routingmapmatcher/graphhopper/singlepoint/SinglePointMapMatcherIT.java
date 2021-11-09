@@ -14,7 +14,6 @@ import com.fasterxml.jackson.databind.module.SimpleModule;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
-
 import lombok.SneakyThrows;
 import nu.ndw.nls.routingmapmatcher.constants.GlobalConstants;
 import nu.ndw.nls.routingmapmatcher.domain.SinglePointMapMatcher;
@@ -22,11 +21,9 @@ import nu.ndw.nls.routingmapmatcher.domain.model.IsochroneUnit;
 import nu.ndw.nls.routingmapmatcher.domain.model.Link;
 import nu.ndw.nls.routingmapmatcher.domain.model.MatchStatus;
 import nu.ndw.nls.routingmapmatcher.domain.model.RoutingNetwork;
-import nu.ndw.nls.routingmapmatcher.domain.model.linestring.LineStringLocation;
 import nu.ndw.nls.routingmapmatcher.domain.model.singlepoint.SinglePointLocation;
 import nu.ndw.nls.routingmapmatcher.domain.model.singlepoint.SinglePointMatch;
 import nu.ndw.nls.routingmapmatcher.graphhopper.NetworkGraphHopperFactory;
-import nu.ndw.nls.routingmapmatcher.graphhopper.viterbi.LineStringLocationDeserializer;
 import nu.ndw.nls.routingmapmatcher.graphhopper.viterbi.LinkDeserializer;
 import org.apache.commons.io.IOUtils;
 import org.junit.jupiter.api.BeforeEach;
@@ -50,7 +47,6 @@ public class SinglePointMapMatcherIT {
         mapper = new ObjectMapper();
         SimpleModule module = new SimpleModule();
         module.addDeserializer(Link.class, new LinkDeserializer());
-        module.addDeserializer(LineStringLocation.class, new LineStringLocationDeserializer());
         mapper.registerModule(module);
         List<Link> links = mapper.readValue(linksJson, new TypeReference<>() {
         });
