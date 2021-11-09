@@ -31,6 +31,7 @@ public class SinglePointMatch extends MapMatch {
         private final Set<Integer> upstreamLinkIds;
         private final Set<Integer> downstreamLinkIds;
         private final Point snappedPoint;
+        private final double fraction;
     }
 
     private final List<CandidateMatch> candidateMatches;
