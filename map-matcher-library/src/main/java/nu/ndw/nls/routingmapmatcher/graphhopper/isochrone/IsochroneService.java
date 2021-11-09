@@ -9,7 +9,7 @@ import com.graphhopper.routing.weighting.Weighting;
 import com.graphhopper.util.EdgeIteratorState;
 
 import lombok.RequiredArgsConstructor;
-import nu.ndw.nls.routingmapmatcher.domain.model.BaseLocation;
+import nu.ndw.nls.routingmapmatcher.domain.model.base.BaseLocation;
 import nu.ndw.nls.routingmapmatcher.domain.model.IsochroneUnit;
 import nu.ndw.nls.routingmapmatcher.graphhopper.LinkFlagEncoder;
 

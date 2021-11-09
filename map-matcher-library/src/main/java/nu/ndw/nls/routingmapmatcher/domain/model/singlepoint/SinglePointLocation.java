@@ -4,7 +4,7 @@ import org.locationtech.jts.geom.Point;
 
 import lombok.Getter;
 import lombok.ToString;
-import nu.ndw.nls.routingmapmatcher.domain.model.BaseLocation;
+import nu.ndw.nls.routingmapmatcher.domain.model.base.BaseLocation;
 import nu.ndw.nls.routingmapmatcher.domain.model.IsochroneUnit;
 
 @Getter
@@ -20,7 +20,7 @@ public class SinglePointLocation extends BaseLocation {
         this.point = point;
     }
 
-    public SinglePointLocation(final int id, Point point) {
+    public SinglePointLocation(final int id, final Point point) {
         super(id);
         this.point = point;
     }

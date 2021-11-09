@@ -24,10 +24,10 @@ public class LineStringMatch extends MapMatch {
     @ToString.Exclude
     private final LineString lineString;
 
-    public LineStringMatch(int id, int locationIndex, boolean reversed,
-            List<Integer> matchedLinkIds, Set<Integer> upstreamLinkIds,
-            Set<Integer> downstreamLinkIds, double startLinkFraction, double endLinkFraction,
-            double reliability, MatchStatus status, LineString lineString) {
+    public LineStringMatch(final int id, final int locationIndex, final boolean reversed,
+            final List<Integer> matchedLinkIds, final Set<Integer> upstreamLinkIds,
+            final Set<Integer> downstreamLinkIds, final double startLinkFraction, final double endLinkFraction,
+            final double reliability, final MatchStatus status, final LineString lineString) {
         super(id, status, reliability);
         this.locationIndex = locationIndex;
         this.reversed = reversed;

@@ -72,8 +72,6 @@ public class PathUtil {
         return matchedLinkIds;
     }
 
-
-
     /**
      * Calculates the fraction (relative normalized distance, a number between 0 start and 1 end) from the start of
      * this segment (baseNode) to the snapped point on the path from the query result.
@@ -92,7 +90,7 @@ public class PathUtil {
      * @param distanceCalc the calculator to use
      * @return the fraction, relative distance on edge beween start 0 and snapped point
      */
-    public double determineSnappedPointFraction(QueryResult queryResult, DistanceCalc distanceCalc) {
+    public double determineSnappedPointFraction(final QueryResult queryResult, final DistanceCalc distanceCalc) {
         // Find out after which point our snapped point snaps on the edge
         final int wayIndex = queryResult.getWayIndex();
 
@@ -100,12 +98,12 @@ public class PathUtil {
 
         // Tower means at start or end, we can determine this without calculations
         if (snappedPosition == Position.TOWER) {
-            if (wayIndex == 0){
+            if (wayIndex == 0) {
                 log.debug("Found snapped position at base tower node, fraction: 0");
-                return 0;
+                return 0D;
             } else {
                 log.debug("Found snapped position at adjacent tower node, fraction: 1");
-                return 1.0D;
+                return 1D;
             }
         }
 
@@ -136,14 +134,14 @@ public class PathUtil {
         final GHPoint3D snappedPoint = queryResult.getSnappedPoint();
 
         while (it.hasNext()) {
-            GHPoint3D current = it.next();
+            final GHPoint3D current = it.next();
 
             // If the start node index is the one after which we found the snapped point, calculate distance from
             // previous node to snapped point.
             if (wayIndex == startNodeIndex) {
                 log.debug("Found snapped point after node {}", wayIndex);
-                double previousToSnappedPointDistance = distanceCalc.calcDist(  previous.getLat(), previous.getLon(),
-                        snappedPoint.getLat(), snappedPoint.getLon());
+                final double previousToSnappedPointDistance = distanceCalc.calcDist(previous.getLat(),
+                        previous.getLon(), snappedPoint.getLat(), snappedPoint.getLon());
 
                 log.trace("Distance from previous node (lat/lon) ({},{}) to snapped point ({},{}): {}",
                         previous.getLat(), previous.getLon(), snappedPoint.getLat(), snappedPoint.getLon(),
@@ -153,8 +151,8 @@ public class PathUtil {
             }
 
             // Calculate distance from previous to current tower/pillar node
-            sumOfPathLenghts += distanceCalc.calcDist( previous.getLat(), previous.getLon(),
-                                                        current.getLat(), current.getLon());
+            sumOfPathLenghts += distanceCalc.calcDist(previous.getLat(), previous.getLon(), current.getLat(),
+                    current.getLon());
 
             log.trace("Length from start node to node index {} is {}", startNodeIndex + 1, sumOfPathLenghts);
 
@@ -167,7 +165,7 @@ public class PathUtil {
             throw new IllegalStateException("Failed to find path distance to snapped point");
         }
 
-        double fraction = pathDistanceToSnappedPoint / sumOfPathLenghts;
+        final double fraction = pathDistanceToSnappedPoint / sumOfPathLenghts;
 
         log.trace("Total (geometrical) edge length: {}, snapped point path length {}. Fraction: {}", sumOfPathLenghts,
                 pathDistanceToSnappedPoint, fraction);
@@ -259,9 +257,9 @@ public class PathUtil {
             final double distanceInOtherDirection = calculateDistanceFromVirtualNodeToNonVirtualNode(queryGraph,
                     lastEdge.getAdjNode(), lastEdge.getBaseNode(), lastEdge);
 
-            endLinkFraction = 1.0D - (distanceInOtherDirection / originalEdge.getDistance());
+            endLinkFraction = 1D - (distanceInOtherDirection / originalEdge.getDistance());
         } else {
-            endLinkFraction = 1.0D;
+            endLinkFraction = 1D;
         }
 
         return endLinkFraction;
