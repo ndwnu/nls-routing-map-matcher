@@ -14,14 +14,6 @@ import org.locationtech.jts.geom.Point;
 @ToString
 public class SinglePointMatch extends MapMatch {
 
-    public SinglePointMatch(int id,
-                            List<CandidateMatch> candidateMatches,
-                            double reliability,
-                            MatchStatus status) {
-        super(id, status, reliability);
-        this.candidateMatches = candidateMatches;
-    }
-
     @RequiredArgsConstructor
     @Getter
     @ToString
@@ -36,4 +28,9 @@ public class SinglePointMatch extends MapMatch {
 
     private final List<CandidateMatch> candidateMatches;
 
+    public SinglePointMatch(final int id, final List<CandidateMatch> candidateMatches, final double reliability,
+            final MatchStatus status) {
+        super(id, status, reliability);
+        this.candidateMatches = candidateMatches;
+    }
 }

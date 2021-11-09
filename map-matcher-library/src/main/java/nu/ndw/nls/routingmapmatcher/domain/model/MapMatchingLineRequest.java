@@ -9,8 +9,8 @@ import nu.ndw.nls.routingmapmatcher.domain.model.linestring.LineStringLocation;
 public class MapMatchingLineRequest extends MapMatchingRequest<LineStringLocation> {
 
     @Builder
-    public MapMatchingLineRequest(String locationTypeName,
-            Supplier<List<LineStringLocation>> locationSupplier) {
+    public MapMatchingLineRequest(final String locationTypeName,
+            final Supplier<List<LineStringLocation>> locationSupplier) {
         super(locationTypeName, locationSupplier);
     }
 }

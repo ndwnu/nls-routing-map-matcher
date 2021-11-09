@@ -12,14 +12,10 @@ import org.locationtech.jts.io.WKBReader;
 
 public class GeometryHelper {
 
-    /*
-        Warning This class is not thread-safe; each thread should create its own instance.
-        https://locationtech.github.io/jts/javadoc/org/locationtech/jts/io/WKBReader.html
-     */
     private final WKBReader wkbReader = new WKBReader(new GeometryFactory(new PrecisionModel(),
             GlobalConstants.WGS84_SRID));
 
-    public LineString convertToLinestring(final byte[] geometryWkb) throws IOException {
+    public synchronized LineString convertToLinestring(final byte[] geometryWkb) throws IOException {
         try {
             final Geometry geometry = wkbReader.read(geometryWkb);
             if (!(geometry instanceof LineString)) {
@@ -31,14 +27,14 @@ public class GeometryHelper {
         }
     }
 
-    public synchronized Point converToPoint(final byte[] geometryWkb) throws IOException {
+    public synchronized Point convertToPoint(final byte[] geometryWkb) throws IOException {
         try {
-            Geometry geometry = this.wkbReader.read(geometryWkb);
+            final Geometry geometry = this.wkbReader.read(geometryWkb);
             if (!(geometry instanceof Point)) {
                 throw new IOException("Unexpected geometry type: expected Point");
             }
             return (Point) geometry;
-        } catch (ParseException e) {
+        } catch (final ParseException e) {
             throw new IOException("Unable to parse WKB", e);
         }
     }

@@ -9,8 +9,8 @@ import nu.ndw.nls.routingmapmatcher.domain.model.singlepoint.SinglePointLocation
 public class MapMatchingSinglePointRequest extends MapMatchingRequest<SinglePointLocation> {
 
     @Builder
-    public MapMatchingSinglePointRequest(String locationTypeName,
-            Supplier<List<SinglePointLocation>> locationSupplier) {
+    public MapMatchingSinglePointRequest(final String locationTypeName,
+            final Supplier<List<SinglePointLocation>> locationSupplier) {
         super(locationTypeName, locationSupplier);
     }
 }

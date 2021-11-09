@@ -144,7 +144,7 @@ public class GraphHopperSinglePointMapMatcher implements SinglePointMapMatcher {
         return new SinglePointMatch(singlePointLocation.getId(), candidateMatches, reliability, MatchStatus.MATCH);
     }
 
-    private SinglePointMatch createFailedMatch(SinglePointLocation singlePointLocation) {
+    private SinglePointMatch createFailedMatch(final SinglePointLocation singlePointLocation) {
         final List<SinglePointMatch.CandidateMatch> candidateMatches = Lists.newArrayList();
         final MatchStatus matchStatus = MatchStatus.NO_MATCH;
         final double reliability = 0.0;
