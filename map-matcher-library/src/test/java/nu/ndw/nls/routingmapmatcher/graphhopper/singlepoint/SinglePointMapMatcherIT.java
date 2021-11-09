@@ -25,7 +25,6 @@ import nu.ndw.nls.routingmapmatcher.domain.model.singlepoint.SinglePointLocation
 import nu.ndw.nls.routingmapmatcher.domain.model.singlepoint.SinglePointMatch;
 import nu.ndw.nls.routingmapmatcher.graphhopper.NetworkGraphHopperFactory;
 import nu.ndw.nls.routingmapmatcher.graphhopper.viterbi.LinkDeserializer;
-import nu.ndw.nls.routingmapmatcher.graphhopper.viterbi.SinglePointLocationDeserializer;
 import org.apache.commons.io.IOUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -48,7 +47,6 @@ public class SinglePointMapMatcherIT {
         mapper = new ObjectMapper();
         SimpleModule module = new SimpleModule();
         module.addDeserializer(Link.class, new LinkDeserializer());
-        module.addDeserializer(SinglePointLocation.class, new SinglePointLocationDeserializer());
         mapper.registerModule(module);
         List<Link> links = mapper.readValue(linksJson, new TypeReference<>() {
         });
