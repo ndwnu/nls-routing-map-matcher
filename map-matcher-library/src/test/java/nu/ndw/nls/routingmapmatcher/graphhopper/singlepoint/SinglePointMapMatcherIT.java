@@ -4,6 +4,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.closeTo;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.nullValue;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -26,8 +27,9 @@ import nu.ndw.nls.routingmapmatcher.domain.model.singlepoint.SinglePointMatch;
 import nu.ndw.nls.routingmapmatcher.graphhopper.NetworkGraphHopperFactory;
 import nu.ndw.nls.routingmapmatcher.graphhopper.viterbi.LinkDeserializer;
 import org.apache.commons.io.IOUtils;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvFileSource;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.Point;
@@ -35,15 +37,17 @@ import org.locationtech.jts.geom.PrecisionModel;
 
 public class SinglePointMapMatcherIT {
 
-    public static final int ID = 123;
+    private static final String LINKS_RESOURCE = "/test-data/links.json";
+    private static final String SHIVI_LINKS_RESOURCE = "/test-data/shivi-verkeersbanen.json";
+    private static final int ID = 123;
+
     private SinglePointMapMatcher singlePointMapMatcher;
     private ObjectMapper mapper;
     private GeometryFactory geometryFactory;
 
     @SneakyThrows
-    @BeforeEach
-    private void setup() {
-        String linksJson = IOUtils.toString(getClass().getResourceAsStream("/test-data/links.json"));
+    private void setupNetwork(String resource) {
+        String linksJson = IOUtils.toString(getClass().getResourceAsStream(resource));
         mapper = new ObjectMapper();
         SimpleModule module = new SimpleModule();
         module.addDeserializer(Link.class, new LinkDeserializer());
@@ -60,8 +64,28 @@ public class SinglePointMapMatcherIT {
     }
 
     @SneakyThrows
+    @ParameterizedTest(name = "{0} [{index}]")
+    @CsvFileSource(resources = "/test-data/shivi-flow-mapping-fractions.csv", numLinesToSkip = 1)
+    void testFraction(String externalId, double x, double y, double expectedFraction) {
+        setupNetwork(SHIVI_LINKS_RESOURCE);
+
+        // The given point is near a one-way road.
+        Point point = geometryFactory.createPoint(new Coordinate(x, y));
+        SinglePointMatch singlePointMatch = singlePointMapMatcher.match(new SinglePointLocation(ID, point));
+        assertThat(singlePointMatch, is(notNullValue()));
+        assertEquals(ID, singlePointMatch.getId());
+        assertThat(singlePointMatch.getStatus(), is(MatchStatus.MATCH));
+        assertThat(singlePointMatch.getCandidateMatches(), hasSize(1));
+        assertThatUpstreamAndDownstreamAreNull(singlePointMatch);
+        assertThat(getSnappedPoints(singlePointMatch), hasSize(1));
+        assertThat(singlePointMatch.getCandidateMatches().get(0).getFraction(), closeTo(expectedFraction, 0.001));
+    }
+
+    @SneakyThrows
     @Test
     void testOneWayMatch() {
+        setupNetwork(LINKS_RESOURCE);
+
         // The given point is near a one-way road.
         Point point = geometryFactory.createPoint(new Coordinate(5.427, 52.177));
         SinglePointMatch singlePointMatch = singlePointMapMatcher.match(new SinglePointLocation(ID, point));
@@ -77,6 +101,8 @@ public class SinglePointMapMatcherIT {
     @SneakyThrows
     @Test
     void testBidirectionalWayMatch() {
+        setupNetwork(LINKS_RESOURCE);
+
         // The given point is near a bidirectional road.
         Point point = geometryFactory.createPoint(new Coordinate(5.4280, 52.1798));
         SinglePointMatch singlePointMatch = singlePointMapMatcher.match(new SinglePointLocation(ID, point));
@@ -92,6 +118,8 @@ public class SinglePointMapMatcherIT {
     @SneakyThrows
     @Test
     void testNodeMatch() {
+        setupNetwork(LINKS_RESOURCE);
+
         // The given point is located at the center of a crossroad.
         Point point = geometryFactory.createPoint(new Coordinate(5.426228, 52.18103));
         SinglePointMatch singlePointMatch = singlePointMapMatcher.match(new SinglePointLocation(ID, point));
@@ -107,6 +135,8 @@ public class SinglePointMapMatcherIT {
     @SneakyThrows
     @Test
     void testDoubleMatch() {
+        setupNetwork(LINKS_RESOURCE);
+
         // The given point is near two one-way roads.
         Point point = geometryFactory.createPoint(new Coordinate(5.424633, 52.178623));
         SinglePointMatch singlePointMatch = singlePointMapMatcher.match(new SinglePointLocation(ID, point));
@@ -122,6 +152,8 @@ public class SinglePointMapMatcherIT {
     @SneakyThrows
     @Test
     void testNoMatch() {
+        setupNetwork(LINKS_RESOURCE);
+
         Point point = geometryFactory.createPoint(new Coordinate(5.420, 52.190));
         SinglePointMatch singlePointMatch = singlePointMapMatcher.match(new SinglePointLocation(ID, point));
         assertThat(singlePointMatch, is(notNullValue()));
@@ -134,6 +166,8 @@ public class SinglePointMapMatcherIT {
     @SneakyThrows
     @Test
     void testUpstreamDownstream() {
+        setupNetwork(LINKS_RESOURCE);
+
         Point point = geometryFactory.createPoint(new Coordinate(5.4278, 52.1764));
         SinglePointMatch singlePointMatch = singlePointMapMatcher.match(new SinglePointLocation(ID, point, 1000,
                 IsochroneUnit.METERS, 30, IsochroneUnit.SECONDS));

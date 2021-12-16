@@ -10,17 +10,16 @@ import com.graphhopper.util.EdgeIterator;
 import com.graphhopper.util.EdgeIteratorState;
 import com.graphhopper.util.PointList;
 import com.graphhopper.util.shapes.GHPoint3D;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Iterator;
+import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import nu.ndw.nls.routingmapmatcher.domain.exception.RoutingMapMatcherException;
 import nu.ndw.nls.routingmapmatcher.graphhopper.LinkFlagEncoder;
 import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.LineString;
 import org.locationtech.jts.geom.impl.PackedCoordinateSequence;
-
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
 
 @Slf4j
 public class PathUtil {
@@ -72,9 +71,46 @@ public class PathUtil {
         return matchedLinkIds;
     }
 
+
+    private enum TravelDirection {
+        BASE_TO_ADJACENT_NODE,
+        ADJACENT_TO_BASE_NODE,
+        BOTH_DIRECTIONS
+    }
+
+    /**
+     * This method determines the direction on which one can travel over a path. We always need to validate the
+     * travel direction because of the way how graphhopper creates node indexes and always wants to store edges with
+     * the lower node index followed by the higher node index:
+     * https://github.com/graphhopper/graphhopper/blob/master/docs/core/technical.md
+     *
+     * Even though we supply nodes in driving direction (base node to adjacent node), graphhopper sometimes decides
+     * to return results in reverse direction.
+     *
+     * @param queryResult
+     * @param flagEncoder
+     * @return travel direction on this specific edge
+     */
+    private TravelDirection determineEdgeDirection(QueryResult queryResult, LinkFlagEncoder flagEncoder) {
+        EdgeIteratorState edge = queryResult.getClosestEdge();
+
+        boolean edgeCanBeTraveledFromBaseToAdj = edge.get(flagEncoder.getAccessEnc());
+        boolean edgeCanBeTraveledFromAdjectToBase = edge.getReverse(flagEncoder.getAccessEnc());
+
+        if (edgeCanBeTraveledFromAdjectToBase && edgeCanBeTraveledFromBaseToAdj) {
+            return TravelDirection.BOTH_DIRECTIONS;
+        } else if (edgeCanBeTraveledFromAdjectToBase) {
+            return TravelDirection.ADJACENT_TO_BASE_NODE;
+        }else if (edgeCanBeTraveledFromBaseToAdj) {
+            return TravelDirection.BASE_TO_ADJACENT_NODE;
+        } else {
+            throw new IllegalStateException("Edge is has no travel direction");
+        }
+    }
+
     /**
      * Calculates the fraction (relative normalized distance, a number between 0 start and 1 end) from the start of
-     * this segment (baseNode) to the snapped point on the path from the query result.
+     * this segment to the snapped point on the path from the query result.
      *
      * First a check is performed on a tower node match, because then we can either return 0 or 1 based on the wayIndex.
      * WayIndex indicates on which or after which node the snapped point is found on the edge, there for the start node
@@ -90,11 +126,16 @@ public class PathUtil {
      * @param distanceCalc the calculator to use
      * @return the fraction, relative distance on edge beween start 0 and snapped point
      */
-    public double determineSnappedPointFraction(final QueryResult queryResult, final DistanceCalc distanceCalc) {
+    public double determineSnappedPointFraction(final QueryResult queryResult, final DistanceCalc distanceCalc,
+            LinkFlagEncoder flagEncoder) {
+
         // Find out after which point our snapped point snaps on the edge
         final int wayIndex = queryResult.getWayIndex();
 
         final Position snappedPosition = queryResult.getSnappedPosition();
+
+        log.trace("Query result point snapped on node type: {}, closest edge {}", snappedPosition,
+                queryResult.getClosestEdge());
 
         // Tower means at start or end, we can determine this without calculations
         if (snappedPosition == Position.TOWER) {
@@ -122,6 +163,7 @@ public class PathUtil {
         }
 
         final Iterator<GHPoint3D> it = pointList.iterator();
+
         GHPoint3D previous = it.next();
 
         double sumOfPathLenghts = 0D;
@@ -165,7 +207,18 @@ public class PathUtil {
             throw new IllegalStateException("Failed to find path distance to snapped point");
         }
 
-        final double fraction = pathDistanceToSnappedPoint / sumOfPathLenghts;
+        TravelDirection travelDirection = determineEdgeDirection(queryResult, flagEncoder);
+        log.trace("Travel direction: {}", travelDirection);
+
+        if (travelDirection == TravelDirection.BOTH_DIRECTIONS) {
+            throw new IllegalStateException("Cannot determine travel direction");
+        }
+
+        double fraction = pathDistanceToSnappedPoint / sumOfPathLenghts;
+        if (travelDirection == TravelDirection.ADJACENT_TO_BASE_NODE) {
+            log.trace("Revere travel direction. Fraction will be inversed.");
+            fraction = 1D - fraction;
+        }
 
         log.trace("Total (geometrical) edge length: {}, snapped point path length {}. Fraction: {}", sumOfPathLenghts,
                 pathDistanceToSnappedPoint, fraction);
