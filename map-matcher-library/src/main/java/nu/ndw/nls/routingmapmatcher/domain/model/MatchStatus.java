@@ -6,6 +6,7 @@ public enum MatchStatus {
 
     EXCEPTION,
     INVALID_INPUT,
+    CONTEXT,
     NO_MATCH,
     MATCH;
 

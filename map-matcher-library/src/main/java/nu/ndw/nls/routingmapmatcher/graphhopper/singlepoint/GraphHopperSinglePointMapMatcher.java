@@ -133,7 +133,7 @@ public class GraphHopperSinglePointMapMatcher implements SinglePointMapMatcher {
                     new Coordinate(ghSnappedPoint.getLon(), ghSnappedPoint.getLat()));
 
                 final double fraction = this.pathUtil.determineSnappedPointFraction(queryResult,
-                        this.distanceCalculator);
+                        this.distanceCalculator, flagEncoder);
 
                 candidateMatches.add(new SinglePointMatch.CandidateMatch(matchedLinkId, upstreamLinkIds,
                         downstreamLinkIds, snappedPoint, fraction));
