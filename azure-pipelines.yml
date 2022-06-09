@@ -2,14 +2,14 @@ trigger:
   batch: true
   branches:
     include:
-      - master
+      - main
       - feature/*
 
 pool:
   vmImage: 'ubuntu-latest'
 
 variables:
-  isMain: ${{ eq(variables['Build.SourceBranch'], 'refs/heads/master') }}
+  isMain: ${{ eq(variables['Build.SourceBranch'], 'refs/heads/main') }}
 
 steps:
   - task: SonarQubePrepare@4
