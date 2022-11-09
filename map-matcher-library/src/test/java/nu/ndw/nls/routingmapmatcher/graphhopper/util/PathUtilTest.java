@@ -1,4 +1,4 @@
-package nu.ndw.nls.routingmapmatcher.util;
+package nu.ndw.nls.routingmapmatcher.graphhopper.util;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.spy;

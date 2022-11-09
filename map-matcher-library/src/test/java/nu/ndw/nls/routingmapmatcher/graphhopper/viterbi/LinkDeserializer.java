@@ -4,12 +4,10 @@ import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
+import java.io.IOException;
 import nu.ndw.nls.routingmapmatcher.domain.model.Link;
 import nu.ndw.nls.routingmapmatcher.util.GeometryHelper;
 import org.locationtech.jts.geom.LineString;
-
-import java.io.IOException;
-
 
 public class LinkDeserializer extends StdDeserializer<Link> {
 
@@ -17,7 +15,6 @@ public class LinkDeserializer extends StdDeserializer<Link> {
 
     public LinkDeserializer() {
         this(null);
-
     }
 
     protected LinkDeserializer(final Class<?> vc) {
@@ -25,11 +22,9 @@ public class LinkDeserializer extends StdDeserializer<Link> {
     }
 
     @Override
-    public Link deserialize(JsonParser jsonParser, final DeserializationContext deserializationContext)
+    public Link deserialize(final JsonParser jsonParser, final DeserializationContext deserializationContext)
             throws IOException {
-
-        final JsonNode node = jsonParser.getCodec()
-                .readTree(jsonParser);
+        final JsonNode node = jsonParser.getCodec().readTree(jsonParser);
         final int id = node.get("id").intValue();
         final int fromNodeId = node.get("fromNodeId").intValue();
         final int toNodeId = node.get("toNodeId").intValue();
@@ -47,6 +42,4 @@ public class LinkDeserializer extends StdDeserializer<Link> {
                 distanceInMeters,
                 lineString);
     }
-
-
 }

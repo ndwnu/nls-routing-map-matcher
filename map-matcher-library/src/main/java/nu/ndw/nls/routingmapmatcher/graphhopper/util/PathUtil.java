@@ -1,4 +1,4 @@
-package nu.ndw.nls.routingmapmatcher.util;
+package nu.ndw.nls.routingmapmatcher.graphhopper.util;
 
 import com.graphhopper.routing.QueryGraph;
 import com.graphhopper.storage.IntsRef;
