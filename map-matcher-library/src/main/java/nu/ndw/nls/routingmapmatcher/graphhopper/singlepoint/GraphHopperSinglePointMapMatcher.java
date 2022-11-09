@@ -16,7 +16,6 @@ import com.graphhopper.util.shapes.GHPoint3D;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
-
 import nu.ndw.nls.routingmapmatcher.constants.GlobalConstants;
 import nu.ndw.nls.routingmapmatcher.domain.SinglePointMapMatcher;
 import nu.ndw.nls.routingmapmatcher.domain.model.MatchStatus;
@@ -25,7 +24,7 @@ import nu.ndw.nls.routingmapmatcher.domain.model.singlepoint.SinglePointMatch;
 import nu.ndw.nls.routingmapmatcher.graphhopper.LinkFlagEncoder;
 import nu.ndw.nls.routingmapmatcher.graphhopper.NetworkGraphHopper;
 import nu.ndw.nls.routingmapmatcher.graphhopper.isochrone.IsochroneService;
-import nu.ndw.nls.routingmapmatcher.util.PathUtil;
+import nu.ndw.nls.routingmapmatcher.graphhopper.util.PathUtil;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.Point;
@@ -53,7 +52,7 @@ public class GraphHopperSinglePointMapMatcher implements SinglePointMapMatcher {
     private final PathUtil pathUtil;
     private final QueryGraph queryGraph;
     private final IsochroneService isochroneService;
-    private DistanceCalc distanceCalculator;
+    private final DistanceCalc distanceCalculator;
 
     public GraphHopperSinglePointMapMatcher(final NetworkGraphHopper network) {
         Preconditions.checkNotNull(network);
