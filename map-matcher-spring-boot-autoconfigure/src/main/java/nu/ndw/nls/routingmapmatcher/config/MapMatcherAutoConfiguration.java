@@ -22,8 +22,10 @@ public class MapMatcherAutoConfiguration {
     @ConditionalOnMissingBean
     public RoutingMapMatcher routingMapMatcher(
             final MapMatcherFactory<LineStringMapMatcher> lineStringMapMatcherFactory,
-            final MapMatcherFactory<SinglePointMapMatcher> singlePointMapMatcherMapMatcherFactory) {
-        return new RoutingMapMatcher(lineStringMapMatcherFactory, singlePointMapMatcherMapMatcherFactory);
+            final MapMatcherFactory<SinglePointMapMatcher> singlePointMapMatcherMapMatcherFactory,
+            final MapMatcherFactory<StartToEndMapMatcher> startToEndMapMatcherMapMatcherFactory) {
+        return new RoutingMapMatcher(lineStringMapMatcherFactory, singlePointMapMatcherMapMatcherFactory,
+                startToEndMapMatcherMapMatcherFactory);
     }
 
     @Bean
@@ -34,25 +36,22 @@ public class MapMatcherAutoConfiguration {
 
     @Bean
     @ConditionalOnMissingBean(value = LineStringMapMatcher.class, parameterizedContainer = MapMatcherFactory.class)
-    public MapMatcherFactory<LineStringMapMatcher> lineStringMapMatcherFactory() {
-        return new ViterbiLinestringMapMatcherFactory(
-                new NetworkGraphHopperFactory()
-        );
+    public MapMatcherFactory<LineStringMapMatcher> lineStringMapMatcherFactory(
+            final NetworkGraphHopperFactory networkGraphHopperFactory) {
+        return new ViterbiLinestringMapMatcherFactory(networkGraphHopperFactory);
     }
 
     @Bean
     @ConditionalOnMissingBean(value = SinglePointMapMatcher.class, parameterizedContainer = MapMatcherFactory.class)
-    public MapMatcherFactory<SinglePointMapMatcher> singlePointMapMatcherFactory() {
-        return new GraphHopperSinglePointMapMatcherFactory(
-                new NetworkGraphHopperFactory()
-        );
+    public MapMatcherFactory<SinglePointMapMatcher> singlePointMapMatcherFactory(
+            final NetworkGraphHopperFactory networkGraphHopperFactory) {
+        return new GraphHopperSinglePointMapMatcherFactory(networkGraphHopperFactory);
     }
 
     @Bean
     @ConditionalOnMissingBean(value = StartToEndMapMatcher.class, parameterizedContainer = MapMatcherFactory.class)
-    public MapMatcherFactory<StartToEndMapMatcher> startToEndMapMatcherFactory() {
-        return new GraphHopperStartToEndMapMatcherFactory(
-                new NetworkGraphHopperFactory()
-        );
+    public MapMatcherFactory<StartToEndMapMatcher> startToEndMapMatcherFactory(
+            final NetworkGraphHopperFactory networkGraphHopperFactory) {
+        return new GraphHopperStartToEndMapMatcherFactory(networkGraphHopperFactory);
     }
 }
