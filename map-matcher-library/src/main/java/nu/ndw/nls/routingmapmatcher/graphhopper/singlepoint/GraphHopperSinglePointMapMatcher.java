@@ -94,7 +94,7 @@ public class GraphHopperSinglePointMapMatcher implements SinglePointMapMatcher {
         final double longitude = point.getX();
 
         final List<QueryResult> queryResults = locationIndexTree.findNClosest(latitude, longitude, edgeFilter,
-            MAXIMUM_CANDIDATE_DISTANCE_IN_METERS);
+                MAXIMUM_CANDIDATE_DISTANCE_IN_METERS);
         final List<QueryResult> candidates = new ArrayList<>(queryResults.size());
 
         for (final QueryResult queryResult : queryResults) {
@@ -110,7 +110,7 @@ public class GraphHopperSinglePointMapMatcher implements SinglePointMapMatcher {
             final SinglePointLocation singlePointLocation) {
         final List<SinglePointMatch.CandidateMatch> candidateMatches = Lists.newArrayList();
         final double closestDistance = queryResults.stream().mapToDouble(QueryResult::getQueryDistance).min()
-            .orElse(MAXIMUM_CANDIDATE_DISTANCE_IN_METERS);
+                .orElse(MAXIMUM_CANDIDATE_DISTANCE_IN_METERS);
 
         if (singlePointLocation.getUpstreamIsochroneUnit() != null ||
                 singlePointLocation.getDownstreamIsochroneUnit() != null) {
@@ -129,7 +129,7 @@ public class GraphHopperSinglePointMapMatcher implements SinglePointMapMatcher {
 
                 final GHPoint3D ghSnappedPoint = queryResult.getSnappedPoint();
                 final Point snappedPoint = geometryFactory.createPoint(
-                    new Coordinate(ghSnappedPoint.getLon(), ghSnappedPoint.getLat()));
+                        new Coordinate(ghSnappedPoint.getLon(), ghSnappedPoint.getLat()));
 
                 final double fraction = this.pathUtil.determineSnappedPointFraction(queryResult,
                         this.distanceCalculator, flagEncoder);
@@ -147,6 +147,6 @@ public class GraphHopperSinglePointMapMatcher implements SinglePointMapMatcher {
         final List<SinglePointMatch.CandidateMatch> candidateMatches = Lists.newArrayList();
         final MatchStatus matchStatus = MatchStatus.NO_MATCH;
         final double reliability = 0.0;
-        return new SinglePointMatch(singlePointLocation.getId(),candidateMatches, reliability, matchStatus);
+        return new SinglePointMatch(singlePointLocation.getId(), candidateMatches, reliability, matchStatus);
     }
 }

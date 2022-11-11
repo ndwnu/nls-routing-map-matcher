@@ -9,12 +9,9 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.stream.Collectors;
 import nu.ndw.nls.routingmapmatcher.domain.model.Link;
-import nu.ndw.nls.routingmapmatcher.domain.model.MapMatchingLineRequest;
 import nu.ndw.nls.routingmapmatcher.domain.model.MapMatchingSinglePointRequest;
 import nu.ndw.nls.routingmapmatcher.domain.model.MatchStatus;
 import nu.ndw.nls.routingmapmatcher.domain.model.RoutingNetwork;
-import nu.ndw.nls.routingmapmatcher.domain.model.linestring.LineStringLocation;
-import nu.ndw.nls.routingmapmatcher.domain.model.linestring.LineStringMatch;
 import nu.ndw.nls.routingmapmatcher.domain.model.singlepoint.SinglePointLocation;
 import nu.ndw.nls.routingmapmatcher.domain.model.singlepoint.SinglePointMatch;
 import org.junit.jupiter.api.BeforeEach;
@@ -26,6 +23,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
 class RoutingMapMatcherSinglePointTest {
+
     @Mock
     private MapMatcherFactory<SinglePointMapMatcher> singlePointMapMatcherFactory;
 

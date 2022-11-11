@@ -71,7 +71,6 @@ public class PathUtil {
         return matchedLinkIds;
     }
 
-
     private enum TravelDirection {
         BASE_TO_ADJACENT_NODE,
         ADJACENT_TO_BASE_NODE,
@@ -91,20 +90,20 @@ public class PathUtil {
      * @param flagEncoder
      * @return travel direction on this specific edge
      */
-    private TravelDirection determineEdgeDirection(QueryResult queryResult, LinkFlagEncoder flagEncoder) {
-        EdgeIteratorState edge = queryResult.getClosestEdge();
+    private TravelDirection determineEdgeDirection(final QueryResult queryResult, final LinkFlagEncoder flagEncoder) {
+        final EdgeIteratorState edge = queryResult.getClosestEdge();
 
-        boolean edgeCanBeTraveledFromBaseToAdj = edge.get(flagEncoder.getAccessEnc());
-        boolean edgeCanBeTraveledFromAdjectToBase = edge.getReverse(flagEncoder.getAccessEnc());
+        final boolean edgeCanBeTraveledFromBaseToAdjacent = edge.get(flagEncoder.getAccessEnc());
+        final boolean edgeCanBeTraveledFromAdjacentToBase = edge.getReverse(flagEncoder.getAccessEnc());
 
-        if (edgeCanBeTraveledFromAdjectToBase && edgeCanBeTraveledFromBaseToAdj) {
+        if (edgeCanBeTraveledFromAdjacentToBase && edgeCanBeTraveledFromBaseToAdjacent) {
             return TravelDirection.BOTH_DIRECTIONS;
-        } else if (edgeCanBeTraveledFromAdjectToBase) {
+        } else if (edgeCanBeTraveledFromAdjacentToBase) {
             return TravelDirection.ADJACENT_TO_BASE_NODE;
-        }else if (edgeCanBeTraveledFromBaseToAdj) {
+        } else if (edgeCanBeTraveledFromBaseToAdjacent) {
             return TravelDirection.BASE_TO_ADJACENT_NODE;
         } else {
-            throw new IllegalStateException("Edge is has no travel direction");
+            throw new IllegalStateException("Edge has no travel direction");
         }
     }
 
@@ -127,8 +126,7 @@ public class PathUtil {
      * @return the fraction, relative distance on edge beween start 0 and snapped point
      */
     public double determineSnappedPointFraction(final QueryResult queryResult, final DistanceCalc distanceCalc,
-            LinkFlagEncoder flagEncoder) {
-
+            final LinkFlagEncoder flagEncoder) {
         // Find out after which point our snapped point snaps on the edge
         final int wayIndex = queryResult.getWayIndex();
 
@@ -166,7 +164,7 @@ public class PathUtil {
 
         GHPoint3D previous = it.next();
 
-        double sumOfPathLenghts = 0D;
+        double sumOfPathLengths = 0D;
 
         Double pathDistanceToSnappedPoint = null;
 
@@ -189,14 +187,14 @@ public class PathUtil {
                         previous.getLat(), previous.getLon(), snappedPoint.getLat(), snappedPoint.getLon(),
                         previousToSnappedPointDistance);
 
-                pathDistanceToSnappedPoint = sumOfPathLenghts + previousToSnappedPointDistance;
+                pathDistanceToSnappedPoint = sumOfPathLengths + previousToSnappedPointDistance;
             }
 
             // Calculate distance from previous to current tower/pillar node
-            sumOfPathLenghts += distanceCalc.calcDist(previous.getLat(), previous.getLon(), current.getLat(),
+            sumOfPathLengths += distanceCalc.calcDist(previous.getLat(), previous.getLon(), current.getLat(),
                     current.getLon());
 
-            log.trace("Length from start node to node index {} is {}", startNodeIndex + 1, sumOfPathLenghts);
+            log.trace("Length from start node to node index {} is {}", startNodeIndex + 1, sumOfPathLengths);
 
             // Prepare for next loop
             previous = current;
@@ -207,20 +205,20 @@ public class PathUtil {
             throw new IllegalStateException("Failed to find path distance to snapped point");
         }
 
-        TravelDirection travelDirection = determineEdgeDirection(queryResult, flagEncoder);
+        final TravelDirection travelDirection = determineEdgeDirection(queryResult, flagEncoder);
         log.trace("Travel direction: {}", travelDirection);
 
         if (travelDirection == TravelDirection.BOTH_DIRECTIONS) {
             throw new IllegalStateException("Cannot determine travel direction");
         }
 
-        double fraction = pathDistanceToSnappedPoint / sumOfPathLenghts;
+        double fraction = pathDistanceToSnappedPoint / sumOfPathLengths;
         if (travelDirection == TravelDirection.ADJACENT_TO_BASE_NODE) {
-            log.trace("Revere travel direction. Fraction will be inversed.");
+            log.trace("Reverse travel direction. Fraction will be inverted.");
             fraction = 1D - fraction;
         }
 
-        log.trace("Total (geometrical) edge length: {}, snapped point path length {}. Fraction: {}", sumOfPathLenghts,
+        log.trace("Total (geometrical) edge length: {}, snapped point path length {}. Fraction: {}", sumOfPathLengths,
                 pathDistanceToSnappedPoint, fraction);
 
         return fraction;
@@ -250,8 +248,8 @@ public class PathUtil {
             } else if (queryGraph.isVirtualNode(edge.getAdjNode())) {
                 originalEdge = queryGraph.getOriginalEdgeFromVirtNode(edge.getAdjNode());
             } else {
-                throw new IllegalStateException
-                        ("Unexpected state: at least one node of a virtual edge should be virtual");
+                throw new IllegalStateException(
+                        "Unexpected state: at least one node of a virtual edge should be virtual");
             }
         } else {
             originalEdge = edge;

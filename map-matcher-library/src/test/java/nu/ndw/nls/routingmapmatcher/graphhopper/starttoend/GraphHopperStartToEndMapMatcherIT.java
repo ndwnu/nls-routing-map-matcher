@@ -49,10 +49,10 @@ class GraphHopperStartToEndMapMatcherIT {
         List<Link> links = mapper.readValue(linksJson, new TypeReference<>() {
         });
         RoutingNetwork routingNetwork = RoutingNetwork.builder()
-            .networkNameAndVersion("test_network")
-            .linkSupplier(links::iterator).build();
+                .networkNameAndVersion("test_network")
+                .linkSupplier(links::iterator).build();
         GraphHopperStartToEndMapMatcherFactory graphHopperStartToEndMapMatcherFactory =
-            new GraphHopperStartToEndMapMatcherFactory(new NetworkGraphHopperFactory());
+                new GraphHopperStartToEndMapMatcherFactory(new NetworkGraphHopperFactory());
         startToEndMapMatcher = graphHopperStartToEndMapMatcherFactory.createMapMatcher(routingNetwork);
         geometryFactory = new GeometryFactory(new PrecisionModel(), GlobalConstants.WGS84_SRID);
     }
