@@ -1,10 +1,9 @@
 package nu.ndw.nls.routingmapmatcher.util;
 
-import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.nio.file.Path;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import org.junit.jupiter.api.Test;
 
 class GraphHopperNetworkPathUtilsTest {
 
@@ -21,12 +20,11 @@ class GraphHopperNetworkPathUtilsTest {
     void formatNormalizedPath_rootPath_prefix_version() {
         assertEquals(GRAPHHOPPER_ROOT_PATH.resolve("lalala_12345"),
                 GraphHopperNetworkPathUtils.formatNormalizedPath(GRAPHHOPPER_ROOT_PATH,
-                "lalala_", "12345"));
+                        "lalala_", "12345"));
 
         assertEquals(GRAPHHOPPER_ROOT_PATH.resolve("_inbetween_987865"),
                 GraphHopperNetworkPathUtils.formatNormalizedPath(GRAPHHOPPER_ROOT_PATH,
-                "_inbetween_", "987865"));
-
+                        "_inbetween_", "987865"));
 
         assertEquals(GRAPHHOPPER_ROOT_PATH.resolve("_inbetween_987865"),
                 GraphHopperNetworkPathUtils.formatNormalizedPath(GRAPHHOPPER_UNNORMALIZED_ROOT_PATH,
@@ -41,6 +39,6 @@ class GraphHopperNetworkPathUtilsTest {
 
         assertEquals(GRAPHHOPPER_ROOT_PATH.resolve("networkAndVersion"),
                 GraphHopperNetworkPathUtils.formatNormalizedPath(GRAPHHOPPER_UNNORMALIZED_ROOT_PATH,
-                        "networkAndVersion"));}
-
+                        "networkAndVersion"));
+    }
 }

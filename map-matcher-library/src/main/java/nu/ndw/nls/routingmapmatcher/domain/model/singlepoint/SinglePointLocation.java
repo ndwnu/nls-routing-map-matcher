@@ -1,11 +1,10 @@
 package nu.ndw.nls.routingmapmatcher.domain.model.singlepoint;
 
-import org.locationtech.jts.geom.Point;
-
 import lombok.Getter;
 import lombok.ToString;
-import nu.ndw.nls.routingmapmatcher.domain.model.base.BaseLocation;
 import nu.ndw.nls.routingmapmatcher.domain.model.IsochroneUnit;
+import nu.ndw.nls.routingmapmatcher.domain.model.base.BaseLocation;
+import org.locationtech.jts.geom.Point;
 
 @Getter
 @ToString(callSuper = true)

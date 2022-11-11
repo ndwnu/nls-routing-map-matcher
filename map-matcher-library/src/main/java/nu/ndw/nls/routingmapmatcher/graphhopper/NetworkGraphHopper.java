@@ -5,11 +5,10 @@ import com.graphhopper.coll.GHLongIntBTree;
 import com.graphhopper.coll.LongIntMap;
 import com.graphhopper.reader.DataReader;
 import com.graphhopper.storage.GraphHopperStorage;
-import nu.ndw.nls.routingmapmatcher.domain.Network;
-import nu.ndw.nls.routingmapmatcher.domain.model.Link;
-
 import java.util.Iterator;
 import java.util.function.Supplier;
+import nu.ndw.nls.routingmapmatcher.domain.Network;
+import nu.ndw.nls.routingmapmatcher.domain.model.Link;
 
 public class NetworkGraphHopper extends GraphHopper implements Network {
 

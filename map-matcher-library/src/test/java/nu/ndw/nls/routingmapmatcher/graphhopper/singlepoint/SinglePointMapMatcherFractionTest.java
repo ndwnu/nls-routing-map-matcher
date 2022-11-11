@@ -31,23 +31,20 @@ class SinglePointMapMatcherFractionTest {
     private GeometryFactory geometryFactory;
     private SinglePointMapMatcher singlePointMapMatcher;
 
-
     @SneakyThrows
     @BeforeEach
     private void setup() {
-
         this.geometryFactory = new GeometryFactory(new PrecisionModel(), GlobalConstants.WGS84_SRID);
 
         RoutingNetwork routingNetwork = RoutingNetwork.builder()
-                                                        .networkNameAndVersion("test_network")
-                                                        .linkSupplier(this.createLinks()::iterator)
-                                                        .build();
+                .networkNameAndVersion("test_network")
+                .linkSupplier(this.createLinks()::iterator)
+                .build();
 
         GraphHopperSinglePointMapMatcherFactory graphHopperSinglePointMapMatcherFactory =
                 new GraphHopperSinglePointMapMatcherFactory(new NetworkGraphHopperFactory());
 
         this.singlePointMapMatcher = graphHopperSinglePointMapMatcherFactory.createMapMatcher(routingNetwork);
-
     }
 
     /**
@@ -66,54 +63,50 @@ class SinglePointMapMatcherFractionTest {
      */
     private List<Link> createLinks() {
         List<Link> links = new ArrayList<>();
-        links.add(this.createLineLink(0, 0, 1, 0,0,  0,1,   0,2));
-        links.add(this.createLineLink(1, 0, 2, 0,0,  2,0));
-        links.add(this.createLineLink(2, 2, 3, 2,0,  4,0,    6,0));
+        links.add(this.createLineLink(0, 0, 1, 0, 0, 0, 1, 0, 2));
+        links.add(this.createLineLink(1, 0, 2, 0, 0, 2, 0));
+        links.add(this.createLineLink(2, 2, 3, 2, 0, 4, 0, 6, 0));
 
         return links;
     }
 
-    private Link createLineLink(    long id,
-                                    long fromNodeId,
-                                    long toNodeId,
-                                    double ... coordinates) {
-
+    private Link createLineLink(long id, long fromNodeId, long toNodeId, double... coordinates) {
         double speedInKilometersPerHour = 100;
         double reverseSpeedInKilometersPerHour = 0;
         double distanceInMeters = 1000;
 
         final LineString lineString = createLineStringWktReader(coordinates);
 
-        return new Link(    id,
-                            fromNodeId,
-                            toNodeId,
-                            speedInKilometersPerHour,
-                            reverseSpeedInKilometersPerHour,
-                            distanceInMeters,
-                            lineString );
+        return new Link(id,
+                fromNodeId,
+                toNodeId,
+                speedInKilometersPerHour,
+                reverseSpeedInKilometersPerHour,
+                distanceInMeters,
+                lineString);
     }
 
     @SneakyThrows
-    private LineString createLineStringWktReader( double... coordinates ) {
+    private LineString createLineStringWktReader(double... coordinates) {
         if (coordinates == null || coordinates.length % 2 != 0) {
             throw new IllegalStateException("Must have coordinates and must come in pairs of two (x, y)");
         }
 
         StringBuilder lineStringSb = new StringBuilder("LINESTRING(");
-        for (int i=0; i<coordinates.length; i+=2) {
+        for (int i = 0; i < coordinates.length; i += 2) {
             if (i > 0) {
                 lineStringSb.append(", ");
             }
             lineStringSb.append(coordinates[i]);
             lineStringSb.append(" ");
-            lineStringSb.append(coordinates[i+1]);
+            lineStringSb.append(coordinates[i + 1]);
         }
 
         lineStringSb.append(")");
 
         log.debug("Loading line string: {}", lineStringSb);
         WKTReader wktReader = new WKTReader(this.geometryFactory);
-        return (LineString)wktReader.read(lineStringSb.toString());
+        return (LineString) wktReader.read(lineStringSb.toString());
     }
 
     private SinglePointLocation createSinglePoint(int id, double x, double y) {
@@ -140,7 +133,7 @@ class SinglePointMapMatcherFractionTest {
     }
 
     @Test
-    void matchSinglePoint_fraction_vertical_edge_() {
+    void matchSinglePoint_fraction_vertical_edge() {
         final SinglePointLocation singlePoint = this.createSinglePoint(123, 0, 1);
         final SinglePointMatch match = this.singlePointMapMatcher.match(singlePoint);
 
@@ -158,7 +151,6 @@ class SinglePointMapMatcherFractionTest {
         assertEquals(0, candidateMatch.getMatchedLinkId());
         assertEquals(1, candidateMatch.getFraction(), 0.001);
     }
-
 
     @Test
     void matchSinglePoint_fraction_towerBaseNode() {
@@ -199,5 +191,4 @@ class SinglePointMapMatcherFractionTest {
         assertEquals(2, candidateMatch.getMatchedLinkId());
         assertEquals(0.25, candidateMatch.getFraction(), 0.001);
     }
-
 }

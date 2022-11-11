@@ -2,8 +2,8 @@ package nu.ndw.nls.routingmapmatcher.domain.model.linestring;
 
 import lombok.Getter;
 import lombok.ToString;
-import nu.ndw.nls.routingmapmatcher.domain.model.base.BaseLocation;
 import nu.ndw.nls.routingmapmatcher.domain.model.IsochroneUnit;
+import nu.ndw.nls.routingmapmatcher.domain.model.base.BaseLocation;
 import org.locationtech.jts.geom.LineString;
 
 @Getter
@@ -12,13 +12,13 @@ public class LineStringLocation extends BaseLocation {
 
     private final int locationIndex;
     private final boolean reversed;
-    private final double lengthInMeters;
+    private final Double lengthInMeters;
     @ToString.Exclude
     private final LineString geometry;
     private final ReliabilityCalculationType reliabilityCalculationType;
 
     public LineStringLocation(final int id, final int locationIndex, final boolean reversed,
-            final double lengthInMeters, final LineString geometry,
+            final Double lengthInMeters, final LineString geometry,
             final ReliabilityCalculationType reliabilityCalculationType, final double upstreamIsochrone,
             final IsochroneUnit upstreamIsochroneUnit, final double downstreamIsochrone,
             final IsochroneUnit downstreamIsochroneUnit) {
@@ -31,7 +31,7 @@ public class LineStringLocation extends BaseLocation {
     }
 
     public LineStringLocation(final int id, final int locationIndex, final boolean reversed,
-            final double lengthInMeters, final LineString geometry,
+            final Double lengthInMeters, final LineString geometry,
             final ReliabilityCalculationType reliabilityCalculationType) {
         super(id);
         this.locationIndex = locationIndex;

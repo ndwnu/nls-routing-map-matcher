@@ -1,5 +1,8 @@
 package nu.ndw.nls.routingmapmatcher.graphhopper.isochrone;
 
+import static nu.ndw.nls.routingmapmatcher.graphhopper.isochrone.Isochrone.ExploreType.DISTANCE;
+import static nu.ndw.nls.routingmapmatcher.graphhopper.isochrone.Isochrone.ExploreType.TIME;
+
 import com.carrotsearch.hppc.IntObjectHashMap;
 import com.carrotsearch.hppc.procedures.IntObjectProcedure;
 import com.graphhopper.coll.GHIntObjectHashMap;
@@ -11,13 +14,9 @@ import com.graphhopper.storage.Graph;
 import com.graphhopper.storage.SPTEntry;
 import com.graphhopper.util.EdgeExplorer;
 import com.graphhopper.util.EdgeIterator;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.PriorityQueue;
-
-import static nu.ndw.nls.routingmapmatcher.graphhopper.isochrone.Isochrone.ExploreType.DISTANCE;
-import static nu.ndw.nls.routingmapmatcher.graphhopper.isochrone.Isochrone.ExploreType.TIME;
 
 /**
  * Based on com.graphhopper.isochrone.algorithm.Isochrone, adapted by NLS to change return type of search method.

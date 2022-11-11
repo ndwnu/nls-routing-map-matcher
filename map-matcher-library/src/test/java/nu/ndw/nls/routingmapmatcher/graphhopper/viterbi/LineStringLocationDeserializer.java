@@ -4,14 +4,13 @@ import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
+import java.io.IOException;
+import java.util.Optional;
 import nu.ndw.nls.routingmapmatcher.domain.model.IsochroneUnit;
 import nu.ndw.nls.routingmapmatcher.domain.model.linestring.LineStringLocation;
 import nu.ndw.nls.routingmapmatcher.domain.model.linestring.ReliabilityCalculationType;
 import nu.ndw.nls.routingmapmatcher.util.GeometryHelper;
 import org.locationtech.jts.geom.LineString;
-
-import java.io.IOException;
-import java.util.Optional;
 
 public class LineStringLocationDeserializer extends StdDeserializer<LineStringLocation> {
 
