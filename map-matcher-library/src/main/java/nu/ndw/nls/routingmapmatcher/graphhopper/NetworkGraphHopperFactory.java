@@ -9,7 +9,7 @@ import nu.ndw.nls.routingmapmatcher.util.GraphHopperNetworkPathUtils;
 
 public class NetworkGraphHopperFactory {
 
-    private static final Path DEFAULT_FOLDER_PREFIX =  Path.of("graphhopper_");
+    private static final Path DEFAULT_FOLDER_PREFIX = Path.of("graphhopper_");
     private static final int BYTES_FOR_EDGE_FLAGS = 12;
 
     public NetworkGraphHopper createNetwork(final RoutingNetwork routingNetwork) {

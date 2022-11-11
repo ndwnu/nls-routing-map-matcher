@@ -9,7 +9,7 @@ import nu.ndw.nls.routingmapmatcher.graphhopper.NetworkGraphHopper;
 import nu.ndw.nls.routingmapmatcher.graphhopper.NetworkGraphHopperFactory;
 
 public class GraphHopperSinglePointMapMatcherFactory extends AbstractMapMatcherFactory
-    implements SinglePointMapMatcherFactory {
+        implements SinglePointMapMatcherFactory {
 
     public GraphHopperSinglePointMapMatcherFactory(final NetworkGraphHopperFactory networkGraphHopperFactory) {
         super(networkGraphHopperFactory);

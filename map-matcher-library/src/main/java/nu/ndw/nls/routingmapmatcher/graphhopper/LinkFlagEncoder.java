@@ -8,9 +8,8 @@ import com.graphhopper.routing.profiles.SimpleIntEncodedValue;
 import com.graphhopper.routing.util.AbstractFlagEncoder;
 import com.graphhopper.routing.util.EncodingManager;
 import com.graphhopper.storage.IntsRef;
-import nu.ndw.nls.routingmapmatcher.domain.model.Link;
-
 import java.util.List;
+import nu.ndw.nls.routingmapmatcher.domain.model.Link;
 
 public class LinkFlagEncoder extends AbstractFlagEncoder {
 
