@@ -1,16 +1,14 @@
 package nu.ndw.nls.routingmapmatcher.graphhopper.isochrone;
 
-import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
-
 import com.graphhopper.routing.QueryGraph;
 import com.graphhopper.routing.weighting.Weighting;
 import com.graphhopper.util.EdgeIteratorState;
-
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
-import nu.ndw.nls.routingmapmatcher.domain.model.base.BaseLocation;
 import nu.ndw.nls.routingmapmatcher.domain.model.IsochroneUnit;
+import nu.ndw.nls.routingmapmatcher.domain.model.base.BaseLocation;
 import nu.ndw.nls.routingmapmatcher.graphhopper.LinkFlagEncoder;
 
 @RequiredArgsConstructor

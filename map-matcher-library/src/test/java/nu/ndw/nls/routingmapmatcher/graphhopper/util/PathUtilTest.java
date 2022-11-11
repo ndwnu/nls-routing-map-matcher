@@ -1,4 +1,4 @@
-package nu.ndw.nls.routingmapmatcher.util;
+package nu.ndw.nls.routingmapmatcher.graphhopper.util;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.spy;
@@ -82,24 +82,23 @@ class PathUtilTest {
         when(this.edgeIteratorState.get(booleanEncodedValue)).thenReturn(true);
         when(this.edgeIteratorState.getReverse(booleanEncodedValue)).thenReturn(false);
 
-
         when(this.queryResult.getSnappedPosition()).thenReturn(Position.PILLAR);
         when(this.queryResult.getWayIndex()).thenReturn(0);
 
-        when(this.queryResult.getSnappedPoint()).thenReturn(new GHPoint3D(1,0, 0));
+        when(this.queryResult.getSnappedPoint()).thenReturn(new GHPoint3D(1, 0, 0));
         when(this.queryResult.getClosestEdge()).thenReturn(this.edgeIteratorState);
 
         PointList pointList = new PointList();
-        pointList.add(0,0);
-        pointList.add(1,0);
-        pointList.add(2,0);
+        pointList.add(0, 0);
+        pointList.add(1, 0);
+        pointList.add(2, 0);
         when(this.edgeIteratorState.fetchWayGeometry(ALL_NODES_MODE)).thenReturn(pointList);
 
         assertEquals(0.5, this.pathUtil.determineSnappedPointFraction(this.queryResult, distanceCalc,
                 flagEncoder), 0.00001);
 
-        verify(this.distanceCalc, times(2)).calcDist(0,0, 1, 0);
-        verify(this.distanceCalc, times(1)).calcDist(1,0, 2, 0);
+        verify(this.distanceCalc, times(2)).calcDist(0, 0, 1, 0);
+        verify(this.distanceCalc, times(1)).calcDist(1, 0, 2, 0);
     }
 
     @Test
@@ -111,22 +110,22 @@ class PathUtilTest {
         when(this.queryResult.getSnappedPosition()).thenReturn(Position.EDGE);
         when(this.queryResult.getWayIndex()).thenReturn(0);
 
-        when(this.queryResult.getSnappedPoint()).thenReturn(new GHPoint3D(1,0, 0));
+        when(this.queryResult.getSnappedPoint()).thenReturn(new GHPoint3D(1, 0, 0));
         when(this.queryResult.getClosestEdge()).thenReturn(this.edgeIteratorState);
 
         PointList pointList = new PointList();
-        pointList.add(0,0);
-        pointList.add(2,0);
+        pointList.add(0, 0);
+        pointList.add(2, 0);
         when(this.edgeIteratorState.fetchWayGeometry(ALL_NODES_MODE)).thenReturn(pointList);
 
         assertEquals(0.5, this.pathUtil.determineSnappedPointFraction(this.queryResult, distanceCalc,
                 flagEncoder), 0.00001);
 
         // From start to snapped
-        verify(this.distanceCalc, times(1)).calcDist(0,0, 1, 0);
+        verify(this.distanceCalc, times(1)).calcDist(0, 0, 1, 0);
 
         // Total length calculation
-        verify(this.distanceCalc, times(1)).calcDist(0,0, 2, 0);
+        verify(this.distanceCalc, times(1)).calcDist(0, 0, 2, 0);
     }
 
     @Test
@@ -138,21 +137,21 @@ class PathUtilTest {
         when(this.queryResult.getSnappedPosition()).thenReturn(Position.EDGE);
         when(this.queryResult.getWayIndex()).thenReturn(0);
 
-        when(this.queryResult.getSnappedPoint()).thenReturn(new GHPoint3D(0.25,0, 0));
+        when(this.queryResult.getSnappedPoint()).thenReturn(new GHPoint3D(0.25, 0, 0));
         when(this.queryResult.getClosestEdge()).thenReturn(this.edgeIteratorState);
 
         PointList pointList = new PointList();
-        pointList.add(0,0);
-        pointList.add(1,0);
+        pointList.add(0, 0);
+        pointList.add(1, 0);
         when(this.edgeIteratorState.fetchWayGeometry(ALL_NODES_MODE)).thenReturn(pointList);
 
         assertEquals(0.25, this.pathUtil.determineSnappedPointFraction(this.queryResult, distanceCalc,
                 flagEncoder), 0.00001);
 
         // From start to snapped
-        verify(this.distanceCalc, times(1)).calcDist(0,0, 0.25, 0);
+        verify(this.distanceCalc, times(1)).calcDist(0, 0, 0.25, 0);
 
         // Total length calculation
-        verify(this.distanceCalc, times(1)).calcDist(0,0, 1, 0);
+        verify(this.distanceCalc, times(1)).calcDist(0, 0, 1, 0);
     }
 }

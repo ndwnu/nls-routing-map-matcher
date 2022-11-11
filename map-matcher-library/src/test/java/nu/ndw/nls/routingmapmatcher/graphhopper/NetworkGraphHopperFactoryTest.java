@@ -1,5 +1,12 @@
 package nu.ndw.nls.routingmapmatcher.graphhopper;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.is;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.mockito.Mockito.when;
+
+import java.nio.file.Path;
+import java.util.Collections;
 import nu.ndw.nls.routingmapmatcher.domain.model.Link;
 import nu.ndw.nls.routingmapmatcher.domain.model.RoutingNetwork;
 import org.junit.jupiter.api.BeforeEach;
@@ -10,16 +17,9 @@ import org.locationtech.jts.geom.LineString;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.nio.file.Path;
-import java.util.Collections;
-
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.is;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.mockito.Mockito.when;
-
 @ExtendWith(MockitoExtension.class)
 class NetworkGraphHopperFactoryTest {
+
     private static final double LONG_1 = 5.358247;
     private static final double LAT_1 = 52.161257;
     private static final double LONG_2 = 5.379687;
@@ -45,7 +45,6 @@ class NetworkGraphHopperFactoryTest {
     @Mock
     private LineString lineString;
 
-
     private NetworkGraphHopperFactory networkGraphHopperFactory;
 
     @BeforeEach
@@ -65,10 +64,10 @@ class NetworkGraphHopperFactoryTest {
     void testCreateNetworkGraphHopper() {
         final NetworkGraphHopper graphHopper = networkGraphHopperFactory.createNetwork(routingNetwork);
 
-        assertThat(graphHopper.getDataReaderFile(), is(Path.of(DEFAULT_GRAPHHOPPER_ROOT_DIRECTORY,
-                TEST_NETWORK).toString()));
-        assertThat(graphHopper.getGraphHopperLocation(), is(Path.of(DEFAULT_GRAPHHOPPER_ROOT_DIRECTORY,
-                TEST_NETWORK).toString()));
+        assertThat(graphHopper.getDataReaderFile(),
+                is(Path.of(DEFAULT_GRAPHHOPPER_ROOT_DIRECTORY, TEST_NETWORK).toString()));
+        assertThat(graphHopper.getGraphHopperLocation(),
+                is(Path.of(DEFAULT_GRAPHHOPPER_ROOT_DIRECTORY, TEST_NETWORK).toString()));
         assertFalse(graphHopper.isCHEnabled());
         assertFalse(graphHopper.isAllowWrites());
         assertFalse(graphHopper.hasElevation());
@@ -80,11 +79,11 @@ class NetworkGraphHopperFactoryTest {
                 false, CUSTOM_GRAPHHOPPER_DIRECTORY);
 
         assertThat(graphHopper.getDataReaderFile(), is(CUSTOM_GRAPHHOPPER_DIRECTORY.resolve(TEST_NETWORK).toString()));
-        assertThat(graphHopper.getGraphHopperLocation(), is(CUSTOM_GRAPHHOPPER_DIRECTORY.resolve(TEST_NETWORK).toString()));
+        assertThat(graphHopper.getGraphHopperLocation(),
+                is(CUSTOM_GRAPHHOPPER_DIRECTORY.resolve(TEST_NETWORK).toString()));
 
         assertFalse(graphHopper.isCHEnabled());
         assertFalse(graphHopper.isAllowWrites());
         assertFalse(graphHopper.hasElevation());
     }
-
 }

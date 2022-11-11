@@ -1,16 +1,15 @@
 package nu.ndw.nls.routingmapmatcher.graphhopper;
 
+import static java.util.Collections.singletonList;
+
 import com.graphhopper.routing.util.EncodingManager;
+import java.nio.file.Path;
 import nu.ndw.nls.routingmapmatcher.domain.model.RoutingNetwork;
 import nu.ndw.nls.routingmapmatcher.util.GraphHopperNetworkPathUtils;
 
-import java.nio.file.Path;
-
-import static java.util.Collections.singletonList;
-
 public class NetworkGraphHopperFactory {
 
-    private static final Path DEFAULT_FOLDER_PREFIX =  Path.of("graphhopper_");
+    private static final Path DEFAULT_FOLDER_PREFIX = Path.of("graphhopper_");
     private static final int BYTES_FOR_EDGE_FLAGS = 12;
 
     public NetworkGraphHopper createNetwork(final RoutingNetwork routingNetwork) {
@@ -19,10 +18,9 @@ public class NetworkGraphHopperFactory {
 
     public NetworkGraphHopper createNetwork(final RoutingNetwork routingNetwork, final boolean storeOnDisk,
             final Path graphhopperRootPath) {
+        final NetworkGraphHopper graphHopper = new NetworkGraphHopper(routingNetwork.getLinkSupplier());
 
-        NetworkGraphHopper graphHopper = new NetworkGraphHopper(routingNetwork.getLinkSupplier());
-
-        Path path = GraphHopperNetworkPathUtils.formatNormalizedPath(graphhopperRootPath,
+        final Path path = GraphHopperNetworkPathUtils.formatNormalizedPath(graphhopperRootPath,
                 routingNetwork.getNetworkNameAndVersion());
 
         graphHopper.setStoreOnFlush(storeOnDisk);

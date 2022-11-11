@@ -1,13 +1,12 @@
 package nu.ndw.nls.routingmapmatcher.domain.model.linestring;
 
+import java.util.List;
+import java.util.Set;
 import lombok.Getter;
 import lombok.ToString;
 import nu.ndw.nls.routingmapmatcher.domain.model.MatchStatus;
 import nu.ndw.nls.routingmapmatcher.domain.model.base.MapMatch;
 import org.locationtech.jts.geom.LineString;
-
-import java.util.List;
-import java.util.Set;
 
 @Getter
 @ToString
