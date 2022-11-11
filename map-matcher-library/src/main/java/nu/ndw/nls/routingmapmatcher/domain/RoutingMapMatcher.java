@@ -3,13 +3,16 @@ package nu.ndw.nls.routingmapmatcher.domain;
 import java.util.List;
 import java.util.Locale;
 import java.util.stream.Stream;
+import lombok.AccessLevel;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import nu.ndw.nls.routingmapmatcher.domain.model.base.BaseLocation;
+import nu.ndw.nls.routingmapmatcher.domain.model.LineMatchingMode;
 import nu.ndw.nls.routingmapmatcher.domain.model.MapMatchingLineRequest;
 import nu.ndw.nls.routingmapmatcher.domain.model.MapMatchingRequest;
 import nu.ndw.nls.routingmapmatcher.domain.model.MapMatchingSinglePointRequest;
 import nu.ndw.nls.routingmapmatcher.domain.model.MatchStatus;
 import nu.ndw.nls.routingmapmatcher.domain.model.RoutingNetwork;
+import nu.ndw.nls.routingmapmatcher.domain.model.base.BaseLocation;
 import nu.ndw.nls.routingmapmatcher.domain.model.base.MapMatch;
 import nu.ndw.nls.routingmapmatcher.domain.model.linestring.LineStringLocation;
 import nu.ndw.nls.routingmapmatcher.domain.model.linestring.LineStringMatch;
@@ -17,25 +20,23 @@ import nu.ndw.nls.routingmapmatcher.domain.model.singlepoint.SinglePointLocation
 import nu.ndw.nls.routingmapmatcher.domain.model.singlepoint.SinglePointMatch;
 
 @Slf4j
+@RequiredArgsConstructor
 public class RoutingMapMatcher {
 
     private static final int REPORT_PROGRESS_INTERVAL = 100;
     private static final double HUNDRED_PERCENT = 100.0;
 
     private final MapMatcherFactory<LineStringMapMatcher> lineStringMapMatcherFactory;
-
     private final MapMatcherFactory<SinglePointMapMatcher> singlePointMapMatcherMapMatcherFactory;
+    private final MapMatcherFactory<StartToEndMapMatcher> startToEndMapMatcherMapMatcherFactory;
 
+    @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
     private static final class MatchingContext<T extends BaseLocation, R extends MapMatch> {
 
         private int matched;
         private int processed;
 
         private final MapMatcher<T, R> mapMatcher;
-
-        private MatchingContext(final MapMatcher<T, R> matcher) {
-            this.mapMatcher = matcher;
-        }
 
         public Stream<R> matchLocations(final MapMatchingRequest<T> mapMatchingRequest) {
             final List<T> locations = mapMatchingRequest.getLocationSupplier().get();
@@ -65,12 +66,6 @@ public class RoutingMapMatcher {
         }
     }
 
-    public RoutingMapMatcher(final MapMatcherFactory<LineStringMapMatcher> lineStringMapMatcherFactory,
-            final MapMatcherFactory<SinglePointMapMatcher> singlePointMapMatcherMapMatcherFactory) {
-        this.lineStringMapMatcherFactory = lineStringMapMatcherFactory;
-        this.singlePointMapMatcherMapMatcherFactory = singlePointMapMatcherMapMatcherFactory;
-    }
-
     public Stream<SinglePointMatch> matchLocations(final RoutingNetwork routingNetwork,
             final MapMatchingSinglePointRequest mapMatchingSinglePointRequest) {
         final SinglePointMapMatcher singlePointMapMatcher =
@@ -84,8 +79,10 @@ public class RoutingMapMatcher {
 
     public Stream<LineStringMatch> matchLocations(final RoutingNetwork routingNetwork,
             final MapMatchingLineRequest mapMatchingLineRequest) {
-        final LineStringMapMatcher lineStringMapMatcher =
-                this.lineStringMapMatcherFactory.createMapMatcher(routingNetwork);
+        final MapMatcher<LineStringLocation, LineStringMatch> lineStringMapMatcher =
+                mapMatchingLineRequest.getLineMatchingMode() == LineMatchingMode.LINE_STRING
+                        ? this.lineStringMapMatcherFactory.createMapMatcher(routingNetwork)
+                        : this.startToEndMapMatcherMapMatcherFactory.createMapMatcher(routingNetwork);
 
         final MatchingContext<LineStringLocation, LineStringMatch> lineStringMapMatchingContext =
                 new MatchingContext<>(lineStringMapMatcher);
