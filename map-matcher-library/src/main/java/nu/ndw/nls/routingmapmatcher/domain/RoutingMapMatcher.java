@@ -16,8 +16,8 @@ import nu.ndw.nls.routingmapmatcher.domain.model.base.BaseLocation;
 import nu.ndw.nls.routingmapmatcher.domain.model.base.MapMatch;
 import nu.ndw.nls.routingmapmatcher.domain.model.linestring.LineStringLocation;
 import nu.ndw.nls.routingmapmatcher.domain.model.linestring.LineStringMatch;
-import nu.ndw.nls.routingmapmatcher.domain.model.singlepoint.SinglePointLocation;
 import nu.ndw.nls.routingmapmatcher.domain.model.singlepoint.SinglePointMatch;
+import nu.ndw.nls.routingmapmatcher.graphhopper.NetworkGraphHopper;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -71,10 +71,15 @@ public class RoutingMapMatcher {
         final SinglePointMapMatcher singlePointMapMatcher =
                 this.singlePointMapMatcherMapMatcherFactory.createMapMatcher(routingNetwork);
 
-        final MatchingContext<SinglePointLocation, SinglePointMatch> lineStringMapMatchingContext =
-                new MatchingContext<>(singlePointMapMatcher);
+        return matchLocations(singlePointMapMatcher, mapMatchingSinglePointRequest);
+    }
 
-        return lineStringMapMatchingContext.matchLocations(mapMatchingSinglePointRequest);
+    public Stream<SinglePointMatch> matchLocations(final NetworkGraphHopper preInitializedNetwork,
+            final MapMatchingSinglePointRequest mapMatchingSinglePointRequest) {
+        final SinglePointMapMatcher singlePointMapMatcher =
+                this.singlePointMapMatcherMapMatcherFactory.createMapMatcher(preInitializedNetwork);
+
+        return matchLocations(singlePointMapMatcher, mapMatchingSinglePointRequest);
     }
 
     public Stream<LineStringMatch> matchLocations(final RoutingNetwork routingNetwork,
@@ -84,9 +89,23 @@ public class RoutingMapMatcher {
                         ? this.lineStringMapMatcherFactory.createMapMatcher(routingNetwork)
                         : this.startToEndMapMatcherMapMatcherFactory.createMapMatcher(routingNetwork);
 
-        final MatchingContext<LineStringLocation, LineStringMatch> lineStringMapMatchingContext =
-                new MatchingContext<>(lineStringMapMatcher);
+        return matchLocations(lineStringMapMatcher, mapMatchingLineRequest);
+    }
 
-        return lineStringMapMatchingContext.matchLocations(mapMatchingLineRequest);
+    public Stream<LineStringMatch> matchLocations(final NetworkGraphHopper preInitializedNetwork,
+            final MapMatchingLineRequest mapMatchingLineRequest) {
+        final MapMatcher<LineStringLocation, LineStringMatch> lineStringMapMatcher =
+                mapMatchingLineRequest.getLineMatchingMode() == LineMatchingMode.LINE_STRING
+                        ? this.lineStringMapMatcherFactory.createMapMatcher(preInitializedNetwork)
+                        : this.startToEndMapMatcherMapMatcherFactory.createMapMatcher(preInitializedNetwork);
+
+        return matchLocations(lineStringMapMatcher, mapMatchingLineRequest);
+    }
+
+    private <T extends BaseLocation, R extends MapMatch> Stream<R> matchLocations(final MapMatcher<T, R> mapMatcher,
+            final MapMatchingRequest<T> mapMatchingRequest) {
+        final MatchingContext<T, R> matchingContext = new MatchingContext<>(mapMatcher);
+
+        return matchingContext.matchLocations(mapMatchingRequest);
     }
 }
