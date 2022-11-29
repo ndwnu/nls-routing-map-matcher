@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>nu.ndw.nls</groupId>
     <artifactId>routing-map-matcher-parent</artifactId>
-    <version>1.0.1-RELEASE</version>
+    <version>1.0.2-RELEASE</version>
     <name>routing map matcher parent</name>
     <description>Routing Map Matcher modules containing the core library and spring boot starter modules</description>
     <packaging>pom</packaging>
@@ -19,14 +19,14 @@
         <maven.compiler.target>11</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.javadoc.failOnError>false</maven.javadoc.failOnError>
-        <lombok.version>1.18.12</lombok.version>
+        <lombok.version>1.18.24</lombok.version>
         <graphhopper-core.version>0.12.0</graphhopper-core.version>
         <graphhopper-map-matching-core.version>0.12.0-3</graphhopper-map-matching-core.version>
-        <jts-core.version>1.16.1</jts-core.version>
-        <guava.version>23.6-jre</guava.version>
+        <jts-core.version>1.19.0</jts-core.version>
+        <guava.version>23.6.1-jre</guava.version>
         <hamcrest.version>2.2</hamcrest.version>
-        <spring-boot.version>2.3.7.RELEASE</spring-boot.version>
-        <jacoco.version>0.8.5</jacoco.version>
+        <spring-boot.version>2.7.6</spring-boot.version>
+        <jacoco.version>0.8.8</jacoco.version>
         <maven-failsafe-plugin.version>2.22.2</maven-failsafe-plugin.version>
         <maven-surefire-plugin.version>2.22.2</maven-surefire-plugin.version>
         <sonar-maven-plugin.version>3.7.0.1746</sonar-maven-plugin.version>
@@ -172,7 +172,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-compiler-plugin</artifactId>
-                    <version>3.8.0</version>
+                    <version>3.10.1</version>
                     <configuration>
                         <source>11</source>
                         <target>11</target>
