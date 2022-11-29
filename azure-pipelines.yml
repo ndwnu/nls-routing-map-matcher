@@ -22,6 +22,11 @@ steps:
         sonar.coverage.exclusions=**/config/**
         sonar.exclusions=**/graphhopper/isochrone/Isochrone.java
 
+  - task: MavenAuthenticate@0
+    displayName: 'Maven Authenticate'
+    inputs:
+      artifactsFeeds: CBM
+
   - task: Maven@3
     displayName: Maven build
     inputs:
