@@ -13,13 +13,11 @@ import com.graphhopper.storage.index.QueryResult;
 import com.graphhopper.util.DistanceCalc;
 import com.graphhopper.util.DistanceCalcEarth;
 import com.graphhopper.util.shapes.GHPoint3D;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
 import nu.ndw.nls.routingmapmatcher.constants.GlobalConstants;
 import nu.ndw.nls.routingmapmatcher.domain.SinglePointMapMatcher;
 import nu.ndw.nls.routingmapmatcher.domain.model.MatchStatus;
 import nu.ndw.nls.routingmapmatcher.domain.model.singlepoint.SinglePointLocation;
+import nu.ndw.nls.routingmapmatcher.domain.model.singlepoint.SinglePointLocationWithBearing;
 import nu.ndw.nls.routingmapmatcher.domain.model.singlepoint.SinglePointMatch;
 import nu.ndw.nls.routingmapmatcher.graphhopper.LinkFlagEncoder;
 import nu.ndw.nls.routingmapmatcher.graphhopper.NetworkGraphHopper;
@@ -29,6 +27,10 @@ import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.Point;
 import org.locationtech.jts.geom.PrecisionModel;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
 
 public class GraphHopperSinglePointMapMatcher implements SinglePointMapMatcher {
 
@@ -89,6 +91,11 @@ public class GraphHopperSinglePointMapMatcher implements SinglePointMapMatcher {
         return match;
     }
 
+    @Override
+    public SinglePointMatch matchWithBearing(SinglePointLocationWithBearing singlePointLocationWithBearing) {
+        return null;
+    }
+
     private List<QueryResult> findCandidates(final Point point) {
         final double latitude = point.getY();
         final double longitude = point.getX();
@@ -107,7 +114,7 @@ public class GraphHopperSinglePointMapMatcher implements SinglePointMapMatcher {
     }
 
     private SinglePointMatch createMatch(final List<QueryResult> queryResults,
-            final SinglePointLocation singlePointLocation) {
+                                         final SinglePointLocation singlePointLocation) {
         final List<SinglePointMatch.CandidateMatch> candidateMatches = Lists.newArrayList();
         final double closestDistance = queryResults.stream().mapToDouble(QueryResult::getQueryDistance).min()
                 .orElse(MAXIMUM_CANDIDATE_DISTANCE_IN_METERS);
