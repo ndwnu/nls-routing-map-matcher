@@ -1,5 +1,8 @@
 package nu.ndw.nls.routingmapmatcher.graphhopper.singlepoint;
 
+import static java.util.Comparator.comparing;
+import static nu.ndw.nls.routingmapmatcher.graphhopper.util.PathUtil.determineEdgeDirection;
+
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 import com.graphhopper.routing.QueryGraph;
@@ -12,25 +15,33 @@ import com.graphhopper.storage.index.LocationIndexTree;
 import com.graphhopper.storage.index.QueryResult;
 import com.graphhopper.util.DistanceCalc;
 import com.graphhopper.util.DistanceCalcEarth;
+import com.graphhopper.util.PointList;
 import com.graphhopper.util.shapes.GHPoint3D;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 import nu.ndw.nls.routingmapmatcher.constants.GlobalConstants;
 import nu.ndw.nls.routingmapmatcher.domain.SinglePointMapMatcher;
 import nu.ndw.nls.routingmapmatcher.domain.model.MatchStatus;
 import nu.ndw.nls.routingmapmatcher.domain.model.singlepoint.SinglePointLocation;
 import nu.ndw.nls.routingmapmatcher.domain.model.singlepoint.SinglePointLocationWithBearing;
 import nu.ndw.nls.routingmapmatcher.domain.model.singlepoint.SinglePointMatch;
+import nu.ndw.nls.routingmapmatcher.domain.model.singlepoint.SinglePointMatch.CandidateMatch;
 import nu.ndw.nls.routingmapmatcher.graphhopper.LinkFlagEncoder;
 import nu.ndw.nls.routingmapmatcher.graphhopper.NetworkGraphHopper;
 import nu.ndw.nls.routingmapmatcher.graphhopper.isochrone.IsochroneService;
+import nu.ndw.nls.routingmapmatcher.graphhopper.model.QueryResultWithBearing;
+import nu.ndw.nls.routingmapmatcher.graphhopper.model.QueryResultWithBearing.LineSegmentBearing;
+import nu.ndw.nls.routingmapmatcher.graphhopper.model.TravelDirection;
 import nu.ndw.nls.routingmapmatcher.graphhopper.util.PathUtil;
 import org.locationtech.jts.geom.Coordinate;
+import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.Point;
+import org.locationtech.jts.geom.Polygon;
 import org.locationtech.jts.geom.PrecisionModel;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
+import org.locationtech.jts.util.GeometricShapeFactory;
 
 public class GraphHopperSinglePointMapMatcher implements SinglePointMapMatcher {
 
@@ -45,7 +56,14 @@ public class GraphHopperSinglePointMapMatcher implements SinglePointMapMatcher {
      */
     private static final double DISTANCE_ROUNDING_ERROR = 0.1;
 
-    private static final int MAX_RELIABILITY_SCORE = 100;
+    public static final int NUM_POINTS = 100;
+    private static final int MAX_RELIABILITY_SCORE = NUM_POINTS;
+
+    // Length in meters of 1° of latitude = always 111.32 km
+    public static final double DEGREE_LATITUDE_IN_KM = 111320d;
+    // Length in meters of 1° of longitude = 40075 km * cos( latitude ) / 360
+    public static final int ALL_NODES = 3;
+    public static final boolean INCLUDE_ELEVATION = false;
 
     private final LinkFlagEncoder flagEncoder;
     private final LocationIndexTree locationIndexTree;
@@ -93,19 +111,84 @@ public class GraphHopperSinglePointMapMatcher implements SinglePointMapMatcher {
 
     @Override
     public SinglePointMatch matchWithBearing(SinglePointLocationWithBearing singlePointLocationWithBearing) {
-        return null;
+        Preconditions.checkNotNull(singlePointLocationWithBearing);
+
+        Point inputPoint = singlePointLocationWithBearing.getPoint();
+        Double inputRadius = singlePointLocationWithBearing.getRadius();
+        List<Double> inputBearingRange = singlePointLocationWithBearing.getBearings();
+        final List<QueryResult> result = findCandidates(inputPoint, inputRadius);
+        final Polygon circle = createCircle(inputPoint, inputRadius);
+        // Crop geometry to only include segments in search radius
+        final List<LineSegmentBearing> filteredResults = result.stream()
+                // filter on intersects
+                .filter(qr -> intersects(circle, qr))
+                .map(q -> {
+                    PointList pl = q.getClosestEdge().fetchWayGeometry(ALL_NODES);
+                    Geometry cutoffGeometry = circle.intersection(pl.toLineString(INCLUDE_ELEVATION));
+                    TravelDirection travelDirection = determineEdgeDirection(q, flagEncoder);
+                    return QueryResultWithBearing
+                            .builder()
+                            .flagEncoder(flagEncoder)
+                            .inputPoint(inputPoint)
+                            .inputBearingRange(inputBearingRange)
+                            .travelDirection(travelDirection)
+                            .cutoffGeometry(cutoffGeometry)
+                            .queryResult(q)
+                            .build()
+                            .calculateBearings();
+                })
+                .flatMap(r -> r.getMatchedLineSegmentBearings().stream())
+                .sorted(comparing(LineSegmentBearing::getDistanceToSnappedPoint))
+                .collect(Collectors.toList());
+        if (filteredResults.isEmpty()) {
+            return createFailedMatch(singlePointLocationWithBearing);
+        }
+        List<CandidateMatch> candidateMatches = filteredResults
+                .stream()
+                .map(r -> new SinglePointMatch.CandidateMatch(
+                        r.getMatchedLinkId(),
+                        null,
+                        null,
+                        r.getSnappedPoint(),
+                        r.getFractionOfSnappedPoint(),
+                        r.getBearing()))
+                .collect(Collectors.toList());
+        final double closestDistance = filteredResults.stream()
+                .mapToDouble(LineSegmentBearing::getDistanceToSnappedPoint).min()
+                .orElse(MAXIMUM_CANDIDATE_DISTANCE_IN_METERS);
+        final double reliability = calculateReliability(closestDistance);
+
+        return new SinglePointMatch(singlePointLocationWithBearing.getId(),
+                candidateMatches,
+                reliability, MatchStatus.MATCH);
     }
 
-    private List<QueryResult> findCandidates(final Point point) {
+
+    private boolean intersects(Polygon circle, QueryResult queryResult) {
+        PointList pl = queryResult.getClosestEdge().fetchWayGeometry(ALL_NODES);
+        return circle.intersects(pl.toLineString(INCLUDE_ELEVATION));
+    }
+
+    private Polygon createCircle(Point point, double distanceInMeters) {
+        GeometryFactory gf = new GeometryFactory(new PrecisionModel(), GlobalConstants.WGS84_SRID);
+        var shapeFactory = new GeometricShapeFactory(gf);
+        shapeFactory.setCentre(new Coordinate(point.getX(), point.getY()));
+        shapeFactory.setNumPoints(NUM_POINTS);
+        shapeFactory.setWidth(distanceInMeters / DEGREE_LATITUDE_IN_KM);
+        shapeFactory.setHeight(distanceInMeters / (40075000 * Math.cos(Math.toRadians(point.getX())) / 360));
+        return shapeFactory.createEllipse();
+    }
+
+    private List<QueryResult> findCandidates(final Point point, double radius) {
         final double latitude = point.getY();
         final double longitude = point.getX();
 
         final List<QueryResult> queryResults = locationIndexTree.findNClosest(latitude, longitude, edgeFilter,
-                MAXIMUM_CANDIDATE_DISTANCE_IN_METERS);
+                radius);
         final List<QueryResult> candidates = new ArrayList<>(queryResults.size());
 
         for (final QueryResult queryResult : queryResults) {
-            if (queryResult.getQueryDistance() <= MAXIMUM_CANDIDATE_DISTANCE_IN_METERS) {
+            if (queryResult.getQueryDistance() <= radius) {
                 candidates.add(queryResult);
             }
         }
@@ -113,8 +196,12 @@ public class GraphHopperSinglePointMapMatcher implements SinglePointMapMatcher {
         return candidates;
     }
 
+    private List<QueryResult> findCandidates(final Point point) {
+        return findCandidates(point, MAXIMUM_CANDIDATE_DISTANCE_IN_METERS);
+    }
+
     private SinglePointMatch createMatch(final List<QueryResult> queryResults,
-                                         final SinglePointLocation singlePointLocation) {
+            final SinglePointLocation singlePointLocation) {
         final List<SinglePointMatch.CandidateMatch> candidateMatches = Lists.newArrayList();
         final double closestDistance = queryResults.stream().mapToDouble(QueryResult::getQueryDistance).min()
                 .orElse(MAXIMUM_CANDIDATE_DISTANCE_IN_METERS);
@@ -142,12 +229,16 @@ public class GraphHopperSinglePointMapMatcher implements SinglePointMapMatcher {
                         this.distanceCalculator, flagEncoder);
 
                 candidateMatches.add(new SinglePointMatch.CandidateMatch(matchedLinkId, upstreamLinkIds,
-                        downstreamLinkIds, snappedPoint, fraction));
+                        downstreamLinkIds, snappedPoint, fraction, null));
             }
         }
 
-        final double reliability = (1 - closestDistance / MAXIMUM_CANDIDATE_DISTANCE_IN_METERS) * MAX_RELIABILITY_SCORE;
+        final double reliability = calculateReliability(closestDistance);
         return new SinglePointMatch(singlePointLocation.getId(), candidateMatches, reliability, MatchStatus.MATCH);
+    }
+
+    private static double calculateReliability(double closestDistance) {
+        return (1 - closestDistance / MAXIMUM_CANDIDATE_DISTANCE_IN_METERS) * MAX_RELIABILITY_SCORE;
     }
 
     private SinglePointMatch createFailedMatch(final SinglePointLocation singlePointLocation) {
