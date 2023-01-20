@@ -10,23 +10,26 @@ import com.graphhopper.util.EdgeIterator;
 import com.graphhopper.util.EdgeIteratorState;
 import com.graphhopper.util.PointList;
 import com.graphhopper.util.shapes.GHPoint3D;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import nu.ndw.nls.routingmapmatcher.domain.exception.RoutingMapMatcherException;
 import nu.ndw.nls.routingmapmatcher.graphhopper.LinkFlagEncoder;
+import nu.ndw.nls.routingmapmatcher.graphhopper.model.TravelDirection;
 import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.LineString;
 import org.locationtech.jts.geom.impl.PackedCoordinateSequence;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.List;
+
 @Slf4j
 public class PathUtil {
 
+    private final GeometryFactory geometryFactory;
+
     public static final int ALL_NODES_MODE = 3;
     public static final int LINESTRING_MINIMUM_POINTS = 2;
-    private final GeometryFactory geometryFactory;
 
     public PathUtil(final GeometryFactory geometryFactory) {
         this.geometryFactory = geometryFactory;
@@ -57,7 +60,7 @@ public class PathUtil {
     }
 
     public List<Integer> determineMatchedLinkIds(final LinkFlagEncoder flagEncoder,
-            final Collection<EdgeIteratorState> edges) {
+                                                 final Collection<EdgeIteratorState> edges) {
         final List<Integer> matchedLinkIds = new ArrayList<>(edges.size());
         Integer previousMatchedLinkId = null;
         for (final EdgeIteratorState edge : edges) {
@@ -71,18 +74,12 @@ public class PathUtil {
         return matchedLinkIds;
     }
 
-    private enum TravelDirection {
-        BASE_TO_ADJACENT_NODE,
-        ADJACENT_TO_BASE_NODE,
-        BOTH_DIRECTIONS
-    }
-
     /**
      * This method determines the direction on which one can travel over a path. We always need to validate the
      * travel direction because of the way how graphhopper creates node indexes and always wants to store edges with
      * the lower node index followed by the higher node index:
      * https://github.com/graphhopper/graphhopper/blob/master/docs/core/technical.md
-     *
+     * <p>
      * Even though we supply nodes in driving direction (base node to adjacent node), graphhopper sometimes decides
      * to return results in reverse direction.
      *
@@ -90,18 +87,18 @@ public class PathUtil {
      * @param flagEncoder
      * @return travel direction on this specific edge
      */
-    private TravelDirection determineEdgeDirection(final QueryResult queryResult, final LinkFlagEncoder flagEncoder) {
+    public static TravelDirection determineEdgeDirection(final QueryResult queryResult, final LinkFlagEncoder flagEncoder) {
         final EdgeIteratorState edge = queryResult.getClosestEdge();
 
         final boolean edgeCanBeTraveledFromBaseToAdjacent = edge.get(flagEncoder.getAccessEnc());
-        final boolean edgeCanBeTraveledFromAdjacentToBase = edge.getReverse(flagEncoder.getAccessEnc());
+;        final boolean edgeCanBeTraveledFromAdjacentToBase = edge.getReverse(flagEncoder.getAccessEnc());
 
         if (edgeCanBeTraveledFromAdjacentToBase && edgeCanBeTraveledFromBaseToAdjacent) {
             return TravelDirection.BOTH_DIRECTIONS;
         } else if (edgeCanBeTraveledFromAdjacentToBase) {
-            return TravelDirection.ADJACENT_TO_BASE_NODE;
+            return TravelDirection.FORWARD;
         } else if (edgeCanBeTraveledFromBaseToAdjacent) {
-            return TravelDirection.BASE_TO_ADJACENT_NODE;
+            return TravelDirection.REVERSED;
         } else {
             throw new IllegalStateException("Edge has no travel direction");
         }
@@ -110,23 +107,23 @@ public class PathUtil {
     /**
      * Calculates the fraction (relative normalized distance, a number between 0 start and 1 end) from the start of
      * this segment to the snapped point on the path from the query result.
-     *
+     * <p>
      * First a check is performed on a tower node match, because then we can either return 0 or 1 based on the wayIndex.
      * WayIndex indicates on which or after which node the snapped point is found on the edge, there for the start node
      * is 0 and if a tower node is not wayIndex 0 then it must be the adjacent end node.
-     *
+     * <p>
      * Otherwise for each line segment the length is calculated, walking the edge path from base tower node (start) to
-     *  end adjacent node (total length)
-     *  snapped point (snapped point length)
+     * end adjacent node (total length)
+     * snapped point (snapped point length)
+     * <p>
+     * Then the fraction is calculated by relating the snapped point length to the total length
      *
-     *  Then the fraction is calculated by relating the snapped point length to the total length
-     *
-     * @param queryResult the query result
+     * @param queryResult  the query result
      * @param distanceCalc the calculator to use
      * @return the fraction, relative distance on edge beween start 0 and snapped point
      */
     public double determineSnappedPointFraction(final QueryResult queryResult, final DistanceCalc distanceCalc,
-            final LinkFlagEncoder flagEncoder) {
+                                                final LinkFlagEncoder flagEncoder) {
         // Find out after which point our snapped point snaps on the edge
         final int wayIndex = queryResult.getWayIndex();
 
@@ -213,7 +210,7 @@ public class PathUtil {
         }
 
         double fraction = pathDistanceToSnappedPoint / sumOfPathLengths;
-        if (travelDirection == TravelDirection.ADJACENT_TO_BASE_NODE) {
+        if (travelDirection == TravelDirection.FORWARD) {
             log.trace("Reverse travel direction. Fraction will be inverted.");
             fraction = 1D - fraction;
         }
@@ -258,7 +255,7 @@ public class PathUtil {
     }
 
     private double calculateDistanceFromVirtualNodeToNonVirtualNode(final QueryGraph queryGraph, final int virtualNode,
-            final int nodeToAvoid, final EdgeIteratorState pathEdge) {
+                                                                    final int nodeToAvoid, final EdgeIteratorState pathEdge) {
         final EdgeExplorer edgeExplorer = queryGraph.createEdgeExplorer();
 
         double distanceInOtherDirection = 0D;
