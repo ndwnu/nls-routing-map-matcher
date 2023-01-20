@@ -52,7 +52,7 @@ public class SinglePointMapMatcherWithBearingIT {
     void matchWithBearing_ok(){
         setupNetwork(LINKS_RESOURCE);
         Point point = geometryFactory.createPoint(new Coordinate(5.426747, 52.176663));
-        var request = new SinglePointLocationWithBearing(1,point,List.of(140.0,150.0),20.0);
+        var request = new SinglePointLocationWithBearing(1,point,List.of(310.0,320.0),20.0);
         singlePointMapMatcher.matchWithBearing(request);
     }
 
