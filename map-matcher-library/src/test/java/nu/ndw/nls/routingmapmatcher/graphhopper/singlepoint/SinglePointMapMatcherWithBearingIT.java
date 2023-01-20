@@ -3,6 +3,7 @@ package nu.ndw.nls.routingmapmatcher.graphhopper.singlepoint;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;
+import java.util.List;
 import lombok.SneakyThrows;
 import nu.ndw.nls.routingmapmatcher.constants.GlobalConstants;
 import nu.ndw.nls.routingmapmatcher.domain.SinglePointMapMatcher;
@@ -17,8 +18,6 @@ import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.Point;
 import org.locationtech.jts.geom.PrecisionModel;
-
-import java.util.List;
 
 public class SinglePointMapMatcherWithBearingIT {
 
@@ -49,11 +48,11 @@ public class SinglePointMapMatcherWithBearingIT {
     }
 
     @Test
-    void matchWithBearing_ok(){
+    void matchWithBearing_ok() {
         setupNetwork(LINKS_RESOURCE);
         Point point = geometryFactory.createPoint(new Coordinate(5.426747, 52.176663));
-        var request = new SinglePointLocationWithBearing(1,point,List.of(310.0,320.0),20.0);
-        singlePointMapMatcher.matchWithBearing(request);
+        var request = new SinglePointLocationWithBearing(1, point, List.of(310.0, 320.0), 100.0);
+        var result = singlePointMapMatcher.matchWithBearing(request);
     }
 
 }
