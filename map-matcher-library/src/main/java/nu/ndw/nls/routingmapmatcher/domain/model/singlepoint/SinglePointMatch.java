@@ -24,6 +24,7 @@ public class SinglePointMatch extends MapMatch {
         private final Point snappedPoint;
         private final double fraction;
         private final Double bearing;
+        private final Double distance;
     }
 
     private final List<CandidateMatch> candidateMatches;

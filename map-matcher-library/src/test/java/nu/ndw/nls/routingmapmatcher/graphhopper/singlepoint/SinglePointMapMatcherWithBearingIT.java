@@ -1,5 +1,11 @@
 package nu.ndw.nls.routingmapmatcher.graphhopper.singlepoint;
 
+
+
+
+
+import static org.assertj.core.api.Assertions.assertThat;
+
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;
@@ -51,8 +57,9 @@ public class SinglePointMapMatcherWithBearingIT {
     void matchWithBearing_ok() {
         setupNetwork(LINKS_RESOURCE);
         Point point = geometryFactory.createPoint(new Coordinate(5.426747, 52.176663));
-        var request = new SinglePointLocationWithBearing(1, point, List.of(310.0, 320.0), 100.0);
+        var request = new SinglePointLocationWithBearing(1, point, List.of(310.0, 320.0), 20.0);
         var result = singlePointMapMatcher.matchWithBearing(request);
+        assertThat(result.getCandidateMatches()).hasSize(2);
     }
 
 }
