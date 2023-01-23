@@ -35,7 +35,7 @@ public class QueryResultWithBearing {
     TravelDirection travelDirection;
     Geometry cutoffGeometry;
     @Builder.Default
-    List<LineSegmentBearing> matchedLineSegmentBearings = new ArrayList<>();
+    List<MatchedLineSegment> matchedLineSegments = new ArrayList<>();
     @Builder.Default
     GeometryFactory geometryFactory = new GeometryFactory(new PrecisionModel(),
             GlobalConstants.WGS84_SRID);
@@ -48,12 +48,12 @@ public class QueryResultWithBearing {
 
     @Value
     @Builder
-    public static class LineSegmentBearing {
+    public static class MatchedLineSegment {
 
         int matchedLinkId;
         Coordinate startCoordinate;
         Coordinate endCoordinate;
-        LineString subGeometry;
+        //LineString subGeometry;
         Double bearing;
         Point snappedPoint;
         Double distanceToSnappedPoint;
@@ -63,39 +63,22 @@ public class QueryResultWithBearing {
     }
 
     @SneakyThrows
-    public QueryResultWithBearing calculateBearings() {
+    public QueryResultWithBearing calculateMatchedBearings() {
         Coordinate[] coordinates = cutoffGeometry.getCoordinates();
         for (int c = 0; c < coordinates.length - 1; c++) {
             Coordinate currentCoordinate = coordinates[c];
             Coordinate nextCoordinate = coordinates[c + 1];
-            calculator.setStartingGeographicPoint(currentCoordinate.getX(),
-                    currentCoordinate.getY());
-            calculator.setDestinationGeographicPoint(nextCoordinate.getX(),
-                    nextCoordinate.getY());
-            double bearing = calculator.getAzimuth();
-            double convertedBearing = bearing < 0.0 ? bearing + 360 : bearing;
-            if (convertedBearing >= inputBearingRange.get(0) && convertedBearing <= inputBearingRange.get(1)) {
-                final Coordinate[] subGeometryCoordinates = {currentCoordinate, nextCoordinate};
-                final LineString subGeometry = geometryFactory.createLineString(subGeometryCoordinates);
-                final LocationIndexedLine lineIndex = new LocationIndexedLine(subGeometry);
-                final LinearLocation snappedPointLinearLocation = lineIndex.project(inputPoint.getCoordinate());
-                final Point snappedPoint = geometryFactory
-                        .createPoint(lineIndex.extractPoint(snappedPointLinearLocation));
-                final LineString originalGeometry = queryResult
-                        .getClosestEdge()
-                        .fetchWayGeometry(3)
-                        .toLineString(false);
-                final double pointDistance = getLengthAlongLineString(originalGeometry, snappedPoint.getCoordinate());
-                final double totalLength = originalGeometry.getLength();
-                final double fraction = (totalLength - pointDistance) / totalLength;
+            double convertedBearing = calculateBearing(currentCoordinate, nextCoordinate);
+            if (bearingIsInRange(convertedBearing)) {
+                final Point snappedPoint = calculateSnappedPoint(currentCoordinate, nextCoordinate);
+                final double fraction = calculateFraction(snappedPoint);
                 final IntsRef flags = queryResult.getClosestEdge().getFlags();
                 final int matchedLinkId = flagEncoder.getId(flags);
-                final LineSegmentBearing lineSegmentBearing = LineSegmentBearing
+                final MatchedLineSegment lineSegmentBearing = MatchedLineSegment
                         .builder()
                         .matchedLinkId(matchedLinkId)
                         .startCoordinate(currentCoordinate)
                         .endCoordinate(nextCoordinate)
-                        .subGeometry(subGeometry)
                         .fractionOfSnappedPoint(fraction)
                         .distanceToSnappedPoint(distanceCalculator.calcDist(inputPoint.getX(),
                                 inputPoint.getY(), snappedPoint.getX(), snappedPoint.getY()))
@@ -103,13 +86,48 @@ public class QueryResultWithBearing {
                         .snappedPoint(snappedPoint)
                         .bearing(convertedBearing)
                         .build();
-                matchedLineSegmentBearings.add(lineSegmentBearing);
+                matchedLineSegments.add(lineSegmentBearing);
             }
 
             log.info("Segment [{} -> {}]. bearing is: {}", c, c + 1, convertedBearing);
         }
 
         return this;
+    }
+
+    private double calculateFraction(Point snappedPoint) {
+        final LineString originalGeometry = queryResult
+                .getClosestEdge()
+                .fetchWayGeometry(3)
+                .toLineString(false);
+        final double pointDistance = getLengthAlongLineString(originalGeometry, snappedPoint.getCoordinate());
+        final double totalLength = originalGeometry.getLength();
+        final double fraction = (totalLength - pointDistance) / totalLength;
+        return fraction;
+    }
+
+    private Point calculateSnappedPoint(Coordinate currentCoordinate, Coordinate nextCoordinate) {
+        final Coordinate[] subGeometryCoordinates = {currentCoordinate, nextCoordinate};
+        final LineString subGeometry = geometryFactory.createLineString(subGeometryCoordinates);
+        final LocationIndexedLine lineIndex = new LocationIndexedLine(subGeometry);
+        final LinearLocation snappedPointLinearLocation = lineIndex.project(inputPoint.getCoordinate());
+        final Point snappedPoint = geometryFactory
+                .createPoint(lineIndex.extractPoint(snappedPointLinearLocation));
+        return snappedPoint;
+    }
+
+    private boolean bearingIsInRange(double convertedBearing) {
+        return convertedBearing >= inputBearingRange.get(0) && convertedBearing <= inputBearingRange.get(1);
+    }
+
+    private double calculateBearing(Coordinate currentCoordinate, Coordinate nextCoordinate) {
+        calculator.setStartingGeographicPoint(currentCoordinate.getX(),
+                currentCoordinate.getY());
+        calculator.setDestinationGeographicPoint(nextCoordinate.getX(),
+                nextCoordinate.getY());
+        double bearing = calculator.getAzimuth();
+        double convertedBearing = bearing < 0.0 ? bearing + 360 : bearing;
+        return convertedBearing;
     }
 
     /*

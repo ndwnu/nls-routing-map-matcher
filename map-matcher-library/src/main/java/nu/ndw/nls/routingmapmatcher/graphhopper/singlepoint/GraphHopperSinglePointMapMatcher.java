@@ -32,7 +32,7 @@ import nu.ndw.nls.routingmapmatcher.graphhopper.LinkFlagEncoder;
 import nu.ndw.nls.routingmapmatcher.graphhopper.NetworkGraphHopper;
 import nu.ndw.nls.routingmapmatcher.graphhopper.isochrone.IsochroneService;
 import nu.ndw.nls.routingmapmatcher.graphhopper.model.QueryResultWithBearing;
-import nu.ndw.nls.routingmapmatcher.graphhopper.model.QueryResultWithBearing.LineSegmentBearing;
+import nu.ndw.nls.routingmapmatcher.graphhopper.model.QueryResultWithBearing.MatchedLineSegment;
 import nu.ndw.nls.routingmapmatcher.graphhopper.model.TravelDirection;
 import nu.ndw.nls.routingmapmatcher.graphhopper.util.PathUtil;
 import org.locationtech.jts.geom.Coordinate;
@@ -119,7 +119,7 @@ public class GraphHopperSinglePointMapMatcher implements SinglePointMapMatcher {
         final List<QueryResult> result = findCandidates(inputPoint, inputRadius);
         final Polygon circle = createCircle(inputPoint, inputRadius);
         // Crop geometry to only include segments in search radius
-        final List<LineSegmentBearing> filteredResults = result.stream()
+        final List<MatchedLineSegment> filteredResults = result.stream()
                 // filter on intersects
                 .filter(qr -> intersects(circle, qr))
                 .map(q -> {
@@ -135,29 +135,29 @@ public class GraphHopperSinglePointMapMatcher implements SinglePointMapMatcher {
                             .cutoffGeometry(cutoffGeometry)
                             .queryResult(q)
                             .build()
-                            .calculateBearings();
+                            .calculateMatchedBearings();
                 })
-                .flatMap(r -> r.getMatchedLineSegmentBearings().stream())
-                .sorted(comparing(LineSegmentBearing::getDistanceToSnappedPoint))
+                .flatMap(r -> r.getMatchedLineSegments().stream())
+                .sorted(comparing(MatchedLineSegment::getDistanceToSnappedPoint))
                 .collect(Collectors.toList());
         if (filteredResults.isEmpty()) {
             return createFailedMatch(singlePointLocationWithBearing);
         }
         List<CandidateMatch> candidateMatches = filteredResults
                 .stream()
-                .map(r -> new SinglePointMatch.CandidateMatch(
-                        r.getMatchedLinkId(),
+                .map(matchedLineSegment -> new SinglePointMatch.CandidateMatch(
+                        matchedLineSegment.getMatchedLinkId(),
                         null,
                         null,
-                        r.getSnappedPoint(),
-                        r.getFractionOfSnappedPoint(),
-                        r.getBearing()))
+                        matchedLineSegment.getSnappedPoint(),
+                        matchedLineSegment.getFractionOfSnappedPoint(),
+                        matchedLineSegment.getBearing(),
+                        matchedLineSegment.getDistanceToSnappedPoint()))
                 .collect(Collectors.toList());
         final double closestDistance = filteredResults.stream()
-                .mapToDouble(LineSegmentBearing::getDistanceToSnappedPoint).min()
+                .mapToDouble(MatchedLineSegment::getDistanceToSnappedPoint).min()
                 .orElse(MAXIMUM_CANDIDATE_DISTANCE_IN_METERS);
         final double reliability = calculateReliability(closestDistance);
-
         return new SinglePointMatch(singlePointLocationWithBearing.getId(),
                 candidateMatches,
                 reliability, MatchStatus.MATCH);
@@ -229,7 +229,7 @@ public class GraphHopperSinglePointMapMatcher implements SinglePointMapMatcher {
                         this.distanceCalculator, flagEncoder);
 
                 candidateMatches.add(new SinglePointMatch.CandidateMatch(matchedLinkId, upstreamLinkIds,
-                        downstreamLinkIds, snappedPoint, fraction, null));
+                        downstreamLinkIds, snappedPoint, fraction, null,null));
             }
         }
 
