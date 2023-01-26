@@ -87,11 +87,12 @@ public class PathUtil {
      * @param flagEncoder
      * @return travel direction on this specific edge
      */
-    public static TravelDirection determineEdgeDirection(final QueryResult queryResult, final LinkFlagEncoder flagEncoder) {
+    public static TravelDirection determineEdgeDirection(final QueryResult queryResult,
+            final LinkFlagEncoder flagEncoder) {
         final EdgeIteratorState edge = queryResult.getClosestEdge();
 
         final boolean edgeCanBeTraveledFromBaseToAdjacent = edge.get(flagEncoder.getAccessEnc());
-;        final boolean edgeCanBeTraveledFromAdjacentToBase = edge.getReverse(flagEncoder.getAccessEnc());
+        final boolean edgeCanBeTraveledFromAdjacentToBase = edge.getReverse(flagEncoder.getAccessEnc());
 
         if (edgeCanBeTraveledFromAdjacentToBase && edgeCanBeTraveledFromBaseToAdjacent) {
             return TravelDirection.BOTH_DIRECTIONS;

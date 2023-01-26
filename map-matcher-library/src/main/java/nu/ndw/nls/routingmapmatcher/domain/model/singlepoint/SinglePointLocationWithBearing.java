@@ -9,12 +9,13 @@ import java.util.List;
 @Getter
 @ToString(callSuper = true)
 public class SinglePointLocationWithBearing extends SinglePointLocation {
-    private final List<Double> bearings;
-    private final Double radius;
 
-    public SinglePointLocationWithBearing(int id, Point point, List<Double> bearings, Double radius) {
-        super(id, point);
-        this.bearings = bearings;
-        this.radius = radius;
+    private final Double minBearing;
+    private final Double maxBearing;
+
+    public SinglePointLocationWithBearing(int id, Point point, Double minBearing, Double maxBearing, Double radius) {
+        super(id, point, radius);
+        this.minBearing = minBearing;
+        this.maxBearing = maxBearing;
     }
 }

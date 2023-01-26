@@ -11,16 +11,25 @@ import org.locationtech.jts.geom.Point;
 public class SinglePointLocation extends BaseLocation {
 
     private final Point point;
+    private final Double radius;
 
     public SinglePointLocation(final int id, final Point point, final double upstreamIsochrone,
             final IsochroneUnit upstreamIsochroneUnit, final double downstreamIsochrone,
             final IsochroneUnit downstreamIsochroneUnit) {
         super(id, upstreamIsochrone, upstreamIsochroneUnit, downstreamIsochrone, downstreamIsochroneUnit);
         this.point = point;
+        this.radius = null;
     }
 
     public SinglePointLocation(final int id, final Point point) {
         super(id);
         this.point = point;
+        this.radius = null;
+    }
+
+    public SinglePointLocation(final int id, final Point point, Double radius) {
+        super(id);
+        this.point = point;
+        this.radius = radius;
     }
 }

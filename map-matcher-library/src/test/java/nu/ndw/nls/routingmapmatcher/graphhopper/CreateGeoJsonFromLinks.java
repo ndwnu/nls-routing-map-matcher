@@ -69,10 +69,8 @@ public class CreateGeoJsonFromLinks {
     @SneakyThrows
     @Test
     @Disabled
+    // TODO Work in progress
     void testIntersection() {
-
-
-
         GeometryFactory gf = new GeometryFactory(new PrecisionModel(), GlobalConstants.WGS84_SRID);
         var shapeFactory =  new GeometricShapeFactory(gf);
         shapeFactory.setCentre(new Coordinate(5.426747, 52.176663));
