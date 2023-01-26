@@ -29,9 +29,9 @@ import org.locationtech.jts.linearref.LocationIndexedLine;
 public class QueryResultWithBearing {
 
     Point inputPoint;
-    List<Double> inputBearingRange;
+    Double inputMinBearing;
+    Double inputMaxBearing;
     QueryResult queryResult;
-
     TravelDirection travelDirection;
     Geometry cutoffGeometry;
     @Builder.Default
@@ -117,7 +117,7 @@ public class QueryResultWithBearing {
     }
 
     private boolean bearingIsInRange(double convertedBearing) {
-        return convertedBearing >= inputBearingRange.get(0) && convertedBearing <= inputBearingRange.get(1);
+        return convertedBearing >= inputMinBearing && convertedBearing <= inputMaxBearing;
     }
 
     private double calculateBearing(Coordinate currentCoordinate, Coordinate nextCoordinate) {
@@ -133,7 +133,7 @@ public class QueryResultWithBearing {
     /*
      * https://gis.stackexchange.com/questions/231750/geotools-calculate-length-along-line-from-start-vertex-up-to-some-point-on-the
      * */
-    public static double getLengthAlongLineString(LineString line, Coordinate coordinate) {
+    private static double getLengthAlongLineString(LineString line, Coordinate coordinate) {
         LocationIndexedLine locationIndexedLine = new LocationIndexedLine(line);
         LinearLocation location = locationIndexedLine.project(coordinate);
         return new LengthLocationMap(line).getLength(location);

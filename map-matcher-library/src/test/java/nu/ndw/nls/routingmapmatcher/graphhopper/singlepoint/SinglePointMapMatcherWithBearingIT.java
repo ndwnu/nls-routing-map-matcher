@@ -1,10 +1,7 @@
 package nu.ndw.nls.routingmapmatcher.graphhopper.singlepoint;
 
-
-
-
-
-import static org.assertj.core.api.Assertions.assertThat;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.hasSize;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -16,6 +13,7 @@ import nu.ndw.nls.routingmapmatcher.domain.SinglePointMapMatcher;
 import nu.ndw.nls.routingmapmatcher.domain.model.Link;
 import nu.ndw.nls.routingmapmatcher.domain.model.RoutingNetwork;
 import nu.ndw.nls.routingmapmatcher.domain.model.singlepoint.SinglePointLocationWithBearing;
+import nu.ndw.nls.routingmapmatcher.domain.model.singlepoint.SinglePointMatch;
 import nu.ndw.nls.routingmapmatcher.graphhopper.NetworkGraphHopperFactory;
 import nu.ndw.nls.routingmapmatcher.graphhopper.viterbi.LinkDeserializer;
 import org.apache.commons.io.IOUtils;
@@ -44,8 +42,7 @@ public class SinglePointMapMatcherWithBearingIT {
         mapper.registerModule(module);
         List<Link> links = mapper.readValue(linksJson, new TypeReference<>() {
         });
-        RoutingNetwork routingNetwork = RoutingNetwork.builder()
-                .networkNameAndVersion("test_network")
+        RoutingNetwork routingNetwork = RoutingNetwork.builder().networkNameAndVersion("test_network")
                 .linkSupplier(links::iterator).build();
         GraphHopperSinglePointMapMatcherFactory graphHopperSinglePointMapMatcherFactory =
                 new GraphHopperSinglePointMapMatcherFactory(new NetworkGraphHopperFactory());
@@ -57,9 +54,9 @@ public class SinglePointMapMatcherWithBearingIT {
     void matchWithBearing_ok() {
         setupNetwork(LINKS_RESOURCE);
         Point point = geometryFactory.createPoint(new Coordinate(5.426747, 52.176663));
-        var request = new SinglePointLocationWithBearing(1, point, List.of(310.0, 320.0), 20.0);
-        var result = singlePointMapMatcher.matchWithBearing(request);
-        assertThat(result.getCandidateMatches()).hasSize(2);
+        SinglePointLocationWithBearing request = new SinglePointLocationWithBearing(1, point,
+                310.0, 320.0, 20.0);
+        SinglePointMatch result = singlePointMapMatcher.matchWithBearing(request);
+        assertThat(result.getCandidateMatches(), hasSize(2));
     }
-
 }
