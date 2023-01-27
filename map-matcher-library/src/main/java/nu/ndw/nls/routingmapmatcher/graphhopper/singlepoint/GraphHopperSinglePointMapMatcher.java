@@ -18,6 +18,7 @@ import com.graphhopper.util.DistanceCalcEarth;
 import com.graphhopper.util.PointList;
 import com.graphhopper.util.shapes.GHPoint3D;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -31,10 +32,11 @@ import nu.ndw.nls.routingmapmatcher.domain.model.singlepoint.SinglePointMatch.Ca
 import nu.ndw.nls.routingmapmatcher.graphhopper.LinkFlagEncoder;
 import nu.ndw.nls.routingmapmatcher.graphhopper.NetworkGraphHopper;
 import nu.ndw.nls.routingmapmatcher.graphhopper.isochrone.IsochroneService;
-import nu.ndw.nls.routingmapmatcher.graphhopper.model.QueryResultWithBearing;
-import nu.ndw.nls.routingmapmatcher.graphhopper.model.QueryResultWithBearing.MatchedLineSegment;
+import nu.ndw.nls.routingmapmatcher.graphhopper.model.MatchedPoint;
+import nu.ndw.nls.routingmapmatcher.graphhopper.model.MatchedQueryResult;
 import nu.ndw.nls.routingmapmatcher.graphhopper.model.TravelDirection;
 import nu.ndw.nls.routingmapmatcher.graphhopper.util.PathUtil;
+import org.geotools.referencing.GeodeticCalculator;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.GeometryFactory;
@@ -56,8 +58,8 @@ public class GraphHopperSinglePointMapMatcher implements SinglePointMapMatcher {
      */
     private static final double DISTANCE_ROUNDING_ERROR = 0.1;
 
-    public static final int NUM_POINTS = 100;
-    private static final int MAX_RELIABILITY_SCORE = NUM_POINTS;
+    private static final int NUM_POINTS = 100;
+    private static final int MAX_RELIABILITY_SCORE = 100;
 
     // Length in meters of 1° of latitude = always 111.32 km
     public static final double DEGREE_LATITUDE_IN_KM = 111320d;
@@ -72,6 +74,7 @@ public class GraphHopperSinglePointMapMatcher implements SinglePointMapMatcher {
     private final QueryGraph queryGraph;
     private final IsochroneService isochroneService;
     private final DistanceCalc distanceCalculator;
+    private final PointMatchingService pointMatchingService;
 
     public GraphHopperSinglePointMapMatcher(final NetworkGraphHopper network) {
         Preconditions.checkNotNull(network);
@@ -82,14 +85,15 @@ public class GraphHopperSinglePointMapMatcher implements SinglePointMapMatcher {
         this.flagEncoder = (LinkFlagEncoder) flagEncoders.get(0);
         this.locationIndexTree = (LocationIndexTree) network.getLocationIndex();
         this.edgeFilter = EdgeFilter.ALL_EDGES;
-
         this.geometryFactory = new GeometryFactory(new PrecisionModel(), GlobalConstants.WGS84_SRID);
         this.pathUtil = new PathUtil(this.geometryFactory);
         this.queryGraph = new QueryGraph(network.getGraphHopperStorage());
         final Weighting weighting = new ShortestWeighting(flagEncoder);
         this.isochroneService = new IsochroneService(flagEncoder, weighting);
-
         this.distanceCalculator = new DistanceCalcEarth();
+        this.pointMatchingService = new PointMatchingService(new GeometryFactory(new PrecisionModel(),
+                GlobalConstants.WGS84_SRID), flagEncoder, new GeodeticCalculator());
+
     }
 
     @Override
@@ -118,35 +122,33 @@ public class GraphHopperSinglePointMapMatcher implements SinglePointMapMatcher {
 
         Point inputPoint = singlePointLocationWithBearing.getPoint();
         Double inputRadius = singlePointLocationWithBearing.getRadius() != null ?
-                        singlePointLocationWithBearing.getRadius()
-                        : MAXIMUM_CANDIDATE_DISTANCE_IN_METERS;
+                singlePointLocationWithBearing.getRadius()
+                : MAXIMUM_CANDIDATE_DISTANCE_IN_METERS;
         Double inputMinBearing = singlePointLocationWithBearing.getMinBearing();
         Double inputMaxBearing = singlePointLocationWithBearing.getMaxBearing();
 
         final List<QueryResult> result = findCandidates(inputPoint, inputRadius);
         final Polygon circle = createCircle(inputPoint, inputRadius);
         // Crop geometry to only include segments in search radius
-        final List<MatchedLineSegment> filteredResults = result.stream()
+        final List<MatchedPoint> filteredResults = result.stream()
                 // filter on intersects
                 .filter(qr -> intersects(circle, qr))
                 .map(q -> {
                     PointList pl = q.getClosestEdge().fetchWayGeometry(ALL_NODES);
                     Geometry cutoffGeometry = circle.intersection(pl.toLineString(INCLUDE_ELEVATION));
                     TravelDirection travelDirection = determineEdgeDirection(q, flagEncoder);
-                    return QueryResultWithBearing
+                    return pointMatchingService.calculateMatches(MatchedQueryResult
                             .builder()
-                            .flagEncoder(flagEncoder)
                             .inputPoint(inputPoint)
                             .inputMinBearing(inputMinBearing)
                             .inputMaxBearing(inputMaxBearing)
                             .travelDirection(travelDirection)
                             .cutoffGeometry(cutoffGeometry)
                             .queryResult(q)
-                            .build()
-                            .calculateMatchedBearings();
+                            .build());
                 })
-                .flatMap(r -> r.getMatchedLineSegments().stream())
-                .sorted(comparing(MatchedLineSegment::getDistanceToSnappedPoint))
+                .flatMap(Collection::stream)
+                .sorted(comparing(MatchedPoint::getDistanceToSnappedPoint))
                 .collect(Collectors.toList());
         if (filteredResults.isEmpty()) {
             return createFailedMatch(singlePointLocationWithBearing);
@@ -162,7 +164,7 @@ public class GraphHopperSinglePointMapMatcher implements SinglePointMapMatcher {
                         matchedLineSegment.getDistanceToSnappedPoint()))
                 .collect(Collectors.toList());
         final double closestDistance = filteredResults.stream()
-                .mapToDouble(MatchedLineSegment::getDistanceToSnappedPoint).min()
+                .mapToDouble(MatchedPoint::getDistanceToSnappedPoint).min()
                 .orElse(MAXIMUM_CANDIDATE_DISTANCE_IN_METERS);
         final double reliability = calculateReliability(closestDistance);
         return new SinglePointMatch(singlePointLocationWithBearing.getId(),
