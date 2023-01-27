@@ -76,9 +76,9 @@ public class CreateGeoJsonFromLinks {
         shapeFactory.setCentre(new Coordinate(5.426747, 52.176663));
         shapeFactory.setNumPoints(100); // adjustable
         // Length in meters of 1° of latitude = always 111.32 km
-        shapeFactory.setWidth(20d/111320d);
+        shapeFactory.setWidth(100d/111320d);
         // Length in meters of 1° of longitude = 40075 km * cos( latitude ) / 360
-        shapeFactory.setHeight(20d / (40075000 * Math.cos(Math.toRadians(5.426747)) / 360));
+        shapeFactory.setHeight(100d / (40075000 * Math.cos(Math.toRadians(5.426747)) / 360));
 
         Polygon circleA = shapeFactory.createEllipse();
 //        Point p = gf.createPoint(new Coordinate(5.426747, 52.176663));

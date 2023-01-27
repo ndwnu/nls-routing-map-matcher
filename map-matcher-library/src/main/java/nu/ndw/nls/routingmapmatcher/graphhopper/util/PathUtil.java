@@ -97,9 +97,9 @@ public class PathUtil {
         if (edgeCanBeTraveledFromAdjacentToBase && edgeCanBeTraveledFromBaseToAdjacent) {
             return TravelDirection.BOTH_DIRECTIONS;
         } else if (edgeCanBeTraveledFromAdjacentToBase) {
-            return TravelDirection.FORWARD;
-        } else if (edgeCanBeTraveledFromBaseToAdjacent) {
             return TravelDirection.REVERSED;
+        } else if (edgeCanBeTraveledFromBaseToAdjacent) {
+            return TravelDirection.FORWARD;
         } else {
             throw new IllegalStateException("Edge has no travel direction");
         }
@@ -211,7 +211,7 @@ public class PathUtil {
         }
 
         double fraction = pathDistanceToSnappedPoint / sumOfPathLengths;
-        if (travelDirection == TravelDirection.FORWARD) {
+        if (travelDirection == TravelDirection.REVERSED) {
             log.trace("Reverse travel direction. Fraction will be inverted.");
             fraction = 1D - fraction;
         }

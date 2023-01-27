@@ -57,6 +57,6 @@ public class SinglePointMapMatcherWithBearingIT {
         SinglePointLocationWithBearing request = new SinglePointLocationWithBearing(1, point,
                 310.0, 320.0, 20.0);
         SinglePointMatch result = singlePointMapMatcher.matchWithBearing(request);
-        assertThat(result.getCandidateMatches(), hasSize(2));
+        assertThat(result.getCandidateMatches(), hasSize(1));
     }
 }
