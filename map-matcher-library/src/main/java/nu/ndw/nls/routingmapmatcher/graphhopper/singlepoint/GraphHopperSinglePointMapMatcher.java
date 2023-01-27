@@ -159,7 +159,6 @@ public class GraphHopperSinglePointMapMatcher implements SinglePointMapMatcher {
                         null,
                         matchedLineSegment.getSnappedPoint(),
                         matchedLineSegment.getFractionOfSnappedPoint(),
-                        matchedLineSegment.getBearing(),
                         matchedLineSegment.getDistanceToSnappedPoint()))
                 .collect(Collectors.toList());
         final double closestDistance = filteredResults.stream()
@@ -232,7 +231,7 @@ public class GraphHopperSinglePointMapMatcher implements SinglePointMapMatcher {
                         this.distanceCalculator, flagEncoder);
 
                 candidateMatches.add(new SinglePointMatch.CandidateMatch(matchedLinkId, upstreamLinkIds,
-                        downstreamLinkIds, snappedPoint, fraction, null, null));
+                        downstreamLinkIds, snappedPoint, fraction, null));
             }
         }
 

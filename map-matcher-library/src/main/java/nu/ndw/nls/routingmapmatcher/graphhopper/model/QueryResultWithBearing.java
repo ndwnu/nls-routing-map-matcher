@@ -2,9 +2,9 @@ package nu.ndw.nls.routingmapmatcher.graphhopper.model;
 
 import com.graphhopper.storage.IntsRef;
 import com.graphhopper.storage.index.QueryResult;
-import com.graphhopper.util.DistanceCalc;
-import com.graphhopper.util.DistanceCalcEarth;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Iterator;
 import java.util.List;
 import lombok.Builder;
 import lombok.SneakyThrows;
@@ -19,7 +19,6 @@ import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.LineString;
 import org.locationtech.jts.geom.Point;
 import org.locationtech.jts.geom.PrecisionModel;
-import org.locationtech.jts.linearref.LengthLocationMap;
 import org.locationtech.jts.linearref.LinearLocation;
 import org.locationtech.jts.linearref.LocationIndexedLine;
 
@@ -28,6 +27,8 @@ import org.locationtech.jts.linearref.LocationIndexedLine;
 @Slf4j
 public class QueryResultWithBearing {
 
+    public static final int MAX_BEARING = 360;
+    public static final int MIN_BEARING = 0;
     Point inputPoint;
     Double inputMinBearing;
     Double inputMaxBearing;
@@ -41,20 +42,16 @@ public class QueryResultWithBearing {
             GlobalConstants.WGS84_SRID);
 
     LinkFlagEncoder flagEncoder;
+
     @Builder.Default
-    DistanceCalc distanceCalculator = new DistanceCalcEarth();
-    @Builder.Default
-    GeodeticCalculator calculator = new GeodeticCalculator();
+    GeodeticCalculator geodeticCalculator = new GeodeticCalculator();
 
     @Value
     @Builder
     public static class MatchedLineSegment {
 
         int matchedLinkId;
-        Coordinate startCoordinate;
-        Coordinate endCoordinate;
-        //LineString subGeometry;
-        Double bearing;
+        LineString subGeometry;
         Point snappedPoint;
         Double distanceToSnappedPoint;
         Double fractionOfSnappedPoint;
@@ -64,33 +61,53 @@ public class QueryResultWithBearing {
 
     @SneakyThrows
     public QueryResultWithBearing calculateMatchedBearings() {
-        Coordinate[] coordinates = cutoffGeometry.getCoordinates();
-        for (int c = 0; c < coordinates.length - 1; c++) {
-            Coordinate currentCoordinate = coordinates[c];
-            Coordinate nextCoordinate = coordinates[c + 1];
+        final Coordinate[] coordinates = cutoffGeometry.getCoordinates();
+        List<LineString> subGeometries = new ArrayList<>();
+        List<Coordinate> partialGeometry = new ArrayList<>();
+        boolean lastBoundaryDetected;
+        var it = Arrays.asList(coordinates).iterator();
+        Coordinate currentCoordinate = it.next();
+        while (it.hasNext()) {
+            final Coordinate nextCoordinate = it.next();
             double convertedBearing = calculateBearing(currentCoordinate, nextCoordinate);
             if (bearingIsInRange(convertedBearing)) {
-                final Point snappedPoint = calculateSnappedPoint(currentCoordinate, nextCoordinate);
-                final double fraction = calculateFraction(snappedPoint);
-                final IntsRef flags = queryResult.getClosestEdge().getFlags();
-                final int matchedLinkId = flagEncoder.getId(flags);
-                final MatchedLineSegment lineSegmentBearing = MatchedLineSegment
-                        .builder()
-                        .matchedLinkId(matchedLinkId)
-                        .startCoordinate(currentCoordinate)
-                        .endCoordinate(nextCoordinate)
-                        .fractionOfSnappedPoint(fraction)
-                        .distanceToSnappedPoint(distanceCalculator.calcDist(inputPoint.getX(),
-                                inputPoint.getY(), snappedPoint.getX(), snappedPoint.getY()))
-
-                        .snappedPoint(snappedPoint)
-                        .bearing(convertedBearing)
-                        .build();
-                matchedLineSegments.add(lineSegmentBearing);
+                partialGeometry.add(currentCoordinate);
+                partialGeometry.add(nextCoordinate);
+                lastBoundaryDetected = false;
+            } else {
+                lastBoundaryDetected = true;
+                subGeometries.add(geometryFactory
+                        .createLineString(partialGeometry.toArray(Coordinate[]::new)));
+                partialGeometry = new ArrayList<>();
+            }
+            if (!it.hasNext() && !lastBoundaryDetected) {
+                subGeometries.add(geometryFactory
+                        .createLineString(partialGeometry.toArray(Coordinate[]::new)));
             }
 
-            log.info("Segment [{} -> {}]. bearing is: {}", c, c + 1, convertedBearing);
+            currentCoordinate = nextCoordinate;
+            log.info("Segment [{} -> {}]. bearing is: {}", currentCoordinate, nextCoordinate, convertedBearing);
         }
+
+        subGeometries.forEach(l -> {
+                    final Point snappedPoint = calculateSnappedPoint(l);
+                    final double fraction = calculateFraction(snappedPoint);
+                    final IntsRef flags = queryResult.getClosestEdge().getFlags();
+                    final int matchedLinkId = flagEncoder.getId(flags);
+                    final double distanceToSnappedPoint = calculateDistance(inputPoint.getCoordinate(),
+                            snappedPoint.getCoordinate());
+
+                    final MatchedLineSegment lineSegmentBearing = MatchedLineSegment
+                            .builder()
+                            .matchedLinkId(matchedLinkId)
+                            .fractionOfSnappedPoint(fraction)
+                            .distanceToSnappedPoint(distanceToSnappedPoint)
+                            .snappedPoint(snappedPoint)
+                            .build();
+
+                    matchedLineSegments.add(lineSegmentBearing);
+                }
+        );
 
         return this;
     }
@@ -100,43 +117,74 @@ public class QueryResultWithBearing {
                 .getClosestEdge()
                 .fetchWayGeometry(3)
                 .toLineString(false);
-        final double pointDistance = getLengthAlongLineString(originalGeometry, snappedPoint.getCoordinate());
-        final double totalLength = originalGeometry.getLength();
-        final double fraction = (totalLength - pointDistance) / totalLength;
-        return fraction;
+        return getFraction(originalGeometry, snappedPoint.getCoordinate());
     }
 
-    private Point calculateSnappedPoint(Coordinate currentCoordinate, Coordinate nextCoordinate) {
-        final Coordinate[] subGeometryCoordinates = {currentCoordinate, nextCoordinate};
-        final LineString subGeometry = geometryFactory.createLineString(subGeometryCoordinates);
+    private Point calculateSnappedPoint(LineString subGeometry) {
         final LocationIndexedLine lineIndex = new LocationIndexedLine(subGeometry);
         final LinearLocation snappedPointLinearLocation = lineIndex.project(inputPoint.getCoordinate());
-        final Point snappedPoint = geometryFactory
+        return geometryFactory
                 .createPoint(lineIndex.extractPoint(snappedPointLinearLocation));
-        return snappedPoint;
     }
 
-    private boolean bearingIsInRange(double convertedBearing) {
-        return convertedBearing >= inputMinBearing && convertedBearing <= inputMaxBearing;
+    boolean bearingIsInRange(double convertedBearing) {
+        double minBearingStandardised = inputMinBearing % MAX_BEARING;
+        double maxBearingStandardised = inputMaxBearing % MAX_BEARING;
+        if (minBearingStandardised > maxBearingStandardised) {
+            return (convertedBearing >= minBearingStandardised && convertedBearing <= MAX_BEARING) || (
+                    convertedBearing >= MIN_BEARING && convertedBearing <= maxBearingStandardised);
+
+        } else {
+            return convertedBearing >= minBearingStandardised && convertedBearing <= maxBearingStandardised;
+        }
     }
 
     private double calculateBearing(Coordinate currentCoordinate, Coordinate nextCoordinate) {
-        calculator.setStartingGeographicPoint(currentCoordinate.getX(),
+        geodeticCalculator.setStartingGeographicPoint(currentCoordinate.getX(),
                 currentCoordinate.getY());
-        calculator.setDestinationGeographicPoint(nextCoordinate.getX(),
+        geodeticCalculator.setDestinationGeographicPoint(nextCoordinate.getX(),
                 nextCoordinate.getY());
-        double bearing = calculator.getAzimuth();
-        double convertedBearing = bearing < 0.0 ? bearing + 360 : bearing;
-        return convertedBearing;
+        final double bearing = geodeticCalculator.getAzimuth();
+        return bearing < 0.0 ? bearing + MAX_BEARING : bearing;
     }
 
-    /*
-     * https://gis.stackexchange.com/questions/231750/geotools-calculate-length-along-line-from-start-vertex-up-to-some-point-on-the
-     * */
-    private static double getLengthAlongLineString(LineString line, Coordinate coordinate) {
-        LocationIndexedLine locationIndexedLine = new LocationIndexedLine(line);
-        LinearLocation location = locationIndexedLine.project(coordinate);
-        return new LengthLocationMap(line).getLength(location);
+    private double getFraction(LineString line, Coordinate coordinate) {
+        final LocationIndexedLine locationIndexedLine = new LocationIndexedLine(line);
+        final LinearLocation snappedPointLocation = locationIndexedLine.indexOf(coordinate);
+        final Iterator<Coordinate> pointList = Arrays.asList(line.getCoordinates()).iterator();
+        Coordinate previous = pointList.next();
+        double sumOfPathLengths = 0D;
+        Double pathDistanceToSnappedPoint = null;
+        while (pointList.hasNext()) {
+            Coordinate current = pointList.next();
+            final LinearLocation previousIndex = locationIndexedLine.indexOf(previous);
+            if (snappedPointLocation.getSegmentIndex() == previousIndex.getSegmentIndex()) {
+                final double previousToSnappedPointDistance = calculateDistance(coordinate, previous);
+                pathDistanceToSnappedPoint = sumOfPathLengths + previousToSnappedPointDistance;
+            }
+            sumOfPathLengths += calculateDistance(previous, current);
+            // Prepare for next loop
+            previous = current;
+        }
+        if (pathDistanceToSnappedPoint == null) {
+            throw new IllegalStateException("Failed to find path distance to snapped point");
+        }
+        double fraction = pathDistanceToSnappedPoint / sumOfPathLengths;
+        if (travelDirection == TravelDirection.REVERSED) {
+            log.trace("Reverse travel direction. Fraction will be inverted.");
+            fraction = 1D - fraction;
+        }
+        log.trace("Total (geometrical) edge length: {}, snapped point path length {}. Fraction: {}", sumOfPathLengths,
+                pathDistanceToSnappedPoint, fraction);
+        return fraction;
+    }
+
+    private double calculateDistance(Coordinate from, Coordinate to) {
+        geodeticCalculator.setStartingGeographicPoint(to
+                        .getX(),
+                to.getY());
+        geodeticCalculator.setDestinationGeographicPoint(from.getX(), from.getY());
+        return geodeticCalculator.getOrthodromicDistance();
     }
 
 }
