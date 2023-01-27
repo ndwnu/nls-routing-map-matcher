@@ -1,4 +1,4 @@
-package nu.ndw.nls.routingmapmatcher.graphhopper.model;
+package nu.ndw.nls.routingmapmatcher.graphhopper.singlepoint;
 
 import com.graphhopper.storage.IntsRef;
 import com.graphhopper.storage.index.QueryResult;
@@ -6,71 +6,51 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
-import lombok.Builder;
-import lombok.SneakyThrows;
-import lombok.Value;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import nu.ndw.nls.routingmapmatcher.constants.GlobalConstants;
 import nu.ndw.nls.routingmapmatcher.graphhopper.LinkFlagEncoder;
+import nu.ndw.nls.routingmapmatcher.graphhopper.model.MatchedPoint;
+import nu.ndw.nls.routingmapmatcher.graphhopper.model.MatchedQueryResult;
+import nu.ndw.nls.routingmapmatcher.graphhopper.model.TravelDirection;
 import org.geotools.referencing.GeodeticCalculator;
 import org.locationtech.jts.geom.Coordinate;
-import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.LineString;
 import org.locationtech.jts.geom.Point;
-import org.locationtech.jts.geom.PrecisionModel;
 import org.locationtech.jts.linearref.LinearLocation;
 import org.locationtech.jts.linearref.LocationIndexedLine;
 
-@Value
-@Builder(toBuilder = true)
+@RequiredArgsConstructor
 @Slf4j
-public class QueryResultWithBearing {
+public class PointMatchingService {
 
-    public static final int MAX_BEARING = 360;
-    public static final int MIN_BEARING = 0;
-    Point inputPoint;
-    Double inputMinBearing;
-    Double inputMaxBearing;
-    QueryResult queryResult;
-    TravelDirection travelDirection;
-    Geometry cutoffGeometry;
-    @Builder.Default
-    List<MatchedLineSegment> matchedLineSegments = new ArrayList<>();
-    @Builder.Default
-    GeometryFactory geometryFactory = new GeometryFactory(new PrecisionModel(),
-            GlobalConstants.WGS84_SRID);
+    private static final int MAX_BEARING = 360;
+    private static final int MIN_BEARING = 0;
+    public static final int ALL_NODES = 3;
+    private final GeometryFactory geometryFactory;
 
-    LinkFlagEncoder flagEncoder;
+    private final LinkFlagEncoder flagEncoder;
 
-    @Builder.Default
-    GeodeticCalculator geodeticCalculator = new GeodeticCalculator();
-
-    @Value
-    @Builder
-    public static class MatchedLineSegment {
-
-        int matchedLinkId;
-        LineString subGeometry;
-        Point snappedPoint;
-        Double distanceToSnappedPoint;
-        Double fractionOfSnappedPoint;
+    private final GeodeticCalculator geodeticCalculator;
 
 
-    }
-
-    @SneakyThrows
-    public QueryResultWithBearing calculateMatchedBearings() {
-        final Coordinate[] coordinates = cutoffGeometry.getCoordinates();
+    List<MatchedPoint> calculateMatches(MatchedQueryResult matchedQueryResult) {
+        final List<MatchedPoint> matchedPoints = new ArrayList<>();
+        final Coordinate[] coordinates = matchedQueryResult.getCutoffGeometry().getCoordinates();
+        final Point inputPoint = matchedQueryResult.getInputPoint();
+        final double minInputBearing = matchedQueryResult.getInputMinBearing();
+        final double maxOutputBearing = matchedQueryResult.getInputMaxBearing();
+        final QueryResult queryResult = matchedQueryResult.getQueryResult();
+        final TravelDirection travelDirection = matchedQueryResult.getTravelDirection();
         List<LineString> subGeometries = new ArrayList<>();
         List<Coordinate> partialGeometry = new ArrayList<>();
         boolean lastBoundaryDetected;
-        var it = Arrays.asList(coordinates).iterator();
-        Coordinate currentCoordinate = it.next();
-        while (it.hasNext()) {
-            final Coordinate nextCoordinate = it.next();
+        var coordinateIterator = Arrays.asList(coordinates).iterator();
+        Coordinate currentCoordinate = coordinateIterator.next();
+        while (coordinateIterator.hasNext()) {
+            final Coordinate nextCoordinate = coordinateIterator.next();
             double convertedBearing = calculateBearing(currentCoordinate, nextCoordinate);
-            if (bearingIsInRange(convertedBearing)) {
+            if (bearingIsInRange(convertedBearing, minInputBearing, maxOutputBearing)) {
                 partialGeometry.add(currentCoordinate);
                 partialGeometry.add(nextCoordinate);
                 lastBoundaryDetected = false;
@@ -80,7 +60,7 @@ public class QueryResultWithBearing {
                         .createLineString(partialGeometry.toArray(Coordinate[]::new)));
                 partialGeometry = new ArrayList<>();
             }
-            if (!it.hasNext() && !lastBoundaryDetected) {
+            if (!coordinateIterator.hasNext() && !lastBoundaryDetected) {
                 subGeometries.add(geometryFactory
                         .createLineString(partialGeometry.toArray(Coordinate[]::new)));
             }
@@ -88,16 +68,15 @@ public class QueryResultWithBearing {
             currentCoordinate = nextCoordinate;
             log.info("Segment [{} -> {}]. bearing is: {}", currentCoordinate, nextCoordinate, convertedBearing);
         }
-
         subGeometries.forEach(l -> {
-                    final Point snappedPoint = calculateSnappedPoint(l);
-                    final double fraction = calculateFraction(snappedPoint);
+                    final Point snappedPoint = calculateSnappedPoint(l, inputPoint);
+                    final double fraction = calculateFraction(snappedPoint, queryResult, travelDirection);
                     final IntsRef flags = queryResult.getClosestEdge().getFlags();
                     final int matchedLinkId = flagEncoder.getId(flags);
                     final double distanceToSnappedPoint = calculateDistance(inputPoint.getCoordinate(),
                             snappedPoint.getCoordinate());
 
-                    final MatchedLineSegment lineSegmentBearing = MatchedLineSegment
+                    final MatchedPoint lineSegmentBearing = MatchedPoint
                             .builder()
                             .matchedLinkId(matchedLinkId)
                             .fractionOfSnappedPoint(fraction)
@@ -105,29 +84,28 @@ public class QueryResultWithBearing {
                             .snappedPoint(snappedPoint)
                             .build();
 
-                    matchedLineSegments.add(lineSegmentBearing);
+                    matchedPoints.add(lineSegmentBearing);
                 }
         );
-
-        return this;
+        return matchedPoints;
     }
 
-    private double calculateFraction(Point snappedPoint) {
+    private double calculateFraction(Point snappedPoint, QueryResult queryResult, TravelDirection travelDirection) {
         final LineString originalGeometry = queryResult
                 .getClosestEdge()
-                .fetchWayGeometry(3)
+                .fetchWayGeometry(ALL_NODES)
                 .toLineString(false);
-        return getFraction(originalGeometry, snappedPoint.getCoordinate());
+        return getFraction(originalGeometry, snappedPoint.getCoordinate(), travelDirection);
     }
 
-    private Point calculateSnappedPoint(LineString subGeometry) {
+    private Point calculateSnappedPoint(LineString subGeometry, Point inputPoint) {
         final LocationIndexedLine lineIndex = new LocationIndexedLine(subGeometry);
         final LinearLocation snappedPointLinearLocation = lineIndex.project(inputPoint.getCoordinate());
         return geometryFactory
                 .createPoint(lineIndex.extractPoint(snappedPointLinearLocation));
     }
 
-    boolean bearingIsInRange(double convertedBearing) {
+    boolean bearingIsInRange(double convertedBearing, double inputMinBearing, double inputMaxBearing) {
         double minBearingStandardised = inputMinBearing % MAX_BEARING;
         double maxBearingStandardised = inputMaxBearing % MAX_BEARING;
         if (minBearingStandardised > maxBearingStandardised) {
@@ -148,7 +126,7 @@ public class QueryResultWithBearing {
         return bearing < 0.0 ? bearing + MAX_BEARING : bearing;
     }
 
-    private double getFraction(LineString line, Coordinate coordinate) {
+    private double getFraction(LineString line, Coordinate coordinate, TravelDirection travelDirection) {
         final LocationIndexedLine locationIndexedLine = new LocationIndexedLine(line);
         final LinearLocation snappedPointLocation = locationIndexedLine.indexOf(coordinate);
         final Iterator<Coordinate> pointList = Arrays.asList(line.getCoordinates()).iterator();
