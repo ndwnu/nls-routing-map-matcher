@@ -1,6 +1,7 @@
 package nu.ndw.nls.routingmapmatcher.graphhopper.singlepoint;
 
 import static java.util.Comparator.comparing;
+import static nu.ndw.nls.routingmapmatcher.graphhopper.util.MatchUtil.getQueryResults;
 import static nu.ndw.nls.routingmapmatcher.graphhopper.util.PathUtil.determineEdgeDirection;
 
 import com.google.common.base.Preconditions;
@@ -17,7 +18,6 @@ import com.graphhopper.util.DistanceCalc;
 import com.graphhopper.util.DistanceCalcEarth;
 import com.graphhopper.util.PointList;
 import com.graphhopper.util.shapes.GHPoint3D;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
@@ -50,7 +50,7 @@ public class GraphHopperSinglePointMapMatcher implements SinglePointMapMatcher {
     /**
      * Only search for candidates within this distance.
      */
-    private static final double MAXIMUM_CANDIDATE_DISTANCE_IN_METERS = 20.0;
+    private static final double DEFAULT_MAXIMUM_CANDIDATE_DISTANCE_IN_METERS = 20.0;
 
     /**
      * Distances returned by GraphHopper contain floating point errors compared to the source data, so a delta needs to
@@ -61,10 +61,11 @@ public class GraphHopperSinglePointMapMatcher implements SinglePointMapMatcher {
     private static final int NUM_POINTS = 100;
     private static final int MAX_RELIABILITY_SCORE = 100;
 
-    // Length in meters of 1° of latitude = always 111.32 km
-    public static final double DEGREE_LATITUDE_IN_KM = 111320d;
-    public static final int ALL_NODES = 3;
-    public static final boolean INCLUDE_ELEVATION = false;
+    private static final double DEGREE_LATITUDE_IN_KM = 111320d;
+    private static final int ALL_NODES = 3;
+    private static final boolean INCLUDE_ELEVATION = false;
+    private static final int EARTH_CIRCUMFERENCE = 40075000;
+    private static final int CIRCLE_DEGREES = 360;
 
     private final LinkFlagEncoder flagEncoder;
     private final LocationIndexTree locationIndexTree;
@@ -99,18 +100,15 @@ public class GraphHopperSinglePointMapMatcher implements SinglePointMapMatcher {
     @Override
     public SinglePointMatch match(final SinglePointLocation singlePointLocation) {
         Preconditions.checkNotNull(singlePointLocation);
-
-        Double inputRadius = singlePointLocation.getRadius() != null ?
+        final double inputRadius = singlePointLocation.getRadius() != null ?
                 singlePointLocation.getRadius()
-                : MAXIMUM_CANDIDATE_DISTANCE_IN_METERS;
-
+                : DEFAULT_MAXIMUM_CANDIDATE_DISTANCE_IN_METERS;
         final List<QueryResult> queryResults = findCandidates(singlePointLocation.getPoint(), inputRadius);
-
         final SinglePointMatch match;
         if (queryResults.isEmpty()) {
             match = createFailedMatch(singlePointLocation);
         } else {
-            match = createMatch(queryResults, singlePointLocation);
+            match = createMatch(queryResults, singlePointLocation, inputRadius);
         }
 
         return match;
@@ -119,14 +117,12 @@ public class GraphHopperSinglePointMapMatcher implements SinglePointMapMatcher {
     @Override
     public SinglePointMatch matchWithBearing(SinglePointLocationWithBearing singlePointLocationWithBearing) {
         Preconditions.checkNotNull(singlePointLocationWithBearing);
-
-        Point inputPoint = singlePointLocationWithBearing.getPoint();
-        Double inputRadius = singlePointLocationWithBearing.getRadius() != null ?
+        final Point inputPoint = singlePointLocationWithBearing.getPoint();
+        final double inputRadius = singlePointLocationWithBearing.getRadius() != null ?
                 singlePointLocationWithBearing.getRadius()
-                : MAXIMUM_CANDIDATE_DISTANCE_IN_METERS;
-        Double inputMinBearing = singlePointLocationWithBearing.getMinBearing();
-        Double inputMaxBearing = singlePointLocationWithBearing.getMaxBearing();
-
+                : DEFAULT_MAXIMUM_CANDIDATE_DISTANCE_IN_METERS;
+        final Double inputMinBearing = singlePointLocationWithBearing.getMinBearing();
+        final Double inputMaxBearing = singlePointLocationWithBearing.getMaxBearing();
         final List<QueryResult> result = findCandidates(inputPoint, inputRadius);
         final Polygon circle = createCircle(inputPoint, inputRadius);
         // Crop geometry to only include segments in search radius
@@ -165,8 +161,8 @@ public class GraphHopperSinglePointMapMatcher implements SinglePointMapMatcher {
                 .collect(Collectors.toList());
         final double closestDistance = filteredResults.stream()
                 .mapToDouble(MatchedPoint::getDistanceToSnappedPoint).min()
-                .orElse(MAXIMUM_CANDIDATE_DISTANCE_IN_METERS);
-        final double reliability = calculateReliability(closestDistance);
+                .orElse(DEFAULT_MAXIMUM_CANDIDATE_DISTANCE_IN_METERS);
+        final double reliability = calculateReliability(closestDistance, inputRadius);
         return new SinglePointMatch(singlePointLocationWithBearing.getId(),
                 candidateMatches,
                 reliability, MatchStatus.MATCH);
@@ -183,32 +179,21 @@ public class GraphHopperSinglePointMapMatcher implements SinglePointMapMatcher {
         shapeFactory.setCentre(new Coordinate(point.getX(), point.getY()));
         shapeFactory.setNumPoints(NUM_POINTS);
         shapeFactory.setWidth(distanceInMeters / DEGREE_LATITUDE_IN_KM);
-        shapeFactory.setHeight(distanceInMeters / (40075000 * Math.cos(Math.toRadians(point.getX())) / 360));
+        shapeFactory.setHeight(
+                distanceInMeters / (EARTH_CIRCUMFERENCE * Math.cos(Math.toRadians(point.getX())) / CIRCLE_DEGREES));
         return shapeFactory.createEllipse();
     }
 
     private List<QueryResult> findCandidates(final Point point, double radius) {
-        final double latitude = point.getY();
-        final double longitude = point.getX();
-
-        final List<QueryResult> queryResults = locationIndexTree.findNClosest(latitude, longitude, edgeFilter,
-                radius);
-        final List<QueryResult> candidates = new ArrayList<>(queryResults.size());
-
-        for (final QueryResult queryResult : queryResults) {
-            if (queryResult.getQueryDistance() <= radius) {
-                candidates.add(queryResult);
-            }
-        }
-
-        return candidates;
+        return getQueryResults(point, radius, locationIndexTree, edgeFilter);
     }
 
+
     private SinglePointMatch createMatch(final List<QueryResult> queryResults,
-            final SinglePointLocation singlePointLocation) {
+            final SinglePointLocation singlePointLocation, double inputRadius) {
         final List<SinglePointMatch.CandidateMatch> candidateMatches = Lists.newArrayList();
         final double closestDistance = queryResults.stream().mapToDouble(QueryResult::getQueryDistance).min()
-                .orElse(MAXIMUM_CANDIDATE_DISTANCE_IN_METERS);
+                .orElse(DEFAULT_MAXIMUM_CANDIDATE_DISTANCE_IN_METERS);
 
         if (singlePointLocation.getUpstreamIsochroneUnit() != null ||
                 singlePointLocation.getDownstreamIsochroneUnit() != null) {
@@ -237,12 +222,12 @@ public class GraphHopperSinglePointMapMatcher implements SinglePointMapMatcher {
             }
         }
 
-        final double reliability = calculateReliability(closestDistance);
+        final double reliability = calculateReliability(closestDistance, inputRadius);
         return new SinglePointMatch(singlePointLocation.getId(), candidateMatches, reliability, MatchStatus.MATCH);
     }
 
-    private static double calculateReliability(double closestDistance) {
-        return (1 - closestDistance / MAXIMUM_CANDIDATE_DISTANCE_IN_METERS) * MAX_RELIABILITY_SCORE;
+    private static double calculateReliability(double closestDistance, double radius) {
+        return (1 - closestDistance / radius) * MAX_RELIABILITY_SCORE;
     }
 
     private SinglePointMatch createFailedMatch(final SinglePointLocation singlePointLocation) {
