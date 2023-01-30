@@ -69,17 +69,7 @@ class PointMatchingServiceTest {
 
     @BeforeEach
     void setup() {
-        //input   POINT (5.426747 52.176663)
-        // snapped POINT (5.426768463894968 52.176694564551426)
-        // 5.42633527,52.17700763
-        //getCutoffGeometry().reverse()
-        // LINESTRING (5.426884 52.176616, 5.426759 52.176701, 5.426408 52.176953)
-        //LINESTRING (5.426884 52.176616, 5.426759 52.176701, 5.426408 52.176953)
 
-        /// one 5.42670562,52.17673626
-        // two 5.42671260,52.17666639
-        // three 5.42676011,52.17669155
-        // four 5.42683114,52.17664148
         pointMatchingService = new PointMatchingService(geometryFactory, flagEncoder, geodeticCalculator);
     }
 
@@ -183,6 +173,29 @@ class PointMatchingServiceTest {
                 .build();
         var matches = pointMatchingService.calculateMatches(request);
         assertThat(matches).hasSize(0);
+    }
+
+    private void createCutOffGeometryForNonLinearGeometry() {
+        /*  non-linear geometry
+        5.42684917,52.17661869
+        5.42682052,52.17663048
+        5.42681463,52.17665913
+        5.42679104,52.17667092
+        5.42676155,52.17665323
+        5.42675986,52.17669198
+        5.42672195,52.17669114
+        5.42672869,52.17670967
+        5.42670342,52.17673579
+
+5.42665413,52.17673958
+       */
+
+
+        var cutoffCoordinates = new Coordinate[]{
+                new Coordinate(5.42684917,52.17661869),
+                new Coordinate(5.42682052,52.17663048),
+                CUTOFF_COORDINATE_3};
+        cutoffGeometry = geometryFactory.createLineString(cutoffCoordinates);
     }
 
     private void createCutOffGeometryForStraightLine() {
