@@ -26,7 +26,7 @@ public class PointMatchingService {
 
     private static final int MAX_BEARING = 360;
     private static final int MIN_BEARING = 0;
-    public static final int ALL_NODES = 3;
+    private static final int ALL_NODES = 3;
     private final GeometryFactory geometryFactory;
 
     private final LinkFlagEncoder flagEncoder;
@@ -34,14 +34,61 @@ public class PointMatchingService {
     private final GeodeticCalculator geodeticCalculator;
 
 
-    List<MatchedPoint> calculateMatches(MatchedQueryResult matchedQueryResult) {
+    public List<MatchedPoint> calculateMatches(MatchedQueryResult matchedQueryResult) {
         final List<MatchedPoint> matchedPoints = new ArrayList<>();
         final Coordinate[] coordinates = matchedQueryResult.getCutoffGeometry().getCoordinates();
+        final Coordinate[] coordinatesReversed = matchedQueryResult.getCutoffGeometry().reverse().getCoordinates();
         final Point inputPoint = matchedQueryResult.getInputPoint();
-        final double minInputBearing = matchedQueryResult.getInputMinBearing();
-        final double maxOutputBearing = matchedQueryResult.getInputMaxBearing();
+        final Double minInputBearing = matchedQueryResult.getInputMinBearing();
+        final Double maxInputBearing = matchedQueryResult.getInputMaxBearing();
         final QueryResult queryResult = matchedQueryResult.getQueryResult();
         final TravelDirection travelDirection = matchedQueryResult.getTravelDirection();
+
+        createAggregatedSubGeometries(coordinates, minInputBearing, maxInputBearing)
+                .forEach(lineString -> {
+                            final MatchedPoint lineSegmentBearing = createMatchedPoint(inputPoint,
+                                    queryResult, travelDirection, lineString);
+                            matchedPoints.add(lineSegmentBearing);
+                        }
+                );
+
+        if (travelDirection == TravelDirection.BOTH_DIRECTIONS) {
+            createAggregatedSubGeometries(coordinatesReversed, minInputBearing, maxInputBearing)
+                    .forEach(lineString -> {
+                                final MatchedPoint lineSegmentBearing = createMatchedPoint(inputPoint,
+                                        queryResult,
+                                        TravelDirection.REVERSED,
+                                        lineString);
+                                matchedPoints.add(lineSegmentBearing);
+                            }
+
+                    );
+        }
+        return matchedPoints;
+    }
+
+    private MatchedPoint createMatchedPoint(Point inputPoint,
+            QueryResult queryResult,
+            TravelDirection travelDirection,
+            LineString aggregatedGeometry) {
+        final Point snappedPoint = calculateSnappedPoint(aggregatedGeometry, inputPoint);
+        final double fraction = calculateFraction(snappedPoint, queryResult, travelDirection);
+        final IntsRef flags = queryResult.getClosestEdge().getFlags();
+        final int matchedLinkId = flagEncoder.getId(flags);
+        final double distanceToSnappedPoint = calculateDistance(inputPoint.getCoordinate(),
+                snappedPoint.getCoordinate());
+        return MatchedPoint
+                .builder()
+                .reversed(TravelDirection.REVERSED == travelDirection)
+                .matchedLinkId(matchedLinkId)
+                .fractionOfSnappedPoint(fraction)
+                .distanceToSnappedPoint(distanceToSnappedPoint)
+                .snappedPoint(snappedPoint)
+                .build();
+    }
+
+    private List<LineString> createAggregatedSubGeometries(Coordinate[] coordinates, Double minInputBearing,
+            Double maxInputBearing) {
         List<LineString> subGeometries = new ArrayList<>();
         List<Coordinate> partialGeometry = new ArrayList<>();
         boolean lastBoundaryDetected;
@@ -50,44 +97,31 @@ public class PointMatchingService {
         while (coordinateIterator.hasNext()) {
             final Coordinate nextCoordinate = coordinateIterator.next();
             double convertedBearing = calculateBearing(currentCoordinate, nextCoordinate);
-            if (bearingIsInRange(convertedBearing, minInputBearing, maxOutputBearing)) {
+            //While bearing is in range add coordinates to partialGeometry
+            if (bearingIsInRange(convertedBearing, minInputBearing, maxInputBearing)) {
                 partialGeometry.add(currentCoordinate);
                 partialGeometry.add(nextCoordinate);
                 lastBoundaryDetected = false;
             } else {
+                //Bearing is out of range add result to subGeometries and reinitialize
                 lastBoundaryDetected = true;
-                subGeometries.add(geometryFactory
-                        .createLineString(partialGeometry.toArray(Coordinate[]::new)));
-                partialGeometry = new ArrayList<>();
-            }
-            if (!coordinateIterator.hasNext() && !lastBoundaryDetected) {
-                subGeometries.add(geometryFactory
-                        .createLineString(partialGeometry.toArray(Coordinate[]::new)));
-            }
-
-            currentCoordinate = nextCoordinate;
-            log.info("Segment [{} -> {}]. bearing is: {}", currentCoordinate, nextCoordinate, convertedBearing);
-        }
-        subGeometries.forEach(l -> {
-                    final Point snappedPoint = calculateSnappedPoint(l, inputPoint);
-                    final double fraction = calculateFraction(snappedPoint, queryResult, travelDirection);
-                    final IntsRef flags = queryResult.getClosestEdge().getFlags();
-                    final int matchedLinkId = flagEncoder.getId(flags);
-                    final double distanceToSnappedPoint = calculateDistance(inputPoint.getCoordinate(),
-                            snappedPoint.getCoordinate());
-
-                    final MatchedPoint lineSegmentBearing = MatchedPoint
-                            .builder()
-                            .matchedLinkId(matchedLinkId)
-                            .fractionOfSnappedPoint(fraction)
-                            .distanceToSnappedPoint(distanceToSnappedPoint)
-                            .snappedPoint(snappedPoint)
-                            .build();
-
-                    matchedPoints.add(lineSegmentBearing);
+                if (!partialGeometry.isEmpty()) {
+                    subGeometries.add(geometryFactory
+                            .createLineString(partialGeometry.toArray(Coordinate[]::new)));
+                    partialGeometry = new ArrayList<>();
                 }
-        );
-        return matchedPoints;
+            }
+            // Stop condition last coordinate add partialGeometry if present
+            if (!coordinateIterator.hasNext() && !lastBoundaryDetected) {
+                if (!partialGeometry.isEmpty()) {
+                    subGeometries.add(geometryFactory
+                            .createLineString(partialGeometry.toArray(Coordinate[]::new)));
+                }
+            }
+            currentCoordinate = nextCoordinate;
+            log.debug("Segment [{} -> {}]. bearing is: {}", currentCoordinate, nextCoordinate, convertedBearing);
+        }
+        return subGeometries;
     }
 
     private double calculateFraction(Point snappedPoint, QueryResult queryResult, TravelDirection travelDirection) {
@@ -105,7 +139,11 @@ public class PointMatchingService {
                 .createPoint(lineIndex.extractPoint(snappedPointLinearLocation));
     }
 
-    boolean bearingIsInRange(double convertedBearing, double inputMinBearing, double inputMaxBearing) {
+    private boolean bearingIsInRange(double convertedBearing, Double inputMinBearing, Double inputMaxBearing) {
+        // If no bearing is provided return true
+        if (inputMinBearing == null && inputMaxBearing == null) {
+            return true;
+        }
         double minBearingStandardised = inputMinBearing % MAX_BEARING;
         double maxBearingStandardised = inputMaxBearing % MAX_BEARING;
         if (minBearingStandardised > maxBearingStandardised) {

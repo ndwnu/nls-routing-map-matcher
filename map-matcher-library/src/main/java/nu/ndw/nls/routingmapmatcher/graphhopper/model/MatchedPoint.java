@@ -9,6 +9,7 @@ import org.locationtech.jts.geom.Point;
 public class MatchedPoint {
     int matchedLinkId;
     Point snappedPoint;
+    boolean reversed;
     Double distanceToSnappedPoint;
     Double fractionOfSnappedPoint;
 }
