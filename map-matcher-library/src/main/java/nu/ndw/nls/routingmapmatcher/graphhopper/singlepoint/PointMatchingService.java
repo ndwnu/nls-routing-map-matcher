@@ -25,7 +25,6 @@ import org.locationtech.jts.linearref.LocationIndexedLine;
 public class PointMatchingService {
 
     private static final int MAX_BEARING = 360;
-    private static final int MIN_BEARING = 0;
     private static final int ALL_NODES = 3;
     private final GeometryFactory geometryFactory;
 
@@ -145,8 +144,7 @@ public class PointMatchingService {
         double minBearingStandardised = inputMinBearing % MAX_BEARING;
         double maxBearingStandardised = inputMaxBearing % MAX_BEARING;
         if (minBearingStandardised > maxBearingStandardised) {
-            return (convertedBearing >= minBearingStandardised && convertedBearing <= MAX_BEARING) || (
-                    convertedBearing >= MIN_BEARING && convertedBearing <= maxBearingStandardised);
+            return convertedBearing >= minBearingStandardised || convertedBearing <= maxBearingStandardised;
 
         } else {
             return convertedBearing >= minBearingStandardised && convertedBearing <= maxBearingStandardised;

@@ -2,6 +2,7 @@ package nu.ndw.nls.routingmapmatcher.graphhopper.singlepoint;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.is;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -14,6 +15,7 @@ import nu.ndw.nls.routingmapmatcher.domain.model.Link;
 import nu.ndw.nls.routingmapmatcher.domain.model.RoutingNetwork;
 import nu.ndw.nls.routingmapmatcher.domain.model.singlepoint.SinglePointLocationWithBearing;
 import nu.ndw.nls.routingmapmatcher.domain.model.singlepoint.SinglePointMatch;
+import nu.ndw.nls.routingmapmatcher.domain.model.singlepoint.SinglePointMatch.CandidateMatch;
 import nu.ndw.nls.routingmapmatcher.graphhopper.NetworkGraphHopperFactory;
 import nu.ndw.nls.routingmapmatcher.graphhopper.viterbi.LinkDeserializer;
 import org.apache.commons.io.IOUtils;
@@ -58,5 +60,9 @@ public class SinglePointMapMatcherWithBearingIT {
                 310.0, 320.0, 20.0);
         SinglePointMatch result = singlePointMapMatcher.matchWithBearing(request);
         assertThat(result.getCandidateMatches(), hasSize(1));
+        CandidateMatch match = result.getCandidateMatches().get(0);
+        //POINT (5.426768463894968 52.176694564551426)
+        assertThat(match.getMatchedLinkId(),is(3667044));
+        assertThat(match.getSnappedPoint().getX(),is(3667044));
     }
 }
