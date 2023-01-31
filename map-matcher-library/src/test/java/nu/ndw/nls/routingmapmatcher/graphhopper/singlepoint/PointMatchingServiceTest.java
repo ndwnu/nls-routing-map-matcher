@@ -28,31 +28,31 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
 class PointMatchingServiceTest {
-
-    private static final Coordinate CUTOFF_COORDINATE_1 = new Coordinate(5.4268356764862355, 52.17664885998936);
-    private static final Coordinate CUTOFF_COORDINATE_2 = new Coordinate(5.426759, 52.176701);
-    private static final Coordinate CUTOFF_COORDINATE_3 = new Coordinate(5.426702665042876, 52.17674144561025);
-    private static final Coordinate ORIGINAL_COORDINATE_1 = new Coordinate(5.426884, 52.176616);
-    private static final Coordinate ORIGINAL_COORDINATE_2 = new Coordinate(5.426759, 52.176701);
-    private static final Coordinate ORIGINAL_COORDINATE_3 = new Coordinate(5.426408, 52.176953);
-    private static final Coordinate INPUT_POINT_COORDINATE = new Coordinate(5.426747, 52.176663);
     private static final int ID = 1;
     private static final double SNAPPED_POINT_X = 5.426768463894968;
     private static final double SNAPPED_POINT_Y = 52.176694564551426;
     private static final double DISTANCE = 3.8067685587693947;
     private static final double FRACTION = 0.2372848571472417;
     private static final double FRACTION_REVERSED = 0.7627151428527583;
+    private static final double SNAPPED_POINT_X_ZIG_ZAG = 5.42678346;
+    private static final double SNAPPED_POINT_Y_ZIG_ZAG = 52.17667896;
+    private static final double DISTANCE_ZIG_ZAG = 3.061770997311956;
+    private static final double FRACTION_ZIG_ZAG = 0.315843722882771;
+    private static final Coordinate INPUT_POINT_COORDINATE = new Coordinate(5.426747, 52.176663);
+    private static final Coordinate CUTOFF_COORDINATE_1 = new Coordinate(5.4268356764862355, 52.17664885998936);
+    private static final Coordinate CUTOFF_COORDINATE_2 = new Coordinate(5.426759, 52.176701);
+    private static final Coordinate CUTOFF_COORDINATE_3 = new Coordinate(5.426702665042876, 52.17674144561025);
+    private static final Coordinate ORIGINAL_COORDINATE_1 = new Coordinate(5.426884, 52.176616);
+    private static final Coordinate ORIGINAL_COORDINATE_2 = new Coordinate(5.426759, 52.176701);
+    private static final Coordinate ORIGINAL_COORDINATE_3 = new Coordinate(5.426408, 52.176953);
+
     private static final Coordinate ZIG_ZAG_COORDINATE_1 = new Coordinate(5.42685002, 52.17661785);
     private static final Coordinate ZIG_ZAG_COORDINATE_2 = new Coordinate(5.42683042, 52.17662641);
     private static final Coordinate ZIG_ZAG_COORDINATE_3 = new Coordinate(5.42682052, 52.17663048);
-
     private static final Coordinate ZIG_ZAG_COORDINATE_4 = new Coordinate(5.42681463, 52.17665913);
     private static final Coordinate ZIG_ZAG_COORDINATE_5 = new Coordinate(5.42679104, 52.17667092);
-    public static final double SNAPPED_POINT_X_ZIG_ZAG = 5.42678346;
-    public static final double SNAPPED_POINT_Y_ZIG_ZAG = 52.17667896;
     private static final Coordinate ZIG_ZAG_COORDINATE_6 = new Coordinate(SNAPPED_POINT_X_ZIG_ZAG,
             SNAPPED_POINT_Y_ZIG_ZAG);
-
     private static final Coordinate ZIG_ZAG_COORDINATE_7 = new Coordinate(5.42676155, 52.17665323);
     private static final Coordinate ZIG_ZAG_COORDINATE_8 = new Coordinate(5.42675986, 52.17669198);
     private static final Coordinate ZIG_ZAG_COORDINATE_9 = new Coordinate(5.42672195, 52.17669114);
@@ -60,8 +60,7 @@ class PointMatchingServiceTest {
     private static final Coordinate ZIG_ZAG_COORDINATE_11 = new Coordinate(5.42670342, 52.17673579);
     private static final Coordinate ZIG_ZAG_COORDINATE_12 = new Coordinate(5.42669635, 52.17673473);
     private static final Coordinate ZIG_ZAG_COORDINATE_13 = new Coordinate(5.42665413, 52.17673958);
-    public static final double DISTANCE_ZIG_ZAG = 3.061770997311956;
-    public static final double FRACTION_ZIG_ZAG = 0.315843722882771;
+
 
     @Mock
     private LinkFlagEncoder flagEncoder;
