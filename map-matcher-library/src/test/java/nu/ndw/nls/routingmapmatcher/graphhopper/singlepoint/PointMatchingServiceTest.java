@@ -1,5 +1,6 @@
 package nu.ndw.nls.routingmapmatcher.graphhopper.singlepoint;
 
+import static java.util.Comparator.comparing;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
 
@@ -7,8 +8,10 @@ import com.graphhopper.storage.IntsRef;
 import com.graphhopper.storage.index.QueryResult;
 import com.graphhopper.util.EdgeIteratorState;
 import com.graphhopper.util.PointList;
+import java.util.stream.Collectors;
 import nu.ndw.nls.routingmapmatcher.constants.GlobalConstants;
 import nu.ndw.nls.routingmapmatcher.graphhopper.LinkFlagEncoder;
+import nu.ndw.nls.routingmapmatcher.graphhopper.model.MatchedPoint;
 import nu.ndw.nls.routingmapmatcher.graphhopper.model.MatchedQueryResult;
 import nu.ndw.nls.routingmapmatcher.graphhopper.model.TravelDirection;
 import org.geotools.referencing.GeodeticCalculator;
@@ -27,18 +30,34 @@ import org.mockito.junit.jupiter.MockitoExtension;
 class PointMatchingServiceTest {
 
     private static final Coordinate CUTOFF_COORDINATE_1 = new Coordinate(5.4268356764862355, 52.17664885998936);
-    public static final Coordinate CUTOFF_COORDINATE_2 = new Coordinate(5.426759, 52.176701);
-    public static final Coordinate CUTOFF_COORDINATE_3 = new Coordinate(5.426702665042876, 52.17674144561025);
-    public static final Coordinate ORIGINAL_COORDINATE_1 = new Coordinate(5.426884, 52.176616);
-    public static final Coordinate ORIGINAL_COORDINATE_2 = new Coordinate(5.426759, 52.176701);
-    public static final Coordinate ORIGINAL_COORDINATE_3 = new Coordinate(5.426408, 52.176953);
-    public static final Coordinate INPUT_POINT_COORDINATE = new Coordinate(5.426747, 52.176663);
-    public static final int ID = 1;
-    public static final double SNAPPED_POINT_X = 5.426768463894968;
-    public static final double SNAPPED_POINT_Y = 52.176694564551426;
-    public static final double DISTANCE = 3.8067685587693947;
-    public static final double FRACTION = 0.2372848571472417;
-    public static final double FRACTION_REVERSED = 0.7627151428527583;
+    private static final Coordinate CUTOFF_COORDINATE_2 = new Coordinate(5.426759, 52.176701);
+    private static final Coordinate CUTOFF_COORDINATE_3 = new Coordinate(5.426702665042876, 52.17674144561025);
+    private static final Coordinate ORIGINAL_COORDINATE_1 = new Coordinate(5.426884, 52.176616);
+    private static final Coordinate ORIGINAL_COORDINATE_2 = new Coordinate(5.426759, 52.176701);
+    private static final Coordinate ORIGINAL_COORDINATE_3 = new Coordinate(5.426408, 52.176953);
+    private static final Coordinate INPUT_POINT_COORDINATE = new Coordinate(5.426747, 52.176663);
+    private static final int ID = 1;
+    private static final double SNAPPED_POINT_X = 5.426768463894968;
+    private static final double SNAPPED_POINT_Y = 52.176694564551426;
+    private static final double DISTANCE = 3.8067685587693947;
+    private static final double FRACTION = 0.2372848571472417;
+    private static final double FRACTION_REVERSED = 0.7627151428527583;
+    private static final Coordinate ZIG_ZAG_COORDINATE_1 = new Coordinate(5.42685002, 52.17661785);
+    private static final Coordinate ZIG_ZAG_COORDINATE_2 = new Coordinate(5.42683042,52.17662641);
+    private static final Coordinate ZIG_ZAG_COORDINATE_3 = new Coordinate(5.42682052, 52.17663048);
+
+    private static final Coordinate ZIG_ZAG_COORDINATE_4 = new Coordinate(5.42681463, 52.17665913);
+    private static final Coordinate ZIG_ZAG_COORDINATE_5 = new Coordinate(5.42679104, 52.17667092);
+    private static final Coordinate ZIG_ZAG_COORDINATE_6 = new Coordinate(5.42678346,52.17667896);
+
+    private static final Coordinate ZIG_ZAG_COORDINATE_7 = new Coordinate(5.42676155, 52.17665323);
+    private static final Coordinate ZIG_ZAG_COORDINATE_8 = new Coordinate(5.42675986, 52.17669198);
+    private static final Coordinate ZIG_ZAG_COORDINATE_9 = new Coordinate(5.42672195, 52.17669114);
+    private static final Coordinate ZIG_ZAG_COORDINATE_10 = new Coordinate(5.42672869, 52.17670967);
+    private static final Coordinate ZIG_ZAG_COORDINATE_11 = new Coordinate(5.42670342, 52.17673579);
+    private static final Coordinate ZIG_ZAG_COORDINATE_12 = new Coordinate(5.42669635,52.17673473);
+    private static final Coordinate ZIG_ZAG_COORDINATE_13 = new Coordinate(5.42665413, 52.17673958);
+
     @Mock
     private LinkFlagEncoder flagEncoder;
 
@@ -175,28 +194,73 @@ class PointMatchingServiceTest {
         assertThat(matches).hasSize(0);
     }
 
-    private void createCutOffGeometryForNonLinearGeometry() {
-        /*  non-linear geometry
-        5.42684917,52.17661869
-        5.42682052,52.17663048
-        5.42681463,52.17665913
-        5.42679104,52.17667092
-        5.42676155,52.17665323
-        5.42675986,52.17669198
-        5.42672195,52.17669114
-        5.42672869,52.17670967
-        5.42670342,52.17673579
+    @Test
+    void calculateMatches_with_zig_zag_line_should_produce_three_matches() {
+        createCutOffGeometryForZigzagLine();
+        LineString originalGeometry = createOriginalGeometryForZigZagLine();
+        setupFixtureForQueryResult(originalGeometry);
+        inputPoint = geometryFactory.createPoint(INPUT_POINT_COORDINATE);
+        var request = MatchedQueryResult
+                .builder()
+                .inputMinBearing(300.0)
+                .inputMaxBearing(330.0)
+                .queryResult(queryResult)
+                .inputPoint(inputPoint)
+                .cutoffGeometry(cutoffGeometry)
+                .travelDirection(TravelDirection.FORWARD)
+                .build();
+        var matches = pointMatchingService.calculateMatches(request)
+                .stream()
+                .sorted(comparing(MatchedPoint::getDistanceToSnappedPoint))
+                .collect(Collectors.toList());
+        assertThat(matches).hasSize(3);
+        var closestMatch = matches.get(0);
+        assertThat(closestMatch.getMatchedLinkId()).isEqualTo(ID);
+        assertThat(closestMatch.getSnappedPoint().getX()).isEqualTo(5.42678346);
+        assertThat(closestMatch.getSnappedPoint().getY()).isEqualTo(52.17667896);
+        assertThat(closestMatch.isReversed()).isEqualTo(false);
+        assertThat(closestMatch.getDistanceToSnappedPoint()).isEqualTo(3.061770997311956);
+        assertThat(closestMatch.getFractionOfSnappedPoint()).isEqualTo(0.315843722882771);
+       ///assertThat(closestMatch)
+    }
 
-5.42665413,52.17673958
-       */
-
+    private void createCutOffGeometryForZigzagLine() {
 
         var cutoffCoordinates = new Coordinate[]{
-                new Coordinate(5.42684917,52.17661869),
-                new Coordinate(5.42682052,52.17663048),
-                CUTOFF_COORDINATE_3};
+                ZIG_ZAG_COORDINATE_2,
+                ZIG_ZAG_COORDINATE_3,
+                ZIG_ZAG_COORDINATE_4,
+                ZIG_ZAG_COORDINATE_5,
+                ZIG_ZAG_COORDINATE_6,
+                ZIG_ZAG_COORDINATE_7,
+                ZIG_ZAG_COORDINATE_8,
+                ZIG_ZAG_COORDINATE_9,
+                ZIG_ZAG_COORDINATE_10,
+                ZIG_ZAG_COORDINATE_11,
+                ZIG_ZAG_COORDINATE_12
+
+        };
         cutoffGeometry = geometryFactory.createLineString(cutoffCoordinates);
     }
+
+    private LineString createOriginalGeometryForZigZagLine() {
+        var originalCoordinates = new Coordinate[]{
+                ZIG_ZAG_COORDINATE_1,
+                ZIG_ZAG_COORDINATE_2,
+                ZIG_ZAG_COORDINATE_3,
+                ZIG_ZAG_COORDINATE_4,
+                ZIG_ZAG_COORDINATE_5,
+                ZIG_ZAG_COORDINATE_6,
+                ZIG_ZAG_COORDINATE_7,
+                ZIG_ZAG_COORDINATE_8,
+                ZIG_ZAG_COORDINATE_9,
+                ZIG_ZAG_COORDINATE_10,
+                ZIG_ZAG_COORDINATE_11,
+                ZIG_ZAG_COORDINATE_13
+        };
+        return geometryFactory.createLineString(originalCoordinates);
+    }
+
 
     private void createCutOffGeometryForStraightLine() {
         var cutoffCoordinates = new Coordinate[]{

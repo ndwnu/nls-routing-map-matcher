@@ -91,7 +91,6 @@ public class PointMatchingService {
             Double maxInputBearing) {
         List<LineString> subGeometries = new ArrayList<>();
         List<Coordinate> partialGeometry = new ArrayList<>();
-        boolean lastBoundaryDetected;
         var coordinateIterator = Arrays.asList(coordinates).iterator();
         Coordinate currentCoordinate = coordinateIterator.next();
         while (coordinateIterator.hasNext()) {
@@ -101,25 +100,24 @@ public class PointMatchingService {
             if (bearingIsInRange(convertedBearing, minInputBearing, maxInputBearing)) {
                 partialGeometry.add(currentCoordinate);
                 partialGeometry.add(nextCoordinate);
-                lastBoundaryDetected = false;
+                // Stop condition last coordinate add partialGeometry if present
+                if (!coordinateIterator.hasNext()){
+                    subGeometries.add(geometryFactory
+                            .createLineString(partialGeometry.toArray(Coordinate[]::new)));
+                }
+
             } else {
                 //Bearing is out of range add result to subGeometries and reinitialize
-                lastBoundaryDetected = true;
                 if (!partialGeometry.isEmpty()) {
                     subGeometries.add(geometryFactory
                             .createLineString(partialGeometry.toArray(Coordinate[]::new)));
                     partialGeometry = new ArrayList<>();
                 }
             }
-            // Stop condition last coordinate add partialGeometry if present
-            if (!coordinateIterator.hasNext() && !lastBoundaryDetected) {
-                if (!partialGeometry.isEmpty()) {
-                    subGeometries.add(geometryFactory
-                            .createLineString(partialGeometry.toArray(Coordinate[]::new)));
-                }
-            }
-            currentCoordinate = nextCoordinate;
+
             log.debug("Segment [{} -> {}]. bearing is: {}", currentCoordinate, nextCoordinate, convertedBearing);
+            currentCoordinate = nextCoordinate;
+
         }
         return subGeometries;
     }
@@ -141,7 +139,7 @@ public class PointMatchingService {
 
     private boolean bearingIsInRange(double convertedBearing, Double inputMinBearing, Double inputMaxBearing) {
         // If no bearing is provided return true
-        if (inputMinBearing == null && inputMaxBearing == null) {
+        if (inputMinBearing == null || inputMaxBearing == null) {
             return true;
         }
         double minBearingStandardised = inputMinBearing % MAX_BEARING;
