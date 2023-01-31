@@ -64,7 +64,7 @@ public class GraphHopperSinglePointMapMatcher implements SinglePointMapMatcher {
     private static final double DEGREE_LATITUDE_IN_KM = 111320D;
     private static final int ALL_NODES = 3;
     private static final boolean INCLUDE_ELEVATION = false;
-    private static final int EARTH_CIRCUMFERENCE = 400_750_00;
+    private static final int EARTH_CIRCUMFERENCE = 40075000;
     private static final int CIRCLE_DEGREES = 360;
     private static final GeometryFactory WGS84_GEOMETRY_FACTORY = new GeometryFactory(new PrecisionModel(),
             GlobalConstants.WGS84_SRID);
