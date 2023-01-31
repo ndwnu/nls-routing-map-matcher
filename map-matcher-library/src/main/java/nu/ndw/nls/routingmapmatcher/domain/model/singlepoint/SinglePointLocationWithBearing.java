@@ -4,8 +4,6 @@ import lombok.Getter;
 import lombok.ToString;
 import org.locationtech.jts.geom.Point;
 
-import java.util.List;
-
 @Getter
 @ToString(callSuper = true)
 public class SinglePointLocationWithBearing extends SinglePointLocation {

@@ -64,8 +64,10 @@ public class GraphHopperSinglePointMapMatcher implements SinglePointMapMatcher {
     private static final double DEGREE_LATITUDE_IN_KM = 111320d;
     private static final int ALL_NODES = 3;
     private static final boolean INCLUDE_ELEVATION = false;
-    private static final int EARTH_CIRCUMFERENCE = 40075000;
+    private static final int EARTH_CIRCUMFERENCE = 400_750_00;
     private static final int CIRCLE_DEGREES = 360;
+    private static final GeometryFactory WGS84_GEOMETRY_FACTORY = new GeometryFactory(new PrecisionModel(),
+            GlobalConstants.WGS84_SRID);
 
     private final LinkFlagEncoder flagEncoder;
     private final LocationIndexTree locationIndexTree;
@@ -86,14 +88,14 @@ public class GraphHopperSinglePointMapMatcher implements SinglePointMapMatcher {
         this.flagEncoder = (LinkFlagEncoder) flagEncoders.get(0);
         this.locationIndexTree = (LocationIndexTree) network.getLocationIndex();
         this.edgeFilter = EdgeFilter.ALL_EDGES;
-        this.geometryFactory = new GeometryFactory(new PrecisionModel(), GlobalConstants.WGS84_SRID);
+        this.geometryFactory = WGS84_GEOMETRY_FACTORY;
         this.pathUtil = new PathUtil(this.geometryFactory);
         this.queryGraph = new QueryGraph(network.getGraphHopperStorage());
         final Weighting weighting = new ShortestWeighting(flagEncoder);
         this.isochroneService = new IsochroneService(flagEncoder, weighting);
         this.distanceCalculator = new DistanceCalcEarth();
-        this.pointMatchingService = new PointMatchingService(new GeometryFactory(new PrecisionModel(),
-                GlobalConstants.WGS84_SRID), flagEncoder, new GeodeticCalculator());
+        this.pointMatchingService = new PointMatchingService(WGS84_GEOMETRY_FACTORY, flagEncoder,
+                new GeodeticCalculator());
 
     }
 
@@ -174,8 +176,7 @@ public class GraphHopperSinglePointMapMatcher implements SinglePointMapMatcher {
     }
 
     private Polygon createCircle(Point point, double distanceInMeters) {
-        GeometryFactory gf = new GeometryFactory(new PrecisionModel(), GlobalConstants.WGS84_SRID);
-        var shapeFactory = new GeometricShapeFactory(gf);
+        var shapeFactory = new GeometricShapeFactory(WGS84_GEOMETRY_FACTORY);
         shapeFactory.setCentre(new Coordinate(point.getX(), point.getY()));
         shapeFactory.setNumPoints(NUM_POINTS);
         shapeFactory.setWidth(distanceInMeters / DEGREE_LATITUDE_IN_KM);
@@ -218,7 +219,7 @@ public class GraphHopperSinglePointMapMatcher implements SinglePointMapMatcher {
                         this.distanceCalculator, flagEncoder);
 
                 candidateMatches.add(new SinglePointMatch.CandidateMatch(matchedLinkId, upstreamLinkIds,
-                        downstreamLinkIds, snappedPoint, fraction, null));
+                        downstreamLinkIds, snappedPoint, fraction, queryResult.getQueryDistance()));
             }
         }
 

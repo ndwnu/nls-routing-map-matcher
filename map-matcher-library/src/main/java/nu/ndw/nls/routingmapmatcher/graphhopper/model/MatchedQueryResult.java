@@ -12,8 +12,6 @@ import org.locationtech.jts.geom.Point;
 @Slf4j
 public class MatchedQueryResult {
 
-    public static final int MAX_BEARING = 360;
-    public static final int MIN_BEARING = 0;
     Point inputPoint;
     Double inputMinBearing;
     Double inputMaxBearing;
