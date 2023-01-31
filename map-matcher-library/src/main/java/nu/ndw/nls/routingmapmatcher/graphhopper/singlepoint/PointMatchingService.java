@@ -45,20 +45,20 @@ public class PointMatchingService {
 
         createAggregatedSubGeometries(coordinates, minInputBearing, maxInputBearing)
                 .forEach(lineString -> {
-                            final MatchedPoint lineSegmentBearing = createMatchedPoint(inputPoint,
+                            final MatchedPoint matchedPoint = createMatchedPoint(inputPoint,
                                     queryResult, travelDirection, lineString);
-                            matchedPoints.add(lineSegmentBearing);
+                            matchedPoints.add(matchedPoint);
                         }
                 );
 
         if (travelDirection == TravelDirection.BOTH_DIRECTIONS) {
             createAggregatedSubGeometries(coordinatesReversed, minInputBearing, maxInputBearing)
                     .forEach(lineString -> {
-                                final MatchedPoint lineSegmentBearing = createMatchedPoint(inputPoint,
+                                final MatchedPoint matchedPoint = createMatchedPoint(inputPoint,
                                         queryResult,
                                         TravelDirection.REVERSED,
                                         lineString);
-                                matchedPoints.add(lineSegmentBearing);
+                                matchedPoints.add(matchedPoint);
                             }
 
                     );
