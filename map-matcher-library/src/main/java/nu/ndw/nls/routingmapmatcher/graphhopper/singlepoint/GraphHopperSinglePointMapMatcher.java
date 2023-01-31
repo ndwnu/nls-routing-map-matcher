@@ -50,7 +50,7 @@ public class GraphHopperSinglePointMapMatcher implements SinglePointMapMatcher {
     /**
      * Only search for candidates within this distance.
      */
-    private static final double DEFAULT_MAXIMUM_CANDIDATE_DISTANCE_IN_METERS = 20.0;
+    private static final double DEFAULT_CANDIDATE_DISTANCE_IN_METERS = 20.0;
 
     /**
      * Distances returned by GraphHopper contain floating point errors compared to the source data, so a delta needs to
@@ -72,7 +72,7 @@ public class GraphHopperSinglePointMapMatcher implements SinglePointMapMatcher {
     private final LinkFlagEncoder flagEncoder;
     private final LocationIndexTree locationIndexTree;
     private final EdgeFilter edgeFilter;
-    private final GeometryFactory geometryFactory;
+
     private final PathUtil pathUtil;
     private final QueryGraph queryGraph;
     private final IsochroneService isochroneService;
@@ -88,8 +88,7 @@ public class GraphHopperSinglePointMapMatcher implements SinglePointMapMatcher {
         this.flagEncoder = (LinkFlagEncoder) flagEncoders.get(0);
         this.locationIndexTree = (LocationIndexTree) network.getLocationIndex();
         this.edgeFilter = EdgeFilter.ALL_EDGES;
-        this.geometryFactory = WGS84_GEOMETRY_FACTORY;
-        this.pathUtil = new PathUtil(this.geometryFactory);
+        this.pathUtil = new PathUtil(WGS84_GEOMETRY_FACTORY);
         this.queryGraph = new QueryGraph(network.getGraphHopperStorage());
         final Weighting weighting = new ShortestWeighting(flagEncoder);
         this.isochroneService = new IsochroneService(flagEncoder, weighting);
@@ -104,7 +103,7 @@ public class GraphHopperSinglePointMapMatcher implements SinglePointMapMatcher {
         Preconditions.checkNotNull(singlePointLocation);
         final double inputRadius = singlePointLocation.getRadius() != null ?
                 singlePointLocation.getRadius()
-                : DEFAULT_MAXIMUM_CANDIDATE_DISTANCE_IN_METERS;
+                : DEFAULT_CANDIDATE_DISTANCE_IN_METERS;
         final List<QueryResult> queryResults = findCandidates(singlePointLocation.getPoint(), inputRadius);
         final SinglePointMatch match;
         if (queryResults.isEmpty()) {
@@ -122,7 +121,7 @@ public class GraphHopperSinglePointMapMatcher implements SinglePointMapMatcher {
         final Point inputPoint = singlePointLocationWithBearing.getPoint();
         final double inputRadius = singlePointLocationWithBearing.getRadius() != null ?
                 singlePointLocationWithBearing.getRadius()
-                : DEFAULT_MAXIMUM_CANDIDATE_DISTANCE_IN_METERS;
+                : DEFAULT_CANDIDATE_DISTANCE_IN_METERS;
         final Double inputMinBearing = singlePointLocationWithBearing.getMinBearing();
         final Double inputMaxBearing = singlePointLocationWithBearing.getMaxBearing();
         final List<QueryResult> result = findCandidates(inputPoint, inputRadius);
@@ -163,7 +162,7 @@ public class GraphHopperSinglePointMapMatcher implements SinglePointMapMatcher {
                 .collect(Collectors.toList());
         final double closestDistance = filteredResults.stream()
                 .mapToDouble(MatchedPoint::getDistanceToSnappedPoint).min()
-                .orElse(DEFAULT_MAXIMUM_CANDIDATE_DISTANCE_IN_METERS);
+                .orElse(DEFAULT_CANDIDATE_DISTANCE_IN_METERS);
         final double reliability = calculateReliability(closestDistance, inputRadius);
         return new SinglePointMatch(singlePointLocationWithBearing.getId(),
                 candidateMatches,
@@ -194,7 +193,7 @@ public class GraphHopperSinglePointMapMatcher implements SinglePointMapMatcher {
             final SinglePointLocation singlePointLocation, double inputRadius) {
         final List<SinglePointMatch.CandidateMatch> candidateMatches = Lists.newArrayList();
         final double closestDistance = queryResults.stream().mapToDouble(QueryResult::getQueryDistance).min()
-                .orElse(DEFAULT_MAXIMUM_CANDIDATE_DISTANCE_IN_METERS);
+                .orElse(DEFAULT_CANDIDATE_DISTANCE_IN_METERS);
 
         if (singlePointLocation.getUpstreamIsochroneUnit() != null ||
                 singlePointLocation.getDownstreamIsochroneUnit() != null) {
@@ -212,7 +211,7 @@ public class GraphHopperSinglePointMapMatcher implements SinglePointMapMatcher {
                         isochroneService.getDownstreamLinkIds(queryGraph, singlePointLocation, nodeId) : null;
 
                 final GHPoint3D ghSnappedPoint = queryResult.getSnappedPoint();
-                final Point snappedPoint = geometryFactory.createPoint(
+                final Point snappedPoint = WGS84_GEOMETRY_FACTORY.createPoint(
                         new Coordinate(ghSnappedPoint.getLon(), ghSnappedPoint.getLat()));
 
                 final double fraction = this.pathUtil.determineSnappedPointFraction(queryResult,

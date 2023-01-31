@@ -10,6 +10,6 @@ public class MatchedPoint {
     int matchedLinkId;
     Point snappedPoint;
     boolean reversed;
-    Double distanceToSnappedPoint;
-    Double fractionOfSnappedPoint;
+    double distanceToSnappedPoint;
+    double fractionOfSnappedPoint;
 }

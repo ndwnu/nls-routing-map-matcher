@@ -160,9 +160,9 @@ public class PointMatchingService {
         return bearing < 0.0 ? (bearing + MAX_BEARING) : bearing;
     }
 
-    private double getFraction(LineString line, Coordinate coordinate, TravelDirection travelDirection) {
+    private double getFraction(LineString line, Coordinate snappedPointCoordinate, TravelDirection travelDirection) {
         final LocationIndexedLine locationIndexedLine = new LocationIndexedLine(line);
-        final LinearLocation snappedPointLocation = locationIndexedLine.indexOf(coordinate);
+        final LinearLocation snappedPointLocation = locationIndexedLine.indexOf(snappedPointCoordinate);
         final Iterator<Coordinate> pointList = Arrays.asList(line.getCoordinates()).iterator();
         Coordinate previous = pointList.next();
         double sumOfPathLengths = 0D;
@@ -171,7 +171,7 @@ public class PointMatchingService {
             Coordinate current = pointList.next();
             final LinearLocation previousIndex = locationIndexedLine.indexOf(previous);
             if (snappedPointLocation.getSegmentIndex() == previousIndex.getSegmentIndex()) {
-                final double previousToSnappedPointDistance = calculateDistance(coordinate, previous);
+                final double previousToSnappedPointDistance = calculateDistance(snappedPointCoordinate, previous);
                 pathDistanceToSnappedPoint = sumOfPathLengths + previousToSnappedPointDistance;
             }
             sumOfPathLengths += calculateDistance(previous, current);
