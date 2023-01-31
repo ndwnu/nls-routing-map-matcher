@@ -61,7 +61,7 @@ public class GraphHopperSinglePointMapMatcher implements SinglePointMapMatcher {
     private static final int NUM_POINTS = 100;
     private static final int MAX_RELIABILITY_SCORE = 100;
 
-    private static final double DEGREE_LATITUDE_IN_KM = 111320d;
+    private static final double DEGREE_LATITUDE_IN_KM = 111320D;
     private static final int ALL_NODES = 3;
     private static final boolean INCLUDE_ELEVATION = false;
     private static final int EARTH_CIRCUMFERENCE = 400_750_00;
