@@ -43,20 +43,25 @@ class PointMatchingServiceTest {
     private static final double FRACTION = 0.2372848571472417;
     private static final double FRACTION_REVERSED = 0.7627151428527583;
     private static final Coordinate ZIG_ZAG_COORDINATE_1 = new Coordinate(5.42685002, 52.17661785);
-    private static final Coordinate ZIG_ZAG_COORDINATE_2 = new Coordinate(5.42683042,52.17662641);
+    private static final Coordinate ZIG_ZAG_COORDINATE_2 = new Coordinate(5.42683042, 52.17662641);
     private static final Coordinate ZIG_ZAG_COORDINATE_3 = new Coordinate(5.42682052, 52.17663048);
 
     private static final Coordinate ZIG_ZAG_COORDINATE_4 = new Coordinate(5.42681463, 52.17665913);
     private static final Coordinate ZIG_ZAG_COORDINATE_5 = new Coordinate(5.42679104, 52.17667092);
-    private static final Coordinate ZIG_ZAG_COORDINATE_6 = new Coordinate(5.42678346,52.17667896);
+    public static final double SNAPPED_POINT_X_ZIG_ZAG = 5.42678346;
+    public static final double SNAPPED_POINT_Y_ZIG_ZAG = 52.17667896;
+    private static final Coordinate ZIG_ZAG_COORDINATE_6 = new Coordinate(SNAPPED_POINT_X_ZIG_ZAG,
+            SNAPPED_POINT_Y_ZIG_ZAG);
 
     private static final Coordinate ZIG_ZAG_COORDINATE_7 = new Coordinate(5.42676155, 52.17665323);
     private static final Coordinate ZIG_ZAG_COORDINATE_8 = new Coordinate(5.42675986, 52.17669198);
     private static final Coordinate ZIG_ZAG_COORDINATE_9 = new Coordinate(5.42672195, 52.17669114);
     private static final Coordinate ZIG_ZAG_COORDINATE_10 = new Coordinate(5.42672869, 52.17670967);
     private static final Coordinate ZIG_ZAG_COORDINATE_11 = new Coordinate(5.42670342, 52.17673579);
-    private static final Coordinate ZIG_ZAG_COORDINATE_12 = new Coordinate(5.42669635,52.17673473);
+    private static final Coordinate ZIG_ZAG_COORDINATE_12 = new Coordinate(5.42669635, 52.17673473);
     private static final Coordinate ZIG_ZAG_COORDINATE_13 = new Coordinate(5.42665413, 52.17673958);
+    public static final double DISTANCE_ZIG_ZAG = 3.061770997311956;
+    public static final double FRACTION_ZIG_ZAG = 0.315843722882771;
 
     @Mock
     private LinkFlagEncoder flagEncoder;
@@ -216,12 +221,11 @@ class PointMatchingServiceTest {
         assertThat(matches).hasSize(3);
         var closestMatch = matches.get(0);
         assertThat(closestMatch.getMatchedLinkId()).isEqualTo(ID);
-        assertThat(closestMatch.getSnappedPoint().getX()).isEqualTo(5.42678346);
-        assertThat(closestMatch.getSnappedPoint().getY()).isEqualTo(52.17667896);
+        assertThat(closestMatch.getSnappedPoint().getX()).isEqualTo(SNAPPED_POINT_X_ZIG_ZAG);
+        assertThat(closestMatch.getSnappedPoint().getY()).isEqualTo(SNAPPED_POINT_Y_ZIG_ZAG);
         assertThat(closestMatch.isReversed()).isEqualTo(false);
-        assertThat(closestMatch.getDistanceToSnappedPoint()).isEqualTo(3.061770997311956);
-        assertThat(closestMatch.getFractionOfSnappedPoint()).isEqualTo(0.315843722882771);
-       ///assertThat(closestMatch)
+        assertThat(closestMatch.getDistanceToSnappedPoint()).isEqualTo(DISTANCE_ZIG_ZAG);
+        assertThat(closestMatch.getFractionOfSnappedPoint()).isEqualTo(FRACTION_ZIG_ZAG);
     }
 
     private void createCutOffGeometryForZigzagLine() {

@@ -7,7 +7,9 @@ import static org.hamcrest.Matchers.is;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
+import java.util.Objects;
 import lombok.SneakyThrows;
 import nu.ndw.nls.routingmapmatcher.constants.GlobalConstants;
 import nu.ndw.nls.routingmapmatcher.domain.SinglePointMapMatcher;
@@ -28,17 +30,16 @@ import org.locationtech.jts.geom.PrecisionModel;
 public class SinglePointMapMatcherWithBearingIT {
 
     private static final String LINKS_RESOURCE = "/test-data/links.json";
-    private static final String SHIVI_LINKS_RESOURCE = "/test-data/shivi-verkeersbanen.json";
-    private static final int ID = 123;
 
     private SinglePointMapMatcher singlePointMapMatcher;
-    private ObjectMapper mapper;
     private GeometryFactory geometryFactory;
 
     @SneakyThrows
-    private void setupNetwork(String resource) {
-        String linksJson = IOUtils.toString(getClass().getResourceAsStream(resource));
-        mapper = new ObjectMapper();
+    private void setupNetwork() {
+        String linksJson = IOUtils.toString(Objects.requireNonNull(getClass().getResourceAsStream(
+                        SinglePointMapMatcherWithBearingIT.LINKS_RESOURCE)),
+                StandardCharsets.UTF_8);
+        ObjectMapper mapper = new ObjectMapper();
         SimpleModule module = new SimpleModule();
         module.addDeserializer(Link.class, new LinkDeserializer());
         mapper.registerModule(module);
@@ -54,7 +55,7 @@ public class SinglePointMapMatcherWithBearingIT {
 
     @Test
     void matchWithBearing_ok() {
-        setupNetwork(LINKS_RESOURCE);
+        setupNetwork();
         Point point = geometryFactory.createPoint(new Coordinate(5.426747, 52.176663));
         SinglePointLocationWithBearing request = new SinglePointLocationWithBearing(1, point,
                 310.0, 320.0, 20.0);
@@ -62,7 +63,10 @@ public class SinglePointMapMatcherWithBearingIT {
         assertThat(result.getCandidateMatches(), hasSize(1));
         CandidateMatch match = result.getCandidateMatches().get(0);
         //POINT (5.426768463894968 52.176694564551426)
-        assertThat(match.getMatchedLinkId(),is(3667044));
-        assertThat(match.getSnappedPoint().getX(),is(3667044));
+        assertThat(match.getMatchedLinkId(), is(3667044));
+        assertThat(match.getSnappedPoint().getX(), is(5.426768463894968));
+        assertThat(match.getSnappedPoint().getY(), is(52.176694564551426));
+        assertThat(match.getDistance(), is(3.8067685587693947));
+        assertThat(match.getFraction(), is(0.7627151428527583));
     }
 }
