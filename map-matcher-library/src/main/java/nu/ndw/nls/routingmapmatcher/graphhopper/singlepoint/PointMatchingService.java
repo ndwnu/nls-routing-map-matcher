@@ -157,7 +157,7 @@ public class PointMatchingService {
         geodeticCalculator.setDestinationGeographicPoint(nextCoordinate.getX(),
                 nextCoordinate.getY());
         final double bearing = geodeticCalculator.getAzimuth();
-        return bearing < 0.0 ? bearing + MAX_BEARING : bearing;
+        return bearing < 0.0 ? (bearing + MAX_BEARING) : bearing;
     }
 
     private double getFraction(LineString line, Coordinate coordinate, TravelDirection travelDirection) {
