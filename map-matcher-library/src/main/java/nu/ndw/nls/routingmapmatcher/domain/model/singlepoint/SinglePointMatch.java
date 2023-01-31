@@ -23,6 +23,7 @@ public class SinglePointMatch extends MapMatch {
         private final Set<Integer> downstreamLinkIds;
         private final Point snappedPoint;
         private final double fraction;
+        //Distance from input point to snapped point
         private final Double distance;
     }
 
