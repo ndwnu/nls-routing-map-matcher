@@ -59,11 +59,10 @@ public class SinglePointMapMatcherWithBearingIT {
         setupNetwork();
         Point point = geometryFactory.createPoint(new Coordinate(5.426747, 52.176663));
         SinglePointLocationWithBearing request = new SinglePointLocationWithBearing(1, point,
-                new BearingRange(310.0, 320.0),20.0);
+                new BearingRange(130.0, 140.0),20.0);
         SinglePointMatch result = singlePointMapMatcher.matchWithBearing(request);
         assertThat(result.getCandidateMatches(), hasSize(1));
         CandidateMatch match = result.getCandidateMatches().get(0);
-        //POINT (5.426768463894968 52.176694564551426)
         assertThat(match.getMatchedLinkId(), is(3667044));
         assertThat(match.getSnappedPoint().getX(), is(5.426768463894968));
         assertThat(match.getSnappedPoint().getY(), is(52.176694564551426));
