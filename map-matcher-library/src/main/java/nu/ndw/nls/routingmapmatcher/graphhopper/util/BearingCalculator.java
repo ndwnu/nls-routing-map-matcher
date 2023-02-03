@@ -10,7 +10,9 @@ public class BearingCalculator {
 
     private final GeodeticCalculator geodeticCalculator;
 
-    private static final int MAX_BEARING = 360;
+    public static final int MAX_BEARING = 360;
+
+    public static final int REVERSE_BEARING = 180;
 
     public boolean bearingIsInRange(double convertedBearing, BearingRange bearingRange) {
         // If no bearing is provided return true
