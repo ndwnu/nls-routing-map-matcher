@@ -25,6 +25,7 @@ import java.util.stream.Collectors;
 import nu.ndw.nls.routingmapmatcher.constants.GlobalConstants;
 import nu.ndw.nls.routingmapmatcher.domain.SinglePointMapMatcher;
 import nu.ndw.nls.routingmapmatcher.domain.model.MatchStatus;
+import nu.ndw.nls.routingmapmatcher.domain.model.singlepoint.BearingRange;
 import nu.ndw.nls.routingmapmatcher.domain.model.singlepoint.SinglePointLocation;
 import nu.ndw.nls.routingmapmatcher.domain.model.singlepoint.SinglePointLocationWithBearing;
 import nu.ndw.nls.routingmapmatcher.domain.model.singlepoint.SinglePointMatch;
@@ -127,8 +128,7 @@ public class GraphHopperSinglePointMapMatcher implements SinglePointMapMatcher {
         final double inputRadius = singlePointLocationWithBearing.getRadius() != null ?
                 singlePointLocationWithBearing.getRadius()
                 : DEFAULT_CANDIDATE_DISTANCE_IN_METERS;
-        final Double inputMinBearing = singlePointLocationWithBearing.getMinBearing();
-        final Double inputMaxBearing = singlePointLocationWithBearing.getMaxBearing();
+        final BearingRange bearingRange = singlePointLocationWithBearing.getBearingRange();
         final List<QueryResult> result = findCandidates(inputPoint, inputRadius);
         final Polygon circle = createCircle(inputPoint, inputRadius);
         // Crop geometry to only include segments in search radius
@@ -142,8 +142,7 @@ public class GraphHopperSinglePointMapMatcher implements SinglePointMapMatcher {
                     return pointMatchingService.calculateMatches(MatchedQueryResult
                             .builder()
                             .inputPoint(inputPoint)
-                            .inputMinBearing(inputMinBearing)
-                            .inputMaxBearing(inputMaxBearing)
+                                    .bearingRange(bearingRange)
                             .travelDirection(travelDirection)
                             .cutoffGeometry(cutoffGeometry)
                             .queryResult(q)

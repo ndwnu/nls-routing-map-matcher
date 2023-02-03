@@ -1,6 +1,7 @@
 package nu.ndw.nls.routingmapmatcher.graphhopper.util;
 
 import lombok.RequiredArgsConstructor;
+import nu.ndw.nls.routingmapmatcher.domain.model.singlepoint.BearingRange;
 import org.geotools.referencing.GeodeticCalculator;
 import org.locationtech.jts.geom.Coordinate;
 
@@ -11,13 +12,13 @@ public class BearingCalculator {
 
     private static final int MAX_BEARING = 360;
 
-    public boolean bearingIsInRange(double convertedBearing, Double inputMinBearing, Double inputMaxBearing) {
+    public boolean bearingIsInRange(double convertedBearing, BearingRange bearingRange) {
         // If no bearing is provided return true
-        if (inputMinBearing == null || inputMaxBearing == null) {
+        if (bearingRange == null) {
             return true;
         }
-        double minBearingStandardised = inputMinBearing % MAX_BEARING;
-        double maxBearingStandardised = inputMaxBearing % MAX_BEARING;
+        double minBearingStandardised = bearingRange.getMinBearing() % MAX_BEARING;
+        double maxBearingStandardised = bearingRange.getMaxBearing() % MAX_BEARING;
         if (minBearingStandardised > maxBearingStandardised) {
             return convertedBearing >= minBearingStandardised || convertedBearing <= maxBearingStandardised;
 

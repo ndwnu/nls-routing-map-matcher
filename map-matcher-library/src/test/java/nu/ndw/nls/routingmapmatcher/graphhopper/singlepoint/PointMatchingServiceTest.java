@@ -10,6 +10,7 @@ import com.graphhopper.util.EdgeIteratorState;
 import com.graphhopper.util.PointList;
 import java.util.stream.Collectors;
 import nu.ndw.nls.routingmapmatcher.constants.GlobalConstants;
+import nu.ndw.nls.routingmapmatcher.domain.model.singlepoint.BearingRange;
 import nu.ndw.nls.routingmapmatcher.graphhopper.LinkFlagEncoder;
 import nu.ndw.nls.routingmapmatcher.graphhopper.model.MatchedPoint;
 import nu.ndw.nls.routingmapmatcher.graphhopper.model.MatchedQueryResult;
@@ -84,12 +85,9 @@ class PointMatchingServiceTest {
 
     private Point inputPoint;
 
-
     private LineString cutoffGeometry;
 
-
     private PointMatchingService pointMatchingService;
-
 
     @BeforeEach
     void setup() {
@@ -165,8 +163,7 @@ class PointMatchingServiceTest {
         inputPoint = geometryFactory.createPoint(INPUT_POINT_COORDINATE);
         var request = MatchedQueryResult
                 .builder()
-                .inputMinBearing(310.0)
-                .inputMaxBearing(320.0)
+                .bearingRange(new BearingRange(310.0,320.0))
                 .queryResult(queryResult)
                 .inputPoint(inputPoint)
                 .cutoffGeometry(cutoffGeometry)
@@ -190,8 +187,7 @@ class PointMatchingServiceTest {
         inputPoint = geometryFactory.createPoint(INPUT_POINT_COORDINATE);
         var request = MatchedQueryResult
                 .builder()
-                .inputMinBearing(100.0)
-                .inputMaxBearing(120.0)
+                .bearingRange(new BearingRange(100.0, 120.0))
                 .queryResult(queryResult)
                 .inputPoint(inputPoint)
                 .cutoffGeometry(cutoffGeometry)
@@ -209,8 +205,7 @@ class PointMatchingServiceTest {
         inputPoint = geometryFactory.createPoint(INPUT_POINT_COORDINATE);
         var request = MatchedQueryResult
                 .builder()
-                .inputMinBearing(300.0)
-                .inputMaxBearing(330.0)
+                .bearingRange(new BearingRange(300.0, 330.0))
                 .queryResult(queryResult)
                 .inputPoint(inputPoint)
                 .cutoffGeometry(cutoffGeometry)

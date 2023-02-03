@@ -7,13 +7,13 @@ import java.util.Arrays;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import nu.ndw.nls.routingmapmatcher.domain.model.singlepoint.BearingRange;
 import nu.ndw.nls.routingmapmatcher.graphhopper.LinkFlagEncoder;
 import nu.ndw.nls.routingmapmatcher.graphhopper.model.MatchedPoint;
 import nu.ndw.nls.routingmapmatcher.graphhopper.model.MatchedQueryResult;
 import nu.ndw.nls.routingmapmatcher.graphhopper.model.TravelDirection;
 import nu.ndw.nls.routingmapmatcher.graphhopper.util.BearingCalculator;
 import nu.ndw.nls.routingmapmatcher.graphhopper.util.FractionAndDistanceCalculator;
-import org.geotools.referencing.GeodeticCalculator;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.LineString;
@@ -38,12 +38,11 @@ public class PointMatchingService {
         final Coordinate[] coordinates = matchedQueryResult.getCutoffGeometry().getCoordinates();
         final Coordinate[] coordinatesReversed = matchedQueryResult.getCutoffGeometry().reverse().getCoordinates();
         final Point inputPoint = matchedQueryResult.getInputPoint();
-        final Double minInputBearing = matchedQueryResult.getInputMinBearing();
-        final Double maxInputBearing = matchedQueryResult.getInputMaxBearing();
+        final BearingRange bearingRange = matchedQueryResult.getBearingRange();
         final QueryResult queryResult = matchedQueryResult.getQueryResult();
         final TravelDirection travelDirection = matchedQueryResult.getTravelDirection();
 
-        createAggregatedSubGeometries(coordinates, minInputBearing, maxInputBearing)
+        createAggregatedSubGeometries(coordinates, bearingRange)
                 .forEach(lineString -> {
                             final MatchedPoint matchedPoint = createMatchedPoint(inputPoint,
                                     queryResult, travelDirection, lineString);
@@ -52,7 +51,7 @@ public class PointMatchingService {
                 );
 
         if (travelDirection == TravelDirection.BOTH_DIRECTIONS) {
-            createAggregatedSubGeometries(coordinatesReversed, minInputBearing, maxInputBearing)
+            createAggregatedSubGeometries(coordinatesReversed, bearingRange)
                     .forEach(lineString -> {
                                 final MatchedPoint matchedPoint = createMatchedPoint(inputPoint,
                                         queryResult,
@@ -74,7 +73,8 @@ public class PointMatchingService {
         final double fraction = calculateFraction(snappedPoint, queryResult, travelDirection);
         final IntsRef flags = queryResult.getClosestEdge().getFlags();
         final int matchedLinkId = flagEncoder.getId(flags);
-        final double distanceToSnappedPoint = fractionAndDistanceCalculator.calculateDistance(inputPoint.getCoordinate(),
+        final double distanceToSnappedPoint = fractionAndDistanceCalculator.calculateDistance(
+                inputPoint.getCoordinate(),
                 snappedPoint.getCoordinate());
         return MatchedPoint
                 .builder()
@@ -86,8 +86,7 @@ public class PointMatchingService {
                 .build();
     }
 
-    private List<LineString> createAggregatedSubGeometries(Coordinate[] coordinates, Double minInputBearing,
-            Double maxInputBearing) {
+    private List<LineString> createAggregatedSubGeometries(Coordinate[] coordinates, BearingRange bearingRange) {
         List<LineString> subGeometries = new ArrayList<>();
         List<Coordinate> partialGeometry = new ArrayList<>();
         var coordinateIterator = Arrays.asList(coordinates).iterator();
@@ -96,7 +95,7 @@ public class PointMatchingService {
             final Coordinate nextCoordinate = coordinateIterator.next();
             double convertedBearing = bearingCalculator.calculateBearing(currentCoordinate, nextCoordinate);
             //While bearing is in range add coordinates to partialGeometry
-            if (bearingCalculator.bearingIsInRange(convertedBearing, minInputBearing, maxInputBearing)) {
+            if (bearingCalculator.bearingIsInRange(convertedBearing, bearingRange)) {
                 partialGeometry.add(currentCoordinate);
                 partialGeometry.add(nextCoordinate);
                 // Stop condition last coordinate add partialGeometry if present
