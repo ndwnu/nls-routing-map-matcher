@@ -1,5 +1,8 @@
 package nu.ndw.nls.routingmapmatcher.graphhopper.singlepoint;
 
+import static nu.ndw.nls.routingmapmatcher.graphhopper.util.BearingCalculator.MAX_BEARING;
+import static nu.ndw.nls.routingmapmatcher.graphhopper.util.BearingCalculator.REVERSE_BEARING;
+
 import com.graphhopper.storage.IntsRef;
 import com.graphhopper.storage.index.QueryResult;
 import java.util.ArrayList;
@@ -42,7 +45,7 @@ public class PointMatchingService {
         final QueryResult queryResult = matchedQueryResult.getQueryResult();
         final TravelDirection travelDirection = matchedQueryResult.getTravelDirection();
 
-        createAggregatedSubGeometries(coordinates, bearingRange)
+        createAggregatedSubGeometries(coordinates, bearingRange, travelDirection)
                 .forEach(lineString -> {
                             final MatchedPoint matchedPoint = createMatchedPoint(inputPoint,
                                     queryResult, travelDirection, lineString);
@@ -51,7 +54,7 @@ public class PointMatchingService {
                 );
 
         if (travelDirection == TravelDirection.BOTH_DIRECTIONS) {
-            createAggregatedSubGeometries(coordinatesReversed, bearingRange)
+            createAggregatedSubGeometries(coordinatesReversed, bearingRange, travelDirection)
                     .forEach(lineString -> {
                                 final MatchedPoint matchedPoint = createMatchedPoint(inputPoint,
                                         queryResult,
@@ -86,7 +89,8 @@ public class PointMatchingService {
                 .build();
     }
 
-    private List<LineString> createAggregatedSubGeometries(Coordinate[] coordinates, BearingRange bearingRange) {
+    private List<LineString> createAggregatedSubGeometries(Coordinate[] coordinates, BearingRange bearingRange,
+            TravelDirection travelDirection) {
         List<LineString> subGeometries = new ArrayList<>();
         List<Coordinate> partialGeometry = new ArrayList<>();
         var coordinateIterator = Arrays.asList(coordinates).iterator();
@@ -94,6 +98,10 @@ public class PointMatchingService {
         while (coordinateIterator.hasNext()) {
             final Coordinate nextCoordinate = coordinateIterator.next();
             double convertedBearing = bearingCalculator.calculateBearing(currentCoordinate, nextCoordinate);
+            if (travelDirection == TravelDirection.REVERSED) {
+                convertedBearing = (convertedBearing - REVERSE_BEARING) % MAX_BEARING;
+                log.trace("Reverse travel direction. Bearing will be inverted.");
+            }
             //While bearing is in range add coordinates to partialGeometry
             if (bearingCalculator.bearingIsInRange(convertedBearing, bearingRange)) {
                 partialGeometry.add(currentCoordinate);
