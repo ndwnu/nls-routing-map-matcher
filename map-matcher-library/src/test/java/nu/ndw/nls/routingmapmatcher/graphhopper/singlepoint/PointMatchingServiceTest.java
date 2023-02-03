@@ -14,6 +14,8 @@ import nu.ndw.nls.routingmapmatcher.graphhopper.LinkFlagEncoder;
 import nu.ndw.nls.routingmapmatcher.graphhopper.model.MatchedPoint;
 import nu.ndw.nls.routingmapmatcher.graphhopper.model.MatchedQueryResult;
 import nu.ndw.nls.routingmapmatcher.graphhopper.model.TravelDirection;
+import nu.ndw.nls.routingmapmatcher.graphhopper.util.BearingCalculator;
+import nu.ndw.nls.routingmapmatcher.graphhopper.util.FractionAndDistanceCalculator;
 import org.geotools.referencing.GeodeticCalculator;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -28,6 +30,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
 class PointMatchingServiceTest {
+
     private static final int ID = 1;
     private static final double SNAPPED_POINT_X = 5.426768463894968;
     private static final double SNAPPED_POINT_Y = 52.176694564551426;
@@ -68,8 +71,6 @@ class PointMatchingServiceTest {
     private final GeometryFactory geometryFactory = new GeometryFactory(new PrecisionModel(),
             GlobalConstants.WGS84_SRID);
 
-    private final GeodeticCalculator geodeticCalculator = new GeodeticCalculator();
-
     @Mock
     private QueryResult queryResult;
 
@@ -92,8 +93,10 @@ class PointMatchingServiceTest {
 
     @BeforeEach
     void setup() {
-
-        pointMatchingService = new PointMatchingService(geometryFactory, flagEncoder, geodeticCalculator);
+        GeodeticCalculator geodeticCalculator = new GeodeticCalculator();
+        pointMatchingService = new PointMatchingService(geometryFactory, flagEncoder,
+                new BearingCalculator(geodeticCalculator),
+                new FractionAndDistanceCalculator(geodeticCalculator));
     }
 
 

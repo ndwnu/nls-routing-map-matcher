@@ -4,7 +4,6 @@ import com.graphhopper.storage.IntsRef;
 import com.graphhopper.storage.index.QueryResult;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Iterator;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -12,6 +11,8 @@ import nu.ndw.nls.routingmapmatcher.graphhopper.LinkFlagEncoder;
 import nu.ndw.nls.routingmapmatcher.graphhopper.model.MatchedPoint;
 import nu.ndw.nls.routingmapmatcher.graphhopper.model.MatchedQueryResult;
 import nu.ndw.nls.routingmapmatcher.graphhopper.model.TravelDirection;
+import nu.ndw.nls.routingmapmatcher.graphhopper.util.BearingCalculator;
+import nu.ndw.nls.routingmapmatcher.graphhopper.util.FractionAndDistanceCalculator;
 import org.geotools.referencing.GeodeticCalculator;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.GeometryFactory;
@@ -24,14 +25,13 @@ import org.locationtech.jts.linearref.LocationIndexedLine;
 @Slf4j
 public class PointMatchingService {
 
-    private static final int MAX_BEARING = 360;
     private static final int ALL_NODES = 3;
     private final GeometryFactory geometryFactory;
 
     private final LinkFlagEncoder flagEncoder;
 
-    private final GeodeticCalculator geodeticCalculator;
-
+    private final BearingCalculator bearingCalculator;
+    private final FractionAndDistanceCalculator fractionAndDistanceCalculator;
 
     public List<MatchedPoint> calculateMatches(MatchedQueryResult matchedQueryResult) {
         final List<MatchedPoint> matchedPoints = new ArrayList<>();
@@ -74,7 +74,7 @@ public class PointMatchingService {
         final double fraction = calculateFraction(snappedPoint, queryResult, travelDirection);
         final IntsRef flags = queryResult.getClosestEdge().getFlags();
         final int matchedLinkId = flagEncoder.getId(flags);
-        final double distanceToSnappedPoint = calculateDistance(inputPoint.getCoordinate(),
+        final double distanceToSnappedPoint = fractionAndDistanceCalculator.calculateDistance(inputPoint.getCoordinate(),
                 snappedPoint.getCoordinate());
         return MatchedPoint
                 .builder()
@@ -94,13 +94,13 @@ public class PointMatchingService {
         Coordinate currentCoordinate = coordinateIterator.next();
         while (coordinateIterator.hasNext()) {
             final Coordinate nextCoordinate = coordinateIterator.next();
-            double convertedBearing = calculateBearing(currentCoordinate, nextCoordinate);
+            double convertedBearing = bearingCalculator.calculateBearing(currentCoordinate, nextCoordinate);
             //While bearing is in range add coordinates to partialGeometry
-            if (bearingIsInRange(convertedBearing, minInputBearing, maxInputBearing)) {
+            if (bearingCalculator.bearingIsInRange(convertedBearing, minInputBearing, maxInputBearing)) {
                 partialGeometry.add(currentCoordinate);
                 partialGeometry.add(nextCoordinate);
                 // Stop condition last coordinate add partialGeometry if present
-                if (!coordinateIterator.hasNext()){
+                if (!coordinateIterator.hasNext()) {
                     subGeometries.add(geometryFactory
                             .createLineString(partialGeometry.toArray(Coordinate[]::new)));
                 }
@@ -126,7 +126,9 @@ public class PointMatchingService {
                 .getClosestEdge()
                 .fetchWayGeometry(ALL_NODES)
                 .toLineString(false);
-        return getFraction(originalGeometry, snappedPoint.getCoordinate(), travelDirection);
+        return fractionAndDistanceCalculator.calculateFraction(originalGeometry,
+                snappedPoint.getCoordinate(),
+                travelDirection);
     }
 
     private Point calculateSnappedPoint(LineString subGeometry, Point inputPoint) {
@@ -134,69 +136,6 @@ public class PointMatchingService {
         final LinearLocation snappedPointLinearLocation = lineIndex.project(inputPoint.getCoordinate());
         return geometryFactory
                 .createPoint(lineIndex.extractPoint(snappedPointLinearLocation));
-    }
-
-    private boolean bearingIsInRange(double convertedBearing, Double inputMinBearing, Double inputMaxBearing) {
-        // If no bearing is provided return true
-        if (inputMinBearing == null || inputMaxBearing == null) {
-            return true;
-        }
-        double minBearingStandardised = inputMinBearing % MAX_BEARING;
-        double maxBearingStandardised = inputMaxBearing % MAX_BEARING;
-        if (minBearingStandardised > maxBearingStandardised) {
-            return convertedBearing >= minBearingStandardised || convertedBearing <= maxBearingStandardised;
-
-        } else {
-            return convertedBearing >= minBearingStandardised && convertedBearing <= maxBearingStandardised;
-        }
-    }
-
-    private double calculateBearing(Coordinate currentCoordinate, Coordinate nextCoordinate) {
-        geodeticCalculator.setStartingGeographicPoint(currentCoordinate.getX(),
-                currentCoordinate.getY());
-        geodeticCalculator.setDestinationGeographicPoint(nextCoordinate.getX(),
-                nextCoordinate.getY());
-        final double bearing = geodeticCalculator.getAzimuth();
-        return bearing < 0.0 ? (bearing + MAX_BEARING) : bearing;
-    }
-
-    private double getFraction(LineString line, Coordinate snappedPointCoordinate, TravelDirection travelDirection) {
-        final LocationIndexedLine locationIndexedLine = new LocationIndexedLine(line);
-        final LinearLocation snappedPointLocation = locationIndexedLine.indexOf(snappedPointCoordinate);
-        final Iterator<Coordinate> pointList = Arrays.asList(line.getCoordinates()).iterator();
-        Coordinate previous = pointList.next();
-        double sumOfPathLengths = 0D;
-        Double pathDistanceToSnappedPoint = null;
-        while (pointList.hasNext()) {
-            Coordinate current = pointList.next();
-            final LinearLocation previousIndex = locationIndexedLine.indexOf(previous);
-            if (snappedPointLocation.getSegmentIndex() == previousIndex.getSegmentIndex()) {
-                final double previousToSnappedPointDistance = calculateDistance(snappedPointCoordinate, previous);
-                pathDistanceToSnappedPoint = sumOfPathLengths + previousToSnappedPointDistance;
-            }
-            sumOfPathLengths += calculateDistance(previous, current);
-            // Prepare for next loop
-            previous = current;
-        }
-        if (pathDistanceToSnappedPoint == null) {
-            throw new IllegalStateException("Failed to find path distance to snapped point");
-        }
-        double fraction = pathDistanceToSnappedPoint / sumOfPathLengths;
-        if (travelDirection == TravelDirection.REVERSED) {
-            log.trace("Reverse travel direction. Fraction will be inverted.");
-            fraction = 1D - fraction;
-        }
-        log.trace("Total (geometrical) edge length: {}, snapped point path length {}. Fraction: {}", sumOfPathLengths,
-                pathDistanceToSnappedPoint, fraction);
-        return fraction;
-    }
-
-    private double calculateDistance(Coordinate from, Coordinate to) {
-        geodeticCalculator.setStartingGeographicPoint(to
-                        .getX(),
-                to.getY());
-        geodeticCalculator.setDestinationGeographicPoint(from.getX(), from.getY());
-        return geodeticCalculator.getOrthodromicDistance();
     }
 
 }

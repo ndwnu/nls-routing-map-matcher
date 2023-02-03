@@ -35,6 +35,8 @@ import nu.ndw.nls.routingmapmatcher.graphhopper.isochrone.IsochroneService;
 import nu.ndw.nls.routingmapmatcher.graphhopper.model.MatchedPoint;
 import nu.ndw.nls.routingmapmatcher.graphhopper.model.MatchedQueryResult;
 import nu.ndw.nls.routingmapmatcher.graphhopper.model.TravelDirection;
+import nu.ndw.nls.routingmapmatcher.graphhopper.util.BearingCalculator;
+import nu.ndw.nls.routingmapmatcher.graphhopper.util.FractionAndDistanceCalculator;
 import nu.ndw.nls.routingmapmatcher.graphhopper.util.PathUtil;
 import org.geotools.referencing.GeodeticCalculator;
 import org.locationtech.jts.geom.Coordinate;
@@ -93,8 +95,11 @@ public class GraphHopperSinglePointMapMatcher implements SinglePointMapMatcher {
         final Weighting weighting = new ShortestWeighting(flagEncoder);
         this.isochroneService = new IsochroneService(flagEncoder, weighting);
         this.distanceCalculator = new DistanceCalcEarth();
-        this.pointMatchingService = new PointMatchingService(WGS84_GEOMETRY_FACTORY, flagEncoder,
-                new GeodeticCalculator());
+        this.pointMatchingService = new PointMatchingService(
+                WGS84_GEOMETRY_FACTORY,
+                flagEncoder,
+                new BearingCalculator(new GeodeticCalculator()),
+                new FractionAndDistanceCalculator(new GeodeticCalculator()));
 
     }
 

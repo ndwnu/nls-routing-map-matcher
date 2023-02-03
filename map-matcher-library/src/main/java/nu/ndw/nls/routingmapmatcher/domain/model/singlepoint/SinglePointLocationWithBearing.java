@@ -8,12 +8,10 @@ import org.locationtech.jts.geom.Point;
 @ToString(callSuper = true)
 public class SinglePointLocationWithBearing extends SinglePointLocation {
 
-    private final Double minBearing;
-    private final Double maxBearing;
+    private final BearingRange bearingRange;
 
-    public SinglePointLocationWithBearing(int id, Point point, Double minBearing, Double maxBearing, Double radius) {
+    public SinglePointLocationWithBearing(int id, Point point, BearingRange bearingRange, Double radius) {
         super(id, point, radius);
-        this.minBearing = minBearing;
-        this.maxBearing = maxBearing;
+        this.bearingRange = bearingRange;
     }
 }

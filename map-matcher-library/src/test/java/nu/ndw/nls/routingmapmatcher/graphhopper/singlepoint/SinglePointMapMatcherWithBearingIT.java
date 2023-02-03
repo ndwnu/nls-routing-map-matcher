@@ -15,6 +15,7 @@ import nu.ndw.nls.routingmapmatcher.constants.GlobalConstants;
 import nu.ndw.nls.routingmapmatcher.domain.SinglePointMapMatcher;
 import nu.ndw.nls.routingmapmatcher.domain.model.Link;
 import nu.ndw.nls.routingmapmatcher.domain.model.RoutingNetwork;
+import nu.ndw.nls.routingmapmatcher.domain.model.singlepoint.BearingRange;
 import nu.ndw.nls.routingmapmatcher.domain.model.singlepoint.SinglePointLocationWithBearing;
 import nu.ndw.nls.routingmapmatcher.domain.model.singlepoint.SinglePointMatch;
 import nu.ndw.nls.routingmapmatcher.domain.model.singlepoint.SinglePointMatch.CandidateMatch;
@@ -58,7 +59,7 @@ public class SinglePointMapMatcherWithBearingIT {
         setupNetwork();
         Point point = geometryFactory.createPoint(new Coordinate(5.426747, 52.176663));
         SinglePointLocationWithBearing request = new SinglePointLocationWithBearing(1, point,
-                310.0, 320.0, 20.0);
+                new BearingRange(310.0, 320.0),20.0);
         SinglePointMatch result = singlePointMapMatcher.matchWithBearing(request);
         assertThat(result.getCandidateMatches(), hasSize(1));
         CandidateMatch match = result.getCandidateMatches().get(0);
