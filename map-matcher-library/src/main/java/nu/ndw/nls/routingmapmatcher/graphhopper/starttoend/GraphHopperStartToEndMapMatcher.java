@@ -1,5 +1,7 @@
 package nu.ndw.nls.routingmapmatcher.graphhopper.starttoend;
 
+import static nu.ndw.nls.routingmapmatcher.graphhopper.util.MatchUtil.getQueryResults;
+
 import com.google.common.base.Preconditions;
 import com.graphhopper.routing.AlgorithmOptions;
 import com.graphhopper.routing.Path;
@@ -93,17 +95,7 @@ public class GraphHopperStartToEndMapMatcher implements StartToEndMapMatcher {
     }
 
     private List<QueryResult> findCandidates(final Point point) {
-        final double latitude = point.getY();
-        final double longitude = point.getX();
-        final List<QueryResult> queryResults = locationIndexTree.findNClosest(latitude, longitude, edgeFilter,
-                MAXIMUM_CANDIDATE_DISTANCE_IN_METERS);
-        final List<QueryResult> candidates = new ArrayList<>(queryResults.size());
-        for (final QueryResult queryResult : queryResults) {
-            if (queryResult.getQueryDistance() <= MAXIMUM_CANDIDATE_DISTANCE_IN_METERS) {
-                candidates.add(queryResult);
-            }
-        }
-        return candidates;
+        return getQueryResults(point, MAXIMUM_CANDIDATE_DISTANCE_IN_METERS, locationIndexTree, edgeFilter);
     }
 
     private QueryGraph createQueryGraphAndAssignClosestNodePerCandidate(final List<QueryResult> startCandidates,
