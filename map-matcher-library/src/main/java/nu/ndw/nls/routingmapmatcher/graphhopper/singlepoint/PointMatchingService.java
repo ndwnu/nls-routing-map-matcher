@@ -99,7 +99,7 @@ public class PointMatchingService {
             final Coordinate nextCoordinate = coordinateIterator.next();
             double convertedBearing = bearingCalculator.calculateBearing(currentCoordinate, nextCoordinate);
             if (travelDirection == TravelDirection.REVERSED) {
-                convertedBearing = (convertedBearing - REVERSE_BEARING) % MAX_BEARING;
+                convertedBearing = (convertedBearing + REVERSE_BEARING) % MAX_BEARING;
                 log.trace("Reverse travel direction. Bearing will be inverted.");
             }
             //While bearing is in range add coordinates to partialGeometry
