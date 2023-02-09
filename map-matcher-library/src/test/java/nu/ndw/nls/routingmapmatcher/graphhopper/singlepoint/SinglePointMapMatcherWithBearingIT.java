@@ -69,4 +69,20 @@ public class SinglePointMapMatcherWithBearingIT {
         assertThat(match.getDistance(), is(3.8067685587693947));
         assertThat(match.getFraction(), is(0.7627151428527583));
     }
+
+    @Test
+    void matchWithBearing_with_snapped_point_at_end_ok() {
+        setupNetwork();
+        Point point = geometryFactory.createPoint(new Coordinate(5.424288905298937,52.17787309176586));
+        SinglePointLocationWithBearing request = new SinglePointLocationWithBearing(1, point,
+                new BearingRange(188,14),250D);
+        SinglePointMatch result = singlePointMapMatcher.matchWithBearing(request);
+        assertThat(result.getCandidateMatches(), hasSize(10));
+//        CandidateMatch match = result.getCandidateMatches().get(0);
+//        assertThat(match.getMatchedLinkId(), is(3667044));
+//        assertThat(match.getSnappedPoint().getX(), is(5.426768463894968));
+//        assertThat(match.getSnappedPoint().getY(), is(52.176694564551426));
+//        assertThat(match.getDistance(), is(3.8067685587693947));
+//        assertThat(match.getFraction(), is(0.7627151428527583));
+    }
 }
