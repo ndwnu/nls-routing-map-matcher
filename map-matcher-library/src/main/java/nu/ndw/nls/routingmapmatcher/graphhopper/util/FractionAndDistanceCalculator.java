@@ -28,9 +28,14 @@ public class FractionAndDistanceCalculator {
         while (pointList.hasNext()) {
             Coordinate current = pointList.next();
             final LinearLocation previousIndex = locationIndexedLine.indexOf(previous);
+            final LinearLocation currentIndex = locationIndexedLine.indexOf(current);
             if (snappedPointLocation.getSegmentIndex() == previousIndex.getSegmentIndex()) {
                 final double previousToSnappedPointDistance = calculateDistance(snappedPointCoordinate, previous);
                 pathDistanceToSnappedPoint = sumOfPathLengths + previousToSnappedPointDistance;
+            } else if (!pointList.hasNext()
+                    && snappedPointLocation.getSegmentIndex() == currentIndex.getSegmentIndex()) {
+                final double currentToSnappedPointDistance = calculateDistance(snappedPointCoordinate, current);
+                pathDistanceToSnappedPoint = sumOfPathLengths + currentToSnappedPointDistance;
             }
             sumOfPathLengths += calculateDistance(previous, current);
             // Prepare for next loop
