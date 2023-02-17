@@ -3,7 +3,6 @@ package nu.ndw.nls.routingmapmatcher.graphhopper.util;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import nu.ndw.nls.routingmapmatcher.constants.GlobalConstants;
-import nu.ndw.nls.routingmapmatcher.graphhopper.model.TravelDirection;
 import org.assertj.core.data.Percentage;
 import org.geotools.referencing.GeodeticCalculator;
 import org.junit.jupiter.api.BeforeEach;
@@ -41,7 +40,7 @@ class FractionAndDistanceCalculatorTest {
     @Test
     void calculateFraction_with_travelDirection_forward_ok() {
         double fraction = fractionAndDistanceCalculator.calculateFraction(lineString, snappedPointCoordinate,
-                TravelDirection.FORWARD);
+                false);
         assertThat(fraction).isEqualTo(0.4986298177545211);
 
 
@@ -50,7 +49,7 @@ class FractionAndDistanceCalculatorTest {
     @Test
     void calculateFraction_with_travelDirection_reversed_ok() {
         double fraction = fractionAndDistanceCalculator.calculateFraction(lineString, snappedPointCoordinate,
-                TravelDirection.REVERSED);
+                true);
         assertThat(fraction).isEqualTo(0.5013701822454789);
 
     }

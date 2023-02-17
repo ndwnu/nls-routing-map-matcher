@@ -4,7 +4,6 @@ import java.util.Arrays;
 import java.util.Iterator;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import nu.ndw.nls.routingmapmatcher.graphhopper.model.TravelDirection;
 import org.geotools.referencing.GeodeticCalculator;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.LineString;
@@ -18,7 +17,7 @@ public class FractionAndDistanceCalculator {
     private final GeodeticCalculator geodeticCalculator;
 
     public double calculateFraction(LineString line, Coordinate snappedPointCoordinate,
-            TravelDirection travelDirection) {
+            boolean reversed) {
         final LocationIndexedLine locationIndexedLine = new LocationIndexedLine(line);
         final LinearLocation snappedPointLocation = locationIndexedLine.indexOf(snappedPointCoordinate);
         final Iterator<Coordinate> pointList = Arrays.asList(line.getCoordinates()).iterator();
@@ -45,7 +44,7 @@ public class FractionAndDistanceCalculator {
             throw new IllegalStateException("Failed to find path distance to snapped point");
         }
         double fraction = pathDistanceToSnappedPoint / sumOfPathLengths;
-        if (travelDirection == TravelDirection.REVERSED) {
+        if (reversed) {
             log.trace("Reverse travel direction. Fraction will be inverted.");
             fraction = 1D - fraction;
         }
