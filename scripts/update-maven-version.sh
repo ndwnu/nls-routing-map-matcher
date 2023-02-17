@@ -1,1 +1,1 @@
-mvn versions:set -DnewVersion=1.1.2-RELEASE -DgroupId=nu.ndw.nls -DartifactId=routing-map-matcher-parent
+mvn versions:set -DnewVersion=1.1.3-BETA -DgroupId=nu.ndw.nls -DartifactId=routing-map-matcher-parent
