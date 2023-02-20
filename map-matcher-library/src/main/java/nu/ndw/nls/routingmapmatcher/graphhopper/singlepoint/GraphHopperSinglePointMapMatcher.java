@@ -1,6 +1,6 @@
 package nu.ndw.nls.routingmapmatcher.graphhopper.singlepoint;
 
-import static com.graphhopper.storage.ReverseExtractor.hasReversed;
+import static com.graphhopper.storage.EdgeIteratorStateReverseExtractor.hasReversed;
 import static java.util.Comparator.comparing;
 import static nu.ndw.nls.routingmapmatcher.graphhopper.util.MatchUtil.getQueryResults;
 import static nu.ndw.nls.routingmapmatcher.graphhopper.util.PathUtil.determineEdgeDirection;
@@ -136,11 +136,21 @@ public class GraphHopperSinglePointMapMatcher implements SinglePointMapMatcher {
                 // filter on intersects
                 .filter(qr -> intersects(circle, qr))
                 .map(q -> {
-                    boolean geometryIsReversed = hasReversed(q);
-                    LineString originalGeometry = q.
+
+                    LineString wayGeometry = q.
                             getClosestEdge()
                             .fetchWayGeometry(ALL_NODES)
                             .toLineString(false);
+                    /*
+                      The geometry direction of the edge iterator wayGeometry does not
+                       necessarily reflect the direction of a street or the original encoded geometry direction.
+                       It is just the direction of the exploration of the graph.
+                       GraphHopper sometimes reverses the geometry direction with respect to the original direction.
+                       To fix this an internal attribute of the edge iterator state is used indicating it has done so
+                       or not.
+                    */
+                    LineString originalGeometry = hasReversed(q) ? wayGeometry
+                            .reverse() : wayGeometry;
                     LineString cutoffGeometry = (LineString) circle.intersection(originalGeometry);
                     EdgeIteratorTravelDirection travelDirection = determineEdgeDirection(q, flagEncoder);
                     final IntsRef flags = q.getClosestEdge().getFlags();
@@ -151,9 +161,8 @@ public class GraphHopperSinglePointMapMatcher implements SinglePointMapMatcher {
                             .inputPoint(inputPoint)
                             .bearingRange(bearingRange)
                             .travelDirection(travelDirection)
-                            .originalGeometry(geometryIsReversed ? originalGeometry
-                                    .reverse() : originalGeometry)
-                            .cutoffGeometry(geometryIsReversed ? cutoffGeometry.reverse() : cutoffGeometry)
+                            .originalGeometry(originalGeometry)
+                            .cutoffGeometry(cutoffGeometry)
                             .build());
                 })
                 .flatMap(Collection::stream)
