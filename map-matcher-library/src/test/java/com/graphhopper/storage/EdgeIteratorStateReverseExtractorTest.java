@@ -33,14 +33,11 @@ class EdgeIteratorStateReverseExtractorTest {
     private static final double LAT_3 = 52.158280;
     private static final double LONG_4 = 5.3783483;
     private static final double LAT_4 = 52.1590774;
-
-
     private static final long FROM_NODE_ID = 1;
     private static final long TO_NODE_ID = 2;
     private static final Coordinate coordinateA1 = new Coordinate(LONG_1, LAT_1);
     private static final Coordinate coordinateA2 = new Coordinate(LONG_2, LAT_2);
     private static final Coordinate coordinateA3 = new Coordinate(LONG_3, LAT_3);
-
     private static final Coordinate coordinateA4 = new Coordinate(LONG_4, LAT_4);
     private static final int TO_NODE_ID_2 = 3;
     public static final int ID_1 = 1;
