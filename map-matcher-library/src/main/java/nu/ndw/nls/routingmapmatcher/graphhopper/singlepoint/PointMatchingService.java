@@ -29,36 +29,38 @@ public class PointMatchingService {
 
     public List<MatchedPoint> calculateMatches(MatchedQueryResult matchedQueryResult) {
         final List<MatchedPoint> matchedPoints = new ArrayList<>();
-        final Coordinate[] coordinates = matchedQueryResult.getCutoffGeometry().getCoordinates();
         final Point inputPoint = matchedQueryResult.getInputPoint();
         final BearingRange bearingRange = matchedQueryResult.getBearingRange();
         final LineString originalGeometry = matchedQueryResult.getOriginalGeometry();
         final EdgeIteratorTravelDirection travelDirection = matchedQueryResult.getTravelDirection();
         final int matchedLinkId = matchedQueryResult.getMatchedLinkId();
+        matchedQueryResult.getCutoffGeometriesAsLineStrings()
+                .forEach(cutOffGeometry -> {
+                            final Coordinate[] coordinates = cutOffGeometry.getCoordinates();
+                            createAggregatedSubGeometries(coordinates, bearingRange)
+                                    .forEach(lineString -> {
+                                                final MatchedPoint matchedPoint = createMatchedPoint(inputPoint,
+                                                        matchedLinkId,
+                                                        originalGeometry, false, lineString);
+                                                matchedPoints.add(matchedPoint);
+                                            }
+                                    );
+                            if (travelDirection == EdgeIteratorTravelDirection.BOTH_DIRECTIONS) {
+                                final Coordinate[] coordinatesReversed = cutOffGeometry.reverse().getCoordinates();
+                                createAggregatedSubGeometries(coordinatesReversed, bearingRange)
+                                        .forEach(lineString -> {
+                                                    final MatchedPoint matchedPoint = createMatchedPoint(inputPoint,
+                                                            matchedLinkId,
+                                                            originalGeometry,
+                                                            true,
+                                                            lineString);
+                                                    matchedPoints.add(matchedPoint);
+                                                }
 
-        createAggregatedSubGeometries(coordinates, bearingRange)
-                .forEach(lineString -> {
-                            final MatchedPoint matchedPoint = createMatchedPoint(inputPoint,
-                                    matchedLinkId,
-                                    originalGeometry, false, lineString);
-                            matchedPoints.add(matchedPoint);
+                                        );
+                            }
                         }
                 );
-
-        if (travelDirection == EdgeIteratorTravelDirection.BOTH_DIRECTIONS) {
-            final Coordinate[] coordinatesReversed = matchedQueryResult.getCutoffGeometry().reverse().getCoordinates();
-            createAggregatedSubGeometries(coordinatesReversed, bearingRange)
-                    .forEach(lineString -> {
-                                final MatchedPoint matchedPoint = createMatchedPoint(inputPoint,
-                                        matchedLinkId,
-                                        originalGeometry,
-                                        true,
-                                        lineString);
-                                matchedPoints.add(matchedPoint);
-                            }
-
-                    );
-        }
         return matchedPoints;
     }
 
