@@ -4,6 +4,7 @@ import lombok.Builder;
 import lombok.Value;
 import lombok.extern.slf4j.Slf4j;
 import nu.ndw.nls.routingmapmatcher.domain.model.singlepoint.BearingRange;
+import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.LineString;
 import org.locationtech.jts.geom.Point;
 
@@ -17,7 +18,7 @@ public class MatchedQueryResult {
     BearingRange bearingRange;
     LineString originalGeometry;
     EdgeIteratorTravelDirection travelDirection;
-    LineString cutoffGeometry;
+    Geometry cutoffGeometry;
     boolean reversed;
 
 }
