@@ -34,7 +34,7 @@ public class PointMatchingService {
         final LineString originalGeometry = matchedQueryResult.getOriginalGeometry();
         final EdgeIteratorTravelDirection travelDirection = matchedQueryResult.getTravelDirection();
         final int matchedLinkId = matchedQueryResult.getMatchedLinkId();
-        matchedQueryResult.getCutoffGeometriesAsLineStrings()
+        matchedQueryResult.getCutoffGeometryAsLineStrings()
                 .forEach(cutOffGeometry -> {
                             final Coordinate[] coordinates = cutOffGeometry.getCoordinates();
                             createAggregatedSubGeometries(coordinates, bearingRange)

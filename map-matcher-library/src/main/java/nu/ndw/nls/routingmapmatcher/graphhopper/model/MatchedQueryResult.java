@@ -27,7 +27,7 @@ public class MatchedQueryResult {
     Geometry cutoffGeometry;
     boolean reversed;
 
-    public List<LineString> getCutoffGeometriesAsLineStrings() {
+    public List<LineString> getCutoffGeometryAsLineStrings() {
         if (cutoffGeometry instanceof MultiLineString) {
             var multiLineString = (MultiLineString) cutoffGeometry;
             List<LineString> lineStrings = new ArrayList<>();
