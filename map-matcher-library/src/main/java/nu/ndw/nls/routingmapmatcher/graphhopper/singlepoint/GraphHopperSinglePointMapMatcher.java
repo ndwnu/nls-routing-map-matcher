@@ -42,6 +42,7 @@ import nu.ndw.nls.routingmapmatcher.graphhopper.util.FractionAndDistanceCalculat
 import nu.ndw.nls.routingmapmatcher.graphhopper.util.PathUtil;
 import org.geotools.referencing.GeodeticCalculator;
 import org.locationtech.jts.geom.Coordinate;
+import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.LineString;
 import org.locationtech.jts.geom.Point;
@@ -151,7 +152,8 @@ public class GraphHopperSinglePointMapMatcher implements SinglePointMapMatcher {
                     */
                     LineString originalGeometry = hasReversed(q) ? wayGeometry
                             .reverse() : wayGeometry;
-                    LineString cutoffGeometry = (LineString) circle.intersection(originalGeometry);
+
+                    Geometry cutoffGeometry = circle.intersection(originalGeometry);
                     EdgeIteratorTravelDirection travelDirection = determineEdgeDirection(q, flagEncoder);
                     final IntsRef flags = q.getClosestEdge().getFlags();
                     final int matchedLinkId = flagEncoder.getId(flags);
