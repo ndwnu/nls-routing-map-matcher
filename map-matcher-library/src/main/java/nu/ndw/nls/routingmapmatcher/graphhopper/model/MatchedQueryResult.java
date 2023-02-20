@@ -2,7 +2,9 @@ package nu.ndw.nls.routingmapmatcher.graphhopper.model;
 
 import java.util.ArrayList;
 import java.util.List;
+import lombok.AccessLevel;
 import lombok.Builder;
+import lombok.Getter;
 import lombok.Value;
 import lombok.extern.slf4j.Slf4j;
 import nu.ndw.nls.routingmapmatcher.domain.model.singlepoint.BearingRange;
@@ -21,6 +23,7 @@ public class MatchedQueryResult {
     BearingRange bearingRange;
     LineString originalGeometry;
     EdgeIteratorTravelDirection travelDirection;
+    @Getter(AccessLevel.NONE)
     Geometry cutoffGeometry;
     boolean reversed;
 
