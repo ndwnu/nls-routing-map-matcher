@@ -38,7 +38,7 @@ class MatchedQueryResultTest {
                 .builder()
                 .cutoffGeometry(multilineString)
                 .build();
-        var result = matchedQueryresult.getCutoffGeometriesAsLineStrings();
+        var result = matchedQueryresult.getCutoffGeometryAsLineStrings();
         assertThat(result).hasSize(2);
         assertThat(result.get(0)).isEqualTo(lineString_1);
         assertThat(result.get(1)).isEqualTo(lineString_2);
