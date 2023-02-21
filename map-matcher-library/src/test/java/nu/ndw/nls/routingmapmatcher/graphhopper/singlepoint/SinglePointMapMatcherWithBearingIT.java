@@ -67,7 +67,7 @@ public class SinglePointMapMatcherWithBearingIT {
         assertThat(match.getSnappedPoint().getX(), is(5.426768463894968));
         assertThat(match.getSnappedPoint().getY(), is(52.176694564551426));
         assertThat(match.getDistance(), is(3.8067685587693947));
-        assertThat(match.getFraction(), is(0.7627151428527583));
+        assertThat(match.getFraction(), is(0.7627151428741638));
     }
 
     @Test

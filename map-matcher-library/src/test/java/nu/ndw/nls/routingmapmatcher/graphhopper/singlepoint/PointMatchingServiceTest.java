@@ -2,19 +2,13 @@ package nu.ndw.nls.routingmapmatcher.graphhopper.singlepoint;
 
 import static java.util.Comparator.comparing;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.when;
 
-import com.graphhopper.storage.IntsRef;
-import com.graphhopper.storage.index.QueryResult;
-import com.graphhopper.util.EdgeIteratorState;
-import com.graphhopper.util.PointList;
 import java.util.stream.Collectors;
 import nu.ndw.nls.routingmapmatcher.constants.GlobalConstants;
 import nu.ndw.nls.routingmapmatcher.domain.model.singlepoint.BearingRange;
-import nu.ndw.nls.routingmapmatcher.graphhopper.LinkFlagEncoder;
+import nu.ndw.nls.routingmapmatcher.graphhopper.model.EdgeIteratorTravelDirection;
 import nu.ndw.nls.routingmapmatcher.graphhopper.model.MatchedPoint;
 import nu.ndw.nls.routingmapmatcher.graphhopper.model.MatchedQueryResult;
-import nu.ndw.nls.routingmapmatcher.graphhopper.model.TravelDirection;
 import nu.ndw.nls.routingmapmatcher.graphhopper.util.BearingCalculator;
 import nu.ndw.nls.routingmapmatcher.graphhopper.util.FractionAndDistanceCalculator;
 import org.geotools.referencing.GeodeticCalculator;
@@ -26,7 +20,6 @@ import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.LineString;
 import org.locationtech.jts.geom.Point;
 import org.locationtech.jts.geom.PrecisionModel;
-import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
@@ -66,22 +59,8 @@ class PointMatchingServiceTest {
     private static final Coordinate ZIG_ZAG_COORDINATE_13 = new Coordinate(5.42665413, 52.17673958);
 
 
-    @Mock
-    private LinkFlagEncoder flagEncoder;
-
     private final GeometryFactory geometryFactory = new GeometryFactory(new PrecisionModel(),
             GlobalConstants.WGS84_SRID);
-
-    @Mock
-    private QueryResult queryResult;
-
-    @Mock
-    private EdgeIteratorState edgeIteratorState;
-
-    @Mock
-    private PointList pointList;
-    @Mock
-    private IntsRef intsRef;
 
     private Point inputPoint;
 
@@ -92,7 +71,7 @@ class PointMatchingServiceTest {
     @BeforeEach
     void setup() {
         GeodeticCalculator geodeticCalculator = new GeodeticCalculator();
-        pointMatchingService = new PointMatchingService(geometryFactory, flagEncoder,
+        pointMatchingService = new PointMatchingService(geometryFactory,
                 new BearingCalculator(geodeticCalculator),
                 new FractionAndDistanceCalculator(geodeticCalculator));
     }
@@ -101,15 +80,15 @@ class PointMatchingServiceTest {
     @Test
     void calculateMatches_with_no_bearing_should_produce_one_match() {
         LineString originalGeometry = createOriginalGeometryForStraightLine();
-        setupFixtureForQueryResult(originalGeometry);
         createCutOffGeometryForStraightLine();
         inputPoint = geometryFactory.createPoint(INPUT_POINT_COORDINATE);
         var request = MatchedQueryResult
                 .builder()
-                .queryResult(queryResult)
+                .matchedLinkId(ID)
+                .originalGeometry(originalGeometry)
                 .inputPoint(inputPoint)
                 .cutoffGeometry(cutoffGeometry)
-                .travelDirection(TravelDirection.FORWARD)
+                .travelDirection(EdgeIteratorTravelDirection.FORWARD)
                 .build();
         var matches = pointMatchingService.calculateMatches(request);
         assertThat(matches).hasSize(1);
@@ -126,15 +105,15 @@ class PointMatchingServiceTest {
     @Test
     void calculateMatches_with_no_bearing_and_both_directions_should_produce_two_matches() {
         LineString originalGeometry = createOriginalGeometryForStraightLine();
-        setupFixtureForQueryResult(originalGeometry);
         createCutOffGeometryForStraightLine();
         inputPoint = geometryFactory.createPoint(INPUT_POINT_COORDINATE);
         var request = MatchedQueryResult
                 .builder()
-                .queryResult(queryResult)
+                .matchedLinkId(ID)
+                .originalGeometry(originalGeometry)
                 .inputPoint(inputPoint)
                 .cutoffGeometry(cutoffGeometry)
-                .travelDirection(TravelDirection.BOTH_DIRECTIONS)
+                .travelDirection(EdgeIteratorTravelDirection.BOTH_DIRECTIONS)
                 .build();
         var matches = pointMatchingService.calculateMatches(request);
         assertThat(matches).hasSize(2);
@@ -158,16 +137,16 @@ class PointMatchingServiceTest {
     @Test
     void calculateMatches_with_matching_bearing_should_produce_one_match() {
         LineString originalGeometry = createOriginalGeometryForStraightLine();
-        setupFixtureForQueryResult(originalGeometry);
         createCutOffGeometryForStraightLine();
         inputPoint = geometryFactory.createPoint(INPUT_POINT_COORDINATE);
         var request = MatchedQueryResult
                 .builder()
-                .bearingRange(new BearingRange(310.0,320.0))
-                .queryResult(queryResult)
+                .matchedLinkId(ID)
+                .bearingRange(new BearingRange(310.0, 320.0))
+                .originalGeometry(originalGeometry)
                 .inputPoint(inputPoint)
                 .cutoffGeometry(cutoffGeometry)
-                .travelDirection(TravelDirection.BOTH_DIRECTIONS)
+                .travelDirection(EdgeIteratorTravelDirection.BOTH_DIRECTIONS)
                 .build();
         var matches = pointMatchingService.calculateMatches(request);
         assertThat(matches).hasSize(1);
@@ -187,11 +166,12 @@ class PointMatchingServiceTest {
         inputPoint = geometryFactory.createPoint(INPUT_POINT_COORDINATE);
         var request = MatchedQueryResult
                 .builder()
+                .matchedLinkId(ID)
                 .bearingRange(new BearingRange(100.0, 120.0))
-                .queryResult(queryResult)
+                .originalGeometry(cutoffGeometry)
                 .inputPoint(inputPoint)
                 .cutoffGeometry(cutoffGeometry)
-                .travelDirection(TravelDirection.BOTH_DIRECTIONS)
+                .travelDirection(EdgeIteratorTravelDirection.BOTH_DIRECTIONS)
                 .build();
         var matches = pointMatchingService.calculateMatches(request);
         assertThat(matches).hasSize(0);
@@ -201,15 +181,15 @@ class PointMatchingServiceTest {
     void calculateMatches_with_zig_zag_line_should_produce_three_matches() {
         createCutOffGeometryForZigzagLine();
         LineString originalGeometry = createOriginalGeometryForZigZagLine();
-        setupFixtureForQueryResult(originalGeometry);
         inputPoint = geometryFactory.createPoint(INPUT_POINT_COORDINATE);
         var request = MatchedQueryResult
                 .builder()
+                .matchedLinkId(ID)
                 .bearingRange(new BearingRange(300.0, 330.0))
-                .queryResult(queryResult)
+                .originalGeometry(originalGeometry)
                 .inputPoint(inputPoint)
                 .cutoffGeometry(cutoffGeometry)
-                .travelDirection(TravelDirection.FORWARD)
+                .travelDirection(EdgeIteratorTravelDirection.FORWARD)
                 .build();
         var matches = pointMatchingService.calculateMatches(request)
                 .stream()
@@ -279,11 +259,4 @@ class PointMatchingServiceTest {
         return geometryFactory.createLineString(originalCoordinates);
     }
 
-    private void setupFixtureForQueryResult(LineString originalGeometry) {
-        when(queryResult.getClosestEdge()).thenReturn(edgeIteratorState);
-        when(edgeIteratorState.fetchWayGeometry(3)).thenReturn(pointList);
-        when(pointList.toLineString(false)).thenReturn(originalGeometry);
-        when(edgeIteratorState.getFlags()).thenReturn(intsRef);
-        when(flagEncoder.getId(intsRef)).thenReturn(ID);
-    }
 }

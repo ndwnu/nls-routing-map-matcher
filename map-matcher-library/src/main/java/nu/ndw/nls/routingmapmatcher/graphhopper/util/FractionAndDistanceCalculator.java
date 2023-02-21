@@ -1,10 +1,7 @@
 package nu.ndw.nls.routingmapmatcher.graphhopper.util;
 
-import java.util.Arrays;
-import java.util.Iterator;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import nu.ndw.nls.routingmapmatcher.graphhopper.model.TravelDirection;
 import org.geotools.referencing.GeodeticCalculator;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.LineString;
@@ -17,35 +14,28 @@ public class FractionAndDistanceCalculator {
 
     private final GeodeticCalculator geodeticCalculator;
 
-    public double calculateFraction(LineString line, Coordinate snappedPointCoordinate,
-            TravelDirection travelDirection) {
+    public double calculateFraction(final LineString line, final Coordinate snappedPointCoordinate,
+            final boolean reversed) {
         final LocationIndexedLine locationIndexedLine = new LocationIndexedLine(line);
         final LinearLocation snappedPointLocation = locationIndexedLine.indexOf(snappedPointCoordinate);
-        final Iterator<Coordinate> pointList = Arrays.asList(line.getCoordinates()).iterator();
-        Coordinate previous = pointList.next();
+        final Coordinate[] coordinates = line.getCoordinates();
         double sumOfPathLengths = 0D;
         Double pathDistanceToSnappedPoint = null;
-        while (pointList.hasNext()) {
-            Coordinate current = pointList.next();
-            final LinearLocation previousIndex = locationIndexedLine.indexOf(previous);
-            final LinearLocation currentIndex = locationIndexedLine.indexOf(current);
-            if (snappedPointLocation.getSegmentIndex() == previousIndex.getSegmentIndex()) {
-                final double previousToSnappedPointDistance = calculateDistance(snappedPointCoordinate, previous);
-                pathDistanceToSnappedPoint = sumOfPathLengths + previousToSnappedPointDistance;
-            } else if (!pointList.hasNext()
-                    && snappedPointLocation.getSegmentIndex() == currentIndex.getSegmentIndex()) {
-                final double currentToSnappedPointDistance = calculateDistance(snappedPointCoordinate, current);
-                pathDistanceToSnappedPoint = sumOfPathLengths + currentToSnappedPointDistance;
+        for (int i = 0; i < coordinates.length; i++) {
+            final Coordinate current = coordinates[i];
+            if (i == snappedPointLocation.getSegmentIndex()) {
+                pathDistanceToSnappedPoint = sumOfPathLengths + calculateDistance(current, snappedPointCoordinate);
             }
-            sumOfPathLengths += calculateDistance(previous, current);
-            // Prepare for next loop
-            previous = current;
+            if (i + 1 < coordinates.length) {
+                final Coordinate next = coordinates[i + 1];
+                sumOfPathLengths += calculateDistance(current, next);
+            }
         }
         if (pathDistanceToSnappedPoint == null) {
             throw new IllegalStateException("Failed to find path distance to snapped point");
         }
         double fraction = pathDistanceToSnappedPoint / sumOfPathLengths;
-        if (travelDirection == TravelDirection.REVERSED) {
+        if (reversed) {
             log.trace("Reverse travel direction. Fraction will be inverted.");
             fraction = 1D - fraction;
         }
@@ -54,10 +44,8 @@ public class FractionAndDistanceCalculator {
         return fraction;
     }
 
-    public double calculateDistance(Coordinate from, Coordinate to) {
-        geodeticCalculator.setStartingGeographicPoint(to
-                        .getX(),
-                to.getY());
+    public double calculateDistance(final Coordinate from, final Coordinate to) {
+        geodeticCalculator.setStartingGeographicPoint(to.getX(), to.getY());
         geodeticCalculator.setDestinationGeographicPoint(from.getX(), from.getY());
         return geodeticCalculator.getOrthodromicDistance();
     }
