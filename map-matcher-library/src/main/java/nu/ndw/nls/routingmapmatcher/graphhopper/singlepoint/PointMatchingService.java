@@ -1,7 +1,6 @@
 package nu.ndw.nls.routingmapmatcher.graphhopper.singlepoint;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -13,6 +12,7 @@ import nu.ndw.nls.routingmapmatcher.graphhopper.util.BearingCalculator;
 import nu.ndw.nls.routingmapmatcher.graphhopper.util.FractionAndDistanceCalculator;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.GeometryFactory;
+import org.locationtech.jts.geom.LineSegment;
 import org.locationtech.jts.geom.LineString;
 import org.locationtech.jts.geom.Point;
 import org.locationtech.jts.linearref.LinearLocation;
@@ -27,9 +27,9 @@ public class PointMatchingService {
     private final BearingCalculator bearingCalculator;
     private final FractionAndDistanceCalculator fractionAndDistanceCalculator;
 
-    public List<MatchedPoint> calculateMatches(MatchedQueryResult matchedQueryResult) {
+    public List<MatchedPoint> calculateMatches(final MatchedQueryResult matchedQueryResult) {
         final List<MatchedPoint> matchedPoints = new ArrayList<>();
-        final Point inputPoint = matchedQueryResult.getInputPoint();
+        final Coordinate inputCoordinate = matchedQueryResult.getInputPoint().getCoordinate();
         final BearingRange bearingRange = matchedQueryResult.getBearingRange();
         final LineString originalGeometry = matchedQueryResult.getOriginalGeometry();
         final EdgeIteratorTravelDirection travelDirection = matchedQueryResult.getTravelDirection();
@@ -39,9 +39,8 @@ public class PointMatchingService {
                             final Coordinate[] coordinates = cutOffGeometry.getCoordinates();
                             createAggregatedSubGeometries(coordinates, bearingRange)
                                     .forEach(lineString -> {
-                                                final MatchedPoint matchedPoint = createMatchedPoint(inputPoint,
-                                                        matchedLinkId,
-                                                        originalGeometry, false, lineString);
+                                                final MatchedPoint matchedPoint = createMatchedPoint(inputCoordinate,
+                                                        matchedLinkId, originalGeometry, false, lineString);
                                                 matchedPoints.add(matchedPoint);
                                             }
                                     );
@@ -49,14 +48,11 @@ public class PointMatchingService {
                                 final Coordinate[] coordinatesReversed = cutOffGeometry.reverse().getCoordinates();
                                 createAggregatedSubGeometries(coordinatesReversed, bearingRange)
                                         .forEach(lineString -> {
-                                                    final MatchedPoint matchedPoint = createMatchedPoint(inputPoint,
-                                                            matchedLinkId,
-                                                            originalGeometry,
-                                                            true,
+                                                    final MatchedPoint matchedPoint = createMatchedPoint(
+                                                            inputCoordinate, matchedLinkId, originalGeometry, true,
                                                             lineString);
                                                     matchedPoints.add(matchedPoint);
                                                 }
-
                                         );
                             }
                         }
@@ -64,75 +60,60 @@ public class PointMatchingService {
         return matchedPoints;
     }
 
-    private MatchedPoint createMatchedPoint(Point inputPoint,
-            int matchedLinkId,
-            LineString originalGeometry,
-            boolean reversed,
-            LineString aggregatedGeometry
+    private MatchedPoint createMatchedPoint(final Coordinate inputCoordinate, final int matchedLinkId,
+            final LineString originalGeometry, final boolean reversed, final LineString aggregatedGeometry) {
+        final LocationIndexedLine lineIndex = new LocationIndexedLine(aggregatedGeometry);
+        final LinearLocation snappedPointLinearLocation = lineIndex.project(inputCoordinate);
+        final Coordinate snappedCoordinate = lineIndex.extractPoint(snappedPointLinearLocation);
+        final Point snappedPoint = geometryFactory.createPoint(snappedCoordinate);
 
-    ) {
-        final Point snappedPoint = calculateSnappedPoint(aggregatedGeometry, inputPoint);
-        final double fraction = calculateFraction(snappedPoint, originalGeometry, reversed);
+        final double fraction = fractionAndDistanceCalculator.calculateFraction(originalGeometry, snappedCoordinate,
+                reversed);
 
-        final double distanceToSnappedPoint = fractionAndDistanceCalculator.calculateDistance(
-                inputPoint.getCoordinate(),
-                snappedPoint.getCoordinate());
+        final double distance = fractionAndDistanceCalculator.calculateDistance(inputCoordinate, snappedCoordinate);
+
+        final LineSegment segment = snappedPointLinearLocation.getSegment(aggregatedGeometry);
+        final double bearing = bearingCalculator.calculateBearing(segment.p0, segment.p1);
+
         return MatchedPoint
                 .builder()
-                .reversed(reversed)
                 .matchedLinkId(matchedLinkId)
-                .fractionOfSnappedPoint(fraction)
-                .distanceToSnappedPoint(distanceToSnappedPoint)
                 .snappedPoint(snappedPoint)
+                .fractionOfSnappedPoint(fraction)
+                .distanceToSnappedPoint(distance)
+                .bearingOfSnappedPoint(bearing)
+                .reversed(reversed)
                 .build();
     }
 
-    private List<LineString> createAggregatedSubGeometries(Coordinate[] coordinates, BearingRange bearingRange) {
-        List<LineString> subGeometries = new ArrayList<>();
+    private List<LineString> createAggregatedSubGeometries(final Coordinate[] coordinates,
+            final BearingRange bearingRange) {
+        final List<LineString> subGeometries = new ArrayList<>();
         List<Coordinate> partialGeometry = new ArrayList<>();
-        var coordinateIterator = Arrays.asList(coordinates).iterator();
-        Coordinate currentCoordinate = coordinateIterator.next();
-        while (coordinateIterator.hasNext()) {
-            final Coordinate nextCoordinate = coordinateIterator.next();
-            double convertedBearing = bearingCalculator.calculateBearing(currentCoordinate, nextCoordinate);
-            //While bearing is in range add coordinates to partialGeometry
+        for (int i = 1; i < coordinates.length; i++) {
+            final Coordinate currentCoordinate = coordinates[i - 1];
+            final Coordinate nextCoordinate = coordinates[i];
+            final double convertedBearing = bearingCalculator.calculateBearing(currentCoordinate, nextCoordinate);
+            // While bearing is in range, add coordinates to partialGeometry
             if (bearingCalculator.bearingIsInRange(convertedBearing, bearingRange)) {
-                partialGeometry.add(currentCoordinate);
-                partialGeometry.add(nextCoordinate);
-                // Stop condition last coordinate add partialGeometry if present
-                if (!coordinateIterator.hasNext()) {
-                    subGeometries.add(geometryFactory
-                            .createLineString(partialGeometry.toArray(Coordinate[]::new)));
+                if (partialGeometry.isEmpty()) {
+                    partialGeometry.add(currentCoordinate);
                 }
-
+                partialGeometry.add(nextCoordinate);
+                // Stop condition: last coordinate. Add partialGeometry if present
+                if (i == coordinates.length - 1) {
+                    subGeometries.add(geometryFactory.createLineString(partialGeometry.toArray(Coordinate[]::new)));
+                }
             } else {
-                //Bearing is out of range add result to subGeometries and reinitialize
+                // Bearing is out of range. Add result to subGeometries and reinitialize
                 if (!partialGeometry.isEmpty()) {
-                    subGeometries.add(geometryFactory
-                            .createLineString(partialGeometry.toArray(Coordinate[]::new)));
+                    subGeometries.add(geometryFactory.createLineString(partialGeometry.toArray(Coordinate[]::new)));
                     partialGeometry = new ArrayList<>();
                 }
             }
 
             log.debug("Segment [{} -> {}]. bearing is: {}", currentCoordinate, nextCoordinate, convertedBearing);
-            currentCoordinate = nextCoordinate;
-
         }
         return subGeometries;
     }
-
-    private double calculateFraction(Point snappedPoint, LineString originalGeometry, boolean reversed) {
-
-        return fractionAndDistanceCalculator.calculateFraction(originalGeometry,
-                snappedPoint.getCoordinate(),
-                reversed);
-    }
-
-    private Point calculateSnappedPoint(LineString subGeometry, Point inputPoint) {
-        final LocationIndexedLine lineIndex = new LocationIndexedLine(subGeometry);
-        final LinearLocation snappedPointLinearLocation = lineIndex.project(inputPoint.getCoordinate());
-        return geometryFactory
-                .createPoint(lineIndex.extractPoint(snappedPointLinearLocation));
-    }
-
 }
