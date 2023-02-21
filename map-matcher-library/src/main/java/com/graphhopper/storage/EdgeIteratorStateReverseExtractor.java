@@ -21,7 +21,7 @@ public final class EdgeIteratorStateReverseExtractor {
     private EdgeIteratorStateReverseExtractor() {
     }
 
-    public static boolean hasReversed(QueryResult q) {
+    public static boolean hasReversed(final QueryResult q) {
         final EdgeIteratorState closestEdge = q.getClosestEdge();
         if (!(closestEdge instanceof EdgeIterable)) {
             throw new IllegalArgumentException("This method can only be called with an EdgeIteratorState "

@@ -10,7 +10,8 @@ public class SinglePointLocationWithBearing extends SinglePointLocation {
 
     private final BearingRange bearingRange;
 
-    public SinglePointLocationWithBearing(int id, Point point, BearingRange bearingRange, Double radius) {
+    public SinglePointLocationWithBearing(final int id, final Point point, final BearingRange bearingRange,
+            final Double radius) {
         super(id, point, radius);
         this.bearingRange = bearingRange;
     }

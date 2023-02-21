@@ -14,26 +14,23 @@ public class BearingCalculator {
 
     public static final int REVERSE_BEARING = 180;
 
-    public boolean bearingIsInRange(double convertedBearing, BearingRange bearingRange) {
+    public boolean bearingIsInRange(final double convertedBearing, final BearingRange bearingRange) {
         // If no bearing is provided return true
         if (bearingRange == null) {
             return true;
         }
-        double minBearingStandardised = bearingRange.getMinBearing() % MAX_BEARING;
-        double maxBearingStandardised = bearingRange.getMaxBearing() % MAX_BEARING;
-        if (minBearingStandardised > maxBearingStandardised) {
-            return convertedBearing >= minBearingStandardised || convertedBearing <= maxBearingStandardised;
-
+        final double minBearingStandardized = bearingRange.getMinBearing() % MAX_BEARING;
+        final double maxBearingStandardized = bearingRange.getMaxBearing() % MAX_BEARING;
+        if (minBearingStandardized > maxBearingStandardized) {
+            return convertedBearing >= minBearingStandardized || convertedBearing <= maxBearingStandardized;
         } else {
-            return convertedBearing >= minBearingStandardised && convertedBearing <= maxBearingStandardised;
+            return convertedBearing >= minBearingStandardized && convertedBearing <= maxBearingStandardized;
         }
     }
 
-    public double calculateBearing(Coordinate currentCoordinate, Coordinate nextCoordinate) {
-        geodeticCalculator.setStartingGeographicPoint(currentCoordinate.getX(),
-                currentCoordinate.getY());
-        geodeticCalculator.setDestinationGeographicPoint(nextCoordinate.getX(),
-                nextCoordinate.getY());
+    public double calculateBearing(final Coordinate currentCoordinate, final Coordinate nextCoordinate) {
+        geodeticCalculator.setStartingGeographicPoint(currentCoordinate.getX(), currentCoordinate.getY());
+        geodeticCalculator.setDestinationGeographicPoint(nextCoordinate.getX(), nextCoordinate.getY());
         final double bearing = geodeticCalculator.getAzimuth();
         return (bearing + MAX_BEARING) % MAX_BEARING;
     }

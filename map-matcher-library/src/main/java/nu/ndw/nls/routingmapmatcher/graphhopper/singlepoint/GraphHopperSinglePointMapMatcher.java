@@ -102,7 +102,6 @@ public class GraphHopperSinglePointMapMatcher implements SinglePointMapMatcher {
                 WGS84_GEOMETRY_FACTORY,
                 new BearingCalculator(new GeodeticCalculator()),
                 new FractionAndDistanceCalculator(new GeodeticCalculator()));
-
     }
 
     @Override
@@ -123,7 +122,7 @@ public class GraphHopperSinglePointMapMatcher implements SinglePointMapMatcher {
     }
 
     @Override
-    public SinglePointMatch matchWithBearing(SinglePointLocationWithBearing singlePointLocationWithBearing) {
+    public SinglePointMatch matchWithBearing(final SinglePointLocationWithBearing singlePointLocationWithBearing) {
         Preconditions.checkNotNull(singlePointLocationWithBearing);
         final Point inputPoint = singlePointLocationWithBearing.getPoint();
         final double inputRadius = singlePointLocationWithBearing.getRadius() != null ?
@@ -137,24 +136,19 @@ public class GraphHopperSinglePointMapMatcher implements SinglePointMapMatcher {
                 // filter on intersects
                 .filter(qr -> intersects(circle, qr))
                 .map(q -> {
-
-                    LineString wayGeometry = q.
-                            getClosestEdge()
+                    final LineString wayGeometry = q.getClosestEdge()
                             .fetchWayGeometry(ALL_NODES)
                             .toLineString(false);
                     /*
-                      The geometry direction of the edge iterator wayGeometry does not
-                       necessarily reflect the direction of a street or the original encoded geometry direction.
-                       It is just the direction of the exploration of the graph.
-                       GraphHopper sometimes reverses the geometry direction with respect to the original direction.
-                       To fix this an internal attribute of the edge iterator state is used indicating it has done so
-                       or not.
+                       The geometry direction of the edge iterator wayGeometry does not necessarily reflect the
+                       direction of a street or the original encoded geometry direction. It is just the direction of
+                       the exploration of the graph. GraphHopper sometimes reverses the geometry direction with respect
+                       to the original direction. To fix this, an internal attribute of the edge iterator state is used,
+                       indicating it has done so or not.
                     */
-                    LineString originalGeometry = hasReversed(q) ? wayGeometry
-                            .reverse() : wayGeometry;
-
-                    Geometry cutoffGeometry = circle.intersection(originalGeometry);
-                    EdgeIteratorTravelDirection travelDirection = determineEdgeDirection(q, flagEncoder);
+                    final LineString originalGeometry = hasReversed(q) ? wayGeometry.reverse() : wayGeometry;
+                    final Geometry cutoffGeometry = circle.intersection(originalGeometry);
+                    final EdgeIteratorTravelDirection travelDirection = determineEdgeDirection(q, flagEncoder);
                     final IntsRef flags = q.getClosestEdge().getFlags();
                     final int matchedLinkId = flagEncoder.getId(flags);
                     return pointMatchingService.calculateMatches(MatchedQueryResult
@@ -173,7 +167,7 @@ public class GraphHopperSinglePointMapMatcher implements SinglePointMapMatcher {
         if (filteredResults.isEmpty()) {
             return createFailedMatch(singlePointLocationWithBearing);
         }
-        List<CandidateMatch> candidateMatches = filteredResults
+        final List<CandidateMatch> candidateMatches = filteredResults
                 .stream()
                 .map(matchedLineSegment -> new SinglePointMatch.CandidateMatch(
                         matchedLineSegment.getMatchedLinkId(),
@@ -181,7 +175,9 @@ public class GraphHopperSinglePointMapMatcher implements SinglePointMapMatcher {
                         null,
                         matchedLineSegment.getSnappedPoint(),
                         matchedLineSegment.getFractionOfSnappedPoint(),
-                        matchedLineSegment.getDistanceToSnappedPoint(), matchedLineSegment.isReversed()))
+                        matchedLineSegment.getDistanceToSnappedPoint(),
+                        matchedLineSegment.getBearingOfSnappedPoint(),
+                        matchedLineSegment.isReversed()))
                 .collect(Collectors.toList());
         final double closestDistance = filteredResults.stream()
                 .mapToDouble(MatchedPoint::getDistanceToSnappedPoint).min()
@@ -192,14 +188,13 @@ public class GraphHopperSinglePointMapMatcher implements SinglePointMapMatcher {
                 reliability, MatchStatus.MATCH);
     }
 
-
-    private boolean intersects(Polygon circle, QueryResult queryResult) {
-        PointList pl = queryResult.getClosestEdge().fetchWayGeometry(ALL_NODES);
+    private boolean intersects(final Polygon circle, final QueryResult queryResult) {
+        final PointList pl = queryResult.getClosestEdge().fetchWayGeometry(ALL_NODES);
         return circle.intersects(pl.toLineString(INCLUDE_ELEVATION));
     }
 
-    private Polygon createCircle(Point point, double distanceInMeters) {
-        var shapeFactory = new GeometricShapeFactory(WGS84_GEOMETRY_FACTORY);
+    private Polygon createCircle(final Point point, final double distanceInMeters) {
+        final var shapeFactory = new GeometricShapeFactory(WGS84_GEOMETRY_FACTORY);
         shapeFactory.setCentre(new Coordinate(point.getX(), point.getY()));
         shapeFactory.setNumPoints(NUM_POINTS);
         shapeFactory.setWidth(distanceInMeters / DEGREE_LATITUDE_IN_KM);
@@ -208,13 +203,12 @@ public class GraphHopperSinglePointMapMatcher implements SinglePointMapMatcher {
         return shapeFactory.createEllipse();
     }
 
-    private List<QueryResult> findCandidates(final Point point, double radius) {
+    private List<QueryResult> findCandidates(final Point point, final double radius) {
         return getQueryResults(point, radius, locationIndexTree, edgeFilter);
     }
 
-
     private SinglePointMatch createMatch(final List<QueryResult> queryResults,
-            final SinglePointLocation singlePointLocation, double inputRadius) {
+            final SinglePointLocation singlePointLocation, final double inputRadius) {
         final List<SinglePointMatch.CandidateMatch> candidateMatches = Lists.newArrayList();
         final double closestDistance = queryResults.stream().mapToDouble(QueryResult::getQueryDistance).min()
                 .orElse(DEFAULT_CANDIDATE_DISTANCE_IN_METERS);
@@ -242,7 +236,7 @@ public class GraphHopperSinglePointMapMatcher implements SinglePointMapMatcher {
                         this.distanceCalculator, flagEncoder);
 
                 candidateMatches.add(new SinglePointMatch.CandidateMatch(matchedLinkId, upstreamLinkIds,
-                        downstreamLinkIds, snappedPoint, fraction, queryResult.getQueryDistance(), false));
+                        downstreamLinkIds, snappedPoint, fraction, queryResult.getQueryDistance(), null, false));
             }
         }
 
@@ -250,7 +244,7 @@ public class GraphHopperSinglePointMapMatcher implements SinglePointMapMatcher {
         return new SinglePointMatch(singlePointLocation.getId(), candidateMatches, reliability, MatchStatus.MATCH);
     }
 
-    private static double calculateReliability(double closestDistance, double radius) {
+    private static double calculateReliability(final double closestDistance, final double radius) {
         return (1 - closestDistance / radius) * MAX_RELIABILITY_SCORE;
     }
 
