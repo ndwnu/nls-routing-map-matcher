@@ -32,7 +32,7 @@ steps:
     inputs:
       publishJUnitResults: false
       sonarQubeRunAnalysis: true
-      jdkVersionOption: 1.11
+      jdkVersionOption: 1.17
       ${{ if eq(variables.isMain, true) }}:
         mavenAuthenticateFeed: true
         goals: 'deploy'
