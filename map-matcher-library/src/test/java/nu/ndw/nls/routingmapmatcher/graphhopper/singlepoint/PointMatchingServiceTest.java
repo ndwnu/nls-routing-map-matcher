@@ -30,11 +30,14 @@ class PointMatchingServiceTest {
     private static final double SNAPPED_POINT_Y = 52.176694564551426;
     private static final double DISTANCE = 3.8067685587693947;
     private static final double FRACTION = 0.2372848571472417;
+    private static final double BEARING = 317.8835356767284;
     private static final double FRACTION_REVERSED = 0.7627151428527583;
+    private static final double BEARING_REVERSED = 137.88347510955532;
     private static final double SNAPPED_POINT_X_ZIG_ZAG = 5.42678346;
     private static final double SNAPPED_POINT_Y_ZIG_ZAG = 52.17667896;
     private static final double DISTANCE_ZIG_ZAG = 3.061770997311956;
     private static final double FRACTION_ZIG_ZAG = 0.315843722882771;
+    private static final double BEARING_ZIG_ZAG = 329.90304946644443;
     private static final Coordinate INPUT_POINT_COORDINATE = new Coordinate(5.426747, 52.176663);
     private static final Coordinate CUTOFF_COORDINATE_1 = new Coordinate(5.4268356764862355, 52.17664885998936);
     private static final Coordinate CUTOFF_COORDINATE_2 = new Coordinate(5.426759, 52.176701);
@@ -58,7 +61,6 @@ class PointMatchingServiceTest {
     private static final Coordinate ZIG_ZAG_COORDINATE_12 = new Coordinate(5.42669635, 52.17673473);
     private static final Coordinate ZIG_ZAG_COORDINATE_13 = new Coordinate(5.42665413, 52.17673958);
 
-
     private final GeometryFactory geometryFactory = new GeometryFactory(new PrecisionModel(),
             GlobalConstants.WGS84_SRID);
 
@@ -75,7 +77,6 @@ class PointMatchingServiceTest {
                 new BearingCalculator(geodeticCalculator),
                 new FractionAndDistanceCalculator(geodeticCalculator));
     }
-
 
     @Test
     void calculateMatches_with_no_bearing_should_produce_one_match() {
@@ -100,6 +101,7 @@ class PointMatchingServiceTest {
         assertThat(match.isReversed()).isEqualTo(false);
         assertThat(match.getDistanceToSnappedPoint()).isEqualTo(DISTANCE);
         assertThat(match.getFractionOfSnappedPoint()).isEqualTo(FRACTION);
+        assertThat(match.getBearingOfSnappedPoint()).isEqualTo(BEARING);
     }
 
     @Test
@@ -125,6 +127,7 @@ class PointMatchingServiceTest {
         assertThat(matchOne.isReversed()).isEqualTo(false);
         assertThat(matchOne.getDistanceToSnappedPoint()).isEqualTo(DISTANCE);
         assertThat(matchOne.getFractionOfSnappedPoint()).isEqualTo(FRACTION);
+        assertThat(matchOne.getBearingOfSnappedPoint()).isEqualTo(BEARING);
         var matchTwo = matches.get(1);
         assertThat(matchTwo.getMatchedLinkId()).isEqualTo(ID);
         assertThat(matchTwo.getSnappedPoint().getX()).isEqualTo(SNAPPED_POINT_X);
@@ -132,6 +135,7 @@ class PointMatchingServiceTest {
         assertThat(matchTwo.isReversed()).isEqualTo(true);
         assertThat(matchTwo.getDistanceToSnappedPoint()).isEqualTo(DISTANCE);
         assertThat(matchTwo.getFractionOfSnappedPoint()).isEqualTo(FRACTION_REVERSED);
+        assertThat(matchTwo.getBearingOfSnappedPoint()).isEqualTo(BEARING_REVERSED);
     }
 
     @Test
@@ -158,6 +162,7 @@ class PointMatchingServiceTest {
         assertThat(matchOne.isReversed()).isEqualTo(false);
         assertThat(matchOne.getDistanceToSnappedPoint()).isEqualTo(DISTANCE);
         assertThat(matchOne.getFractionOfSnappedPoint()).isEqualTo(FRACTION);
+        assertThat(matchOne.getBearingOfSnappedPoint()).isEqualTo(BEARING);
     }
 
     @Test
@@ -203,10 +208,10 @@ class PointMatchingServiceTest {
         assertThat(closestMatch.isReversed()).isEqualTo(false);
         assertThat(closestMatch.getDistanceToSnappedPoint()).isEqualTo(DISTANCE_ZIG_ZAG);
         assertThat(closestMatch.getFractionOfSnappedPoint()).isEqualTo(FRACTION_ZIG_ZAG);
+        assertThat(closestMatch.getBearingOfSnappedPoint()).isEqualTo(BEARING_ZIG_ZAG);
     }
 
     private void createCutOffGeometryForZigzagLine() {
-
         var cutoffCoordinates = new Coordinate[]{
                 ZIG_ZAG_COORDINATE_2,
                 ZIG_ZAG_COORDINATE_3,
@@ -219,7 +224,6 @@ class PointMatchingServiceTest {
                 ZIG_ZAG_COORDINATE_10,
                 ZIG_ZAG_COORDINATE_11,
                 ZIG_ZAG_COORDINATE_12
-
         };
         cutoffGeometry = geometryFactory.createLineString(cutoffCoordinates);
     }
@@ -242,7 +246,6 @@ class PointMatchingServiceTest {
         return geometryFactory.createLineString(originalCoordinates);
     }
 
-
     private void createCutOffGeometryForStraightLine() {
         var cutoffCoordinates = new Coordinate[]{
                 CUTOFF_COORDINATE_1,
@@ -258,5 +261,4 @@ class PointMatchingServiceTest {
                 ORIGINAL_COORDINATE_3};
         return geometryFactory.createLineString(originalCoordinates);
     }
-
 }
