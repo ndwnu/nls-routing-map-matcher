@@ -30,14 +30,15 @@ steps:
   - task: Maven@3
     displayName: Maven build
     inputs:
+      options: -B
       publishJUnitResults: false
       sonarQubeRunAnalysis: true
       jdkVersionOption: 1.11
       ${{ if eq(variables.isMain, true) }}:
         mavenAuthenticateFeed: true
-        goals: 'deploy'
+        goals: clean deploy
       ${{ if ne(variables.isMain, true) }}:
-        goals: 'clean verify'
+        goals: clean verify
 
   - task: SonarQubePublish@4
     displayName: Publish Sonar analysis results
