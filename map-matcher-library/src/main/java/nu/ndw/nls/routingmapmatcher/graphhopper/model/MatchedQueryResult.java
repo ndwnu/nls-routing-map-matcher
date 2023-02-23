@@ -29,14 +29,14 @@ public class MatchedQueryResult {
 
     public List<LineString> getCutoffGeometryAsLineStrings() {
         if (cutoffGeometry instanceof MultiLineString) {
-            var multiLineString = (MultiLineString) cutoffGeometry;
-            List<LineString> lineStrings = new ArrayList<>();
+            final var multiLineString = (MultiLineString) cutoffGeometry;
+            final List<LineString> lineStrings = new ArrayList<>();
             for (int i = 0; i < multiLineString.getNumGeometries(); i++) {
                 lineStrings.add((LineString) multiLineString.getGeometryN(i));
             }
             return lineStrings;
         } else if (cutoffGeometry instanceof LineString) {
-            var lineString = (LineString) cutoffGeometry;
+            final var lineString = (LineString) cutoffGeometry;
             return List.of(lineString);
         } else {
             throw new IllegalStateException("Only LineString or MultiLineString "

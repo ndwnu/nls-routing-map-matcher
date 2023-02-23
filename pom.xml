@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>nu.ndw.nls</groupId>
     <artifactId>routing-map-matcher-parent</artifactId>
-    <version>1.1.3-RELEASE</version>
+    <version>1.1.6-RELEASE</version>
     <name>routing map matcher parent</name>
     <description>Routing Map Matcher modules containing the core library and spring boot starter modules</description>
     <packaging>pom</packaging>
@@ -27,7 +27,7 @@
         <hamcrest.version>2.2</hamcrest.version>
         <spring-boot.version>2.7.6</spring-boot.version>
         <jacoco.version>0.8.8</jacoco.version>
-        <geotools.version>27.2</geotools.version>
+        <geotools.version>28.2</geotools.version>
         <maven-failsafe-plugin.version>2.22.2</maven-failsafe-plugin.version>
         <maven-surefire-plugin.version>2.22.2</maven-surefire-plugin.version>
         <sonar-maven-plugin.version>3.7.0.1746</sonar-maven-plugin.version>
