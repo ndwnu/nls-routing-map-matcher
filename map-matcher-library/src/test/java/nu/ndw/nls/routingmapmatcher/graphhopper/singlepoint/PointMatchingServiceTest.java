@@ -31,7 +31,6 @@ class PointMatchingServiceTest {
     private static final double DISTANCE = 3.8067685587693947;
     private static final double FRACTION = 0.2372848571472417;
     private static final double BEARING = 317.8835356767284;
-    private static final double FRACTION_REVERSED = 0.7627151428527583;
     private static final double BEARING_REVERSED = 137.88347510955532;
     private static final double SNAPPED_POINT_X_ZIG_ZAG = 5.42678346;
     private static final double SNAPPED_POINT_Y_ZIG_ZAG = 52.17667896;
@@ -134,7 +133,7 @@ class PointMatchingServiceTest {
         assertThat(matchTwo.getSnappedPoint().getY()).isEqualTo(SNAPPED_POINT_Y);
         assertThat(matchTwo.isReversed()).isEqualTo(true);
         assertThat(matchTwo.getDistanceToSnappedPoint()).isEqualTo(DISTANCE);
-        assertThat(matchTwo.getFractionOfSnappedPoint()).isEqualTo(FRACTION_REVERSED);
+        assertThat(matchTwo.getFractionOfSnappedPoint()).isEqualTo(FRACTION);
         assertThat(matchTwo.getBearingOfSnappedPoint()).isEqualTo(BEARING_REVERSED);
     }
 
