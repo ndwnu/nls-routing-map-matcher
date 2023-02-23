@@ -27,7 +27,7 @@ public class SinglePointLocation extends BaseLocation {
         this.radius = null;
     }
 
-    public SinglePointLocation(final int id, final Point point, Double radius) {
+    public SinglePointLocation(final int id, final Point point, final Double radius) {
         super(id);
         this.point = point;
         this.radius = radius;

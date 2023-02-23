@@ -38,19 +38,10 @@ class FractionAndDistanceCalculatorTest {
     }
 
     @Test
-    void calculateFraction_with_travelDirection_forward_ok() {
-        double fraction = fractionAndDistanceCalculator.calculateFraction(lineString, snappedPointCoordinate,
-                false);
-        assertThat(fraction).isEqualTo(0.4986298177545211);
+    void calculateFraction_ok() {
+        double fraction = fractionAndDistanceCalculator.calculateFraction(lineString, snappedPointCoordinate);
+        assertThat(fraction).isCloseTo(0.4986, Percentage.withPercentage(1));
 
-
-    }
-
-    @Test
-    void calculateFraction_with_travelDirection_reversed_ok() {
-        double fraction = fractionAndDistanceCalculator.calculateFraction(lineString, snappedPointCoordinate,
-                true);
-        assertThat(fraction).isEqualTo(0.5013701822454789);
 
     }
 

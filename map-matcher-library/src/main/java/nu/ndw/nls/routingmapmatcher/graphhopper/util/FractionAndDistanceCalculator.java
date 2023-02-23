@@ -12,14 +12,14 @@ import org.locationtech.jts.linearref.LocationIndexedLine;
 @Slf4j
 public class FractionAndDistanceCalculator {
 
+    public static final double NEAR_ZERO = 0.00000000000001;
     private final GeodeticCalculator geodeticCalculator;
 
-    public double calculateFraction(final LineString line, final Coordinate snappedPointCoordinate,
-            final boolean reversed) {
+    public double calculateFraction(final LineString line, final Coordinate snappedPointCoordinate) {
         final LocationIndexedLine locationIndexedLine = new LocationIndexedLine(line);
         final LinearLocation snappedPointLocation = locationIndexedLine.indexOf(snappedPointCoordinate);
         final Coordinate[] coordinates = line.getCoordinates();
-        double sumOfPathLengths = 0D;
+        double sumOfPathLengths = NEAR_ZERO;
         Double pathDistanceToSnappedPoint = null;
         for (int i = 0; i < coordinates.length; i++) {
             final Coordinate current = coordinates[i];
@@ -35,10 +35,7 @@ public class FractionAndDistanceCalculator {
             throw new IllegalStateException("Failed to find path distance to snapped point");
         }
         double fraction = pathDistanceToSnappedPoint / sumOfPathLengths;
-        if (reversed) {
-            log.trace("Reverse travel direction. Fraction will be inverted.");
-            fraction = 1D - fraction;
-        }
+
         log.trace("Total (geometrical) edge length: {}, snapped point path length {}. Fraction: {}", sumOfPathLengths,
                 pathDistanceToSnappedPoint, fraction);
         return fraction;
