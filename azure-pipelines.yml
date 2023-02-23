@@ -9,7 +9,7 @@ pool:
   vmImage: 'ubuntu-latest'
 
 variables:
-  isMain: ${{ eq(variables['Build.SourceBranch'], 'refs/heads/main') }}
+  isMain: true #${{ eq(variables['Build.SourceBranch'], 'refs/heads/main') }}
 
 steps:
   - task: SonarQubePrepare@4
