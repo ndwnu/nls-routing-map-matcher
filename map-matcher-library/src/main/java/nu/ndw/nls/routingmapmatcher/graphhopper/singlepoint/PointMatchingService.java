@@ -65,12 +65,12 @@ public class PointMatchingService {
 
         final LocationIndexedLine lineIndex = new LocationIndexedLine(aggregatedGeometry);
         final LinearLocation snappedPointLinearLocation = lineIndex.project(inputCoordinate);
-        final Coordinate snappedCoordinate = lineIndex.extractPoint(snappedPointLinearLocation);
+        final LineSegment snappedPointSegment = snappedPointLinearLocation.getSegment(aggregatedGeometry);
+        final Coordinate snappedCoordinate = snappedPointSegment.closestPoint(inputCoordinate);
         final Point snappedPoint = geometryFactory.createPoint(snappedCoordinate);
         final double fraction = fractionAndDistanceCalculator.calculateFraction(originalGeometry, snappedCoordinate);
         final double distance = fractionAndDistanceCalculator.calculateDistance(inputCoordinate, snappedCoordinate);
-        final LineSegment segment = snappedPointLinearLocation.getSegment(aggregatedGeometry);
-        final double bearing = bearingCalculator.calculateBearing(segment.p0, segment.p1);
+        final double bearing = bearingCalculator.calculateBearing(snappedPointSegment.p0, snappedPointSegment.p1);
 
         return MatchedPoint
                 .builder()

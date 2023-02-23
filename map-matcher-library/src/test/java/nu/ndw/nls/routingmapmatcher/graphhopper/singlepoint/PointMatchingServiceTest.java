@@ -29,13 +29,13 @@ class PointMatchingServiceTest {
     private static final double SNAPPED_POINT_X = 5.426768463894968;
     private static final double SNAPPED_POINT_Y = 52.176694564551426;
     private static final double DISTANCE = 3.8067685587693947;
-    private static final double FRACTION = 0.2372848571472417;
+    private static final double FRACTION = 0.23728485714724185;
     private static final double BEARING = 317.8835356767284;
     private static final double BEARING_REVERSED = 137.88347510955532;
     private static final double SNAPPED_POINT_X_ZIG_ZAG = 5.42678346;
     private static final double SNAPPED_POINT_Y_ZIG_ZAG = 52.17667896;
     private static final double DISTANCE_ZIG_ZAG = 3.061770997311956;
-    private static final double FRACTION_ZIG_ZAG = 0.315843722882771;
+    private static final double FRACTION_ZIG_ZAG = 0.3158437228827713;
     private static final double BEARING_ZIG_ZAG = 329.90304946644443;
     private static final Coordinate INPUT_POINT_COORDINATE = new Coordinate(5.426747, 52.176663);
     private static final Coordinate CUTOFF_COORDINATE_1 = new Coordinate(5.4268356764862355, 52.17664885998936);
