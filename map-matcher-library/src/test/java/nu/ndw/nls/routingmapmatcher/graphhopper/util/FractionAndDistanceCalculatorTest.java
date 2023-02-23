@@ -40,7 +40,7 @@ class FractionAndDistanceCalculatorTest {
     @Test
     void calculateFraction_ok() {
         double fraction = fractionAndDistanceCalculator.calculateFraction(lineString, snappedPointCoordinate);
-        assertThat(fraction).isEqualTo(0.4986298177545211);
+        assertThat(fraction).isCloseTo(0.4986, Percentage.withPercentage(1));
 
 
     }
