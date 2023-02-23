@@ -9,7 +9,7 @@ pool:
   vmImage: 'ubuntu-latest'
 
 variables:
-  isMain: true #${{ eq(variables['Build.SourceBranch'], 'refs/heads/main') }}
+  isMain: ${{ eq(variables['Build.SourceBranch'], 'refs/heads/main') }}
 
 steps:
   - task: SonarQubePrepare@4
@@ -35,7 +35,6 @@ steps:
       sonarQubeRunAnalysis: true
       jdkVersionOption: 1.11
       ${{ if eq(variables.isMain, true) }}:
-        #mavenAuthenticateFeed: true
         goals: clean deploy
       ${{ if ne(variables.isMain, true) }}:
         goals: clean verify
