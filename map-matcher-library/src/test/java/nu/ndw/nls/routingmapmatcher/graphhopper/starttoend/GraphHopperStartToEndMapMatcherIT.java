@@ -62,8 +62,14 @@ class GraphHopperStartToEndMapMatcherIT {
     void match_ok_pointObservations() {
         LineString lineString = geometryFactory.createLineString(new Coordinate[]{new Coordinate(5.431, 52.181),
                 new Coordinate(5.423, 52.181)});
-        LineStringLocation lineStringLocation = new LineStringLocation(1, 1, false, 543.0, lineString,
-                ReliabilityCalculationType.POINT_OBSERVATIONS);
+        LineStringLocation lineStringLocation = LineStringLocation.builder()
+                .id(1)
+                .locationIndex(1)
+                .reversed(false)
+                .lengthInMeters(543.0)
+                .geometry(lineString)
+                .reliabilityCalculationType(ReliabilityCalculationType.POINT_OBSERVATIONS)
+                .build();
         LineStringMatch lineStringMatch = startToEndMapMatcher.match(lineStringLocation);
         assertThat(lineStringMatch, is(notNullValue()));
         assertThat(lineStringMatch.getStatus(), is(MatchStatus.MATCH));
@@ -100,8 +106,14 @@ class GraphHopperStartToEndMapMatcherIT {
     void match_noMatch() {
         LineString lineString = geometryFactory.createLineString(new Coordinate[]{new Coordinate(5.430, 52.180),
                 new Coordinate(5.431, 52.181)});
-        LineStringLocation lineStringLocation = new LineStringLocation(1, 1, false, 130.0, lineString,
-                ReliabilityCalculationType.POINT_OBSERVATIONS);
+        LineStringLocation lineStringLocation = LineStringLocation.builder()
+                .id(1)
+                .locationIndex(1)
+                .reversed(false)
+                .lengthInMeters(130.0)
+                .geometry(lineString)
+                .reliabilityCalculationType(ReliabilityCalculationType.POINT_OBSERVATIONS)
+                .build();
         LineStringMatch lineStringMatch = startToEndMapMatcher.match(lineStringLocation);
         assertThat(lineStringMatch, is(notNullValue()));
         assertThat(lineStringMatch.getStatus(), is(MatchStatus.NO_MATCH));

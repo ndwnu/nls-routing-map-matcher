@@ -1,13 +1,15 @@
 package nu.ndw.nls.routingmapmatcher.domain.model.base;
 
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 import lombok.ToString;
+import lombok.experimental.SuperBuilder;
 import nu.ndw.nls.routingmapmatcher.domain.model.MatchStatus;
 
-@ToString
+@SuperBuilder
 @Getter
-@RequiredArgsConstructor
+@EqualsAndHashCode
+@ToString
 public abstract class MapMatch {
 
     private final int id;

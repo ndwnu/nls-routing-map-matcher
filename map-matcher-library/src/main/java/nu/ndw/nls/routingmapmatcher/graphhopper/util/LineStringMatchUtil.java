@@ -49,19 +49,34 @@ public class LineStringMatchUtil {
         final double startLinkFraction = pathUtil.determineStartLinkFraction(edges.get(0), queryGraph);
         final double endLinkFraction = pathUtil.determineEndLinkFraction(edges.get(edges.size() - 1), queryGraph);
         final LineString lineString = pathUtil.createLineString(path.calcPoints());
-        return new LineStringMatch(lineStringLocation.getId(), lineStringLocation.getLocationIndex(),
-                lineStringLocation.isReversed(), matchedLinkIds, upstreamLinkIds, downstreamLinkIds, startLinkFraction,
-                endLinkFraction, reliability, MatchStatus.MATCH, lineString);
+        return LineStringMatch.builder()
+                .id(lineStringLocation.getId())
+                .locationIndex(lineStringLocation.getLocationIndex())
+                .reversed(lineStringLocation.isReversed())
+                .matchedLinkIds(matchedLinkIds)
+                .upstreamLinkIds(upstreamLinkIds)
+                .downstreamLinkIds(downstreamLinkIds)
+                .startLinkFraction(startLinkFraction)
+                .endLinkFraction(endLinkFraction)
+                .reliability(reliability)
+                .status(MatchStatus.MATCH)
+                .lineString(lineString)
+                .build();
     }
 
     public LineStringMatch createFailedMatch(final LineStringLocation lineStringLocation, final MatchStatus status) {
-        final List<Integer> matchedLinkIds = Lists.newArrayList();
-        final double startLinkFraction = 0.0;
-        final double endLinkFraction = 0.0;
-        final double reliability = 0.0;
-        final LineString lineString = lineStringLocation.getGeometry();
-        return new LineStringMatch(lineStringLocation.getId(), lineStringLocation.getLocationIndex(),
-                lineStringLocation.isReversed(), matchedLinkIds, null, null, startLinkFraction, endLinkFraction,
-                reliability, status, lineString);
+        return LineStringMatch.builder()
+                .id(lineStringLocation.getId())
+                .locationIndex(lineStringLocation.getLocationIndex())
+                .reversed(lineStringLocation.isReversed())
+                .matchedLinkIds(Lists.newArrayList())
+                .upstreamLinkIds(null)
+                .downstreamLinkIds(null)
+                .startLinkFraction(0.0)
+                .endLinkFraction(0.0)
+                .reliability(0.0)
+                .status(status)
+                .lineString(lineStringLocation.getGeometry())
+                .build();
     }
 }

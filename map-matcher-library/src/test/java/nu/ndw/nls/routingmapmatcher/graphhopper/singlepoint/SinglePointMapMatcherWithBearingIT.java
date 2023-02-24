@@ -58,7 +58,12 @@ public class SinglePointMapMatcherWithBearingIT {
     void match_ok_withBearingFilter() {
         setupNetwork();
         Point point = geometryFactory.createPoint(new Coordinate(5.426747, 52.176663));
-        SinglePointLocation request = new SinglePointLocation(1, point, 10.0, new BearingFilter(135, 5));
+        SinglePointLocation request = SinglePointLocation.builder()
+                .id(1)
+                .point(point)
+                .cutoffDistance(10.0)
+                .bearingFilter(new BearingFilter(135, 5))
+                .build();
         SinglePointMatch result = singlePointMapMatcher.match(request);
         assertThat(result.getCandidateMatches(), hasSize(1));
         CandidateMatch match = result.getCandidateMatches().get(0);
@@ -73,7 +78,12 @@ public class SinglePointMapMatcherWithBearingIT {
     void match_ok_withBearingFilterAndSnappedPointAtEnd() {
         setupNetwork();
         Point point = geometryFactory.createPoint(new Coordinate(5.424289, 52.177873));
-        SinglePointLocation request = new SinglePointLocation(1, point, 25.0, new BearingFilter(160, 5));
+        SinglePointLocation request = SinglePointLocation.builder()
+                .id(1)
+                .point(point)
+                .cutoffDistance(25.0)
+                .bearingFilter(new BearingFilter(160, 5))
+                .build();
         SinglePointMatch result = singlePointMapMatcher.match(request);
         assertThat(result.getCandidateMatches(), hasSize(2));
         assertThat(result.getCandidateMatches().get(1).getFraction(), is(1.0));

@@ -1,33 +1,23 @@
 package nu.ndw.nls.routingmapmatcher.domain.model.singlepoint;
 
+import lombok.Builder;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
-import nu.ndw.nls.routingmapmatcher.domain.model.IsochroneUnit;
+import lombok.experimental.SuperBuilder;
 import nu.ndw.nls.routingmapmatcher.domain.model.base.BaseLocation;
 import org.locationtech.jts.geom.Point;
 
+@SuperBuilder
 @Getter
+@EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
 public class SinglePointLocation extends BaseLocation {
 
+    private static final double DEFAULT_CANDIDATE_DISTANCE_IN_METERS = 20.0;
+
     private final Point point;
-    private final Double cutoffDistance;
+    @Builder.Default
+    private final double cutoffDistance = DEFAULT_CANDIDATE_DISTANCE_IN_METERS;
     private final BearingFilter bearingFilter;
-
-    public SinglePointLocation(final int id, final Point point, final double upstreamIsochrone,
-            final IsochroneUnit upstreamIsochroneUnit, final double downstreamIsochrone,
-            final IsochroneUnit downstreamIsochroneUnit) {
-        super(id, upstreamIsochrone, upstreamIsochroneUnit, downstreamIsochrone, downstreamIsochroneUnit);
-        this.point = point;
-        this.cutoffDistance = null;
-        this.bearingFilter = null;
-    }
-
-    public SinglePointLocation(final int id, final Point point, final Double cutoffDistance,
-            final BearingFilter bearingFilter) {
-        super(id);
-        this.point = point;
-        this.cutoffDistance = cutoffDistance;
-        this.bearingFilter = bearingFilter;
-    }
 }

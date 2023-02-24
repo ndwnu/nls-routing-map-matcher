@@ -34,12 +34,14 @@ public class LinkDeserializer extends StdDeserializer<Link> {
         final byte[] geometryWkb = node.get("geometry").binaryValue();
         final LineString lineString = geometryHelper.convertToLinestring(geometryWkb);
 
-        return new Link(id,
-                fromNodeId,
-                toNodeId,
-                speedInKilometersPerHour,
-                reverseSpeedInKilometersPerHour,
-                distanceInMeters,
-                lineString);
+        return Link.builder()
+                .id(id)
+                .fromNodeId(fromNodeId)
+                .toNodeId(toNodeId)
+                .speedInKilometersPerHour(speedInKilometersPerHour)
+                .reverseSpeedInKilometersPerHour(reverseSpeedInKilometersPerHour)
+                .distanceInMeters(distanceInMeters)
+                .geometry(lineString)
+                .build();
     }
 }
