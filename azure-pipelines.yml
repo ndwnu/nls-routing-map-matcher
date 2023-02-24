@@ -33,7 +33,7 @@ steps:
       options: -B
       publishJUnitResults: false
       sonarQubeRunAnalysis: true
-      jdkVersionOption: 1.11
+      jdkVersionOption: 1.17
       ${{ if eq(variables.isMain, true) }}:
         goals: clean deploy
       ${{ if ne(variables.isMain, true) }}:
