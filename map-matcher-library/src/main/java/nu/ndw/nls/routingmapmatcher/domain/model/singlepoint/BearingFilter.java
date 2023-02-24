@@ -3,8 +3,8 @@ package nu.ndw.nls.routingmapmatcher.domain.model.singlepoint;
 import lombok.Value;
 
 @Value
-public class BearingRange {
+public class BearingFilter {
 
-    double minBearing;
-    double maxBearing;
+    int target;
+    int cutoffMargin;
 }

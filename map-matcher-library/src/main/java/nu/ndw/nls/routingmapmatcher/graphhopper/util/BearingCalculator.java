@@ -1,31 +1,25 @@
 package nu.ndw.nls.routingmapmatcher.graphhopper.util;
 
 import lombok.RequiredArgsConstructor;
-import nu.ndw.nls.routingmapmatcher.domain.model.singlepoint.BearingRange;
+import nu.ndw.nls.routingmapmatcher.domain.model.singlepoint.BearingFilter;
 import org.geotools.referencing.GeodeticCalculator;
 import org.locationtech.jts.geom.Coordinate;
 
 @RequiredArgsConstructor
 public class BearingCalculator {
 
+    private static final int MAX_BEARING = 360;
+
     private final GeodeticCalculator geodeticCalculator;
 
-    public static final int MAX_BEARING = 360;
-
-    public static final int REVERSE_BEARING = 180;
-
-    public boolean bearingIsInRange(final double convertedBearing, final BearingRange bearingRange) {
-        // If no bearing is provided return true
-        if (bearingRange == null) {
+    public boolean bearingIsInRange(final double convertedBearing, final BearingFilter bearingFilter) {
+        // If no bearing filter is provided, return true so the match is always kept.
+        if (bearingFilter == null) {
             return true;
         }
-        final double minBearingStandardized = bearingRange.getMinBearing() % MAX_BEARING;
-        final double maxBearingStandardized = bearingRange.getMaxBearing() % MAX_BEARING;
-        if (minBearingStandardized > maxBearingStandardized) {
-            return convertedBearing >= minBearingStandardized || convertedBearing <= maxBearingStandardized;
-        } else {
-            return convertedBearing >= minBearingStandardized && convertedBearing <= maxBearingStandardized;
-        }
+        final double delta = Math.abs(convertedBearing - bearingFilter.getTarget());
+        final double normalizedDelta = Math.min(delta, MAX_BEARING - delta);
+        return normalizedDelta <= bearingFilter.getCutoffMargin();
     }
 
     public double calculateBearing(final Coordinate currentCoordinate, final Coordinate nextCoordinate) {

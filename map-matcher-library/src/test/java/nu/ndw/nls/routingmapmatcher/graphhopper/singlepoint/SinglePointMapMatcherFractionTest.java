@@ -111,7 +111,7 @@ class SinglePointMapMatcherFractionTest {
 
     private SinglePointLocation createSinglePoint(int id, double x, double y) {
         Point point = this.geometryFactory.createPoint(new Coordinate(x, y));
-        return new SinglePointLocation(id, point);
+        return new SinglePointLocation(id, point, null, null);
     }
 
     @Test
@@ -124,12 +124,12 @@ class SinglePointMapMatcherFractionTest {
         final Optional<CandidateMatch> first = match.getCandidateMatches().stream()
                 .filter(c -> c.getMatchedLinkId() == 0).findFirst();
         assertTrue(first.isPresent());
-        assertEquals(0, first.get().getFraction());
+        assertEquals(0, first.get().getFraction(), 0.001);
 
         final Optional<CandidateMatch> second = match.getCandidateMatches().stream()
                 .filter(c -> c.getMatchedLinkId() == 1).findFirst();
         assertTrue(second.isPresent());
-        assertEquals(0, second.get().getFraction());
+        assertEquals(0, second.get().getFraction(), 0.001);
     }
 
     @Test

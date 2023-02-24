@@ -7,7 +7,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.Value;
 import lombok.extern.slf4j.Slf4j;
-import nu.ndw.nls.routingmapmatcher.domain.model.singlepoint.BearingRange;
+import nu.ndw.nls.routingmapmatcher.domain.model.singlepoint.BearingFilter;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.LineString;
 import org.locationtech.jts.geom.MultiLineString;
@@ -20,7 +20,7 @@ public class MatchedQueryResult {
 
     Point inputPoint;
     int matchedLinkId;
-    BearingRange bearingRange;
+    BearingFilter bearingFilter;
     LineString originalGeometry;
     EdgeIteratorTravelDirection travelDirection;
     @Getter(AccessLevel.NONE)

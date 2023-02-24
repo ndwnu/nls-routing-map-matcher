@@ -5,7 +5,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.stream.Collectors;
 import nu.ndw.nls.routingmapmatcher.constants.GlobalConstants;
-import nu.ndw.nls.routingmapmatcher.domain.model.singlepoint.BearingRange;
+import nu.ndw.nls.routingmapmatcher.domain.model.singlepoint.BearingFilter;
 import nu.ndw.nls.routingmapmatcher.graphhopper.model.EdgeIteratorTravelDirection;
 import nu.ndw.nls.routingmapmatcher.graphhopper.model.MatchedPoint;
 import nu.ndw.nls.routingmapmatcher.graphhopper.model.MatchedQueryResult;
@@ -145,7 +145,7 @@ class PointMatchingServiceTest {
         var request = MatchedQueryResult
                 .builder()
                 .matchedLinkId(ID)
-                .bearingRange(new BearingRange(310.0, 320.0))
+                .bearingFilter(new BearingFilter(315, 5))
                 .originalGeometry(originalGeometry)
                 .inputPoint(inputPoint)
                 .cutoffGeometry(cutoffGeometry)
@@ -171,7 +171,7 @@ class PointMatchingServiceTest {
         var request = MatchedQueryResult
                 .builder()
                 .matchedLinkId(ID)
-                .bearingRange(new BearingRange(100.0, 120.0))
+                .bearingFilter(new BearingFilter(110, 10))
                 .originalGeometry(cutoffGeometry)
                 .inputPoint(inputPoint)
                 .cutoffGeometry(cutoffGeometry)
@@ -189,7 +189,7 @@ class PointMatchingServiceTest {
         var request = MatchedQueryResult
                 .builder()
                 .matchedLinkId(ID)
-                .bearingRange(new BearingRange(300.0, 330.0))
+                .bearingFilter(new BearingFilter(315, 15))
                 .originalGeometry(originalGeometry)
                 .inputPoint(inputPoint)
                 .cutoffGeometry(cutoffGeometry)

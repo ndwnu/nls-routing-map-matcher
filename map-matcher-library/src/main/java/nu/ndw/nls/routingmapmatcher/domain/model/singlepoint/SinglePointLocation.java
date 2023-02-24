@@ -11,25 +11,23 @@ import org.locationtech.jts.geom.Point;
 public class SinglePointLocation extends BaseLocation {
 
     private final Point point;
-    private final Double radius;
+    private final Double cutoffDistance;
+    private final BearingFilter bearingFilter;
 
     public SinglePointLocation(final int id, final Point point, final double upstreamIsochrone,
             final IsochroneUnit upstreamIsochroneUnit, final double downstreamIsochrone,
             final IsochroneUnit downstreamIsochroneUnit) {
         super(id, upstreamIsochrone, upstreamIsochroneUnit, downstreamIsochrone, downstreamIsochroneUnit);
         this.point = point;
-        this.radius = null;
+        this.cutoffDistance = null;
+        this.bearingFilter = null;
     }
 
-    public SinglePointLocation(final int id, final Point point) {
+    public SinglePointLocation(final int id, final Point point, final Double cutoffDistance,
+            final BearingFilter bearingFilter) {
         super(id);
         this.point = point;
-        this.radius = null;
-    }
-
-    public SinglePointLocation(final int id, final Point point, final Double radius) {
-        super(id);
-        this.point = point;
-        this.radius = radius;
+        this.cutoffDistance = cutoffDistance;
+        this.bearingFilter = bearingFilter;
     }
 }
