@@ -1,10 +1,5 @@
 package nu.ndw.nls.routingmapmatcher.domain.model.singlepoint;
 
-import lombok.Value;
+public record BearingFilter(int target, int cutoffMargin) {
 
-@Value
-public class BearingFilter {
-
-    int target;
-    int cutoffMargin;
 }

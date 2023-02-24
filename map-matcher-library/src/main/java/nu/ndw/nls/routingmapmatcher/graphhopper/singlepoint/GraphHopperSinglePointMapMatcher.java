@@ -47,11 +47,6 @@ import org.locationtech.jts.util.GeometricShapeFactory;
 
 public class GraphHopperSinglePointMapMatcher implements SinglePointMapMatcher {
 
-    /**
-     * Only search for candidates within this distance.
-     */
-    private static final double DEFAULT_CANDIDATE_DISTANCE_IN_METERS = 20.0;
-
     private static final int NUM_POINTS = 100;
     private static final int MAX_RELIABILITY_SCORE = 100;
 
@@ -93,8 +88,7 @@ public class GraphHopperSinglePointMapMatcher implements SinglePointMapMatcher {
     public SinglePointMatch match(final SinglePointLocation singlePointLocation) {
         Preconditions.checkNotNull(singlePointLocation);
         final Point inputPoint = singlePointLocation.getPoint();
-        final double inputRadius = singlePointLocation.getCutoffDistance() != null ?
-                singlePointLocation.getCutoffDistance() : DEFAULT_CANDIDATE_DISTANCE_IN_METERS;
+        final double inputRadius = singlePointLocation.getCutoffDistance();
         final BearingFilter bearingFilter = singlePointLocation.getBearingFilter();
         final List<QueryResult> queryResults = findCandidates(inputPoint, inputRadius);
 
@@ -115,7 +109,12 @@ public class GraphHopperSinglePointMapMatcher implements SinglePointMapMatcher {
         }
         final double closestDistance = candidateMatches.get(0).getDistance();
         final double reliability = calculateReliability(closestDistance, inputRadius);
-        return new SinglePointMatch(singlePointLocation.getId(), candidateMatches, reliability, MatchStatus.MATCH);
+        return SinglePointMatch.builder()
+                .id(singlePointLocation.getId())
+                .candidateMatches(candidateMatches)
+                .reliability(reliability)
+                .status(MatchStatus.MATCH)
+                .build();
     }
 
     private boolean intersects(final Polygon circle, final QueryResult queryResult) {
@@ -168,15 +167,16 @@ public class GraphHopperSinglePointMapMatcher implements SinglePointMapMatcher {
                 .cutoffGeometry(cutoffGeometry)
                 .build();
         return pointMatchingService.calculateMatches(matchedQueryResult).stream()
-                .map(matchedLineSegment -> new CandidateMatch(
-                        matchedLineSegment.getMatchedLinkId(),
-                        upstreamLinkIds,
-                        downstreamLinkIds,
-                        matchedLineSegment.getSnappedPoint(),
-                        matchedLineSegment.getFractionOfSnappedPoint(),
-                        matchedLineSegment.getDistanceToSnappedPoint(),
-                        matchedLineSegment.getBearingOfSnappedPoint(),
-                        matchedLineSegment.isReversed()));
+                .map(matchedLineSegment -> CandidateMatch.builder()
+                        .matchedLinkId(matchedLineSegment.getMatchedLinkId())
+                        .upstreamLinkIds(upstreamLinkIds)
+                        .downstreamLinkIds(downstreamLinkIds)
+                        .snappedPoint(matchedLineSegment.getSnappedPoint())
+                        .fraction(matchedLineSegment.getFractionOfSnappedPoint())
+                        .distance(matchedLineSegment.getDistanceToSnappedPoint())
+                        .bearing(matchedLineSegment.getBearingOfSnappedPoint())
+                        .reversed(matchedLineSegment.isReversed())
+                        .build());
     }
 
     private static double calculateReliability(final double closestDistance, final double radius) {
@@ -184,9 +184,11 @@ public class GraphHopperSinglePointMapMatcher implements SinglePointMapMatcher {
     }
 
     private SinglePointMatch createFailedMatch(final SinglePointLocation singlePointLocation) {
-        final List<SinglePointMatch.CandidateMatch> candidateMatches = Lists.newArrayList();
-        final MatchStatus matchStatus = MatchStatus.NO_MATCH;
-        final double reliability = 0.0;
-        return new SinglePointMatch(singlePointLocation.getId(), candidateMatches, reliability, matchStatus);
+        return SinglePointMatch.builder()
+                .id(singlePointLocation.getId())
+                .candidateMatches(Lists.newArrayList())
+                .reliability(0.0)
+                .status(MatchStatus.NO_MATCH)
+                .build();
     }
 }

@@ -3,12 +3,16 @@ package nu.ndw.nls.routingmapmatcher.domain.model;
 import java.util.Iterator;
 import java.util.function.Supplier;
 import lombok.Builder;
-import lombok.Value;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.ToString;
 
-@Value
 @Builder
+@Getter
+@EqualsAndHashCode
+@ToString
 public class RoutingNetwork {
 
-    String networkNameAndVersion;
-    Supplier<Iterator<Link>> linkSupplier;
+    private final String networkNameAndVersion;
+    private final Supplier<Iterator<Link>> linkSupplier;
 }

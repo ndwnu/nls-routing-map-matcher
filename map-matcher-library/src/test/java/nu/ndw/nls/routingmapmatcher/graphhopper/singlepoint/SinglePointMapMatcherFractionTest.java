@@ -71,19 +71,15 @@ class SinglePointMapMatcherFractionTest {
     }
 
     private Link createLineLink(long id, long fromNodeId, long toNodeId, double... coordinates) {
-        double speedInKilometersPerHour = 100;
-        double reverseSpeedInKilometersPerHour = 0;
-        double distanceInMeters = 1000;
-
-        final LineString lineString = createLineStringWktReader(coordinates);
-
-        return new Link(id,
-                fromNodeId,
-                toNodeId,
-                speedInKilometersPerHour,
-                reverseSpeedInKilometersPerHour,
-                distanceInMeters,
-                lineString);
+        return Link.builder()
+                .id(id)
+                .fromNodeId(fromNodeId)
+                .toNodeId(toNodeId)
+                .speedInKilometersPerHour(100)
+                .reverseSpeedInKilometersPerHour(0)
+                .distanceInMeters(1000)
+                .geometry(createLineStringWktReader(coordinates))
+                .build();
     }
 
     @SneakyThrows
@@ -111,7 +107,10 @@ class SinglePointMapMatcherFractionTest {
 
     private SinglePointLocation createSinglePoint(int id, double x, double y) {
         Point point = this.geometryFactory.createPoint(new Coordinate(x, y));
-        return new SinglePointLocation(id, point, null, null);
+        return SinglePointLocation.builder()
+                .id(id)
+                .point(point)
+                .build();
     }
 
     @Test

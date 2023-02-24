@@ -4,8 +4,9 @@ import java.util.ArrayList;
 import java.util.List;
 import lombok.AccessLevel;
 import lombok.Builder;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
-import lombok.Value;
+import lombok.ToString;
 import lombok.extern.slf4j.Slf4j;
 import nu.ndw.nls.routingmapmatcher.domain.model.singlepoint.BearingFilter;
 import org.locationtech.jts.geom.Geometry;
@@ -13,19 +14,21 @@ import org.locationtech.jts.geom.LineString;
 import org.locationtech.jts.geom.MultiLineString;
 import org.locationtech.jts.geom.Point;
 
-@Value
-@Builder(toBuilder = true)
+@Builder
+@Getter
+@EqualsAndHashCode
+@ToString
 @Slf4j
 public class MatchedQueryResult {
 
-    Point inputPoint;
-    int matchedLinkId;
-    BearingFilter bearingFilter;
-    LineString originalGeometry;
-    EdgeIteratorTravelDirection travelDirection;
+    private final Point inputPoint;
+    private final int matchedLinkId;
+    private final BearingFilter bearingFilter;
+    private final LineString originalGeometry;
+    private final EdgeIteratorTravelDirection travelDirection;
     @Getter(AccessLevel.NONE)
-    Geometry cutoffGeometry;
-    boolean reversed;
+    private final Geometry cutoffGeometry;
+    private final boolean reversed;
 
     public List<LineString> getCutoffGeometryAsLineStrings() {
         if (cutoffGeometry instanceof MultiLineString) {
@@ -43,5 +46,4 @@ public class MatchedQueryResult {
                     + "geometry types are supported " + cutoffGeometry.getClass().getName());
         }
     }
-
 }

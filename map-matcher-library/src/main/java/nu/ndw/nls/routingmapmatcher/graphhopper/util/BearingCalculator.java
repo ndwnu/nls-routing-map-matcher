@@ -17,9 +17,9 @@ public class BearingCalculator {
         if (bearingFilter == null) {
             return true;
         }
-        final double delta = Math.abs(convertedBearing - bearingFilter.getTarget());
+        final double delta = Math.abs(convertedBearing - bearingFilter.target());
         final double normalizedDelta = Math.min(delta, MAX_BEARING - delta);
-        return normalizedDelta <= bearingFilter.getCutoffMargin();
+        return normalizedDelta <= bearingFilter.cutoffMargin();
     }
 
     public double calculateBearing(final Coordinate currentCoordinate, final Coordinate nextCoordinate) {

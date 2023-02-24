@@ -2,19 +2,23 @@ package nu.ndw.nls.routingmapmatcher.domain.model.singlepoint;
 
 import java.util.List;
 import java.util.Set;
+import lombok.Builder;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 import lombok.ToString;
-import nu.ndw.nls.routingmapmatcher.domain.model.MatchStatus;
+import lombok.experimental.SuperBuilder;
 import nu.ndw.nls.routingmapmatcher.domain.model.base.MapMatch;
 import org.locationtech.jts.geom.Point;
 
+@SuperBuilder
 @Getter
-@ToString
+@EqualsAndHashCode(callSuper = true)
+@ToString(callSuper = true)
 public class SinglePointMatch extends MapMatch {
 
-    @RequiredArgsConstructor
+    @Builder
     @Getter
+    @EqualsAndHashCode
     @ToString
     public static class CandidateMatch {
 
@@ -23,17 +27,11 @@ public class SinglePointMatch extends MapMatch {
         private final Set<Integer> downstreamLinkIds;
         private final Point snappedPoint;
         private final double fraction;
-        //Distance in meters from input point to snapped point
+        // Distance in meters from input point to snapped point
         private final double distance;
         private final Double bearing;
         private final boolean reversed;
     }
 
     private final List<CandidateMatch> candidateMatches;
-
-    public SinglePointMatch(final int id, final List<CandidateMatch> candidateMatches, final double reliability,
-            final MatchStatus status) {
-        super(id, status, reliability);
-        this.candidateMatches = candidateMatches;
-    }
 }

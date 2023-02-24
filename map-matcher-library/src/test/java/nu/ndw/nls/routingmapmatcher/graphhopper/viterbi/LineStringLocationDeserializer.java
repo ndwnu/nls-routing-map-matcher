@@ -44,8 +44,17 @@ public class LineStringLocationDeserializer extends StdDeserializer<LineStringLo
         final IsochroneUnit downstreamIsochroneUnit = Optional.ofNullable(node.get("downstreamIsochroneUnit"))
                 .map(JsonNode::textValue).map(IsochroneUnit::valueOf).orElse(null);
         final LineString lineString = geometryHelper.convertToLinestring(geometryWkb);
-        return new LineStringLocation(id, locationIndex, reversed, lengthInMeters, lineString,
-                reliabilityCalculationType, upstreamIsochrone, upstreamIsochroneUnit, downstreamIsochrone,
-                downstreamIsochroneUnit);
+        return LineStringLocation.builder()
+                .id(id)
+                .locationIndex(locationIndex)
+                .reversed(reversed)
+                .lengthInMeters(lengthInMeters)
+                .geometry(lineString)
+                .reliabilityCalculationType(reliabilityCalculationType)
+                .upstreamIsochrone(upstreamIsochrone)
+                .upstreamIsochroneUnit(upstreamIsochroneUnit)
+                .downstreamIsochrone(downstreamIsochrone)
+                .downstreamIsochroneUnit(downstreamIsochroneUnit)
+                .build();
     }
 }
