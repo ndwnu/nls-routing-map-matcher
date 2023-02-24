@@ -40,6 +40,8 @@ import nu.ndw.nls.routingmapmatcher.graphhopper.model.MatchedQueryResult;
 import nu.ndw.nls.routingmapmatcher.graphhopper.util.BearingCalculator;
 import nu.ndw.nls.routingmapmatcher.graphhopper.util.FractionAndDistanceCalculator;
 import nu.ndw.nls.routingmapmatcher.graphhopper.util.PathUtil;
+import org.geotools.geometry.jts.JTS;
+import org.geotools.referencing.CRS;
 import org.geotools.referencing.GeodeticCalculator;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Geometry;
@@ -49,6 +51,10 @@ import org.locationtech.jts.geom.Point;
 import org.locationtech.jts.geom.Polygon;
 import org.locationtech.jts.geom.PrecisionModel;
 import org.locationtech.jts.util.GeometricShapeFactory;
+import org.opengis.referencing.FactoryException;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
+import org.opengis.referencing.operation.MathTransform;
+import org.opengis.referencing.operation.TransformException;
 
 public class GraphHopperSinglePointMapMatcher implements SinglePointMapMatcher {
 
@@ -66,13 +72,14 @@ public class GraphHopperSinglePointMapMatcher implements SinglePointMapMatcher {
     private static final int NUM_POINTS = 100;
     private static final int MAX_RELIABILITY_SCORE = 100;
 
-    private static final double DEGREE_LATITUDE_IN_KM = 111320D;
     private static final int ALL_NODES = 3;
     private static final boolean INCLUDE_ELEVATION = false;
-    private static final int EARTH_CIRCUMFERENCE = 40_075_000;
-    private static final int CIRCLE_DEGREES = 360;
     private static final GeometryFactory WGS84_GEOMETRY_FACTORY = new GeometryFactory(new PrecisionModel(),
             GlobalConstants.WGS84_SRID);
+    private static final GeometryFactory RD_NEW_GEOMETRY_FACTORY = new GeometryFactory(new PrecisionModel(),
+            GlobalConstants.RD_NEW_SRID);
+    private final MathTransform transformFromWgs84ToRdNew;
+    private final MathTransform transformFromRdNewToWgs84;
 
     private final LinkFlagEncoder flagEncoder;
     private final LocationIndexTree locationIndexTree;
@@ -98,10 +105,21 @@ public class GraphHopperSinglePointMapMatcher implements SinglePointMapMatcher {
         final Weighting weighting = new ShortestWeighting(flagEncoder);
         this.isochroneService = new IsochroneService(flagEncoder, weighting);
         this.distanceCalculator = new DistanceCalcEarth();
-        this.pointMatchingService = new PointMatchingService(
-                WGS84_GEOMETRY_FACTORY,
+        this.pointMatchingService = new PointMatchingService(WGS84_GEOMETRY_FACTORY,
                 new BearingCalculator(new GeodeticCalculator()),
                 new FractionAndDistanceCalculator(new GeodeticCalculator()));
+
+        try {
+            // Longitude first prevents swapped coordinates, see
+            // https://gis.stackexchange.com/questions/433425/geotools-transform-to-new-coordinate-system-not-working
+            final boolean longitudeFirst = true;
+            final CoordinateReferenceSystem wgs84 = CRS.decode("EPSG:4326", longitudeFirst);
+            final CoordinateReferenceSystem rdNew = CRS.decode("EPSG:28992", longitudeFirst);
+            transformFromWgs84ToRdNew = CRS.findMathTransform(wgs84, rdNew);
+            transformFromRdNewToWgs84 = CRS.findMathTransform(rdNew, wgs84);
+        } catch (final FactoryException e) {
+            throw new IllegalStateException("Failed to initialize coordinate reference systems", e);
+        }
     }
 
     @Override
@@ -130,7 +148,7 @@ public class GraphHopperSinglePointMapMatcher implements SinglePointMapMatcher {
                 : DEFAULT_CANDIDATE_DISTANCE_IN_METERS;
         final BearingRange bearingRange = singlePointLocationWithBearing.getBearingRange();
         final List<QueryResult> result = findCandidates(inputPoint, inputRadius);
-        final Polygon circle = createCircle(inputPoint, inputRadius);
+        final Polygon circle = createCircle(inputPoint, 2 * inputRadius);
         // Crop geometry to only include segments in search radius
         final List<MatchedPoint> filteredResults = result.stream()
                 // filter on intersects
@@ -163,7 +181,7 @@ public class GraphHopperSinglePointMapMatcher implements SinglePointMapMatcher {
                 })
                 .flatMap(Collection::stream)
                 .sorted(comparing(MatchedPoint::getDistanceToSnappedPoint))
-                .collect(Collectors.toList());
+                .toList();
         if (filteredResults.isEmpty()) {
             return createFailedMatch(singlePointLocationWithBearing);
         }
@@ -193,14 +211,20 @@ public class GraphHopperSinglePointMapMatcher implements SinglePointMapMatcher {
         return circle.intersects(pl.toLineString(INCLUDE_ELEVATION));
     }
 
-    private Polygon createCircle(final Point point, final double distanceInMeters) {
-        final var shapeFactory = new GeometricShapeFactory(WGS84_GEOMETRY_FACTORY);
-        shapeFactory.setCentre(new Coordinate(point.getX(), point.getY()));
-        shapeFactory.setNumPoints(NUM_POINTS);
-        shapeFactory.setWidth(distanceInMeters / DEGREE_LATITUDE_IN_KM);
-        shapeFactory.setHeight(
-                distanceInMeters / (EARTH_CIRCUMFERENCE * Math.cos(Math.toRadians(point.getX())) / CIRCLE_DEGREES));
-        return shapeFactory.createEllipse();
+    private Polygon createCircle(final Point pointWgs84, final double diameterInMeters) {
+        final var shapeFactory = new GeometricShapeFactory(RD_NEW_GEOMETRY_FACTORY);
+
+        try {
+            final Point pointRd = (Point) JTS.transform(pointWgs84, transformFromWgs84ToRdNew);
+            shapeFactory.setCentre(new Coordinate(pointRd.getX(), pointRd.getY()));
+            shapeFactory.setNumPoints(NUM_POINTS);
+            shapeFactory.setWidth(diameterInMeters);
+            shapeFactory.setHeight(diameterInMeters);
+            final Polygon ellipseRd = shapeFactory.createEllipse();
+            return (Polygon) JTS.transform(ellipseRd, transformFromRdNewToWgs84);
+        } catch (final TransformException e) {
+            throw new IllegalStateException("Failed to create circle in RD", e);
+        }
     }
 
     private List<QueryResult> findCandidates(final Point point, final double radius) {
