@@ -40,8 +40,7 @@ import nu.ndw.nls.routingmapmatcher.graphhopper.model.MatchedQueryResult;
 import nu.ndw.nls.routingmapmatcher.graphhopper.util.BearingCalculator;
 import nu.ndw.nls.routingmapmatcher.graphhopper.util.FractionAndDistanceCalculator;
 import nu.ndw.nls.routingmapmatcher.graphhopper.util.PathUtil;
-import org.geotools.geometry.jts.JTS;
-import org.geotools.referencing.CRS;
+import nu.ndw.nls.routingmapmatcher.graphhopper.util.CrsTransformer;
 import org.geotools.referencing.GeodeticCalculator;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Geometry;
@@ -51,10 +50,6 @@ import org.locationtech.jts.geom.Point;
 import org.locationtech.jts.geom.Polygon;
 import org.locationtech.jts.geom.PrecisionModel;
 import org.locationtech.jts.util.GeometricShapeFactory;
-import org.opengis.referencing.FactoryException;
-import org.opengis.referencing.crs.CoordinateReferenceSystem;
-import org.opengis.referencing.operation.MathTransform;
-import org.opengis.referencing.operation.TransformException;
 
 public class GraphHopperSinglePointMapMatcher implements SinglePointMapMatcher {
 
@@ -78,8 +73,6 @@ public class GraphHopperSinglePointMapMatcher implements SinglePointMapMatcher {
             GlobalConstants.WGS84_SRID);
     private static final GeometryFactory RD_NEW_GEOMETRY_FACTORY = new GeometryFactory(new PrecisionModel(),
             GlobalConstants.RD_NEW_SRID);
-    private final MathTransform transformFromWgs84ToRdNew;
-    private final MathTransform transformFromRdNewToWgs84;
 
     private final LinkFlagEncoder flagEncoder;
     private final LocationIndexTree locationIndexTree;
@@ -90,6 +83,7 @@ public class GraphHopperSinglePointMapMatcher implements SinglePointMapMatcher {
     private final IsochroneService isochroneService;
     private final DistanceCalc distanceCalculator;
     private final PointMatchingService pointMatchingService;
+    private final CrsTransformer crsTransformer;
 
     public GraphHopperSinglePointMapMatcher(final NetworkGraphHopper network) {
         Preconditions.checkNotNull(network);
@@ -108,18 +102,7 @@ public class GraphHopperSinglePointMapMatcher implements SinglePointMapMatcher {
         this.pointMatchingService = new PointMatchingService(WGS84_GEOMETRY_FACTORY,
                 new BearingCalculator(new GeodeticCalculator()),
                 new FractionAndDistanceCalculator(new GeodeticCalculator()));
-
-        try {
-            // Longitude first prevents swapped coordinates, see
-            // https://gis.stackexchange.com/questions/433425/geotools-transform-to-new-coordinate-system-not-working
-            final boolean longitudeFirst = true;
-            final CoordinateReferenceSystem wgs84 = CRS.decode("EPSG:4326", longitudeFirst);
-            final CoordinateReferenceSystem rdNew = CRS.decode("EPSG:28992", longitudeFirst);
-            transformFromWgs84ToRdNew = CRS.findMathTransform(wgs84, rdNew);
-            transformFromRdNewToWgs84 = CRS.findMathTransform(rdNew, wgs84);
-        } catch (final FactoryException e) {
-            throw new IllegalStateException("Failed to initialize coordinate reference systems", e);
-        }
+        this.crsTransformer = new CrsTransformer();
     }
 
     @Override
@@ -213,18 +196,13 @@ public class GraphHopperSinglePointMapMatcher implements SinglePointMapMatcher {
 
     private Polygon createCircle(final Point pointWgs84, final double diameterInMeters) {
         final var shapeFactory = new GeometricShapeFactory(RD_NEW_GEOMETRY_FACTORY);
-
-        try {
-            final Point pointRd = (Point) JTS.transform(pointWgs84, transformFromWgs84ToRdNew);
-            shapeFactory.setCentre(new Coordinate(pointRd.getX(), pointRd.getY()));
-            shapeFactory.setNumPoints(NUM_POINTS);
-            shapeFactory.setWidth(diameterInMeters);
-            shapeFactory.setHeight(diameterInMeters);
-            final Polygon ellipseRd = shapeFactory.createEllipse();
-            return (Polygon) JTS.transform(ellipseRd, transformFromRdNewToWgs84);
-        } catch (final TransformException e) {
-            throw new IllegalStateException("Failed to create circle in RD", e);
-        }
+        final Point pointRd = (Point) crsTransformer.transformFromWgs84ToRdNew(pointWgs84);
+        shapeFactory.setCentre(new Coordinate(pointRd.getX(), pointRd.getY()));
+        shapeFactory.setNumPoints(NUM_POINTS);
+        shapeFactory.setWidth(diameterInMeters);
+        shapeFactory.setHeight(diameterInMeters);
+        final Polygon ellipseRd = shapeFactory.createEllipse();
+        return (Polygon) crsTransformer.transformFromRdNewToWgs84(ellipseRd);
     }
 
     private List<QueryResult> findCandidates(final Point point, final double radius) {
