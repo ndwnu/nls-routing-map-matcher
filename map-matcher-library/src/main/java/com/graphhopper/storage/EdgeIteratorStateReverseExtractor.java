@@ -1,8 +1,10 @@
 package com.graphhopper.storage;
 
+import com.graphhopper.routing.VirtualEdgeIteratorState;
 import com.graphhopper.storage.BaseGraph.EdgeIterable;
-import com.graphhopper.storage.index.QueryResult;
 import com.graphhopper.util.EdgeIteratorState;
+import java.lang.reflect.Field;
+import lombok.SneakyThrows;
 
 /**
  * The geometry direction of the edge iterator wayGeometry does not necessarily reflect the direction of a street or the
@@ -21,12 +23,27 @@ public final class EdgeIteratorStateReverseExtractor {
     private EdgeIteratorStateReverseExtractor() {
     }
 
-    public static boolean hasReversed(QueryResult q) {
-        EdgeIteratorState closestEdge = q.getClosestEdge();
-        if (!(closestEdge instanceof EdgeIterable edgeIterable)) {
-            throw new IllegalArgumentException("This method can only be called with an EdgeIteratorState "
-                    + "instance of EdgeIterable");
+    @SneakyThrows
+    public static boolean hasReversed(final EdgeIteratorState closestEdge) {
+        if (closestEdge instanceof VirtualEdgeIteratorState) {
+            return extractReversedFromVirtualEdge((VirtualEdgeIteratorState) closestEdge);
+        } else if (closestEdge instanceof EdgeIterable) {
+            final EdgeIterable edgeIterable = (EdgeIterable) closestEdge;
+            return edgeIterable.reverse;
+        } else {
+            throw new IllegalArgumentException(
+                    "This method can only be called with an EdgeIterable or VirtualEdgeIteratorState"
+                            + "instance of EdgeIteratorState");
+
         }
-        return edgeIterable.reverse;
+
+
+    }
+    private static boolean extractReversedFromVirtualEdge(VirtualEdgeIteratorState closestEdge)
+            throws NoSuchFieldException, IllegalAccessException {
+        final VirtualEdgeIteratorState edgeIterable = closestEdge;
+        Field f = edgeIterable.getClass().getDeclaredField("reverse"); //NoSuchFieldException
+        f.setAccessible(true);
+        return (boolean) f.get(edgeIterable);
     }
 }

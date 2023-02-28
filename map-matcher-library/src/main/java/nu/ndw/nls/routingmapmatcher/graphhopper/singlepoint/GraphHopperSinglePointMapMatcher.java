@@ -149,7 +149,7 @@ public class GraphHopperSinglePointMapMatcher implements SinglePointMapMatcher {
            GraphHopper sometimes reverses the geometry direction with respect to the original direction. To fix this,
            an internal attribute of the edge iterator state is used, indicating it has done so or not.
         */
-        LineString originalGeometry = hasReversed(queryResult) ? wayGeometry.reverse() : wayGeometry;
+        LineString originalGeometry = hasReversed(queryResult.getClosestEdge()) ? wayGeometry.reverse() : wayGeometry;
         Geometry cutoffGeometry = circle.intersection(originalGeometry);
         EdgeIteratorTravelDirection travelDirection = determineEdgeDirection(queryResult, flagEncoder);
         IntsRef flags = queryResult.getClosestEdge().getFlags();
