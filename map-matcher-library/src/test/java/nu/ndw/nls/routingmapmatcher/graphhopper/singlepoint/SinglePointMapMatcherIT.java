@@ -23,6 +23,7 @@ import nu.ndw.nls.routingmapmatcher.domain.model.IsochroneUnit;
 import nu.ndw.nls.routingmapmatcher.domain.model.Link;
 import nu.ndw.nls.routingmapmatcher.domain.model.MatchStatus;
 import nu.ndw.nls.routingmapmatcher.domain.model.RoutingNetwork;
+import nu.ndw.nls.routingmapmatcher.domain.model.singlepoint.BearingFilter;
 import nu.ndw.nls.routingmapmatcher.domain.model.singlepoint.SinglePointLocation;
 import nu.ndw.nls.routingmapmatcher.domain.model.singlepoint.SinglePointMatch;
 import nu.ndw.nls.routingmapmatcher.domain.model.singlepoint.SinglePointMatch.CandidateMatch;
@@ -131,6 +132,28 @@ public class SinglePointMapMatcherIT {
 
     @SneakyThrows
     @Test
+    void testBidirectionalWayMatchWithBearingFilter() {
+        setupNetwork(LINKS_RESOURCE);
+
+        // The given point is near a bidirectional road.
+        Point point = geometryFactory.createPoint(new Coordinate(5.4280, 52.1798));
+        SinglePointMatch singlePointMatch = singlePointMapMatcher.match(SinglePointLocation.builder()
+                .id(ID)
+                .point(point)
+                .bearingFilter(new BearingFilter(85, 30))
+                .build());
+        assertThat(singlePointMatch, is(notNullValue()));
+        assertEquals(ID, singlePointMatch.getId());
+        assertThat(singlePointMatch.getStatus(), is(MatchStatus.MATCH));
+        List<CandidateMatch> candidateMatches = getNearestCandidateMatches(singlePointMatch.getCandidateMatches());
+        assertThat(candidateMatches, hasSize(1));
+        assertThatUpstreamAndDownstreamAreNull(candidateMatches);
+        assertThat(getSnappedPoints(candidateMatches), hasSize(1));
+        assertThat(singlePointMatch.getReliability(), is(79.53533559944795));
+    }
+
+    @SneakyThrows
+    @Test
     void testNodeMatch() {
         setupNetwork(LINKS_RESOURCE);
 
@@ -148,6 +171,28 @@ public class SinglePointMapMatcherIT {
         assertThatUpstreamAndDownstreamAreNull(candidateMatches);
         assertThat(getSnappedPoints(candidateMatches), hasSize(1));
         assertThat(singlePointMatch.getReliability(), is(100.0));
+    }
+
+    @SneakyThrows
+    @Test
+    void testNodeMatchWithBearingFilter() {
+        setupNetwork(LINKS_RESOURCE);
+
+        // The given point is located at the center of a crossroad.
+        Point point = geometryFactory.createPoint(new Coordinate(5.426228, 52.18103));
+        SinglePointMatch singlePointMatch = singlePointMapMatcher.match(SinglePointLocation.builder()
+                .id(ID)
+                .point(point)
+                .bearingFilter(new BearingFilter(15, 30))
+                .build());
+        assertThat(singlePointMatch, is(notNullValue()));
+        assertEquals(ID, singlePointMatch.getId());
+        assertThat(singlePointMatch.getStatus(), is(MatchStatus.MATCH));
+        List<CandidateMatch> candidateMatches = getNearestCandidateMatches(singlePointMatch.getCandidateMatches());
+        assertThat(candidateMatches, hasSize(2));
+        assertThatUpstreamAndDownstreamAreNull(candidateMatches);
+        assertThat(getSnappedPoints(candidateMatches), hasSize(1));
+        assertThat(singlePointMatch.getReliability(), is(97.28721697585911));
     }
 
     @SneakyThrows
