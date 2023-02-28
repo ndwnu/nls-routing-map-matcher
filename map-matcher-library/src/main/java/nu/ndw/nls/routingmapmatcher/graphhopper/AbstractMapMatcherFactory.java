@@ -10,7 +10,7 @@ public abstract class AbstractMapMatcherFactory {
 
     private final NetworkGraphHopperFactory networkGraphHopperFactory;
 
-    protected NetworkGraphHopper readNetwork(final RoutingNetwork routingNetwork) {
+    protected NetworkGraphHopper readNetwork(RoutingNetwork routingNetwork) {
         log.info("Start reading network with version {}", routingNetwork.getNetworkNameAndVersion());
         return networkGraphHopperFactory.createNetwork(routingNetwork);
     }

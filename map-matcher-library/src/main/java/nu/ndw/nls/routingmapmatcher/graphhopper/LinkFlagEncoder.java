@@ -27,10 +27,10 @@ public class LinkFlagEncoder extends AbstractFlagEncoder {
         this(DEFAULT_SPEED_BITS, DEFAULT_SPEED_FACTOR, DEFAULT_MAXIMUM_SPEED, true, 0);
     }
 
-    public LinkFlagEncoder(final int speedBits, final double speedFactor, final double maximumSpeed,
-            final boolean speedInTwoDirections, final int maxTurnCosts) {
+    public LinkFlagEncoder(int speedBits, double speedFactor, double maximumSpeed, boolean speedInTwoDirections,
+            int maxTurnCosts) {
         super(speedBits, speedFactor, maxTurnCosts);
-        final double maximumEncodedSpeed = ((1L << speedBits) - 1) * speedFactor;
+        double maximumEncodedSpeed = ((1L << speedBits) - 1) * speedFactor;
         this.maximumSpeed = Math.max(maximumSpeed, maximumEncodedSpeed);
         this.speedInTwoDirections = speedInTwoDirections;
     }
@@ -41,20 +41,19 @@ public class LinkFlagEncoder extends AbstractFlagEncoder {
     }
 
     @Override
-    public long handleRelationTags(final long oldRelationFlags, final ReaderRelation relation) {
+    public long handleRelationTags(long oldRelationFlags, ReaderRelation relation) {
         return oldRelationFlags;
     }
 
     @Override
-    public EncodingManager.Access getAccess(final ReaderWay way) {
-        final Link link = castToLink(way);
-        final boolean access = link.getSpeedInKilometersPerHour() > 0.0 ||
-                link.getReverseSpeedInKilometersPerHour() > 0.0;
+    public EncodingManager.Access getAccess(ReaderWay way) {
+        Link link = castToLink(way);
+        boolean access = link.getSpeedInKilometersPerHour() > 0.0 || link.getReverseSpeedInKilometersPerHour() > 0.0;
         return access ? EncodingManager.Access.WAY : EncodingManager.Access.CAN_SKIP;
     }
 
-    private Link castToLink(final ReaderWay way) {
-        final Link link = (Link) way;
+    private Link castToLink(ReaderWay way) {
+        Link link = (Link) way;
         if (link == null) {
             throw new IllegalStateException("Only LinkDto's are supported by this flag encoder");
         }
@@ -62,27 +61,25 @@ public class LinkFlagEncoder extends AbstractFlagEncoder {
     }
 
     @Override
-    public void createEncodedValues(final List<EncodedValue> registerNewEncodedValue, final String prefix,
-            final int index) {
+    public void createEncodedValues(List<EncodedValue> registerNewEncodedValue, String prefix, int index) {
         super.createEncodedValues(registerNewEncodedValue, prefix, index);
 
         speedEncoder = new FactorizedDecimalEncodedValue(prefix + "average_speed", speedBits, speedFactor,
                 speedInTwoDirections);
         registerNewEncodedValue.add(speedEncoder);
 
-        final boolean idInTwoDirections = false;
+        boolean idInTwoDirections = false;
         idEncoder = new SimpleIntEncodedValue(prefix + "id", TOTAL_BITS_FOR_ENCODING_INTS, idInTwoDirections);
         registerNewEncodedValue.add(idEncoder);
     }
 
     @Override
-    public IntsRef handleWayTags(final IntsRef edgeFlags, final ReaderWay way, final EncodingManager.Access accept,
-            final long relationFlags) {
+    public IntsRef handleWayTags(IntsRef edgeFlags, ReaderWay way, EncodingManager.Access accept, long relationFlags) {
         if (accept.canSkip()) {
             return edgeFlags;
         }
 
-        final Link link = castToLink(way);
+        Link link = castToLink(way);
 
         accessEnc.setBool(false, edgeFlags, link.getSpeedInKilometersPerHour() > 0.0);
         accessEnc.setBool(true, edgeFlags, link.getReverseSpeedInKilometersPerHour() > 0.0);
@@ -95,7 +92,7 @@ public class LinkFlagEncoder extends AbstractFlagEncoder {
         return edgeFlags;
     }
 
-    public int getId(final IntsRef edgeFlags) {
+    public int getId(IntsRef edgeFlags) {
         return idEncoder.getInt(false, edgeFlags);
     }
 

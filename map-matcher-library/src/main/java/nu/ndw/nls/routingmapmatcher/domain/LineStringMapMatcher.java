@@ -5,5 +5,5 @@ import nu.ndw.nls.routingmapmatcher.domain.model.linestring.LineStringMatch;
 
 public interface LineStringMapMatcher extends MapMatcher<LineStringLocation, LineStringMatch> {
 
-    LineStringMatch match(final LineStringLocation lineStringLocation);
+    LineStringMatch match(LineStringLocation lineStringLocation);
 }

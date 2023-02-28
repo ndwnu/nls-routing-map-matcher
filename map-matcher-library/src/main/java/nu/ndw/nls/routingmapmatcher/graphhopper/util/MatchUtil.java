@@ -13,15 +13,15 @@ public final class MatchUtil {
 
     }
 
-    public static List<QueryResult> getQueryResults(final Point point, final double radius,
-            final LocationIndexTree locationIndexTree, final EdgeFilter edgeFilter) {
-        final double latitude = point.getY();
-        final double longitude = point.getX();
+    public static List<QueryResult> getQueryResults(Point point, double radius, LocationIndexTree locationIndexTree,
+            EdgeFilter edgeFilter) {
+        double latitude = point.getY();
+        double longitude = point.getX();
 
-        final List<QueryResult> queryResults = locationIndexTree.findNClosest(latitude, longitude, edgeFilter, radius);
-        final List<QueryResult> candidates = new ArrayList<>(queryResults.size());
+        List<QueryResult> queryResults = locationIndexTree.findNClosest(latitude, longitude, edgeFilter, radius);
+        List<QueryResult> candidates = new ArrayList<>(queryResults.size());
 
-        for (final QueryResult queryResult : queryResults) {
+        for (QueryResult queryResult : queryResults) {
             if (queryResult.getQueryDistance() <= radius) {
                 candidates.add(queryResult);
             }

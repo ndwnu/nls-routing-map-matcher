@@ -3,9 +3,8 @@ package nu.ndw.nls.routingmapmatcher.graphhopper.singlepoint;
 import static java.util.Comparator.comparing;
 import static org.assertj.core.api.Assertions.assertThat;
 
-import java.util.stream.Collectors;
 import nu.ndw.nls.routingmapmatcher.constants.GlobalConstants;
-import nu.ndw.nls.routingmapmatcher.domain.model.singlepoint.BearingRange;
+import nu.ndw.nls.routingmapmatcher.domain.model.singlepoint.BearingFilter;
 import nu.ndw.nls.routingmapmatcher.graphhopper.model.EdgeIteratorTravelDirection;
 import nu.ndw.nls.routingmapmatcher.graphhopper.model.MatchedPoint;
 import nu.ndw.nls.routingmapmatcher.graphhopper.model.MatchedQueryResult;
@@ -98,9 +97,9 @@ class PointMatchingServiceTest {
         assertThat(match.getSnappedPoint().getX()).isEqualTo(SNAPPED_POINT_X);
         assertThat(match.getSnappedPoint().getY()).isEqualTo(SNAPPED_POINT_Y);
         assertThat(match.isReversed()).isEqualTo(false);
-        assertThat(match.getDistanceToSnappedPoint()).isEqualTo(DISTANCE);
-        assertThat(match.getFractionOfSnappedPoint()).isEqualTo(FRACTION);
-        assertThat(match.getBearingOfSnappedPoint()).isEqualTo(BEARING);
+        assertThat(match.getDistance()).isEqualTo(DISTANCE);
+        assertThat(match.getFraction()).isEqualTo(FRACTION);
+        assertThat(match.getBearing()).isEqualTo(BEARING);
     }
 
     @Test
@@ -124,17 +123,17 @@ class PointMatchingServiceTest {
         assertThat(matchOne.getSnappedPoint().getX()).isEqualTo(SNAPPED_POINT_X);
         assertThat(matchOne.getSnappedPoint().getY()).isEqualTo(SNAPPED_POINT_Y);
         assertThat(matchOne.isReversed()).isEqualTo(false);
-        assertThat(matchOne.getDistanceToSnappedPoint()).isEqualTo(DISTANCE);
-        assertThat(matchOne.getFractionOfSnappedPoint()).isEqualTo(FRACTION);
-        assertThat(matchOne.getBearingOfSnappedPoint()).isEqualTo(BEARING);
+        assertThat(matchOne.getDistance()).isEqualTo(DISTANCE);
+        assertThat(matchOne.getFraction()).isEqualTo(FRACTION);
+        assertThat(matchOne.getBearing()).isEqualTo(BEARING);
         var matchTwo = matches.get(1);
         assertThat(matchTwo.getMatchedLinkId()).isEqualTo(ID);
         assertThat(matchTwo.getSnappedPoint().getX()).isEqualTo(SNAPPED_POINT_X);
         assertThat(matchTwo.getSnappedPoint().getY()).isEqualTo(SNAPPED_POINT_Y);
         assertThat(matchTwo.isReversed()).isEqualTo(true);
-        assertThat(matchTwo.getDistanceToSnappedPoint()).isEqualTo(DISTANCE);
-        assertThat(matchTwo.getFractionOfSnappedPoint()).isEqualTo(FRACTION);
-        assertThat(matchTwo.getBearingOfSnappedPoint()).isEqualTo(BEARING_REVERSED);
+        assertThat(matchTwo.getDistance()).isEqualTo(DISTANCE);
+        assertThat(matchTwo.getFraction()).isEqualTo(FRACTION);
+        assertThat(matchTwo.getBearing()).isEqualTo(BEARING_REVERSED);
     }
 
     @Test
@@ -145,7 +144,7 @@ class PointMatchingServiceTest {
         var request = MatchedQueryResult
                 .builder()
                 .matchedLinkId(ID)
-                .bearingRange(new BearingRange(310.0, 320.0))
+                .bearingFilter(new BearingFilter(315, 5))
                 .originalGeometry(originalGeometry)
                 .inputPoint(inputPoint)
                 .cutoffGeometry(cutoffGeometry)
@@ -159,9 +158,9 @@ class PointMatchingServiceTest {
         assertThat(matchOne.getSnappedPoint().getX()).isEqualTo(SNAPPED_POINT_X);
         assertThat(matchOne.getSnappedPoint().getY()).isEqualTo(SNAPPED_POINT_Y);
         assertThat(matchOne.isReversed()).isEqualTo(false);
-        assertThat(matchOne.getDistanceToSnappedPoint()).isEqualTo(DISTANCE);
-        assertThat(matchOne.getFractionOfSnappedPoint()).isEqualTo(FRACTION);
-        assertThat(matchOne.getBearingOfSnappedPoint()).isEqualTo(BEARING);
+        assertThat(matchOne.getDistance()).isEqualTo(DISTANCE);
+        assertThat(matchOne.getFraction()).isEqualTo(FRACTION);
+        assertThat(matchOne.getBearing()).isEqualTo(BEARING);
     }
 
     @Test
@@ -171,7 +170,7 @@ class PointMatchingServiceTest {
         var request = MatchedQueryResult
                 .builder()
                 .matchedLinkId(ID)
-                .bearingRange(new BearingRange(100.0, 120.0))
+                .bearingFilter(new BearingFilter(110, 10))
                 .originalGeometry(cutoffGeometry)
                 .inputPoint(inputPoint)
                 .cutoffGeometry(cutoffGeometry)
@@ -189,7 +188,7 @@ class PointMatchingServiceTest {
         var request = MatchedQueryResult
                 .builder()
                 .matchedLinkId(ID)
-                .bearingRange(new BearingRange(300.0, 330.0))
+                .bearingFilter(new BearingFilter(315, 15))
                 .originalGeometry(originalGeometry)
                 .inputPoint(inputPoint)
                 .cutoffGeometry(cutoffGeometry)
@@ -197,17 +196,17 @@ class PointMatchingServiceTest {
                 .build();
         var matches = pointMatchingService.calculateMatches(request)
                 .stream()
-                .sorted(comparing(MatchedPoint::getDistanceToSnappedPoint))
-                .collect(Collectors.toList());
+                .sorted(comparing(MatchedPoint::getDistance))
+                .toList();
         assertThat(matches).hasSize(3);
         var closestMatch = matches.get(0);
         assertThat(closestMatch.getMatchedLinkId()).isEqualTo(ID);
         assertThat(closestMatch.getSnappedPoint().getX()).isEqualTo(SNAPPED_POINT_X_ZIG_ZAG);
         assertThat(closestMatch.getSnappedPoint().getY()).isEqualTo(SNAPPED_POINT_Y_ZIG_ZAG);
         assertThat(closestMatch.isReversed()).isEqualTo(false);
-        assertThat(closestMatch.getDistanceToSnappedPoint()).isEqualTo(DISTANCE_ZIG_ZAG);
-        assertThat(closestMatch.getFractionOfSnappedPoint()).isEqualTo(FRACTION_ZIG_ZAG);
-        assertThat(closestMatch.getBearingOfSnappedPoint()).isEqualTo(BEARING_ZIG_ZAG);
+        assertThat(closestMatch.getDistance()).isEqualTo(DISTANCE_ZIG_ZAG);
+        assertThat(closestMatch.getFraction()).isEqualTo(FRACTION_ZIG_ZAG);
+        assertThat(closestMatch.getBearing()).isEqualTo(BEARING_ZIG_ZAG);
     }
 
     private void createCutOffGeometryForZigzagLine() {

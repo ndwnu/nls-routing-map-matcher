@@ -7,5 +7,5 @@ import nu.ndw.nls.routingmapmatcher.domain.model.linestring.LineStringMatch;
  * point of the provided LineString as input, disregarding any waypoints except in the calculation of the path score. */
 public interface StartToEndMapMatcher extends MapMatcher<LineStringLocation, LineStringMatch> {
 
-    LineStringMatch match(final LineStringLocation lineStringLocation);
+    LineStringMatch match(LineStringLocation lineStringLocation);
 }

@@ -15,8 +15,8 @@ import nu.ndw.nls.routingmapmatcher.constants.GlobalConstants;
 import nu.ndw.nls.routingmapmatcher.domain.SinglePointMapMatcher;
 import nu.ndw.nls.routingmapmatcher.domain.model.Link;
 import nu.ndw.nls.routingmapmatcher.domain.model.RoutingNetwork;
-import nu.ndw.nls.routingmapmatcher.domain.model.singlepoint.BearingRange;
-import nu.ndw.nls.routingmapmatcher.domain.model.singlepoint.SinglePointLocationWithBearing;
+import nu.ndw.nls.routingmapmatcher.domain.model.singlepoint.BearingFilter;
+import nu.ndw.nls.routingmapmatcher.domain.model.singlepoint.SinglePointLocation;
 import nu.ndw.nls.routingmapmatcher.domain.model.singlepoint.SinglePointMatch;
 import nu.ndw.nls.routingmapmatcher.domain.model.singlepoint.SinglePointMatch.CandidateMatch;
 import nu.ndw.nls.routingmapmatcher.graphhopper.NetworkGraphHopperFactory;
@@ -55,12 +55,16 @@ public class SinglePointMapMatcherWithBearingIT {
     }
 
     @Test
-    void matchWithBearing_ok() {
+    void match_ok_withBearingFilter() {
         setupNetwork();
         Point point = geometryFactory.createPoint(new Coordinate(5.426747, 52.176663));
-        SinglePointLocationWithBearing request = new SinglePointLocationWithBearing(1, point,
-                new BearingRange(130.0, 140.0), 10.0);
-        SinglePointMatch result = singlePointMapMatcher.matchWithBearing(request);
+        SinglePointLocation request = SinglePointLocation.builder()
+                .id(1)
+                .point(point)
+                .cutoffDistance(10.0)
+                .bearingFilter(new BearingFilter(135, 5))
+                .build();
+        SinglePointMatch result = singlePointMapMatcher.match(request);
         assertThat(result.getCandidateMatches(), hasSize(1));
         CandidateMatch match = result.getCandidateMatches().get(0);
         assertThat(match.getMatchedLinkId(), is(3667044));
@@ -71,13 +75,16 @@ public class SinglePointMapMatcherWithBearingIT {
     }
 
     @Test
-    void matchWithBearing_ok_snappedPointAtEnd() {
+    void match_ok_withBearingFilterAndSnappedPointAtEnd() {
         setupNetwork();
         Point point = geometryFactory.createPoint(new Coordinate(5.424289, 52.177873));
-        SinglePointLocationWithBearing request = new SinglePointLocationWithBearing(1, point,
-                new BearingRange(155.0, 165.0), 25.0);
-        SinglePointMatch result = singlePointMapMatcher.matchWithBearing(request);
-        System.out.println(result.getCandidateMatches());
+        SinglePointLocation request = SinglePointLocation.builder()
+                .id(1)
+                .point(point)
+                .cutoffDistance(25.0)
+                .bearingFilter(new BearingFilter(160, 5))
+                .build();
+        SinglePointMatch result = singlePointMapMatcher.match(request);
         assertThat(result.getCandidateMatches(), hasSize(2));
         assertThat(result.getCandidateMatches().get(1).getFraction(), is(1.0));
     }
