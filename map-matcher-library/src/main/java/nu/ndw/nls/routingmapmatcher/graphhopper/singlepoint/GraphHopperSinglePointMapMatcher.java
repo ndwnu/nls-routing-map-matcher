@@ -17,12 +17,12 @@ import com.graphhopper.storage.index.LocationIndexTree;
 import com.graphhopper.storage.index.QueryResult;
 import com.graphhopper.util.PointList;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Stream;
 import nu.ndw.nls.routingmapmatcher.constants.GlobalConstants;
 import nu.ndw.nls.routingmapmatcher.domain.SinglePointMapMatcher;
 import nu.ndw.nls.routingmapmatcher.domain.model.MatchStatus;
-import nu.ndw.nls.routingmapmatcher.domain.model.singlepoint.BearingFilter;
 import nu.ndw.nls.routingmapmatcher.domain.model.singlepoint.SinglePointLocation;
 import nu.ndw.nls.routingmapmatcher.domain.model.singlepoint.SinglePointMatch;
 import nu.ndw.nls.routingmapmatcher.domain.model.singlepoint.SinglePointMatch.CandidateMatch;
@@ -167,24 +167,24 @@ public class GraphHopperSinglePointMapMatcher implements SinglePointMapMatcher {
                 .cutoffGeometry(cutoffGeometry)
                 .build();
         return pointMatchingService.calculateMatches(matchedQueryResult).stream()
-                .map(matchedLineSegment -> CandidateMatch.builder()
-                        .matchedLinkId(matchedLineSegment.getMatchedLinkId())
-                        .reversed(matchedLineSegment.isReversed())
+                .map(matchedPoint -> CandidateMatch.builder()
+                        .matchedLinkId(matchedPoint.getMatchedLinkId())
+                        .reversed(matchedPoint.isReversed())
                         .upstreamLinkIds(upstreamLinkIds)
                         .downstreamLinkIds(downstreamLinkIds)
-                        .snappedPoint(matchedLineSegment.getSnappedPoint())
-                        .fraction(matchedLineSegment.getFraction())
-                        .distance(matchedLineSegment.getDistance())
-                        .bearing(matchedLineSegment.getBearing())
-                        .reliability(calculateReliability(matchedLineSegment, singlePointLocation))
+                        .snappedPoint(matchedPoint.getSnappedPoint())
+                        .fraction(matchedPoint.getFraction())
+                        .distance(matchedPoint.getDistance())
+                        .bearing(matchedPoint.getBearing())
+                        .reliability(calculateReliability(matchedPoint, singlePointLocation))
                         .build());
     }
 
-    private double calculateReliability(MatchedPoint matchedLineSegment, SinglePointLocation singlePointLocation) {
-        double distancePenalty = matchedLineSegment.getDistance() / singlePointLocation.getCutoffDistance();
-        BearingFilter bearingFilter = singlePointLocation.getBearingFilter();
-        double bearingPenalty = bearingFilter != null ? bearingCalculator.bearingDelta(matchedLineSegment.getBearing(),
-                bearingFilter.target()) / bearingFilter.cutoffMargin() : 0;
+    private double calculateReliability(MatchedPoint matchedPoint, SinglePointLocation singlePointLocation) {
+        double distancePenalty = matchedPoint.getDistance() / singlePointLocation.getCutoffDistance();
+        double bearingPenalty = Optional.ofNullable(singlePointLocation.getBearingFilter())
+                .map(bf -> bearingCalculator.bearingDelta(matchedPoint.getBearing(), bf.target()) / bf.cutoffMargin())
+                .orElse(0.0);
         return (1 - distancePenalty - bearingPenalty) * MAX_RELIABILITY_SCORE;
     }
 
