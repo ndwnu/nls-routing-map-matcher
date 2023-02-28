@@ -20,30 +20,30 @@ public class LineStringLocationDeserializer extends StdDeserializer<LineStringLo
         this(null);
     }
 
-    protected LineStringLocationDeserializer(final Class<?> vc) {
+    protected LineStringLocationDeserializer(Class<?> vc) {
         super(vc);
     }
 
     @Override
-    public LineStringLocation deserialize(final JsonParser jsonParser,
-            final DeserializationContext deserializationContext) throws IOException {
-        final JsonNode node = jsonParser.getCodec().readTree(jsonParser);
-        final int id = node.get("id").intValue();
-        final int locationIndex = node.get("locationIndex").intValue();
-        final boolean reversed = node.get("reversed").booleanValue();
-        final double lengthInMeters = node.get("lengthInMeters").doubleValue();
-        final ReliabilityCalculationType reliabilityCalculationType = ReliabilityCalculationType
+    public LineStringLocation deserialize(JsonParser jsonParser, DeserializationContext deserializationContext)
+            throws IOException {
+        JsonNode node = jsonParser.getCodec().readTree(jsonParser);
+        int id = node.get("id").intValue();
+        int locationIndex = node.get("locationIndex").intValue();
+        boolean reversed = node.get("reversed").booleanValue();
+        double lengthInMeters = node.get("lengthInMeters").doubleValue();
+        ReliabilityCalculationType reliabilityCalculationType = ReliabilityCalculationType
                 .valueOf(node.get("reliabilityCalculationType").textValue());
-        final byte[] geometryWkb = node.get("geometry").binaryValue();
-        final double upstreamIsochrone = Optional.ofNullable(node.get("upstreamIsochrone"))
+        byte[] geometryWkb = node.get("geometry").binaryValue();
+        double upstreamIsochrone = Optional.ofNullable(node.get("upstreamIsochrone"))
                 .map(JsonNode::doubleValue).orElse(0.0);
-        final IsochroneUnit upstreamIsochroneUnit = Optional.ofNullable(node.get("upstreamIsochroneUnit"))
+        IsochroneUnit upstreamIsochroneUnit = Optional.ofNullable(node.get("upstreamIsochroneUnit"))
                 .map(JsonNode::textValue).map(IsochroneUnit::valueOf).orElse(null);
-        final double downstreamIsochrone = Optional.ofNullable(node.get("downstreamIsochrone"))
+        double downstreamIsochrone = Optional.ofNullable(node.get("downstreamIsochrone"))
                 .map(JsonNode::doubleValue).orElse(0.0);
-        final IsochroneUnit downstreamIsochroneUnit = Optional.ofNullable(node.get("downstreamIsochroneUnit"))
+        IsochroneUnit downstreamIsochroneUnit = Optional.ofNullable(node.get("downstreamIsochroneUnit"))
                 .map(JsonNode::textValue).map(IsochroneUnit::valueOf).orElse(null);
-        final LineString lineString = geometryHelper.convertToLinestring(geometryWkb);
+        LineString lineString = geometryHelper.convertToLinestring(geometryWkb);
         return LineStringLocation.builder()
                 .id(id)
                 .locationIndex(locationIndex)

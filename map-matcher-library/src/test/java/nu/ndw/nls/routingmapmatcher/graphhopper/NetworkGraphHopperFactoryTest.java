@@ -51,7 +51,7 @@ class NetworkGraphHopperFactoryTest {
     void setup() {
         when(link.getFromNodeId()).thenReturn(FROM_NODE_ID);
         when(link.getToNodeId()).thenReturn(TO_NODE_ID);
-        final Coordinate[] coordinates = {coordinateA1, coordinateA2, coordinateA3};
+        Coordinate[] coordinates = {coordinateA1, coordinateA2, coordinateA3};
         when(lineString.getCoordinates()).thenReturn(coordinates);
         when(link.getGeometry()).thenReturn(lineString);
         when(routingNetwork.getNetworkNameAndVersion()).thenReturn(TEST_NETWORK);
@@ -62,7 +62,7 @@ class NetworkGraphHopperFactoryTest {
 
     @Test
     void testCreateNetworkGraphHopper() {
-        final NetworkGraphHopper graphHopper = networkGraphHopperFactory.createNetwork(routingNetwork);
+        NetworkGraphHopper graphHopper = networkGraphHopperFactory.createNetwork(routingNetwork);
 
         assertThat(graphHopper.getDataReaderFile(),
                 is(Path.of(DEFAULT_GRAPHHOPPER_ROOT_DIRECTORY, TEST_NETWORK).toString()));
@@ -75,8 +75,8 @@ class NetworkGraphHopperFactoryTest {
 
     @Test
     void testCreateNetworkGraphHopper_with_Network() {
-        final NetworkGraphHopper graphHopper = networkGraphHopperFactory.createNetwork(routingNetwork,
-                false, CUSTOM_GRAPHHOPPER_DIRECTORY);
+        NetworkGraphHopper graphHopper = networkGraphHopperFactory.createNetwork(routingNetwork, false,
+                CUSTOM_GRAPHHOPPER_DIRECTORY);
 
         assertThat(graphHopper.getDataReaderFile(), is(CUSTOM_GRAPHHOPPER_DIRECTORY.resolve(TEST_NETWORK).toString()));
         assertThat(graphHopper.getGraphHopperLocation(),

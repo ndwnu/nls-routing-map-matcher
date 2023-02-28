@@ -9,10 +9,10 @@ import nu.ndw.nls.routingmapmatcher.domain.exception.RoutingMapMatcherException;
  */
 public class QueryGraphExtractor {
 
-    public QueryGraph extractQueryGraph(final Path path) {
-        if (!(path.graph instanceof QueryGraph)) {
+    public QueryGraph extractQueryGraph(Path path) {
+        if (!(path.graph instanceof QueryGraph queryGraph)) {
             throw new RoutingMapMatcherException("Expected graph of path to be of type QueryGraph");
         }
-        return (QueryGraph) path.graph;
+        return queryGraph;
     }
 }

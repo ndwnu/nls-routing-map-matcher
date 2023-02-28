@@ -16,8 +16,8 @@ public class Link extends ReaderWay {
     private final LineString geometry;
 
     @Builder
-    private Link(final long id, final long fromNodeId, final long toNodeId, final double speedInKilometersPerHour,
-            final double reverseSpeedInKilometersPerHour, final double distanceInMeters, final LineString geometry) {
+    private Link(long id, long fromNodeId, long toNodeId, double speedInKilometersPerHour,
+            double reverseSpeedInKilometersPerHour, double distanceInMeters, LineString geometry) {
         super(id);
         this.fromNodeId = fromNodeId;
         this.toNodeId = toNodeId;

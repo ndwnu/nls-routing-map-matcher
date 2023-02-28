@@ -11,17 +11,17 @@ import nu.ndw.nls.routingmapmatcher.graphhopper.NetworkGraphHopperFactory;
 public class GraphHopperSinglePointMapMatcherFactory extends AbstractMapMatcherFactory
         implements SinglePointMapMatcherFactory {
 
-    public GraphHopperSinglePointMapMatcherFactory(final NetworkGraphHopperFactory networkGraphHopperFactory) {
+    public GraphHopperSinglePointMapMatcherFactory(NetworkGraphHopperFactory networkGraphHopperFactory) {
         super(networkGraphHopperFactory);
     }
 
     @Override
-    public SinglePointMapMatcher createMapMatcher(final RoutingNetwork routingNetwork) {
+    public SinglePointMapMatcher createMapMatcher(RoutingNetwork routingNetwork) {
         return new GraphHopperSinglePointMapMatcher(readNetwork(routingNetwork));
     }
 
     @Override
-    public SinglePointMapMatcher createMapMatcher(final Network preInitializedNetwork) {
+    public SinglePointMapMatcher createMapMatcher(Network preInitializedNetwork) {
         return new GraphHopperSinglePointMapMatcher((NetworkGraphHopper) preInitializedNetwork);
     }
 }

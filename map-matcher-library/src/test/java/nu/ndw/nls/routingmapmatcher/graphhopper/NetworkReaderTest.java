@@ -71,8 +71,8 @@ class NetworkReaderTest {
     @BeforeEach
     void setup() {
         when(ghStorage.getEncodingManager()).thenReturn(encodingManager);
-        final List<Link> links = Collections.singletonList(link);
-        final Supplier<Iterator<Link>> networkSupplier = links::iterator;
+        List<Link> links = Collections.singletonList(link);
+        Supplier<Iterator<Link>> networkSupplier = links::iterator;
         networkReader = new NetworkReader(ghStorage, networkSupplier, nodeIdToInternalNodeIdMap);
     }
 
@@ -84,12 +84,12 @@ class NetworkReaderTest {
         when(edge.setWayGeometry(any())).thenReturn(edge);
         when(link.getFromNodeId()).thenReturn(FROM_NODE_ID);
         when(link.getToNodeId()).thenReturn(TO_NODE_ID);
-        final Coordinate[] coordinates = {coordinateA1, coordinateA2, coordinateA3};
+        Coordinate[] coordinates = {coordinateA1, coordinateA2, coordinateA3};
         when(lineString.getCoordinates()).thenReturn(coordinates);
         when(link.getGeometry()).thenReturn(lineString);
         networkReader.readGraph();
         verify(edge).setWayGeometry(pointListArgumentCaptor.capture());
-        final PointList pointList = pointListArgumentCaptor.getValue();
+        PointList pointList = pointListArgumentCaptor.getValue();
         assertThat(pointList.getSize(), is(1));
         assertThat(pointList.getLon(0), is(LONG_2));
         assertThat(pointList.getLat(0), is(LAT_2));

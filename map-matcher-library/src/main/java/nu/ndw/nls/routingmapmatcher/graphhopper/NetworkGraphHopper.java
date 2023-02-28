@@ -18,13 +18,13 @@ public class NetworkGraphHopper extends GraphHopper implements Network {
 
     private final LongIntMap nodeIdToInternalNodeIdMap;
 
-    public NetworkGraphHopper(final Supplier<Iterator<Link>> linkSupplier) {
+    public NetworkGraphHopper(Supplier<Iterator<Link>> linkSupplier) {
         this.linkSupplier = linkSupplier;
         this.nodeIdToInternalNodeIdMap = new GHLongIntBTree(MAX_LEAF_ENTRIES);
     }
 
     @Override
-    protected DataReader createReader(final GraphHopperStorage ghStorage) {
+    protected DataReader createReader(GraphHopperStorage ghStorage) {
         return initDataReader(new NetworkReader(ghStorage, linkSupplier, nodeIdToInternalNodeIdMap));
     }
 }

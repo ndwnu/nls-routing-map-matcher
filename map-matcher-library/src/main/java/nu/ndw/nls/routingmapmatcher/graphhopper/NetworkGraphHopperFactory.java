@@ -12,15 +12,15 @@ public class NetworkGraphHopperFactory {
     private static final Path DEFAULT_FOLDER_PREFIX = Path.of("graphhopper_");
     private static final int BYTES_FOR_EDGE_FLAGS = 12;
 
-    public NetworkGraphHopper createNetwork(final RoutingNetwork routingNetwork) {
+    public NetworkGraphHopper createNetwork(RoutingNetwork routingNetwork) {
         return createNetwork(routingNetwork, false, DEFAULT_FOLDER_PREFIX);
     }
 
-    public NetworkGraphHopper createNetwork(final RoutingNetwork routingNetwork, final boolean storeOnDisk,
-            final Path graphhopperRootPath) {
-        final NetworkGraphHopper graphHopper = new NetworkGraphHopper(routingNetwork.getLinkSupplier());
+    public NetworkGraphHopper createNetwork(RoutingNetwork routingNetwork, boolean storeOnDisk,
+            Path graphhopperRootPath) {
+        NetworkGraphHopper graphHopper = new NetworkGraphHopper(routingNetwork.getLinkSupplier());
 
-        final Path path = GraphHopperNetworkPathUtils.formatNormalizedPath(graphhopperRootPath,
+        Path path = GraphHopperNetworkPathUtils.formatNormalizedPath(graphhopperRootPath,
                 routingNetwork.getNetworkNameAndVersion());
 
         graphHopper.setStoreOnFlush(storeOnDisk);
@@ -29,7 +29,7 @@ public class NetworkGraphHopperFactory {
         graphHopper.setMinNetworkSize(0, 0);
         graphHopper.setDataReaderFile(path.toString());
         graphHopper.setGraphHopperLocation(path.toString());
-        final LinkFlagEncoder flagEncoder = new LinkFlagEncoder();
+        LinkFlagEncoder flagEncoder = new LinkFlagEncoder();
         graphHopper.setEncodingManager(EncodingManager.create(singletonList(flagEncoder), BYTES_FOR_EDGE_FLAGS));
         graphHopper.importOrLoad();
         graphHopper.setAllowWrites(false);

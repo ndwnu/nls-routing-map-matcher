@@ -15,26 +15,26 @@ public class GeometryHelper {
     private final WKBReader wkbReader = new WKBReader(new GeometryFactory(new PrecisionModel(),
             GlobalConstants.WGS84_SRID));
 
-    public synchronized LineString convertToLinestring(final byte[] geometryWkb) throws IOException {
+    public synchronized LineString convertToLinestring(byte[] geometryWkb) throws IOException {
         try {
-            final Geometry geometry = wkbReader.read(geometryWkb);
-            if (!(geometry instanceof LineString)) {
+            Geometry geometry = wkbReader.read(geometryWkb);
+            if (!(geometry instanceof LineString lineString)) {
                 throw new IOException("Unexpected geometry type: expected LineString");
             }
-            return (LineString) geometry;
-        } catch (final ParseException e) {
+            return lineString;
+        } catch (ParseException e) {
             throw new IOException("Unable to parse WKB", e);
         }
     }
 
-    public synchronized Point convertToPoint(final byte[] geometryWkb) throws IOException {
+    public synchronized Point convertToPoint(byte[] geometryWkb) throws IOException {
         try {
-            final Geometry geometry = this.wkbReader.read(geometryWkb);
-            if (!(geometry instanceof Point)) {
+            Geometry geometry = this.wkbReader.read(geometryWkb);
+            if (!(geometry instanceof Point point)) {
                 throw new IOException("Unexpected geometry type: expected Point");
             }
-            return (Point) geometry;
-        } catch (final ParseException e) {
+            return point;
+        } catch (ParseException e) {
             throw new IOException("Unable to parse WKB", e);
         }
     }

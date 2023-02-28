@@ -17,22 +17,22 @@ public class LinkDeserializer extends StdDeserializer<Link> {
         this(null);
     }
 
-    protected LinkDeserializer(final Class<?> vc) {
+    protected LinkDeserializer(Class<?> vc) {
         super(vc);
     }
 
     @Override
-    public Link deserialize(final JsonParser jsonParser, final DeserializationContext deserializationContext)
+    public Link deserialize(JsonParser jsonParser, DeserializationContext deserializationContext)
             throws IOException {
-        final JsonNode node = jsonParser.getCodec().readTree(jsonParser);
-        final int id = node.get("id").intValue();
-        final int fromNodeId = node.get("fromNodeId").intValue();
-        final int toNodeId = node.get("toNodeId").intValue();
-        final double speedInKilometersPerHour = node.get("speedInKilometersPerHour").doubleValue();
-        final double reverseSpeedInKilometersPerHour = node.get("reverseSpeedInKilometersPerHour").doubleValue();
-        final double distanceInMeters = node.get("distanceInMeters").doubleValue();
-        final byte[] geometryWkb = node.get("geometry").binaryValue();
-        final LineString lineString = geometryHelper.convertToLinestring(geometryWkb);
+        JsonNode node = jsonParser.getCodec().readTree(jsonParser);
+        int id = node.get("id").intValue();
+        int fromNodeId = node.get("fromNodeId").intValue();
+        int toNodeId = node.get("toNodeId").intValue();
+        double speedInKilometersPerHour = node.get("speedInKilometersPerHour").doubleValue();
+        double reverseSpeedInKilometersPerHour = node.get("reverseSpeedInKilometersPerHour").doubleValue();
+        double distanceInMeters = node.get("distanceInMeters").doubleValue();
+        byte[] geometryWkb = node.get("geometry").binaryValue();
+        LineString lineString = geometryHelper.convertToLinestring(geometryWkb);
 
         return Link.builder()
                 .id(id)

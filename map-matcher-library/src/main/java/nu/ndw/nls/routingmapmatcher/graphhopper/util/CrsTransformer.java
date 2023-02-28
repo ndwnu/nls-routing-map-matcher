@@ -18,28 +18,28 @@ public class CrsTransformer {
         try {
             // Longitude first prevents swapped coordinates, see
             // https://gis.stackexchange.com/questions/433425/geotools-transform-to-new-coordinate-system-not-working
-            final boolean longitudeFirst = true;
-            final CoordinateReferenceSystem wgs84 = CRS.decode("EPSG:" + GlobalConstants.WGS84_SRID, longitudeFirst);
-            final CoordinateReferenceSystem rdNew = CRS.decode("EPSG:" + GlobalConstants.RD_NEW_SRID, longitudeFirst);
+            boolean longitudeFirst = true;
+            CoordinateReferenceSystem wgs84 = CRS.decode("EPSG:" + GlobalConstants.WGS84_SRID, longitudeFirst);
+            CoordinateReferenceSystem rdNew = CRS.decode("EPSG:" + GlobalConstants.RD_NEW_SRID, longitudeFirst);
             transformFromWgs84ToRdNew = CRS.findMathTransform(wgs84, rdNew);
             transformFromRdNewToWgs84 = CRS.findMathTransform(rdNew, wgs84);
-        } catch (final FactoryException e) {
+        } catch (FactoryException e) {
             throw new IllegalStateException("Failed to initialize coordinate reference systems", e);
         }
     }
 
-    public Geometry transformFromWgs84ToRdNew(final Geometry geometry) {
+    public Geometry transformFromWgs84ToRdNew(Geometry geometry) {
         try {
             return JTS.transform(geometry, transformFromWgs84ToRdNew);
-        } catch (final TransformException e) {
+        } catch (TransformException e) {
             throw new IllegalStateException("Failed to transform from WGS84 to RD New", e);
         }
     }
 
-    public Geometry transformFromRdNewToWgs84(final Geometry geometry) {
+    public Geometry transformFromRdNewToWgs84(Geometry geometry) {
         try {
             return JTS.transform(geometry, transformFromRdNewToWgs84);
-        } catch (final TransformException e) {
+        } catch (TransformException e) {
             throw new IllegalStateException("Failed to transform from RD New to WGS84", e);
         }
     }

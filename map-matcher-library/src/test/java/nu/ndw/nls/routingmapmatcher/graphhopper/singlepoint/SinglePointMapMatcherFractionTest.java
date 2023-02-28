@@ -115,17 +115,17 @@ class SinglePointMapMatcherFractionTest {
 
     @Test
     void matchSinglePoint_fraction_vertical_towerBaseNode() {
-        final SinglePointLocation singlePoint = this.createSinglePoint(123, 0, 0);
-        final SinglePointMatch match = this.singlePointMapMatcher.match(singlePoint);
+        SinglePointLocation singlePoint = this.createSinglePoint(123, 0, 0);
+        SinglePointMatch match = this.singlePointMapMatcher.match(singlePoint);
 
         assertEquals(2, match.getCandidateMatches().size());
 
-        final Optional<CandidateMatch> first = match.getCandidateMatches().stream()
+        Optional<CandidateMatch> first = match.getCandidateMatches().stream()
                 .filter(c -> c.getMatchedLinkId() == 0).findFirst();
         assertTrue(first.isPresent());
         assertEquals(0, first.get().getFraction(), 0.001);
 
-        final Optional<CandidateMatch> second = match.getCandidateMatches().stream()
+        Optional<CandidateMatch> second = match.getCandidateMatches().stream()
                 .filter(c -> c.getMatchedLinkId() == 1).findFirst();
         assertTrue(second.isPresent());
         assertEquals(0, second.get().getFraction(), 0.001);
@@ -133,60 +133,60 @@ class SinglePointMapMatcherFractionTest {
 
     @Test
     void matchSinglePoint_fraction_vertical_edge() {
-        final SinglePointLocation singlePoint = this.createSinglePoint(123, 0, 1);
-        final SinglePointMatch match = this.singlePointMapMatcher.match(singlePoint);
+        SinglePointLocation singlePoint = this.createSinglePoint(123, 0, 1);
+        SinglePointMatch match = this.singlePointMapMatcher.match(singlePoint);
 
-        final CandidateMatch candidateMatch = match.getCandidateMatches().get(0);
+        CandidateMatch candidateMatch = match.getCandidateMatches().get(0);
         assertEquals(0, candidateMatch.getMatchedLinkId());
         assertEquals(0.5, candidateMatch.getFraction(), 0.001);
     }
 
     @Test
     void matchSinglePoint_fraction_vertical_towerAdjacentNode() {
-        final SinglePointLocation singlePoint = this.createSinglePoint(123, 0, 2);
-        final SinglePointMatch match = this.singlePointMapMatcher.match(singlePoint);
+        SinglePointLocation singlePoint = this.createSinglePoint(123, 0, 2);
+        SinglePointMatch match = this.singlePointMapMatcher.match(singlePoint);
 
-        final CandidateMatch candidateMatch = match.getCandidateMatches().get(0);
+        CandidateMatch candidateMatch = match.getCandidateMatches().get(0);
         assertEquals(0, candidateMatch.getMatchedLinkId());
         assertEquals(1, candidateMatch.getFraction(), 0.001);
     }
 
     @Test
     void matchSinglePoint_fraction_towerBaseNode() {
-        final SinglePointLocation singlePoint = this.createSinglePoint(123, 0, 0);
-        final SinglePointMatch match = this.singlePointMapMatcher.match(singlePoint);
+        SinglePointLocation singlePoint = this.createSinglePoint(123, 0, 0);
+        SinglePointMatch match = this.singlePointMapMatcher.match(singlePoint);
 
-        final CandidateMatch candidateMatch = match.getCandidateMatches().get(0);
+        CandidateMatch candidateMatch = match.getCandidateMatches().get(0);
         assertEquals(1, candidateMatch.getMatchedLinkId());
         assertEquals(0, candidateMatch.getFraction(), 0.001);
     }
 
     @Test
     void matchSinglePoint_fraction_towerAdjacentNode() {
-        final SinglePointLocation singlePoint = this.createSinglePoint(123, 6, 0);
-        final SinglePointMatch match = this.singlePointMapMatcher.match(singlePoint);
+        SinglePointLocation singlePoint = this.createSinglePoint(123, 6, 0);
+        SinglePointMatch match = this.singlePointMapMatcher.match(singlePoint);
 
-        final CandidateMatch candidateMatch = match.getCandidateMatches().get(0);
+        CandidateMatch candidateMatch = match.getCandidateMatches().get(0);
         assertEquals(2, candidateMatch.getMatchedLinkId());
         assertEquals(1, candidateMatch.getFraction(), 0.001);
     }
 
     @Test
     void matchSinglePoint_fraction_pillarHalfWay() {
-        final SinglePointLocation singlePoint = this.createSinglePoint(123, 4, 0);
-        final SinglePointMatch match = this.singlePointMapMatcher.match(singlePoint);
+        SinglePointLocation singlePoint = this.createSinglePoint(123, 4, 0);
+        SinglePointMatch match = this.singlePointMapMatcher.match(singlePoint);
 
-        final CandidateMatch candidateMatch = match.getCandidateMatches().get(0);
+        CandidateMatch candidateMatch = match.getCandidateMatches().get(0);
         assertEquals(2, candidateMatch.getMatchedLinkId());
         assertEquals(0.5, candidateMatch.getFraction(), 0.001);
     }
 
     @Test
     void matchSinglePoint_fraction_edgeQuarterWay() {
-        final SinglePointLocation singlePoint = this.createSinglePoint(123, 3, 0);
-        final SinglePointMatch match = this.singlePointMapMatcher.match(singlePoint);
+        SinglePointLocation singlePoint = this.createSinglePoint(123, 3, 0);
+        SinglePointMatch match = this.singlePointMapMatcher.match(singlePoint);
 
-        final CandidateMatch candidateMatch = match.getCandidateMatches().get(0);
+        CandidateMatch candidateMatch = match.getCandidateMatches().get(0);
         assertEquals(2, candidateMatch.getMatchedLinkId());
         assertEquals(0.25, candidateMatch.getFraction(), 0.001);
     }

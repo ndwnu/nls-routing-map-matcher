@@ -4,7 +4,7 @@ import nu.ndw.nls.routingmapmatcher.domain.model.RoutingNetwork;
 
 public interface MapMatcherFactory<T> {
 
-    T createMapMatcher(final RoutingNetwork routingNetwork);
+    T createMapMatcher(RoutingNetwork routingNetwork);
 
-    T createMapMatcher(final Network preInitializedNetwork);
+    T createMapMatcher(Network preInitializedNetwork);
 }

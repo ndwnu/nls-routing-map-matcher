@@ -50,41 +50,41 @@ public class GraphHopperStartToEndMapMatcher implements StartToEndMapMatcher {
     private final LineStringMatchUtil lineStringMatchUtil;
     private final LineStringScoreUtil lineStringScoreUtil;
 
-    public GraphHopperStartToEndMapMatcher(final NetworkGraphHopper graphHopper) {
+    public GraphHopperStartToEndMapMatcher(NetworkGraphHopper graphHopper) {
         Preconditions.checkNotNull(graphHopper);
-        final List<FlagEncoder> flagEncoders = graphHopper.getEncodingManager().fetchEdgeEncoders();
+        List<FlagEncoder> flagEncoders = graphHopper.getEncodingManager().fetchEdgeEncoders();
         Preconditions.checkArgument(flagEncoders.size() == 1);
         Preconditions.checkArgument(flagEncoders.get(0) instanceof LinkFlagEncoder);
 
-        final LinkFlagEncoder flagEncoder = (LinkFlagEncoder) flagEncoders.get(0);
+        LinkFlagEncoder flagEncoder = (LinkFlagEncoder) flagEncoders.get(0);
         this.routingGraph = graphHopper.getGraphHopperStorage();
         this.locationIndexTree = (LocationIndexTree) graphHopper.getLocationIndex();
         this.edgeFilter = EdgeFilter.ALL_EDGES;
 
-        final HintsMap hints = new HintsMap();
+        HintsMap hints = new HintsMap();
         hints.put(Parameters.CH.DISABLE, true);
         hints.setVehicle(flagEncoder.toString());
         this.algorithmFactory = graphHopper.getAlgorithmFactory(hints);
 
-        final String algorithm = Parameters.Algorithms.DIJKSTRA_BI;
-        final Weighting weighting = new ShortestWeighting(flagEncoder);
+        String algorithm = Parameters.Algorithms.DIJKSTRA_BI;
+        Weighting weighting = new ShortestWeighting(flagEncoder);
         this.algorithmOptions = new AlgorithmOptions(algorithm, weighting);
 
         this.lineStringMatchUtil = new LineStringMatchUtil(flagEncoder, weighting);
         this.lineStringScoreUtil = new LineStringScoreUtil();
     }
 
-    public LineStringMatch match(final LineStringLocation lineStringLocation) {
+    public LineStringMatch match(LineStringLocation lineStringLocation) {
         Preconditions.checkNotNull(lineStringLocation);
 
         List<QueryResult> startCandidates = findCandidates(lineStringLocation.getGeometry().getStartPoint());
         List<QueryResult> endCandidates = findCandidates(lineStringLocation.getGeometry().getEndPoint());
 
-        final QueryGraph queryGraph = createQueryGraphAndAssignClosestNodePerCandidate(startCandidates, endCandidates);
+        QueryGraph queryGraph = createQueryGraphAndAssignClosestNodePerCandidate(startCandidates, endCandidates);
         startCandidates = deduplicateCandidatesByClosestNode(startCandidates);
         endCandidates = deduplicateCandidatesByClosestNode(endCandidates);
 
-        final List<Candidate> candidatePaths = createCandidatePaths(queryGraph, startCandidates, endCandidates,
+        List<Candidate> candidatePaths = createCandidatePaths(queryGraph, startCandidates, endCandidates,
                 lineStringLocation);
 
         return candidatePaths.stream()
@@ -94,44 +94,44 @@ public class GraphHopperStartToEndMapMatcher implements StartToEndMapMatcher {
                 .orElseGet(() -> lineStringMatchUtil.createFailedMatch(lineStringLocation, MatchStatus.NO_MATCH));
     }
 
-    private List<QueryResult> findCandidates(final Point point) {
+    private List<QueryResult> findCandidates(Point point) {
         return getQueryResults(point, MAXIMUM_CANDIDATE_DISTANCE_IN_METERS, locationIndexTree, edgeFilter);
     }
 
-    private QueryGraph createQueryGraphAndAssignClosestNodePerCandidate(final List<QueryResult> startCandidates,
-            final List<QueryResult> endCandidates) {
-        final List<QueryResult> allCandidates = new ArrayList<>(startCandidates.size() + endCandidates.size());
+    private QueryGraph createQueryGraphAndAssignClosestNodePerCandidate(List<QueryResult> startCandidates,
+            List<QueryResult> endCandidates) {
+        List<QueryResult> allCandidates = new ArrayList<>(startCandidates.size() + endCandidates.size());
         allCandidates.addAll(startCandidates);
         allCandidates.addAll(endCandidates);
-        final QueryGraph queryGraph = new QueryGraph(routingGraph);
+        QueryGraph queryGraph = new QueryGraph(routingGraph);
         queryGraph.setUseEdgeExplorerCache(true);
         queryGraph.lookup(allCandidates);
         return queryGraph;
     }
 
-    private List<QueryResult> deduplicateCandidatesByClosestNode(final List<QueryResult> candidates) {
-        final List<QueryResult> deduplicatedCandidates = new ArrayList<>(candidates.size());
-        final Map<Integer, QueryResult> candidatePerClosestNode = new HashMap<>();
-        for (final QueryResult queryResult : candidates) {
+    private List<QueryResult> deduplicateCandidatesByClosestNode(List<QueryResult> candidates) {
+        List<QueryResult> deduplicatedCandidates = new ArrayList<>(candidates.size());
+        Map<Integer, QueryResult> candidatePerClosestNode = new HashMap<>();
+        for (QueryResult queryResult : candidates) {
             candidatePerClosestNode.put(queryResult.getClosestNode(), queryResult);
         }
         deduplicatedCandidates.addAll(candidatePerClosestNode.values());
         return deduplicatedCandidates;
     }
 
-    private List<Candidate> createCandidatePaths(final QueryGraph queryGraph, final List<QueryResult> startCandidates,
-            final List<QueryResult> endCandidates, final LineStringLocation lineStringLocation) {
-        final List<Candidate> candidatePaths = new ArrayList<>(startCandidates.size() * endCandidates.size());
-        for (final QueryResult startCandidate : startCandidates) {
-            for (final QueryResult endCandidate : endCandidates) {
-                final int fromNode = startCandidate.getClosestNode();
-                final int toNode = endCandidate.getClosestNode();
+    private List<Candidate> createCandidatePaths(QueryGraph queryGraph, List<QueryResult> startCandidates,
+            List<QueryResult> endCandidates, LineStringLocation lineStringLocation) {
+        List<Candidate> candidatePaths = new ArrayList<>(startCandidates.size() * endCandidates.size());
+        for (QueryResult startCandidate : startCandidates) {
+            for (QueryResult endCandidate : endCandidates) {
+                int fromNode = startCandidate.getClosestNode();
+                int toNode = endCandidate.getClosestNode();
 
-                final RoutingAlgorithm routingAlgorithm = algorithmFactory.createAlgo(queryGraph, algorithmOptions);
-                final Path path = routingAlgorithm.calcPath(fromNode, toNode);
+                RoutingAlgorithm routingAlgorithm = algorithmFactory.createAlgo(queryGraph, algorithmOptions);
+                Path path = routingAlgorithm.calcPath(fromNode, toNode);
 
                 if (path.isFound() && path.getEdgeCount() > 0) {
-                    final double score = lineStringScoreUtil.calculateCandidatePathScore(path, lineStringLocation);
+                    double score = lineStringScoreUtil.calculateCandidatePathScore(path, lineStringLocation);
                     candidatePaths.add(new Candidate(path, score));
                 }
             }

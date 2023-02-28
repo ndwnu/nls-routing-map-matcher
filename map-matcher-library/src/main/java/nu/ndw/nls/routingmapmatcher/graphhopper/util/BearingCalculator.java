@@ -12,20 +12,20 @@ public class BearingCalculator {
 
     private final GeodeticCalculator geodeticCalculator;
 
-    public boolean bearingIsInRange(final double convertedBearing, final BearingFilter bearingFilter) {
+    public boolean bearingIsInRange(double convertedBearing, BearingFilter bearingFilter) {
         // If no bearing filter is provided, return true so the match is always kept.
         if (bearingFilter == null) {
             return true;
         }
-        final double delta = Math.abs(convertedBearing - bearingFilter.target());
-        final double normalizedDelta = Math.min(delta, MAX_BEARING - delta);
+        double delta = Math.abs(convertedBearing - bearingFilter.target());
+        double normalizedDelta = Math.min(delta, MAX_BEARING - delta);
         return normalizedDelta <= bearingFilter.cutoffMargin();
     }
 
-    public double calculateBearing(final Coordinate currentCoordinate, final Coordinate nextCoordinate) {
+    public double calculateBearing(Coordinate currentCoordinate, Coordinate nextCoordinate) {
         geodeticCalculator.setStartingGeographicPoint(currentCoordinate.getX(), currentCoordinate.getY());
         geodeticCalculator.setDestinationGeographicPoint(nextCoordinate.getX(), nextCoordinate.getY());
-        final double bearing = geodeticCalculator.getAzimuth();
+        double bearing = geodeticCalculator.getAzimuth();
         return (bearing + MAX_BEARING) % MAX_BEARING;
     }
 }

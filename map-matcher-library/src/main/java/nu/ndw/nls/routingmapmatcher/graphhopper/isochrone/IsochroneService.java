@@ -17,20 +17,19 @@ public class IsochroneService {
     private final LinkFlagEncoder flagEncoder;
     private final Weighting weighting;
 
-    public Set<Integer> getUpstreamLinkIds(final QueryGraph queryGraph, final BaseLocation location, final int nodeId) {
+    public Set<Integer> getUpstreamLinkIds(QueryGraph queryGraph, BaseLocation location, int nodeId) {
         return getIsochroneLinkIds(queryGraph, true, location.getUpstreamIsochrone(),
                 location.getUpstreamIsochroneUnit(), nodeId);
     }
 
-    public Set<Integer> getDownstreamLinkIds(final QueryGraph queryGraph, final BaseLocation location,
-            final int nodeId) {
+    public Set<Integer> getDownstreamLinkIds(QueryGraph queryGraph, BaseLocation location, int nodeId) {
         return getIsochroneLinkIds(queryGraph, false, location.getDownstreamIsochrone(),
                 location.getDownstreamIsochroneUnit(), nodeId);
     }
 
-    private Set<Integer> getIsochroneLinkIds(final QueryGraph queryGraph, final boolean reverse,
-            final double isochroneValue, final IsochroneUnit isochroneUnit, final int nodeId) {
-        final Isochrone isochrone = new Isochrone(queryGraph, this.weighting, reverse);
+    private Set<Integer> getIsochroneLinkIds(QueryGraph queryGraph, boolean reverse, double isochroneValue,
+            IsochroneUnit isochroneUnit, int nodeId) {
+        Isochrone isochrone = new Isochrone(queryGraph, this.weighting, reverse);
         if (isochroneUnit == IsochroneUnit.METERS) {
             isochrone.setDistanceLimit(isochroneValue);
         } else if (isochroneUnit == IsochroneUnit.SECONDS) {
@@ -38,7 +37,7 @@ public class IsochroneService {
         } else {
             throw new IllegalArgumentException("Unexpected isochrone unit");
         }
-        final List<Isochrone.IsoLabel> labels = isochrone.search(nodeId);
+        List<Isochrone.IsoLabel> labels = isochrone.search(nodeId);
         return labels.stream()
                 .map(l -> queryGraph.getEdgeIteratorState(l.edge, l.adjNode))
                 .map(EdgeIteratorState::getFlags)
