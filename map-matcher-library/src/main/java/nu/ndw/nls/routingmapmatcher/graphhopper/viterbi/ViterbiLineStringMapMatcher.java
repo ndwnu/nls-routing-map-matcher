@@ -54,6 +54,7 @@ public class ViterbiLineStringMapMatcher implements LineStringMapMatcher {
      * See also the comment in {@link #createGpsTrack(LineString)}
      */
     private static final double NEARBY_NDW_NETWORK_DISTANCE_IN_METERS = 2 * MEASUREMENT_ERROR_SIGMA_IN_METERS;
+    private static final double DISTANCE_CALCULATOR_CUSTOM_DISTANCE = 3 * MEASUREMENT_ERROR_SIGMA_IN_METERS;
 
     /**
      * Speed to use when creating a GPS track from a geometry.
@@ -64,7 +65,7 @@ public class ViterbiLineStringMapMatcher implements LineStringMapMatcher {
 
     private static final int MILLIS_PER_SECOND = 1000;
 
-    private static final int NEEDED_GPS_TRACK_ENTRIES = 2;
+    private static final int COORDINATES_LENGTH_START_END = 2;
 
     private final MapMatching mapMatching;
     private final CustomDistanceCalc distanceCalc;
@@ -101,7 +102,7 @@ public class ViterbiLineStringMapMatcher implements LineStringMapMatcher {
         List<GPXEntry> gpsTrack = createGpsTrack(lineStringLocation.getGeometry());
 
         LineStringMatch lineStringMatch;
-        if (gpsTrack.size() >= NEEDED_GPS_TRACK_ENTRIES) {
+        if (gpsTrack.size() >= COORDINATES_LENGTH_START_END) {
             try {
                 preventFilteringWhileMapMatching(gpsTrack);
                 MatchResult matchResult = mapMatching.doWork(gpsTrack);
@@ -110,7 +111,7 @@ public class ViterbiLineStringMapMatcher implements LineStringMapMatcher {
                 } else {
                     lineStringMatch = lineStringMatchUtil.createFailedMatch(lineStringLocation, MatchStatus.NO_MATCH);
                 }
-            } catch (Exception e) {
+            } catch (RuntimeException e) {
                 log.debug("Exception while map matching, creating failed result for {}", lineStringLocation, e);
                 lineStringMatch = lineStringMatchUtil.createFailedMatch(lineStringLocation, MatchStatus.EXCEPTION);
             }
@@ -160,10 +161,9 @@ public class ViterbiLineStringMapMatcher implements LineStringMapMatcher {
     }
 
     private void preventFilteringWhileMapMatching(List<GPXEntry> gpsTrack) {
-        double customDistance = 3 * MEASUREMENT_ERROR_SIGMA_IN_METERS;
         // When filtering there is no distance calculation for the first and last GPS coordinates
-        int numberOfCalls = Math.max(gpsTrack.size() - 2, 0);
-        distanceCalc.returnCustomDistanceForNextCalls(customDistance, numberOfCalls);
+        int numberOfCalls = Math.max(gpsTrack.size() - COORDINATES_LENGTH_START_END, 0);
+        distanceCalc.returnCustomDistanceForNextCalls(DISTANCE_CALCULATOR_CUSTOM_DISTANCE, numberOfCalls);
     }
 
     private LineStringMatch createMatch(MatchResult matchResult, LineStringLocation lineStringLocation) {

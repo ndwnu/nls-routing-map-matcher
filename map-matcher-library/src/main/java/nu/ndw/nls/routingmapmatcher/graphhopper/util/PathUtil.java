@@ -21,6 +21,10 @@ import org.locationtech.jts.geom.impl.PackedCoordinateSequence;
 @Slf4j
 public class PathUtil {
 
+    private static final int MINIMUM_LENGTH = 2;
+    private static final int DIMENSIONS = 2;
+    private static final int MEASURES = 0;
+
     private final GeometryFactory geometryFactory;
 
     public PathUtil(GeometryFactory geometryFactory) {
@@ -31,14 +35,15 @@ public class PathUtil {
         LineString lineString;
         if (points.size() > 1) {
             PackedCoordinateSequence.Double coordinateSequence =
-                    new PackedCoordinateSequence.Double(points.size(), 2, 0);
+                    new PackedCoordinateSequence.Double(points.size(), DIMENSIONS, MEASURES);
             for (int index = 0; index < points.size(); index++) {
                 coordinateSequence.setOrdinate(index, 0, points.getLongitude(index));
                 coordinateSequence.setOrdinate(index, 1, points.getLatitude(index));
             }
             lineString = geometryFactory.createLineString(coordinateSequence);
         } else if (points.size() == 1) {
-            PackedCoordinateSequence.Double coordinateSequence = new PackedCoordinateSequence.Double(2, 2, 0);
+            PackedCoordinateSequence.Double coordinateSequence =
+                    new PackedCoordinateSequence.Double(MINIMUM_LENGTH, DIMENSIONS, MEASURES);
             coordinateSequence.setOrdinate(0, 0, points.getLongitude(0));
             coordinateSequence.setOrdinate(0, 1, points.getLatitude(0));
             coordinateSequence.setOrdinate(1, 0, points.getLongitude(0));
