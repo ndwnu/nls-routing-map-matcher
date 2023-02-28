@@ -28,8 +28,8 @@ class NetworkReader implements DataReader {
     private final LongIntMap nodeIdToInternalNodeIdMap;
     private final EncodingManager encodingManager;
 
-    public NetworkReader(final GraphHopperStorage ghStorage, final Supplier<Iterator<Link>> linkSupplier,
-            final LongIntMap nodeIdToInternalNodeIdMap) {
+    public NetworkReader(GraphHopperStorage ghStorage, Supplier<Iterator<Link>> linkSupplier,
+            LongIntMap nodeIdToInternalNodeIdMap) {
         this.ghStorage = Preconditions.checkNotNull(ghStorage);
         this.linkSupplier = linkSupplier;
         this.nodeIdToInternalNodeIdMap = Preconditions.checkNotNull(nodeIdToInternalNodeIdMap);
@@ -37,31 +37,31 @@ class NetworkReader implements DataReader {
     }
 
     @Override
-    public DataReader setFile(final File file) {
+    public DataReader setFile(File file) {
         // Ignore this property, get the link from the database instead
         return this;
     }
 
     @Override
-    public DataReader setElevationProvider(final ElevationProvider elevationProvider) {
+    public DataReader setElevationProvider(ElevationProvider elevationProvider) {
         // Ignore this property, don't use elevation
         return this;
     }
 
     @Override
-    public DataReader setSmoothElevation(final boolean smoothElevation) {
+    public DataReader setSmoothElevation(boolean smoothElevation) {
         // Ignore this property, don't use elevation
         return this;
     }
 
     @Override
-    public DataReader setWorkerThreads(final int workerThreads) {
+    public DataReader setWorkerThreads(int workerThreads) {
         // Ignore this property, always use one thread
         return this;
     }
 
     @Override
-    public DataReader setWayPointMaxDistance(final double wayPointMaxDistance) {
+    public DataReader setWayPointMaxDistance(double wayPointMaxDistance) {
         // Ignore this property, don't simplify geometries
         return this;
     }
@@ -70,41 +70,40 @@ class NetworkReader implements DataReader {
     public void readGraph() {
         log.info("Start reading links");
         ghStorage.create(STORAGE_BYTE_COUNT);
-        final Iterator<Link> links = linkSupplier.get();
+        Iterator<Link> links = linkSupplier.get();
         readLinks(links);
         log.info("Finished reading links");
     }
 
-    private void readLinks(final Iterator<Link> links) {
+    private void readLinks(Iterator<Link> links) {
         int count = 0;
         while (links.hasNext()) {
-            final Link link = links.next();
+            Link link = links.next();
             addLink(link);
             count++;
             logCount(count);
         }
     }
 
-    private void addLink(final Link link) {
-        final Coordinate[] coordinates = link.getGeometry().getCoordinates();
+    private void addLink(Link link) {
+        Coordinate[] coordinates = link.getGeometry().getCoordinates();
         if (coordinates.length < COORDINATES_LENGTH_FOR_START_AND_END_ONLY) {
             throw new IllegalStateException("Invalid geometry");
         }
-        final int internalFromNodeId = addNodeIfNeeded(link.getFromNodeId(), coordinates[0].y,
-                coordinates[0].x);
-        final int internalToNodeId = addNodeIfNeeded(link.getToNodeId(), coordinates[coordinates.length - 1].y,
+        int internalFromNodeId = addNodeIfNeeded(link.getFromNodeId(), coordinates[0].y, coordinates[0].x);
+        int internalToNodeId = addNodeIfNeeded(link.getToNodeId(), coordinates[coordinates.length - 1].y,
                 coordinates[coordinates.length - 1].x);
-        final IntsRef wayFlags = determineWayFlags(link);
-        final EdgeIteratorState edge = ghStorage.edge(internalFromNodeId, internalToNodeId)
+        IntsRef wayFlags = determineWayFlags(link);
+        EdgeIteratorState edge = ghStorage.edge(internalFromNodeId, internalToNodeId)
                 .setDistance(link.getDistanceInMeters())
                 .setFlags(wayFlags);
         if (coordinates.length > COORDINATES_LENGTH_FOR_START_AND_END_ONLY) {
-            final PointList geometry = createPointListWithoutStartAndEndPoint(coordinates);
+            PointList geometry = createPointListWithoutStartAndEndPoint(coordinates);
             edge.setWayGeometry(geometry);
         }
     }
 
-    private int addNodeIfNeeded(final long id, final double latitude, final double longitude) {
+    private int addNodeIfNeeded(long id, double latitude, double longitude) {
         int internalNodeId = nodeIdToInternalNodeIdMap.get(id);
         if (internalNodeId < 0) {
             internalNodeId = Math.toIntExact(nodeIdToInternalNodeIdMap.getSize());
@@ -114,20 +113,20 @@ class NetworkReader implements DataReader {
         return internalNodeId;
     }
 
-    private IntsRef determineWayFlags(final Link link) {
-        final EncodingManager.AcceptWay acceptWay = new EncodingManager.AcceptWay();
-        final boolean includeWay = encodingManager.acceptWay(link, acceptWay);
+    private IntsRef determineWayFlags(Link link) {
+        EncodingManager.AcceptWay acceptWay = new EncodingManager.AcceptWay();
+        boolean includeWay = encodingManager.acceptWay(link, acceptWay);
         if (!includeWay) {
             return IntsRef.EMPTY;
         }
 
-        final long relationFlags = 0;
+        long relationFlags = 0;
         return encodingManager.handleWayTags(link, acceptWay, relationFlags);
     }
 
-    private PointList createPointListWithoutStartAndEndPoint(final Coordinate[] coordinates) {
-        final boolean is3d = false;
-        final PointList pointList = new PointList(coordinates.length - 2, is3d);
+    private PointList createPointListWithoutStartAndEndPoint(Coordinate[] coordinates) {
+        boolean is3d = false;
+        PointList pointList = new PointList(coordinates.length - 2, is3d);
         for (int index = 1; index < coordinates.length - 1; index++) {
             pointList.add(coordinates[index].y, coordinates[index].x);
         }
@@ -135,7 +134,7 @@ class NetworkReader implements DataReader {
     }
 
     @SuppressWarnings("squid:S109")
-    private void logCount(final int count) {
+    private void logCount(int count) {
         boolean shouldLog = count <= 10 && count % 5 == 0;
         shouldLog = shouldLog || (count <= 100 && count % 50 == 0);
         shouldLog = shouldLog || (count <= 1_000 && count % 500 == 0);

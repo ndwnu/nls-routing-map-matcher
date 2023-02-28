@@ -4,15 +4,15 @@ public class RoutingMapMatcherException extends RuntimeException {
 
     private static final long serialVersionUID = 1898783087894428865L;
 
-    public RoutingMapMatcherException(final String message) {
+    public RoutingMapMatcherException(String message) {
         super(message);
     }
 
-    public RoutingMapMatcherException(final Throwable cause) {
+    public RoutingMapMatcherException(Throwable cause) {
         super(cause);
     }
 
-    public RoutingMapMatcherException(final String message, final Throwable cause) {
+    public RoutingMapMatcherException(String message, Throwable cause) {
         super(message, cause);
     }
 }

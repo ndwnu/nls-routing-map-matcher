@@ -5,5 +5,5 @@ import nu.ndw.nls.routingmapmatcher.domain.model.singlepoint.SinglePointMatch;
 
 public interface SinglePointMapMatcher extends MapMatcher<SinglePointLocation, SinglePointMatch> {
 
-    SinglePointMatch match(final SinglePointLocation singlePointLocation);
+    SinglePointMatch match(SinglePointLocation singlePointLocation);
 }

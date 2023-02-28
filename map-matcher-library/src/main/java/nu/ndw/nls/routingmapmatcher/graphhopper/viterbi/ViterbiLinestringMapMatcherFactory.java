@@ -13,17 +13,17 @@ import nu.ndw.nls.routingmapmatcher.graphhopper.NetworkGraphHopperFactory;
 public class ViterbiLinestringMapMatcherFactory extends AbstractMapMatcherFactory
         implements MapMatcherFactory<LineStringMapMatcher> {
 
-    public ViterbiLinestringMapMatcherFactory(final NetworkGraphHopperFactory networkGraphHopperFactory) {
+    public ViterbiLinestringMapMatcherFactory(NetworkGraphHopperFactory networkGraphHopperFactory) {
         super(networkGraphHopperFactory);
     }
 
     @Override
-    public LineStringMapMatcher createMapMatcher(final RoutingNetwork routingNetwork) {
+    public LineStringMapMatcher createMapMatcher(RoutingNetwork routingNetwork) {
         return new ViterbiLineStringMapMatcher(readNetwork(routingNetwork));
     }
 
     @Override
-    public LineStringMapMatcher createMapMatcher(final Network preInitializedNetwork) {
+    public LineStringMapMatcher createMapMatcher(Network preInitializedNetwork) {
         return new ViterbiLineStringMapMatcher((NetworkGraphHopper) preInitializedNetwork);
     }
 }

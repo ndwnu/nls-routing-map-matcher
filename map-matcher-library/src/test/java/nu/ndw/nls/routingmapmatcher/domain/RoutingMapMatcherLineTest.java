@@ -45,8 +45,8 @@ class RoutingMapMatcherLineTest {
 
     @BeforeEach
     void setup() {
-        final Iterator<Link> links = Collections.emptyIterator();
-        final List<LineStringLocation> lineStringLocations = Collections.singletonList(lineStringLocation);
+        Iterator<Link> links = Collections.emptyIterator();
+        List<LineStringLocation> lineStringLocations = Collections.singletonList(lineStringLocation);
 
         routingNetwork = RoutingNetwork.builder()
                 .networkNameAndVersion("test network")
@@ -64,7 +64,7 @@ class RoutingMapMatcherLineTest {
                 .thenReturn(lineStringMapMatcher);
         when(lineStringMapMatcher.match(lineStringLocation)).thenReturn(lineStringMatch);
         when(lineStringMatch.getStatus()).thenReturn(MatchStatus.MATCH);
-        final List<LineStringMatch> results = routingMapMatcher.matchLocations(routingNetwork, mapMatchingRequest)
+        List<LineStringMatch> results = routingMapMatcher.matchLocations(routingNetwork, mapMatchingRequest)
                 .collect(Collectors.toList());
         assertThat(results, hasSize(1));
     }

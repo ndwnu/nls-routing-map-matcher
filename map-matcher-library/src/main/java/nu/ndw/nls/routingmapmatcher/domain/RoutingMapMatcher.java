@@ -38,17 +38,17 @@ public class RoutingMapMatcher {
 
         private final MapMatcher<T, R> mapMatcher;
 
-        public Stream<R> matchLocations(final MapMatchingRequest<T> mapMatchingRequest) {
-            final List<T> locations = mapMatchingRequest.getLocationSupplier().get();
+        public Stream<R> matchLocations(MapMatchingRequest<T> mapMatchingRequest) {
+            List<T> locations = mapMatchingRequest.getLocationSupplier().get();
 
-            final int numLocations = locations.size();
+            int numLocations = locations.size();
             log.info("Start map matching for {}, count = {}", mapMatchingRequest.getLocationTypeName(), numLocations);
 
             return locations.stream().map(location -> this.performMatching(numLocations, location));
         }
 
-        private R performMatching(final int numLocations, final T location) {
-            final R match = this.mapMatcher.match(location);
+        private R performMatching(int numLocations, T location) {
+            R match = this.mapMatcher.match(location);
             this.processed++;
             if (match.getStatus() == MatchStatus.MATCH) {
                 this.matched++;
@@ -57,7 +57,7 @@ public class RoutingMapMatcher {
                 log.info("Processed {} of {} total", this.processed, numLocations);
             }
             if (this.processed == numLocations) {
-                final double percentage = HUNDRED_PERCENT * this.matched / numLocations;
+                double percentage = HUNDRED_PERCENT * this.matched / numLocations;
                 log.info("Done. Processed {} locations, {} successfully matched ({}%)", numLocations, this.matched,
                         String.format(Locale.getDefault(), "%.2f", percentage));
             }
@@ -66,25 +66,25 @@ public class RoutingMapMatcher {
         }
     }
 
-    public Stream<SinglePointMatch> matchLocations(final RoutingNetwork routingNetwork,
-            final MapMatchingSinglePointRequest mapMatchingSinglePointRequest) {
-        final SinglePointMapMatcher singlePointMapMatcher =
+    public Stream<SinglePointMatch> matchLocations(RoutingNetwork routingNetwork,
+            MapMatchingSinglePointRequest mapMatchingSinglePointRequest) {
+        SinglePointMapMatcher singlePointMapMatcher =
                 this.singlePointMapMatcherMapMatcherFactory.createMapMatcher(routingNetwork);
 
         return matchLocations(singlePointMapMatcher, mapMatchingSinglePointRequest);
     }
 
-    public Stream<SinglePointMatch> matchLocations(final NetworkGraphHopper preInitializedNetwork,
-            final MapMatchingSinglePointRequest mapMatchingSinglePointRequest) {
-        final SinglePointMapMatcher singlePointMapMatcher =
+    public Stream<SinglePointMatch> matchLocations(NetworkGraphHopper preInitializedNetwork,
+            MapMatchingSinglePointRequest mapMatchingSinglePointRequest) {
+        SinglePointMapMatcher singlePointMapMatcher =
                 this.singlePointMapMatcherMapMatcherFactory.createMapMatcher(preInitializedNetwork);
 
         return matchLocations(singlePointMapMatcher, mapMatchingSinglePointRequest);
     }
 
-    public Stream<LineStringMatch> matchLocations(final RoutingNetwork routingNetwork,
-            final MapMatchingLineRequest mapMatchingLineRequest) {
-        final MapMatcher<LineStringLocation, LineStringMatch> lineStringMapMatcher =
+    public Stream<LineStringMatch> matchLocations(RoutingNetwork routingNetwork,
+            MapMatchingLineRequest mapMatchingLineRequest) {
+        MapMatcher<LineStringLocation, LineStringMatch> lineStringMapMatcher =
                 mapMatchingLineRequest.getLineMatchingMode() == LineMatchingMode.LINE_STRING
                         ? this.lineStringMapMatcherFactory.createMapMatcher(routingNetwork)
                         : this.startToEndMapMatcherMapMatcherFactory.createMapMatcher(routingNetwork);
@@ -92,9 +92,9 @@ public class RoutingMapMatcher {
         return matchLocations(lineStringMapMatcher, mapMatchingLineRequest);
     }
 
-    public Stream<LineStringMatch> matchLocations(final NetworkGraphHopper preInitializedNetwork,
-            final MapMatchingLineRequest mapMatchingLineRequest) {
-        final MapMatcher<LineStringLocation, LineStringMatch> lineStringMapMatcher =
+    public Stream<LineStringMatch> matchLocations(NetworkGraphHopper preInitializedNetwork,
+            MapMatchingLineRequest mapMatchingLineRequest) {
+        MapMatcher<LineStringLocation, LineStringMatch> lineStringMapMatcher =
                 mapMatchingLineRequest.getLineMatchingMode() == LineMatchingMode.LINE_STRING
                         ? this.lineStringMapMatcherFactory.createMapMatcher(preInitializedNetwork)
                         : this.startToEndMapMatcherMapMatcherFactory.createMapMatcher(preInitializedNetwork);
@@ -102,9 +102,9 @@ public class RoutingMapMatcher {
         return matchLocations(lineStringMapMatcher, mapMatchingLineRequest);
     }
 
-    private <T extends BaseLocation, R extends MapMatch> Stream<R> matchLocations(final MapMatcher<T, R> mapMatcher,
-            final MapMatchingRequest<T> mapMatchingRequest) {
-        final MatchingContext<T, R> matchingContext = new MatchingContext<>(mapMatcher);
+    private <T extends BaseLocation, R extends MapMatch> Stream<R> matchLocations(MapMatcher<T, R> mapMatcher,
+            MapMatchingRequest<T> mapMatchingRequest) {
+        MatchingContext<T, R> matchingContext = new MatchingContext<>(mapMatcher);
 
         return matchingContext.matchLocations(mapMatchingRequest);
     }

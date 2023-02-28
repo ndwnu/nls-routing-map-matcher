@@ -66,9 +66,9 @@ public class GraphHopperSinglePointMapMatcher implements SinglePointMapMatcher {
     private final PointMatchingService pointMatchingService;
     private final CrsTransformer crsTransformer;
 
-    public GraphHopperSinglePointMapMatcher(final NetworkGraphHopper network) {
+    public GraphHopperSinglePointMapMatcher(NetworkGraphHopper network) {
         Preconditions.checkNotNull(network);
-        final List<FlagEncoder> flagEncoders = network.getEncodingManager().fetchEdgeEncoders();
+        List<FlagEncoder> flagEncoders = network.getEncodingManager().fetchEdgeEncoders();
         Preconditions.checkArgument(flagEncoders.size() == 1);
         Preconditions.checkArgument(flagEncoders.get(0) instanceof LinkFlagEncoder);
 
@@ -76,7 +76,7 @@ public class GraphHopperSinglePointMapMatcher implements SinglePointMapMatcher {
         this.locationIndexTree = (LocationIndexTree) network.getLocationIndex();
         this.edgeFilter = EdgeFilter.ALL_EDGES;
         this.queryGraph = new QueryGraph(network.getGraphHopperStorage());
-        final Weighting weighting = new ShortestWeighting(flagEncoder);
+        Weighting weighting = new ShortestWeighting(flagEncoder);
         this.isochroneService = new IsochroneService(flagEncoder, weighting);
         this.pointMatchingService = new PointMatchingService(WGS84_GEOMETRY_FACTORY,
                 new BearingCalculator(new GeodeticCalculator()),
@@ -85,21 +85,21 @@ public class GraphHopperSinglePointMapMatcher implements SinglePointMapMatcher {
     }
 
     @Override
-    public SinglePointMatch match(final SinglePointLocation singlePointLocation) {
+    public SinglePointMatch match(SinglePointLocation singlePointLocation) {
         Preconditions.checkNotNull(singlePointLocation);
-        final Point inputPoint = singlePointLocation.getPoint();
-        final double inputRadius = singlePointLocation.getCutoffDistance();
-        final BearingFilter bearingFilter = singlePointLocation.getBearingFilter();
-        final List<QueryResult> queryResults = findCandidates(inputPoint, inputRadius);
+        Point inputPoint = singlePointLocation.getPoint();
+        double inputRadius = singlePointLocation.getCutoffDistance();
+        BearingFilter bearingFilter = singlePointLocation.getBearingFilter();
+        List<QueryResult> queryResults = findCandidates(inputPoint, inputRadius);
 
         if (singlePointLocation.getUpstreamIsochroneUnit() != null ||
                 singlePointLocation.getDownstreamIsochroneUnit() != null) {
             queryGraph.lookup(queryResults);
         }
 
-        final Polygon circle = createCircle(inputPoint, 2 * inputRadius);
+        Polygon circle = createCircle(inputPoint, 2 * inputRadius);
         // Crop geometry to only include segments in search radius
-        final List<CandidateMatch> candidateMatches = queryResults.stream()
+        List<CandidateMatch> candidateMatches = queryResults.stream()
                 .filter(qr -> intersects(circle, qr))
                 .flatMap(qr -> createMatch(qr, circle, singlePointLocation, inputPoint, bearingFilter))
                 .sorted(comparing(CandidateMatch::getDistance))
@@ -107,8 +107,8 @@ public class GraphHopperSinglePointMapMatcher implements SinglePointMapMatcher {
         if (candidateMatches.isEmpty()) {
             return createFailedMatch(singlePointLocation);
         }
-        final double closestDistance = candidateMatches.get(0).getDistance();
-        final double reliability = calculateReliability(closestDistance, inputRadius);
+        double closestDistance = candidateMatches.get(0).getDistance();
+        double reliability = calculateReliability(closestDistance, inputRadius);
         return SinglePointMatch.builder()
                 .id(singlePointLocation.getId())
                 .candidateMatches(candidateMatches)
@@ -117,29 +117,29 @@ public class GraphHopperSinglePointMapMatcher implements SinglePointMapMatcher {
                 .build();
     }
 
-    private boolean intersects(final Polygon circle, final QueryResult queryResult) {
-        final PointList pl = queryResult.getClosestEdge().fetchWayGeometry(ALL_NODES);
+    private boolean intersects(Polygon circle, QueryResult queryResult) {
+        PointList pl = queryResult.getClosestEdge().fetchWayGeometry(ALL_NODES);
         return circle.intersects(pl.toLineString(INCLUDE_ELEVATION));
     }
 
-    private Polygon createCircle(final Point pointWgs84, final double diameterInMeters) {
-        final var shapeFactory = new GeometricShapeFactory(RD_NEW_GEOMETRY_FACTORY);
-        final Point pointRd = (Point) crsTransformer.transformFromWgs84ToRdNew(pointWgs84);
+    private Polygon createCircle(Point pointWgs84, double diameterInMeters) {
+        var shapeFactory = new GeometricShapeFactory(RD_NEW_GEOMETRY_FACTORY);
+        Point pointRd = (Point) crsTransformer.transformFromWgs84ToRdNew(pointWgs84);
         shapeFactory.setCentre(new Coordinate(pointRd.getX(), pointRd.getY()));
         shapeFactory.setNumPoints(NUM_POINTS);
         shapeFactory.setWidth(diameterInMeters);
         shapeFactory.setHeight(diameterInMeters);
-        final Polygon ellipseRd = shapeFactory.createEllipse();
+        Polygon ellipseRd = shapeFactory.createEllipse();
         return (Polygon) crsTransformer.transformFromRdNewToWgs84(ellipseRd);
     }
 
-    private List<QueryResult> findCandidates(final Point point, final double radius) {
+    private List<QueryResult> findCandidates(Point point, double radius) {
         return getQueryResults(point, radius, locationIndexTree, edgeFilter);
     }
 
-    private Stream<CandidateMatch> createMatch(final QueryResult queryResult, final Polygon circle,
-            final SinglePointLocation singlePointLocation, final Point inputPoint, final BearingFilter bearingFilter) {
-        final LineString wayGeometry = queryResult.getClosestEdge()
+    private Stream<CandidateMatch> createMatch(QueryResult queryResult, Polygon circle,
+            SinglePointLocation singlePointLocation, Point inputPoint, BearingFilter bearingFilter) {
+        LineString wayGeometry = queryResult.getClosestEdge()
                 .fetchWayGeometry(ALL_NODES)
                 .toLineString(false);
         /*
@@ -148,17 +148,17 @@ public class GraphHopperSinglePointMapMatcher implements SinglePointMapMatcher {
            GraphHopper sometimes reverses the geometry direction with respect to the original direction. To fix this,
            an internal attribute of the edge iterator state is used, indicating it has done so or not.
         */
-        final LineString originalGeometry = hasReversed(queryResult) ? wayGeometry.reverse() : wayGeometry;
-        final Geometry cutoffGeometry = circle.intersection(originalGeometry);
-        final EdgeIteratorTravelDirection travelDirection = determineEdgeDirection(queryResult, flagEncoder);
-        final IntsRef flags = queryResult.getClosestEdge().getFlags();
-        final int matchedLinkId = flagEncoder.getId(flags);
-        final int nodeId = queryResult.getClosestNode();
-        final Set<Integer> upstreamLinkIds = singlePointLocation.getUpstreamIsochroneUnit() != null ?
+        LineString originalGeometry = hasReversed(queryResult) ? wayGeometry.reverse() : wayGeometry;
+        Geometry cutoffGeometry = circle.intersection(originalGeometry);
+        EdgeIteratorTravelDirection travelDirection = determineEdgeDirection(queryResult, flagEncoder);
+        IntsRef flags = queryResult.getClosestEdge().getFlags();
+        int matchedLinkId = flagEncoder.getId(flags);
+        int nodeId = queryResult.getClosestNode();
+        Set<Integer> upstreamLinkIds = singlePointLocation.getUpstreamIsochroneUnit() != null ?
                 isochroneService.getUpstreamLinkIds(queryGraph, singlePointLocation, nodeId) : null;
-        final Set<Integer> downstreamLinkIds = singlePointLocation.getDownstreamIsochroneUnit() != null ?
+        Set<Integer> downstreamLinkIds = singlePointLocation.getDownstreamIsochroneUnit() != null ?
                 isochroneService.getDownstreamLinkIds(queryGraph, singlePointLocation, nodeId) : null;
-        final var matchedQueryResult = MatchedQueryResult.builder()
+        var matchedQueryResult = MatchedQueryResult.builder()
                 .matchedLinkId(matchedLinkId)
                 .inputPoint(inputPoint)
                 .bearingFilter(bearingFilter)
@@ -179,11 +179,11 @@ public class GraphHopperSinglePointMapMatcher implements SinglePointMapMatcher {
                         .build());
     }
 
-    private static double calculateReliability(final double closestDistance, final double radius) {
+    private static double calculateReliability(double closestDistance, double radius) {
         return (1 - closestDistance / radius) * MAX_RELIABILITY_SCORE;
     }
 
-    private SinglePointMatch createFailedMatch(final SinglePointLocation singlePointLocation) {
+    private SinglePointMatch createFailedMatch(SinglePointLocation singlePointLocation) {
         return SinglePointMatch.builder()
                 .id(singlePointLocation.getId())
                 .candidateMatches(Lists.newArrayList())

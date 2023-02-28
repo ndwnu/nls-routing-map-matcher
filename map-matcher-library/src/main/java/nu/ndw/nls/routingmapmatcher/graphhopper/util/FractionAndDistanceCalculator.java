@@ -15,19 +15,19 @@ public class FractionAndDistanceCalculator {
     public static final double NEAR_ZERO = 0.00000000000001;
     private final GeodeticCalculator geodeticCalculator;
 
-    public double calculateFraction(final LineString line, final Coordinate snappedPointCoordinate) {
-        final LocationIndexedLine locationIndexedLine = new LocationIndexedLine(line);
-        final LinearLocation snappedPointLocation = locationIndexedLine.indexOf(snappedPointCoordinate);
-        final Coordinate[] coordinates = line.getCoordinates();
+    public double calculateFraction(LineString line, Coordinate snappedPointCoordinate) {
+        LocationIndexedLine locationIndexedLine = new LocationIndexedLine(line);
+        LinearLocation snappedPointLocation = locationIndexedLine.indexOf(snappedPointCoordinate);
+        Coordinate[] coordinates = line.getCoordinates();
         double sumOfPathLengths = NEAR_ZERO;
         Double pathDistanceToSnappedPoint = null;
         for (int i = 0; i < coordinates.length; i++) {
-            final Coordinate current = coordinates[i];
+            Coordinate current = coordinates[i];
             if (i == snappedPointLocation.getSegmentIndex()) {
                 pathDistanceToSnappedPoint = sumOfPathLengths + calculateDistance(current, snappedPointCoordinate);
             }
             if (i + 1 < coordinates.length) {
-                final Coordinate next = coordinates[i + 1];
+                Coordinate next = coordinates[i + 1];
                 sumOfPathLengths += calculateDistance(current, next);
             }
         }
@@ -41,7 +41,7 @@ public class FractionAndDistanceCalculator {
         return fraction;
     }
 
-    public double calculateDistance(final Coordinate from, final Coordinate to) {
+    public double calculateDistance(Coordinate from, Coordinate to) {
         geodeticCalculator.setStartingGeographicPoint(to.getX(), to.getY());
         geodeticCalculator.setDestinationGeographicPoint(from.getX(), from.getY());
         return geodeticCalculator.getOrthodromicDistance();

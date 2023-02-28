@@ -23,14 +23,14 @@ public class PathUtil {
 
     private final GeometryFactory geometryFactory;
 
-    public PathUtil(final GeometryFactory geometryFactory) {
+    public PathUtil(GeometryFactory geometryFactory) {
         this.geometryFactory = geometryFactory;
     }
 
-    public LineString createLineString(final PointList points) {
-        final LineString lineString;
+    public LineString createLineString(PointList points) {
+        LineString lineString;
         if (points.size() > 1) {
-            final PackedCoordinateSequence.Double coordinateSequence =
+            PackedCoordinateSequence.Double coordinateSequence =
                     new PackedCoordinateSequence.Double(points.size(), 2, 0);
             for (int index = 0; index < points.size(); index++) {
                 coordinateSequence.setOrdinate(index, 0, points.getLongitude(index));
@@ -38,8 +38,7 @@ public class PathUtil {
             }
             lineString = geometryFactory.createLineString(coordinateSequence);
         } else if (points.size() == 1) {
-            final PackedCoordinateSequence.Double coordinateSequence =
-                    new PackedCoordinateSequence.Double(2, 2, 0);
+            PackedCoordinateSequence.Double coordinateSequence = new PackedCoordinateSequence.Double(2, 2, 0);
             coordinateSequence.setOrdinate(0, 0, points.getLongitude(0));
             coordinateSequence.setOrdinate(0, 1, points.getLatitude(0));
             coordinateSequence.setOrdinate(1, 0, points.getLongitude(0));
@@ -51,13 +50,12 @@ public class PathUtil {
         return lineString;
     }
 
-    public List<Integer> determineMatchedLinkIds(final LinkFlagEncoder flagEncoder,
-            final Collection<EdgeIteratorState> edges) {
-        final List<Integer> matchedLinkIds = new ArrayList<>(edges.size());
+    public List<Integer> determineMatchedLinkIds(LinkFlagEncoder flagEncoder, Collection<EdgeIteratorState> edges) {
+        List<Integer> matchedLinkIds = new ArrayList<>(edges.size());
         Integer previousMatchedLinkId = null;
-        for (final EdgeIteratorState edge : edges) {
-            final IntsRef flags = edge.getFlags();
-            final Integer matchedLinkId = flagEncoder.getId(flags);
+        for (EdgeIteratorState edge : edges) {
+            IntsRef flags = edge.getFlags();
+            Integer matchedLinkId = flagEncoder.getId(flags);
             if (previousMatchedLinkId == null || !previousMatchedLinkId.equals(matchedLinkId)) {
                 matchedLinkIds.add(matchedLinkId);
             }
@@ -79,12 +77,12 @@ public class PathUtil {
      * @param flagEncoder
      * @return travel direction on this specific edge
      */
-    public static EdgeIteratorTravelDirection determineEdgeDirection(final QueryResult queryResult,
-            final LinkFlagEncoder flagEncoder) {
-        final EdgeIteratorState edge = queryResult.getClosestEdge();
+    public static EdgeIteratorTravelDirection determineEdgeDirection(QueryResult queryResult,
+            LinkFlagEncoder flagEncoder) {
+        EdgeIteratorState edge = queryResult.getClosestEdge();
 
-        final boolean edgeCanBeTraveledFromBaseToAdjacent = edge.get(flagEncoder.getAccessEnc());
-        final boolean edgeCanBeTraveledFromAdjacentToBase = edge.getReverse(flagEncoder.getAccessEnc());
+        boolean edgeCanBeTraveledFromBaseToAdjacent = edge.get(flagEncoder.getAccessEnc());
+        boolean edgeCanBeTraveledFromAdjacentToBase = edge.getReverse(flagEncoder.getAccessEnc());
 
         if (edgeCanBeTraveledFromAdjacentToBase && edgeCanBeTraveledFromBaseToAdjacent) {
             return EdgeIteratorTravelDirection.BOTH_DIRECTIONS;
@@ -97,12 +95,12 @@ public class PathUtil {
         }
     }
 
-    public double determineStartLinkFraction(final EdgeIteratorState firstEdge, final QueryGraph queryGraph) {
-        final double startLinkFraction;
+    public double determineStartLinkFraction(EdgeIteratorState firstEdge, QueryGraph queryGraph) {
+        double startLinkFraction;
         if (queryGraph.isVirtualNode(firstEdge.getBaseNode())) {
-            final EdgeIteratorState originalEdge = findOriginalEdge(firstEdge, queryGraph);
+            EdgeIteratorState originalEdge = findOriginalEdge(firstEdge, queryGraph);
 
-            final double distanceInOtherDirection = calculateDistanceFromVirtualNodeToNonVirtualNode(queryGraph,
+            double distanceInOtherDirection = calculateDistanceFromVirtualNodeToNonVirtualNode(queryGraph,
                     firstEdge.getBaseNode(), firstEdge.getAdjNode(), firstEdge);
 
             startLinkFraction = distanceInOtherDirection / originalEdge.getDistance();
@@ -113,8 +111,8 @@ public class PathUtil {
         return startLinkFraction;
     }
 
-    private EdgeIteratorState findOriginalEdge(final EdgeIteratorState edge, final QueryGraph queryGraph) {
-        final EdgeIteratorState originalEdge;
+    private EdgeIteratorState findOriginalEdge(EdgeIteratorState edge, QueryGraph queryGraph) {
+        EdgeIteratorState originalEdge;
         if (queryGraph.isVirtualEdge(edge.getEdge())) {
             if (queryGraph.isVirtualNode(edge.getBaseNode())) {
                 originalEdge = queryGraph.getOriginalEdgeFromVirtNode(edge.getBaseNode());
@@ -130,11 +128,9 @@ public class PathUtil {
         return originalEdge;
     }
 
-    private double calculateDistanceFromVirtualNodeToNonVirtualNode(final QueryGraph queryGraph,
-            final int virtualNode,
-            final int nodeToAvoid,
-            final EdgeIteratorState pathEdge) {
-        final EdgeExplorer edgeExplorer = queryGraph.createEdgeExplorer();
+    private double calculateDistanceFromVirtualNodeToNonVirtualNode(QueryGraph queryGraph, int virtualNode,
+            int nodeToAvoid, EdgeIteratorState pathEdge) {
+        EdgeExplorer edgeExplorer = queryGraph.createEdgeExplorer();
 
         double distanceInOtherDirection = 0D;
         boolean distanceInOtherDirectionCalculated = false;
@@ -175,12 +171,12 @@ public class PathUtil {
         return distanceInOtherDirection;
     }
 
-    public double determineEndLinkFraction(final EdgeIteratorState lastEdge, final QueryGraph queryGraph) {
-        final double endLinkFraction;
+    public double determineEndLinkFraction(EdgeIteratorState lastEdge, QueryGraph queryGraph) {
+        double endLinkFraction;
         if (queryGraph.isVirtualNode(lastEdge.getAdjNode())) {
-            final EdgeIteratorState originalEdge = findOriginalEdge(lastEdge, queryGraph);
+            EdgeIteratorState originalEdge = findOriginalEdge(lastEdge, queryGraph);
 
-            final double distanceInOtherDirection = calculateDistanceFromVirtualNodeToNonVirtualNode(queryGraph,
+            double distanceInOtherDirection = calculateDistanceFromVirtualNodeToNonVirtualNode(queryGraph,
                     lastEdge.getAdjNode(), lastEdge.getBaseNode(), lastEdge);
 
             endLinkFraction = 1D - (distanceInOtherDirection / originalEdge.getDistance());

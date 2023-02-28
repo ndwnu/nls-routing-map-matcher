@@ -31,15 +31,13 @@ public class MatchedQueryResult {
     private final boolean reversed;
 
     public List<LineString> getCutoffGeometryAsLineStrings() {
-        if (cutoffGeometry instanceof MultiLineString) {
-            final var multiLineString = (MultiLineString) cutoffGeometry;
-            final List<LineString> lineStrings = new ArrayList<>();
+        if (cutoffGeometry instanceof MultiLineString multiLineString) {
+            List<LineString> lineStrings = new ArrayList<>();
             for (int i = 0; i < multiLineString.getNumGeometries(); i++) {
                 lineStrings.add((LineString) multiLineString.getGeometryN(i));
             }
             return lineStrings;
-        } else if (cutoffGeometry instanceof LineString) {
-            final var lineString = (LineString) cutoffGeometry;
+        } else if (cutoffGeometry instanceof LineString lineString) {
             return List.of(lineString);
         } else {
             throw new IllegalStateException("Only LineString or MultiLineString "
