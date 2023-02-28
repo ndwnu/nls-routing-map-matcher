@@ -1,6 +1,7 @@
 package nu.ndw.nls.routingmapmatcher.graphhopper.util;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.verify;
@@ -18,10 +19,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 @ExtendWith(MockitoExtension.class)
 class BearingCalculatorTest {
 
-    private static final double MIN_BEARING_10 = 10D;
-    private static final double MAX_BEARING_20 = 20D;
-    private static final double MIN_BEARING_350 = 350D;
-    private static final double CONVERTED_BEARING_IN_RANGE = 10D;
+    private static final BearingFilter BEARING_FILTER_WITH_WRAPAROUND = new BearingFilter(0, 10);
 
     @Mock
     private GeodeticCalculator geodeticCalculator;
@@ -29,28 +27,32 @@ class BearingCalculatorTest {
     private BearingCalculator bearingCalculator;
 
     @Test
-    void bearingIsInRange_with_no_range_should_return_true() {
-        assertTrue(bearingCalculator.bearingIsInRange(CONVERTED_BEARING_IN_RANGE, null));
+    void bearingIsInRange_true_bearingFilterNull() {
+        assertTrue(bearingCalculator.bearingIsInRange(10.0, null));
     }
 
     @Test
-    void bearingIsInRange_with_10_20_range_should_return_true() {
-        assertTrue(bearingCalculator.bearingIsInRange(CONVERTED_BEARING_IN_RANGE, new BearingFilter(15, 5)));
+    void bearingIsInRange_true_inRange() {
+        assertTrue(bearingCalculator.bearingIsInRange(0, BEARING_FILTER_WITH_WRAPAROUND));
+        // 360 is equivalent to 0.
+        assertTrue(bearingCalculator.bearingIsInRange(360, BEARING_FILTER_WITH_WRAPAROUND));
+        // Range is inclusive.
+        assertTrue(bearingCalculator.bearingIsInRange(350, BEARING_FILTER_WITH_WRAPAROUND));
+        assertTrue(bearingCalculator.bearingIsInRange(10, BEARING_FILTER_WITH_WRAPAROUND));
     }
 
     @Test
-    void bearingIsInRange_with_350_10_range_should_return_true() {
-        assertTrue(bearingCalculator.bearingIsInRange(CONVERTED_BEARING_IN_RANGE, new BearingFilter(0, 10)));
+    void bearingIsInRange_false_notInRange() {
+        assertFalse(bearingCalculator.bearingIsInRange(349.9, BEARING_FILTER_WITH_WRAPAROUND));
+        assertFalse(bearingCalculator.bearingIsInRange(10.1, BEARING_FILTER_WITH_WRAPAROUND));
     }
 
     @Test
-    void bearingIsInRange_with_10_20_range_should_return_false() {
-        assertFalse(bearingCalculator.bearingIsInRange(9D, new BearingFilter(15, 5)));
-    }
-
-    @Test
-    void bearingIsInRange_with_350_10_range_should_return_false() {
-        assertFalse(bearingCalculator.bearingIsInRange(10.1, new BearingFilter(0, 10)));
+    void bearingDelta_ok() {
+        assertEquals(0, bearingCalculator.bearingDelta(0, 360));
+        assertEquals(0, bearingCalculator.bearingDelta(360, 0));
+        assertEquals(179, bearingCalculator.bearingDelta(0, 181));
+        assertEquals(2, bearingCalculator.bearingDelta(1, 359));
     }
 
     @Test
