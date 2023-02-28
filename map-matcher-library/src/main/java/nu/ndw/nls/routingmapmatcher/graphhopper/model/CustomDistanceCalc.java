@@ -8,7 +8,7 @@ public class CustomDistanceCalc extends DistancePlaneProjection {
     private double customDistance;
     private int customDistanceCounter;
 
-    public void returnCustomDistanceForNextCalls(final double customDistance, final int numberOfCalls) {
+    public void returnCustomDistanceForNextCalls(double customDistance, int numberOfCalls) {
         Preconditions.checkArgument(customDistance >= 0.0);
         Preconditions.checkArgument(numberOfCalls >= 0);
 
@@ -17,7 +17,7 @@ public class CustomDistanceCalc extends DistancePlaneProjection {
     }
 
     @Override
-    public double calcDist(final double fromLat, final double fromLon, final double toLat, final double toLon) {
+    public double calcDist(double fromLat, double fromLon, double toLat, double toLon) {
         if (customDistanceCounter > 0) {
             customDistanceCounter--;
             return customDistance;

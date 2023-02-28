@@ -54,6 +54,7 @@ public class ViterbiLineStringMapMatcher implements LineStringMapMatcher {
      * See also the comment in {@link #createGpsTrack(LineString)}
      */
     private static final double NEARBY_NDW_NETWORK_DISTANCE_IN_METERS = 2 * MEASUREMENT_ERROR_SIGMA_IN_METERS;
+    private static final double DISTANCE_CALCULATOR_CUSTOM_DISTANCE = 3 * MEASUREMENT_ERROR_SIGMA_IN_METERS;
 
     /**
      * Speed to use when creating a GPS track from a geometry.
@@ -64,7 +65,7 @@ public class ViterbiLineStringMapMatcher implements LineStringMapMatcher {
 
     private static final int MILLIS_PER_SECOND = 1000;
 
-    private static final int NEEDED_GPS_TRACK_ENTRIES = 2;
+    private static final int COORDINATES_LENGTH_START_END = 2;
 
     private final MapMatching mapMatching;
     private final CustomDistanceCalc distanceCalc;
@@ -74,14 +75,14 @@ public class ViterbiLineStringMapMatcher implements LineStringMapMatcher {
     private final LineStringMatchUtil lineStringMatchUtil;
     private final LineStringScoreUtil lineStringScoreUtil;
 
-    public ViterbiLineStringMapMatcher(final NetworkGraphHopper network) {
+    public ViterbiLineStringMapMatcher(NetworkGraphHopper network) {
         Preconditions.checkNotNull(network);
-        final List<FlagEncoder> flagEncoders = network.getEncodingManager().fetchEdgeEncoders();
+        List<FlagEncoder> flagEncoders = network.getEncodingManager().fetchEdgeEncoders();
         Preconditions.checkArgument(flagEncoders.size() == 1);
         Preconditions.checkArgument(flagEncoders.get(0) instanceof LinkFlagEncoder);
-        final LinkFlagEncoder flagEncoder = (LinkFlagEncoder) flagEncoders.get(0);
-        final String algorithm = Parameters.Algorithms.DIJKSTRA_BI;
-        final Weighting weighting = new ShortestWeighting(flagEncoder);
+        LinkFlagEncoder flagEncoder = (LinkFlagEncoder) flagEncoders.get(0);
+        String algorithm = Parameters.Algorithms.DIJKSTRA_BI;
+        Weighting weighting = new ShortestWeighting(flagEncoder);
         this.mapMatching = new MapMatching(network, new AlgorithmOptions(algorithm, weighting));
         mapMatching.setMeasurementErrorSigma(MEASUREMENT_ERROR_SIGMA_IN_METERS);
         mapMatching.setTransitionProbabilityBeta(TRANSITION_PROBABILITY_BETA);
@@ -95,22 +96,22 @@ public class ViterbiLineStringMapMatcher implements LineStringMapMatcher {
     }
 
     @Override
-    public LineStringMatch match(final LineStringLocation lineStringLocation) {
+    public LineStringMatch match(LineStringLocation lineStringLocation) {
         Preconditions.checkNotNull(lineStringLocation);
 
-        final List<GPXEntry> gpsTrack = createGpsTrack(lineStringLocation.getGeometry());
+        List<GPXEntry> gpsTrack = createGpsTrack(lineStringLocation.getGeometry());
 
         LineStringMatch lineStringMatch;
-        if (gpsTrack.size() >= NEEDED_GPS_TRACK_ENTRIES) {
+        if (gpsTrack.size() >= COORDINATES_LENGTH_START_END) {
             try {
                 preventFilteringWhileMapMatching(gpsTrack);
-                final MatchResult matchResult = mapMatching.doWork(gpsTrack);
+                MatchResult matchResult = mapMatching.doWork(gpsTrack);
                 if (matchResult.getMergedPath().getEdgeCount() > 0) {
                     lineStringMatch = createMatch(matchResult, lineStringLocation);
                 } else {
                     lineStringMatch = lineStringMatchUtil.createFailedMatch(lineStringLocation, MatchStatus.NO_MATCH);
                 }
-            } catch (final Exception e) {
+            } catch (RuntimeException e) {
                 log.debug("Exception while map matching, creating failed result for {}", lineStringLocation, e);
                 lineStringMatch = lineStringMatchUtil.createFailedMatch(lineStringLocation, MatchStatus.EXCEPTION);
             }
@@ -120,23 +121,23 @@ public class ViterbiLineStringMapMatcher implements LineStringMapMatcher {
         return lineStringMatch;
     }
 
-    private List<GPXEntry> createGpsTrack(final LineString lineString) {
-        final CoordinateSequence coordinateSequence = lineString.getCoordinateSequence();
+    private List<GPXEntry> createGpsTrack(LineString lineString) {
+        CoordinateSequence coordinateSequence = lineString.getCoordinateSequence();
 
-        final List<GPXEntry> gpsTrack = new ArrayList<>();
+        List<GPXEntry> gpsTrack = new ArrayList<>();
         long previousTimestampInMillis = 0;
         for (int index = 0; index < coordinateSequence.size(); index++) {
-            final long timestampInMillis;
+            long timestampInMillis;
             if (index == 0) {
                 timestampInMillis = previousTimestampInMillis;
             } else {
-                final double distanceInMeters = distanceCalc.calcDist(
+                double distanceInMeters = distanceCalc.calcDist(
                         coordinateSequence.getY(index - 1), coordinateSequence.getX(index - 1),
                         coordinateSequence.getY(index), coordinateSequence.getX(index));
-                final double durationInSeconds = distanceInMeters / GPS_TRACK_SPEED_IN_METERS_PER_SECOND;
+                double durationInSeconds = distanceInMeters / GPS_TRACK_SPEED_IN_METERS_PER_SECOND;
                 timestampInMillis = previousTimestampInMillis + Math.round(durationInSeconds * MILLIS_PER_SECOND);
             }
-            final GPXEntry gpxEntry = new GPXEntry(coordinateSequence.getY(index), coordinateSequence.getX(index),
+            GPXEntry gpxEntry = new GPXEntry(coordinateSequence.getY(index), coordinateSequence.getX(index),
                     timestampInMillis);
             // Only add gpx entry when coordinate is nearby the NDW base network. This way, when an empty GPS track is
             // returned, we can be pretty confident that there is no matching possible on the NDW base network.
@@ -148,10 +149,10 @@ public class ViterbiLineStringMapMatcher implements LineStringMapMatcher {
         return gpsTrack;
     }
 
-    private boolean isNearbyNdwNetwork(final GPXEntry gpxEntry) {
-        final List<QueryResult> queryResults = locationIndexTree.findNClosest(
-                gpxEntry.getLat(), gpxEntry.getLon(), edgeFilter, MEASUREMENT_ERROR_SIGMA_IN_METERS);
-        for (final QueryResult queryResult : queryResults) {
+    private boolean isNearbyNdwNetwork(GPXEntry gpxEntry) {
+        List<QueryResult> queryResults = locationIndexTree.findNClosest(gpxEntry.getLat(), gpxEntry.getLon(),
+                edgeFilter, MEASUREMENT_ERROR_SIGMA_IN_METERS);
+        for (QueryResult queryResult : queryResults) {
             if (queryResult.getQueryDistance() <= NEARBY_NDW_NETWORK_DISTANCE_IN_METERS) {
                 return true;
             }
@@ -159,17 +160,16 @@ public class ViterbiLineStringMapMatcher implements LineStringMapMatcher {
         return false;
     }
 
-    private void preventFilteringWhileMapMatching(final List<GPXEntry> gpsTrack) {
-        final double customDistance = 3 * MEASUREMENT_ERROR_SIGMA_IN_METERS;
+    private void preventFilteringWhileMapMatching(List<GPXEntry> gpsTrack) {
         // When filtering there is no distance calculation for the first and last GPS coordinates
-        final int numberOfCalls = Math.max(gpsTrack.size() - 2, 0);
-        distanceCalc.returnCustomDistanceForNextCalls(customDistance, numberOfCalls);
+        int numberOfCalls = Math.max(gpsTrack.size() - COORDINATES_LENGTH_START_END, 0);
+        distanceCalc.returnCustomDistanceForNextCalls(DISTANCE_CALCULATOR_CUSTOM_DISTANCE, numberOfCalls);
     }
 
-    private LineStringMatch createMatch(final MatchResult matchResult, final LineStringLocation lineStringLocation) {
-        final Path path = matchResult.getMergedPath();
-        final QueryGraph queryGraph = queryGraphExtractor.extractQueryGraph(path);
-        final double reliability = lineStringScoreUtil.calculateCandidatePathScore(path, lineStringLocation);
+    private LineStringMatch createMatch(MatchResult matchResult, LineStringLocation lineStringLocation) {
+        Path path = matchResult.getMergedPath();
+        QueryGraph queryGraph = queryGraphExtractor.extractQueryGraph(path);
+        double reliability = lineStringScoreUtil.calculateCandidatePathScore(path, lineStringLocation);
         return lineStringMatchUtil.createMatch(lineStringLocation, path, queryGraph, reliability);
     }
 }

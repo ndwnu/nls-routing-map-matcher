@@ -21,13 +21,12 @@ public final class EdgeIteratorStateReverseExtractor {
     private EdgeIteratorStateReverseExtractor() {
     }
 
-    public static boolean hasReversed(final QueryResult q) {
-        final EdgeIteratorState closestEdge = q.getClosestEdge();
-        if (!(closestEdge instanceof EdgeIterable)) {
+    public static boolean hasReversed(QueryResult q) {
+        EdgeIteratorState closestEdge = q.getClosestEdge();
+        if (!(closestEdge instanceof EdgeIterable edgeIterable)) {
             throw new IllegalArgumentException("This method can only be called with an EdgeIteratorState "
                     + "instance of EdgeIterable");
         }
-        final EdgeIterable edgeIterable = (EdgeIterable) closestEdge;
         return edgeIterable.reverse;
     }
 }

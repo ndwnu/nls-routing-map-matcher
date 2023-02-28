@@ -21,9 +21,9 @@ public class MapMatcherAutoConfiguration {
     @Bean
     @ConditionalOnMissingBean
     public RoutingMapMatcher routingMapMatcher(
-            final MapMatcherFactory<LineStringMapMatcher> lineStringMapMatcherFactory,
-            final MapMatcherFactory<SinglePointMapMatcher> singlePointMapMatcherMapMatcherFactory,
-            final MapMatcherFactory<StartToEndMapMatcher> startToEndMapMatcherMapMatcherFactory) {
+            MapMatcherFactory<LineStringMapMatcher> lineStringMapMatcherFactory,
+            MapMatcherFactory<SinglePointMapMatcher> singlePointMapMatcherMapMatcherFactory,
+            MapMatcherFactory<StartToEndMapMatcher> startToEndMapMatcherMapMatcherFactory) {
         return new RoutingMapMatcher(lineStringMapMatcherFactory, singlePointMapMatcherMapMatcherFactory,
                 startToEndMapMatcherMapMatcherFactory);
     }
@@ -37,21 +37,21 @@ public class MapMatcherAutoConfiguration {
     @Bean
     @ConditionalOnMissingBean(value = LineStringMapMatcher.class, parameterizedContainer = MapMatcherFactory.class)
     public MapMatcherFactory<LineStringMapMatcher> lineStringMapMatcherFactory(
-            final NetworkGraphHopperFactory networkGraphHopperFactory) {
+            NetworkGraphHopperFactory networkGraphHopperFactory) {
         return new ViterbiLinestringMapMatcherFactory(networkGraphHopperFactory);
     }
 
     @Bean
     @ConditionalOnMissingBean(value = SinglePointMapMatcher.class, parameterizedContainer = MapMatcherFactory.class)
     public MapMatcherFactory<SinglePointMapMatcher> singlePointMapMatcherFactory(
-            final NetworkGraphHopperFactory networkGraphHopperFactory) {
+            NetworkGraphHopperFactory networkGraphHopperFactory) {
         return new GraphHopperSinglePointMapMatcherFactory(networkGraphHopperFactory);
     }
 
     @Bean
     @ConditionalOnMissingBean(value = StartToEndMapMatcher.class, parameterizedContainer = MapMatcherFactory.class)
     public MapMatcherFactory<StartToEndMapMatcher> startToEndMapMatcherFactory(
-            final NetworkGraphHopperFactory networkGraphHopperFactory) {
+            NetworkGraphHopperFactory networkGraphHopperFactory) {
         return new GraphHopperStartToEndMapMatcherFactory(networkGraphHopperFactory);
     }
 }

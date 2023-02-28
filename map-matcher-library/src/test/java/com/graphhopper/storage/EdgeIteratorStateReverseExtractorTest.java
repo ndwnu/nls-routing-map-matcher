@@ -40,13 +40,12 @@ class EdgeIteratorStateReverseExtractorTest {
     private static final Coordinate coordinateA3 = new Coordinate(LONG_3, LAT_3);
     private static final Coordinate coordinateA4 = new Coordinate(LONG_4, LAT_4);
     private static final int TO_NODE_ID_2 = 3;
-    public static final int ID_1 = 1;
-    public static final int ID_2 = 2;
-    public static final int ALL_NODES = 3;
+    private static final int ID_1 = 1;
+    private static final int ID_2 = 2;
+    private static final int ALL_NODES = 3;
     private List<QueryResult> queryResults;
     private NetworkGraphHopper network;
     private LineString lineString_1;
-    private LineString lineString_2;
 
     @BeforeEach
     void setup() {
@@ -54,16 +53,26 @@ class EdgeIteratorStateReverseExtractorTest {
                 GlobalConstants.WGS84_SRID);
         lineString_1 = geometryFactory
                 .createLineString(new Coordinate[]{coordinateA1, coordinateA2, coordinateA3});
-        var link = new Link(ID_1, FROM_NODE_ID, TO_NODE_ID,
-                50,
-                50, 1500,
-                lineString_1);
-        lineString_2 = geometryFactory
+        var link = Link.builder()
+                .id(ID_1)
+                .fromNodeId(FROM_NODE_ID)
+                .toNodeId(TO_NODE_ID)
+                .speedInKilometersPerHour(50)
+                .reverseSpeedInKilometersPerHour(50)
+                .distanceInMeters(1500)
+                .geometry(lineString_1)
+                .build();
+        LineString lineString_2 = geometryFactory
                 .createLineString(new Coordinate[]{coordinateA3, coordinateA4});
-        var link2 = new Link(ID_2, TO_NODE_ID, TO_NODE_ID_2,
-                50,
-                50, 500,
-                lineString_2);
+        var link2 = Link.builder()
+                .id(ID_2)
+                .fromNodeId(TO_NODE_ID)
+                .toNodeId(TO_NODE_ID_2)
+                .speedInKilometersPerHour(50)
+                .reverseSpeedInKilometersPerHour(50)
+                .distanceInMeters(500)
+                .geometry(lineString_2)
+                .build();
         Supplier<Iterator<Link>> linkSupplier = () -> List.of(link, link2).iterator();
         var routingNetwork = RoutingNetwork.builder()
                 .networkNameAndVersion("test-1")
@@ -75,7 +84,6 @@ class EdgeIteratorStateReverseExtractorTest {
         var inputPoint = geometryFactory.createPoint(new Coordinate(5.3789037, 52.1588714));
         queryResults = getQueryResults(inputPoint, 100, locationIndexTree, EdgeFilter.ALL_EDGES);
     }
-
 
     @Test
     void hasReversed_when_reversed_isTrue_geometry_should_be_reversed() {
@@ -89,6 +97,5 @@ class EdgeIteratorStateReverseExtractorTest {
         assertThat(hasReversed(reversedQueryResult)).isTrue();
         assertThat(lineString_1.reverse())
                 .isEqualTo(reversedEdge.fetchWayGeometry(ALL_NODES).toLineString(false));
-
     }
 }
