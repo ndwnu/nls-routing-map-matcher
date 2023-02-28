@@ -101,19 +101,15 @@ public class PathUtil {
     }
 
     public double determineStartLinkFraction(EdgeIteratorState firstEdge, QueryGraph queryGraph) {
-        double startLinkFraction;
         if (queryGraph.isVirtualNode(firstEdge.getBaseNode())) {
             EdgeIteratorState originalEdge = findOriginalEdge(firstEdge, queryGraph);
 
             double distanceInOtherDirection = calculateDistanceFromVirtualNodeToNonVirtualNode(queryGraph,
                     firstEdge.getBaseNode(), firstEdge.getAdjNode(), firstEdge);
 
-            startLinkFraction = distanceInOtherDirection / originalEdge.getDistance();
-        } else {
-            startLinkFraction = 0D;
+            return distanceInOtherDirection / originalEdge.getDistance();
         }
-
-        return startLinkFraction;
+        return 0D;
     }
 
     private EdgeIteratorState findOriginalEdge(EdgeIteratorState edge, QueryGraph queryGraph) {
@@ -177,18 +173,14 @@ public class PathUtil {
     }
 
     public double determineEndLinkFraction(EdgeIteratorState lastEdge, QueryGraph queryGraph) {
-        double endLinkFraction;
         if (queryGraph.isVirtualNode(lastEdge.getAdjNode())) {
             EdgeIteratorState originalEdge = findOriginalEdge(lastEdge, queryGraph);
 
             double distanceInOtherDirection = calculateDistanceFromVirtualNodeToNonVirtualNode(queryGraph,
                     lastEdge.getAdjNode(), lastEdge.getBaseNode(), lastEdge);
 
-            endLinkFraction = 1D - (distanceInOtherDirection / originalEdge.getDistance());
-        } else {
-            endLinkFraction = 1D;
+            return 1D - (distanceInOtherDirection / originalEdge.getDistance());
         }
-
-        return endLinkFraction;
+        return 1D;
     }
 }
