@@ -13,9 +13,9 @@ import org.locationtech.jts.geom.Point;
 public class MatchedPoint {
 
     private final int matchedLinkId;
-    private final Point snappedPoint;
-    private final double fractionOfSnappedPoint;
-    private final double distanceToSnappedPoint;
-    private final double bearingOfSnappedPoint;
     private final boolean reversed;
+    private final Point snappedPoint;
+    private final double fraction;
+    private final double distance;
+    private final double bearing;
 }

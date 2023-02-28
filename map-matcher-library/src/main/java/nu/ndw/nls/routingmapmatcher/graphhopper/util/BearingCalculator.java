@@ -12,14 +12,17 @@ public class BearingCalculator {
 
     private final GeodeticCalculator geodeticCalculator;
 
-    public boolean bearingIsInRange(double convertedBearing, BearingFilter bearingFilter) {
+    public boolean bearingIsInRange(double actualBearing, BearingFilter bearingFilter) {
         // If no bearing filter is provided, return true so the match is always kept.
         if (bearingFilter == null) {
             return true;
         }
-        double delta = Math.abs(convertedBearing - bearingFilter.target());
-        double normalizedDelta = Math.min(delta, MAX_BEARING - delta);
-        return normalizedDelta <= bearingFilter.cutoffMargin();
+        return bearingDelta(actualBearing, bearingFilter.target()) <= bearingFilter.cutoffMargin();
+    }
+
+    public double bearingDelta(double actualBearing, double targetBearing) {
+        double delta = Math.abs(actualBearing - targetBearing);
+        return Math.min(delta, MAX_BEARING - delta);
     }
 
     public double calculateBearing(Coordinate currentCoordinate, Coordinate nextCoordinate) {

@@ -12,6 +12,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;
+import java.nio.charset.Charset;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -44,13 +45,12 @@ public class SinglePointMapMatcherIT {
     private static final double DISTANCE_ROUNDING_ERROR = 0.1;
 
     private SinglePointMapMatcher singlePointMapMatcher;
-    private ObjectMapper mapper;
     private GeometryFactory geometryFactory;
 
     @SneakyThrows
     private void setupNetwork(String resource) {
-        String linksJson = IOUtils.toString(getClass().getResourceAsStream(resource));
-        mapper = new ObjectMapper();
+        String linksJson = IOUtils.toString(getClass().getResourceAsStream(resource), Charset.defaultCharset());
+        ObjectMapper mapper = new ObjectMapper();
         SimpleModule module = new SimpleModule();
         module.addDeserializer(Link.class, new LinkDeserializer());
         mapper.registerModule(module);
