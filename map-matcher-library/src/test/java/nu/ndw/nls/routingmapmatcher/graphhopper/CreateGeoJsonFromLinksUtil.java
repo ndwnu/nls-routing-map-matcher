@@ -11,7 +11,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.stream.Collectors;
 import lombok.SneakyThrows;
 import nu.ndw.nls.routingmapmatcher.constants.GlobalConstants;
 import nu.ndw.nls.routingmapmatcher.domain.model.Link;
@@ -113,7 +112,7 @@ public class CreateGeoJsonFromLinksUtil {
                     GeoJSONWriter writer = new GeoJSONWriter();
                     var geometry = writer.write(circleA.intersection(l.getGeometry()));
                     return new Feature(l.getId(), geometry, properties);
-                }).collect(Collectors.toList());
+                }).toList();
 
         GeoJSONWriter writer = new GeoJSONWriter();
         GeoJSON json = writer.write(geoms);

@@ -74,11 +74,11 @@ public class PointMatchingService {
         return MatchedPoint
                 .builder()
                 .matchedLinkId(matchedLinkId)
-                .snappedPoint(snappedPoint)
-                .fractionOfSnappedPoint(fraction)
-                .distanceToSnappedPoint(distance)
-                .bearingOfSnappedPoint(bearing)
                 .reversed(reversed)
+                .snappedPoint(snappedPoint)
+                .fraction(fraction)
+                .distance(distance)
+                .bearing(bearing)
                 .build();
     }
 

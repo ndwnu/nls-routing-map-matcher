@@ -7,7 +7,6 @@ import static org.mockito.Mockito.when;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
-import java.util.stream.Collectors;
 import nu.ndw.nls.routingmapmatcher.domain.model.Link;
 import nu.ndw.nls.routingmapmatcher.domain.model.MapMatchingSinglePointRequest;
 import nu.ndw.nls.routingmapmatcher.domain.model.MatchStatus;
@@ -64,8 +63,7 @@ class RoutingMapMatcherSinglePointTest {
                 .thenReturn(singlePointMapMatcher);
         when(singlePointMapMatcher.match(singlePointLocation)).thenReturn(singlePointMatch);
         when(singlePointMatch.getStatus()).thenReturn(MatchStatus.MATCH);
-        List<SinglePointMatch> results = routingMapMatcher.matchLocations(routingNetwork, mapMatchingRequest)
-                .collect(Collectors.toList());
+        List<SinglePointMatch> results = routingMapMatcher.matchLocations(routingNetwork, mapMatchingRequest).toList();
         assertThat(results, hasSize(1));
     }
 }
