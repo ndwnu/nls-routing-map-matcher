@@ -51,6 +51,7 @@ public class GraphHopperSinglePointMapMatcher implements SinglePointMapMatcher {
     private static final int ALL_NODES = 3;
     private static final boolean INCLUDE_ELEVATION = false;
     private static final int NUM_POINTS = 100;
+    private static final int MIN_RELIABILITY_SCORE = 0;
     private static final int MAX_RELIABILITY_SCORE = 100;
 
     private static final GeometryFactory WGS84_GEOMETRY_FACTORY = new GeometryFactory(new PrecisionModel(),
@@ -185,7 +186,7 @@ public class GraphHopperSinglePointMapMatcher implements SinglePointMapMatcher {
         double bearingPenalty = Optional.ofNullable(singlePointLocation.getBearingFilter())
                 .map(bf -> bearingCalculator.bearingDelta(matchedPoint.getBearing(), bf.target()) / bf.cutoffMargin())
                 .orElse(0.0);
-        return (1 - distancePenalty - bearingPenalty) * MAX_RELIABILITY_SCORE;
+        return Math.max(MIN_RELIABILITY_SCORE, (1 - distancePenalty - bearingPenalty) * MAX_RELIABILITY_SCORE);
     }
 
     private SinglePointMatch createFailedMatch(SinglePointLocation singlePointLocation) {
