@@ -47,11 +47,12 @@ import org.locationtech.jts.util.GeometricShapeFactory;
 
 public class GraphHopperSinglePointMapMatcher implements SinglePointMapMatcher {
 
+    private static final int RADIUS_TO_DIAMETER = 2;
+    private static final int ALL_NODES = 3;
+    private static final boolean INCLUDE_ELEVATION = false;
     private static final int NUM_POINTS = 100;
     private static final int MAX_RELIABILITY_SCORE = 100;
 
-    private static final int ALL_NODES = 3;
-    private static final boolean INCLUDE_ELEVATION = false;
     private static final GeometryFactory WGS84_GEOMETRY_FACTORY = new GeometryFactory(new PrecisionModel(),
             GlobalConstants.WGS84_SRID);
     private static final GeometryFactory RD_NEW_GEOMETRY_FACTORY = new GeometryFactory(new PrecisionModel(),
@@ -97,7 +98,7 @@ public class GraphHopperSinglePointMapMatcher implements SinglePointMapMatcher {
             queryGraph.lookup(queryResults);
         }
 
-        Polygon circle = createCircle(inputPoint, 2 * inputRadius);
+        Polygon circle = createCircle(inputPoint, RADIUS_TO_DIAMETER * inputRadius);
         // Crop geometry to only include segments in search radius
         List<CandidateMatch> candidateMatches = queryResults.stream()
                 .filter(qr -> intersects(circle, qr))

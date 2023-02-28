@@ -21,7 +21,7 @@ import org.locationtech.jts.geom.Coordinate;
 class NetworkReader implements DataReader {
 
     private static final int STORAGE_BYTE_COUNT = 1000;
-    private static final int COORDINATES_LENGTH_FOR_START_AND_END_ONLY = 2;
+    private static final int COORDINATES_LENGTH_START_END = 2;
 
     private final GraphHopperStorage ghStorage;
     private final Supplier<Iterator<Link>> linkSupplier;
@@ -87,7 +87,7 @@ class NetworkReader implements DataReader {
 
     private void addLink(Link link) {
         Coordinate[] coordinates = link.getGeometry().getCoordinates();
-        if (coordinates.length < COORDINATES_LENGTH_FOR_START_AND_END_ONLY) {
+        if (coordinates.length < COORDINATES_LENGTH_START_END) {
             throw new IllegalStateException("Invalid geometry");
         }
         int internalFromNodeId = addNodeIfNeeded(link.getFromNodeId(), coordinates[0].y, coordinates[0].x);
@@ -97,7 +97,7 @@ class NetworkReader implements DataReader {
         EdgeIteratorState edge = ghStorage.edge(internalFromNodeId, internalToNodeId)
                 .setDistance(link.getDistanceInMeters())
                 .setFlags(wayFlags);
-        if (coordinates.length > COORDINATES_LENGTH_FOR_START_AND_END_ONLY) {
+        if (coordinates.length > COORDINATES_LENGTH_START_END) {
             PointList geometry = createPointListWithoutStartAndEndPoint(coordinates);
             edge.setWayGeometry(geometry);
         }
@@ -126,7 +126,7 @@ class NetworkReader implements DataReader {
 
     private PointList createPointListWithoutStartAndEndPoint(Coordinate[] coordinates) {
         boolean is3d = false;
-        PointList pointList = new PointList(coordinates.length - 2, is3d);
+        PointList pointList = new PointList(coordinates.length - COORDINATES_LENGTH_START_END, is3d);
         for (int index = 1; index < coordinates.length - 1; index++) {
             pointList.add(coordinates[index].y, coordinates[index].x);
         }
