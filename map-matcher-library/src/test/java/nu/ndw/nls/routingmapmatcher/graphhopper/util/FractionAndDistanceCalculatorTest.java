@@ -39,10 +39,9 @@ class FractionAndDistanceCalculatorTest {
 
     @Test
     void calculateFraction_ok() {
-        double fraction = fractionAndDistanceCalculator.calculateFraction(lineString, snappedPointCoordinate);
+        double fraction = fractionAndDistanceCalculator.calculateFractionAndDistance(lineString, snappedPointCoordinate)
+                .getFraction();
         assertThat(fraction).isCloseTo(0.4986, Percentage.withPercentage(1));
-
-
     }
 
     @Test
