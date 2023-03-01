@@ -10,6 +10,7 @@ import com.graphhopper.storage.SPTEntry;
 import com.graphhopper.storage.index.LocationIndexTree;
 import com.graphhopper.storage.index.QueryResult;
 import com.graphhopper.util.EdgeIteratorState;
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -32,12 +33,33 @@ public class IsochroneService {
     private final LinkFlagEncoder flagEncoder;
     private final Weighting weighting;
 
-    public List<IsochroneMatch> getIsochroneMatches(MatchedPoint matchedPoint, final QueryGraph queryGraph,
-            final BaseLocation location, LocationIndexTree locationIndexTree) {
+
+    public List<IsochroneMatch> getUpstreamIsochroneMatches(MatchedPoint matchedPoint,
+            final QueryGraph queryGraph,
+            BaseLocation location,
+            LocationIndexTree locationIndexTree) {
+        return getIsochroneMatches(matchedPoint,queryGraph,location.getUpstreamIsochrone(),
+                location.getUpstreamIsochroneUnit(),locationIndexTree,true);
+    }
+
+    public List<IsochroneMatch> getDownstreamIsochroneMatches(MatchedPoint matchedPoint,
+            final QueryGraph queryGraph,
+            BaseLocation location,
+            LocationIndexTree locationIndexTree) {
+        return getIsochroneMatches(matchedPoint,queryGraph,location.getDownstreamIsochrone(),
+                location.getDownstreamIsochroneUnit(),locationIndexTree,false);
+    }
+
+    private List<IsochroneMatch> getIsochroneMatches(MatchedPoint matchedPoint,
+            final QueryGraph queryGraph,
+            double isochroneValue,
+            IsochroneUnit isochroneUnit,
+            LocationIndexTree locationIndexTree,
+            boolean reverseFlow) {
         final double latitude = matchedPoint.getSnappedPoint().getY();
         final double longitude = matchedPoint.getSnappedPoint().getX();
         // Get the  start segment for the isochrone calculation
-        QueryResult startSegment
+        var startSegment
                 = locationIndexTree
                 .findClosest(latitude, longitude, EdgeFilter.ALL_EDGES);
         /* Lookup will create virtual edges based on the snapped cutting the segment in 2 line strings.
@@ -46,14 +68,19 @@ public class IsochroneService {
         **/
         queryGraph.lookup(List.of(startSegment));
         // down stream false upstream true
-        var reverseFlow = false;
         var searchDirectionReversed = !reverseFlow && matchedPoint.isReversed();
-        final Isochrone isochrone = new Isochrone(queryGraph, this.weighting, reverseFlow);
-        var maxDistance = location.getUpstreamIsochrone();
-        if (location.getUpstreamIsochroneUnit() == IsochroneUnit.METERS) {
-            isochrone.setDistanceLimit(location.getUpstreamIsochrone());
-        } else if (location.getUpstreamIsochroneUnit() == IsochroneUnit.SECONDS) {
-            isochrone.setTimeLimit(location.getUpstreamIsochrone());
+
+        var averageSpeed = startSegment.getClosestEdge().get(flagEncoder.getAverageSpeedEnc());
+        /*  Specify the maximum distance on which to crop the geometries use meters
+            or seconds * meters per second from averageSpeed info of start segment
+        **/
+        var maxDistance =
+                IsochroneUnit.METERS == isochroneUnit ? isochroneValue : isochroneValue * (averageSpeed * 1000 / 3600);
+        var isochrone = new Isochrone(queryGraph, this.weighting, reverseFlow);
+        if (isochroneUnit == IsochroneUnit.METERS) {
+            isochrone.setDistanceLimit(isochroneValue);
+        } else if (isochroneUnit == IsochroneUnit.SECONDS) {
+            isochrone.setTimeLimit(isochroneValue);
         } else {
             throw new IllegalArgumentException("Unexpected isochrone unit");
         }

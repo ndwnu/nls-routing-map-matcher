@@ -94,7 +94,7 @@ class EdgeIteratorStateReverseExtractorTest {
         var flags = reversedEdge.getFlags();
         int matchedLinkId = flagEncoder.getId(flags);
         assertThat(matchedLinkId).isEqualTo(ID_1);
-        assertThat(hasReversed(reversedQueryResult)).isTrue();
+        assertThat(hasReversed(reversedQueryResult.getClosestEdge())).isTrue();
         assertThat(lineString_1.reverse())
                 .isEqualTo(reversedEdge.fetchWayGeometry(ALL_NODES).toLineString(false));
     }
