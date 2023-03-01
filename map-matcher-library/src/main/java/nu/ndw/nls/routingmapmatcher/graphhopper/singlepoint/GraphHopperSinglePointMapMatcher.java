@@ -1,6 +1,7 @@
 package nu.ndw.nls.routingmapmatcher.graphhopper.singlepoint;
 
 import static com.graphhopper.storage.EdgeIteratorStateReverseExtractor.hasReversed;
+import static java.util.Comparator.comparing;
 import static java.util.Comparator.comparingDouble;
 import static nu.ndw.nls.routingmapmatcher.graphhopper.util.MatchUtil.getQueryResults;
 import static nu.ndw.nls.routingmapmatcher.graphhopper.util.PathUtil.determineEdgeDirection;
@@ -16,16 +17,20 @@ import com.graphhopper.storage.IntsRef;
 import com.graphhopper.storage.index.LocationIndexTree;
 import com.graphhopper.storage.index.QueryResult;
 import com.graphhopper.util.PointList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Stream;
 import nu.ndw.nls.routingmapmatcher.constants.GlobalConstants;
 import nu.ndw.nls.routingmapmatcher.domain.SinglePointMapMatcher;
+import nu.ndw.nls.routingmapmatcher.domain.model.IsochroneMatch;
 import nu.ndw.nls.routingmapmatcher.domain.model.MatchStatus;
 import nu.ndw.nls.routingmapmatcher.domain.model.singlepoint.SinglePointLocation;
 import nu.ndw.nls.routingmapmatcher.domain.model.singlepoint.SinglePointMatch;
 import nu.ndw.nls.routingmapmatcher.domain.model.singlepoint.SinglePointMatch.CandidateMatch;
+import nu.ndw.nls.routingmapmatcher.domain.model.singlepoint.SinglePointMatchWithIsochrone;
+import nu.ndw.nls.routingmapmatcher.domain.model.singlepoint.SinglePointMatchWithIsochrone.CandidateMatchWithIsochrone;
 import nu.ndw.nls.routingmapmatcher.graphhopper.LinkFlagEncoder;
 import nu.ndw.nls.routingmapmatcher.graphhopper.NetworkGraphHopper;
 import nu.ndw.nls.routingmapmatcher.graphhopper.isochrone.IsochroneService;
@@ -89,6 +94,49 @@ public class GraphHopperSinglePointMapMatcher implements SinglePointMapMatcher {
     }
 
     @Override
+    public SinglePointMatchWithIsochrone matchWithIsochrone(SinglePointLocation singlePointLocation) {
+        Preconditions.checkNotNull(singlePointLocation);
+        Point inputPoint = singlePointLocation.getPoint();
+        double inputRadius = singlePointLocation.getCutoffDistance();
+        List<QueryResult> queryResults = findCandidates(inputPoint, inputRadius);
+        Polygon circle = createCircle(inputPoint, RADIUS_TO_DIAMETER * inputRadius);
+        List<MatchedPoint> matches = queryResults.stream()
+                .filter(qr -> intersects(circle, qr))
+                .flatMap(qr -> calculateMatches(qr, circle, singlePointLocation)
+                        .stream())
+                .sorted(comparing(MatchedPoint::getDistance))
+                .toList();
+        if (matches.isEmpty()) {
+            return createFailedMatchWithIsochrone(singlePointLocation);
+        }
+        MatchedPoint closestMatchedPoint = matches.get(0);
+        List<IsochroneMatch> upstream =
+                singlePointLocation.getUpstreamIsochroneUnit() == null ? Collections.emptyList() : isochroneService
+                        .getUpstreamIsochroneMatches(closestMatchedPoint, queryGraph, singlePointLocation,
+                                locationIndexTree);
+        List<IsochroneMatch> downstream =
+                singlePointLocation.getDownstreamIsochroneUnit() == null ? Collections.emptyList() : isochroneService
+                        .getDownstreamIsochroneMatches(closestMatchedPoint, queryGraph, singlePointLocation,
+                                locationIndexTree);
+        CandidateMatchWithIsochrone candidateMatchWithIsochrone = CandidateMatchWithIsochrone
+                .builder()
+                .matchedLinkId(closestMatchedPoint.getMatchedLinkId())
+                .reversed(closestMatchedPoint.isReversed())
+                .upstream(upstream)
+                .downstream(downstream)
+                .snappedPoint(closestMatchedPoint.getSnappedPoint())
+                .fraction(closestMatchedPoint.getFraction())
+                .distance(closestMatchedPoint.getDistance())
+                .reliability(calculateReliability(closestMatchedPoint, singlePointLocation))
+                .build();
+        return SinglePointMatchWithIsochrone
+                .builder()
+                .reliability(candidateMatchWithIsochrone.getReliability())
+                .candidateMatches(List.of(candidateMatchWithIsochrone))
+                .build();
+    }
+
+    @Override
     public SinglePointMatch match(SinglePointLocation singlePointLocation) {
         Preconditions.checkNotNull(singlePointLocation);
         Point inputPoint = singlePointLocation.getPoint();
@@ -140,6 +188,28 @@ public class GraphHopperSinglePointMapMatcher implements SinglePointMapMatcher {
 
     private Stream<CandidateMatch> createMatch(QueryResult queryResult, Polygon circle,
             SinglePointLocation singlePointLocation) {
+        var nodeId = queryResult.getClosestNode();
+        Set<Integer> upstreamLinkIds = singlePointLocation.getUpstreamIsochroneUnit() != null ?
+                isochroneService.getUpstreamLinkIds(queryGraph, singlePointLocation, nodeId) : null;
+        Set<Integer> downstreamLinkIds = singlePointLocation.getDownstreamIsochroneUnit() != null ?
+                isochroneService.getDownstreamLinkIds(queryGraph, singlePointLocation, nodeId) : null;
+        return calculateMatches(queryResult, circle, singlePointLocation)
+                .stream()
+                .map(matchedPoint -> CandidateMatch.builder()
+                        .matchedLinkId(matchedPoint.getMatchedLinkId())
+                        .reversed(matchedPoint.isReversed())
+                        .upstreamLinkIds(upstreamLinkIds)
+                        .downstreamLinkIds(downstreamLinkIds)
+                        .snappedPoint(matchedPoint.getSnappedPoint())
+                        .fraction(matchedPoint.getFraction())
+                        .distance(matchedPoint.getDistance())
+                        .bearing(matchedPoint.getBearing())
+                        .reliability(calculateReliability(matchedPoint, singlePointLocation))
+                        .build());
+    }
+
+    private List<MatchedPoint> calculateMatches(QueryResult queryResult, Polygon circle,
+            SinglePointLocation singlePointLocation) {
         LineString wayGeometry = queryResult.getClosestEdge()
                 .fetchWayGeometry(ALL_NODES)
                 .toLineString(false);
@@ -154,11 +224,6 @@ public class GraphHopperSinglePointMapMatcher implements SinglePointMapMatcher {
         EdgeIteratorTravelDirection travelDirection = determineEdgeDirection(queryResult, flagEncoder);
         IntsRef flags = queryResult.getClosestEdge().getFlags();
         int matchedLinkId = flagEncoder.getId(flags);
-        int nodeId = queryResult.getClosestNode();
-        Set<Integer> upstreamLinkIds = singlePointLocation.getUpstreamIsochroneUnit() != null ?
-                isochroneService.getUpstreamLinkIds(queryGraph, singlePointLocation, nodeId) : null;
-        Set<Integer> downstreamLinkIds = singlePointLocation.getDownstreamIsochroneUnit() != null ?
-                isochroneService.getDownstreamLinkIds(queryGraph, singlePointLocation, nodeId) : null;
         var matchedQueryResult = MatchedQueryResult.builder()
                 .matchedLinkId(matchedLinkId)
                 .inputPoint(singlePointLocation.getPoint())
@@ -167,18 +232,9 @@ public class GraphHopperSinglePointMapMatcher implements SinglePointMapMatcher {
                 .originalGeometry(originalGeometry)
                 .cutoffGeometry(cutoffGeometry)
                 .build();
-        return pointMatchingService.calculateMatches(matchedQueryResult).stream()
-                .map(matchedPoint -> CandidateMatch.builder()
-                        .matchedLinkId(matchedPoint.getMatchedLinkId())
-                        .reversed(matchedPoint.isReversed())
-                        .upstreamLinkIds(upstreamLinkIds)
-                        .downstreamLinkIds(downstreamLinkIds)
-                        .snappedPoint(matchedPoint.getSnappedPoint())
-                        .fraction(matchedPoint.getFraction())
-                        .distance(matchedPoint.getDistance())
-                        .bearing(matchedPoint.getBearing())
-                        .reliability(calculateReliability(matchedPoint, singlePointLocation))
-                        .build());
+
+        return pointMatchingService.calculateMatches(matchedQueryResult);
+
     }
 
     private double calculateReliability(MatchedPoint matchedPoint, SinglePointLocation singlePointLocation) {
@@ -191,6 +247,15 @@ public class GraphHopperSinglePointMapMatcher implements SinglePointMapMatcher {
 
     private SinglePointMatch createFailedMatch(SinglePointLocation singlePointLocation) {
         return SinglePointMatch.builder()
+                .id(singlePointLocation.getId())
+                .candidateMatches(Lists.newArrayList())
+                .reliability(0.0)
+                .status(MatchStatus.NO_MATCH)
+                .build();
+    }
+
+    private SinglePointMatchWithIsochrone createFailedMatchWithIsochrone(SinglePointLocation singlePointLocation) {
+        return SinglePointMatchWithIsochrone.builder()
                 .id(singlePointLocation.getId())
                 .candidateMatches(Lists.newArrayList())
                 .reliability(0.0)
