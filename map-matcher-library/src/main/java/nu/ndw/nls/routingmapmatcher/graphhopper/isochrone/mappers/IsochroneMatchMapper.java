@@ -30,7 +30,6 @@ public class IsochroneMatchMapper {
     public IsochroneMatch mapToIsochroneMatch(IsoLabel isoLabel) {
         var currentEdge = queryGraph.getEdgeIteratorState(isoLabel.edge, isoLabel.adjNode);
         var edgeDirection = hasReversed(currentEdge) ? Direction.BACKWARD : Direction.FORWARD;
-        var averageSpeed = currentEdge.get(flagEncoder.getAverageSpeedEnc());
         var edgeFlags = currentEdge.getFlags();
         var roadSectionId = flagEncoder.getId(edgeFlags);
         var totalDistanceTravelled = isoLabel.distance;
@@ -106,9 +105,9 @@ public class IsochroneMatchMapper {
 
     private LineString calculatePartialGeometry(LineString edgeGeometry, double isoLabelEdgeGeometryDistance,
             double totalDistanceTravelled, double maxDistance) {
-        var diff = isoLabelEdgeGeometryDistance - (maxDistance - (totalDistanceTravelled
+        var remainingDistanceOnEdge = isoLabelEdgeGeometryDistance - (maxDistance - (totalDistanceTravelled
                 - isoLabelEdgeGeometryDistance));
-        var partialFraction = (isoLabelEdgeGeometryDistance - diff)
+        var partialFraction = (isoLabelEdgeGeometryDistance - remainingDistanceOnEdge)
                 / isoLabelEdgeGeometryDistance;
         return getSubLineString(edgeGeometry, partialFraction);
 
