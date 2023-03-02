@@ -11,6 +11,8 @@ import lombok.ToString;
 @EqualsAndHashCode
 @ToString
 public class FractionAndDistance {
+
     private final double fraction;
-    private final double distance;
+    private final double fractionDistance;
+    private final double totalDistance;
 }

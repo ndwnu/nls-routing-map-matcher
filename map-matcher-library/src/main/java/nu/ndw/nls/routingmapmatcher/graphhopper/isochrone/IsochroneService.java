@@ -33,7 +33,18 @@ public class IsochroneService {
     private final LinkFlagEncoder flagEncoder;
     private final Weighting weighting;
 
-
+    /**
+     *  Performs an isochrone search and returns a list of isochrone matches containing exact cropped geometries
+     *  with start and end fractions.
+     *
+     * @param matchedPoint The nearest point found by the nearest match from which to start the isochrone search
+     * @param queryGraph The query graph to use in the isochrone search
+     * @param location Base location containing isochrone specifications
+     * @param locationIndexTree The spatial index to retrieve the start segment from
+     * @return A list of isochrone matches with the geometries cropped to the max distance.
+     * The geometry is aligned in the direction of travelling.
+     * Start and en fraction are with respect to this alignment (positive negative)
+     */
     public List<IsochroneMatch> getUpstreamIsochroneMatches(MatchedPoint matchedPoint,
             final QueryGraph queryGraph,
             BaseLocation location,
