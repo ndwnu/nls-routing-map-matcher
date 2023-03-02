@@ -5,6 +5,8 @@ import static com.graphhopper.storage.EdgeIteratorStateReverseExtractor.hasRever
 import com.graphhopper.routing.QueryGraph;
 import com.graphhopper.storage.index.QueryResult;
 import com.graphhopper.util.EdgeIteratorState;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import lombok.Builder;
 import nu.ndw.nls.routingmapmatcher.domain.model.IsochroneMatch;
 import nu.ndw.nls.routingmapmatcher.domain.model.IsochroneMatch.Direction;
@@ -20,6 +22,7 @@ public class IsochroneMatchMapper {
 
     private static final boolean INCLUDE_ELEVATION = false;
     private static final int ALL_NODES = 3;
+    private static final int ROUNDING_DECIMAL_PLACES = 12;
     private final CrsTransformer crsTransformer;
     private final QueryResult startSegment;
     private final QueryGraph queryGraph;
@@ -37,8 +40,8 @@ public class IsochroneMatchMapper {
     public IsochroneMatch mapToIsochroneMatch(IsoLabel isoLabel) {
         var currentEdge = queryGraph.getEdgeIteratorState(isoLabel.edge, isoLabel.adjNode);
         /* Here the reversed boolean indicates the direction of travelling along the edge
-        *  with respect to the original alignment of the geometry (can be backward for bidirectional edges).
-        */
+         *  with respect to the original alignment of the geometry (can be backward for bidirectional edges).
+         */
         var edgeDirection = hasReversed(currentEdge) ? Direction.BACKWARD : Direction.FORWARD;
         var edgeFlags = currentEdge.getFlags();
         var roadSectionId = flagEncoder.getId(edgeFlags);
@@ -105,8 +108,12 @@ public class IsochroneMatchMapper {
         }
         return IsochroneMatch.builder()
                 .matchedLinkId(roadSectionId)
-                .startFraction(startFraction)
-                .endFraction(endFraction)
+                .startFraction(new BigDecimal(startFraction)
+                        .setScale(ROUNDING_DECIMAL_PLACES, RoundingMode.HALF_UP)
+                        .doubleValue())
+                .endFraction(new BigDecimal(endFraction)
+                        .setScale(ROUNDING_DECIMAL_PLACES, RoundingMode.HALF_UP)
+                        .doubleValue())
                 .direction(edgeDirection)
                 .geometry(isoLabelEdgeGeometry)
                 .build();

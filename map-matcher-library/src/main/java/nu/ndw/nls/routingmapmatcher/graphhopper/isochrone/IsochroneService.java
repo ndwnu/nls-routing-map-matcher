@@ -1,6 +1,7 @@
 package nu.ndw.nls.routingmapmatcher.graphhopper.isochrone;
 
 import static com.graphhopper.storage.EdgeIteratorStateReverseExtractor.hasReversed;
+import static java.util.Comparator.comparing;
 import static nu.ndw.nls.routingmapmatcher.graphhopper.util.PathUtil.determineEdgeDirection;
 
 import com.graphhopper.routing.QueryGraph;
@@ -19,6 +20,7 @@ import nu.ndw.nls.routingmapmatcher.domain.model.IsochroneMatch;
 import nu.ndw.nls.routingmapmatcher.domain.model.IsochroneUnit;
 import nu.ndw.nls.routingmapmatcher.domain.model.base.BaseLocation;
 import nu.ndw.nls.routingmapmatcher.graphhopper.LinkFlagEncoder;
+import nu.ndw.nls.routingmapmatcher.graphhopper.isochrone.Isochrone.IsoLabel;
 import nu.ndw.nls.routingmapmatcher.graphhopper.isochrone.mappers.IsochroneMatchMapper;
 import nu.ndw.nls.routingmapmatcher.graphhopper.model.EdgeIteratorTravelDirection;
 import nu.ndw.nls.routingmapmatcher.graphhopper.model.MatchedPoint;
@@ -114,6 +116,7 @@ public class IsochroneService {
                         isoLabel,
                         startSegment,
                         queryGraph))
+                .sorted(comparing(isoLabel->isoLabel.distance))
                 .map(isoLabelMapper::mapToIsochroneMatch)
                 .collect(Collectors.toList());
     }
