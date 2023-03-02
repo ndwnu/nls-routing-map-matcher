@@ -42,7 +42,8 @@ public class FractionAndDistanceCalculator {
         return FractionAndDistance
                 .builder()
                 .fraction(fraction)
-                .distance(sumOfPathLengths)
+                .fractionDistance(pathDistanceToSnappedPoint)
+                .totalDistance(sumOfPathLengths)
                 .build();
     }
 

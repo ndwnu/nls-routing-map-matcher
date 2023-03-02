@@ -27,8 +27,18 @@ public class IsochroneMatchMapper {
     private final FractionAndDistanceCalculator fractionAndDistanceCalculator;
     private final double maxDistance;
 
+    /**
+     * Maps an IsoLabel to an IsochroneMatch with cropped geometries aligned to travelling direction and respective
+     * start and end fractions.
+     *
+     * @param isoLabel
+     * @return
+     */
     public IsochroneMatch mapToIsochroneMatch(IsoLabel isoLabel) {
         var currentEdge = queryGraph.getEdgeIteratorState(isoLabel.edge, isoLabel.adjNode);
+        /* Here the reversed boolean indicates the direction of travelling along the edge
+        *  with respect to the original alignment of the geometry (can be backward for bidirectional edges).
+        */
         var edgeDirection = hasReversed(currentEdge) ? Direction.BACKWARD : Direction.FORWARD;
         var edgeFlags = currentEdge.getFlags();
         var roadSectionId = flagEncoder.getId(edgeFlags);
@@ -42,15 +52,15 @@ public class IsochroneMatchMapper {
         var isoLabelEdgeGeometryDistance = fractionAndDistanceCalculator.calculateFractionAndDistance(
                         isoLabelEdgeGeometry,
                         isoLabelEdgeGeometry.getStartPoint().getCoordinate())
-                .getDistance();
+                .getTotalDistance();
 
         /*
-         *   The start segment in the iso-label is split into 2 sections sometimes in opposite directions
-         *   in case of bidirectional roads.
+         *   The start segment in the iso-label is split into 2 sections, in case of bidirectional roads
+         *   in opposite directions as indicated by the edgeDirection.
          *   Here the fractions are calculated based on the entire start-segment geometry.
          * */
         if (isStartSegment(currentEdge, startSegment)) {
-            // If the total distance travelled exceeds the maximum distance cut the linestring
+            // If the total distance travelled exceeds the maximum distance cut the linestring accordingly.
             if (totalDistanceTravelled > maxDistance) {
                 isoLabelEdgeGeometry = calculatePartialGeometry(isoLabelEdgeGeometry,
                         isoLabelEdgeGeometryDistance, totalDistanceTravelled,
@@ -76,7 +86,7 @@ public class IsochroneMatchMapper {
                                     getCoordinate())
                     .getFraction();
 
-            // If the total distance travelled exceeds the maximum distance cut the linestring
+            // If the total distance travelled exceeds the maximum distance cut the linestring accordingly.
         } else if (totalDistanceTravelled > maxDistance) {
             isoLabelEdgeGeometry = calculatePartialGeometry(isoLabelEdgeGeometry,
                     isoLabelEdgeGeometryDistance, totalDistanceTravelled,
