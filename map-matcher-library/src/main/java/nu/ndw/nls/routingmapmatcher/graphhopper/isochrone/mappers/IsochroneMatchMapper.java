@@ -4,7 +4,6 @@ package nu.ndw.nls.routingmapmatcher.graphhopper.isochrone.mappers;
 import com.graphhopper.routing.QueryGraph;
 import com.graphhopper.storage.EdgeIteratorStateReverseExtractor;
 import com.graphhopper.storage.index.QueryResult;
-import com.graphhopper.util.EdgeIteratorState;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import lombok.Builder;
@@ -47,82 +46,88 @@ public class IsochroneMatchMapper {
          */
         var edgeDirection = edgeIteratorStateReverseExtractor
                 .hasReversed(currentEdge) ? Direction.BACKWARD : Direction.FORWARD;
-        var edgeFlags = currentEdge.getFlags();
-        var roadSectionId = flagEncoder.getId(edgeFlags);
+        var roadSectionId = flagEncoder.getId(currentEdge.getFlags());
         var totalDistanceTravelled = isoLabel.distance;
         var startFraction = 0D;
         var endFraction = 1D;
         // This is the entire way geometry except for the start segment which is split up at the start point
-        var isoLabelEdgeGeometry = currentEdge
+        var isoLabelWayGeometry = currentEdge
                 .fetchWayGeometry(ALL_NODES)
                 .toLineString(INCLUDE_ELEVATION);
         var isoLabelEdgeGeometryDistance = fractionAndDistanceCalculator.calculateFractionAndDistance(
-                        isoLabelEdgeGeometry,
-                        isoLabelEdgeGeometry.getStartPoint().getCoordinate())
+                        isoLabelWayGeometry,
+                        isoLabelWayGeometry.getStartPoint().getCoordinate())
                 .getTotalDistance();
 
         /*
          *   The start segment in the iso-label is split into 2 sections, in case of bidirectional roads
          *   in opposite directions as indicated by the edgeDirection.
-         *   Here the fractions are calculated based on the entire start-segment geometry.
+         *   Here the fractions are calculated based on the entire start-segment geometry
+         *   with respect to the partial edges.
          * */
-        if (isStartSegment(currentEdge, startSegment)) {
+        if (isStartSegment(roadSectionId, startSegment)) {
             // If the total distance travelled exceeds the maximum distance cut the linestring accordingly.
             if (totalDistanceTravelled > maxDistance) {
-                isoLabelEdgeGeometry = calculatePartialGeometry(isoLabelEdgeGeometry,
+                isoLabelWayGeometry = calculatePartialGeometry(isoLabelWayGeometry,
                         isoLabelEdgeGeometryDistance, totalDistanceTravelled,
                         maxDistance);
             }
-            var totalStartSegmentGeometry = startSegment
-                    .getClosestEdge().fetchWayGeometry(ALL_NODES)
-                    .toLineString(INCLUDE_ELEVATION);
-            var totalStartSegmentGeometryInForwardDirection =
-                    edgeIteratorStateReverseExtractor.hasReversed(startSegment.getClosestEdge())
-                            ? totalStartSegmentGeometry.reverse()
-                            : totalStartSegmentGeometry;
-            var totalStartSegmentGeometryInDirectionOfTravelling = edgeDirection == Direction.FORWARD ?
-                    totalStartSegmentGeometryInForwardDirection :
-                    totalStartSegmentGeometryInForwardDirection.reverse();
+
+            LineString startSegmentWayGeometryInTravelDirection = getStartSegmentWayGeometryInTravelDirection(
+                    edgeDirection);
             endFraction = fractionAndDistanceCalculator.calculateFractionAndDistance(
-                            totalStartSegmentGeometryInDirectionOfTravelling,
-                            isoLabelEdgeGeometry.getEndPoint().
+                            startSegmentWayGeometryInTravelDirection,
+                            isoLabelWayGeometry.getEndPoint().
                                     getCoordinate())
                     .getFraction();
             startFraction = fractionAndDistanceCalculator.calculateFractionAndDistance(
-                            totalStartSegmentGeometryInDirectionOfTravelling,
-                            isoLabelEdgeGeometry.getStartPoint().
+                            startSegmentWayGeometryInTravelDirection,
+                            isoLabelWayGeometry.getStartPoint().
                                     getCoordinate())
                     .getFraction();
 
             // If the total distance travelled exceeds the maximum distance cut the linestring accordingly.
         } else if (totalDistanceTravelled > maxDistance) {
-            isoLabelEdgeGeometry = calculatePartialGeometry(isoLabelEdgeGeometry,
+            isoLabelWayGeometry = calculatePartialGeometry(isoLabelWayGeometry,
                     isoLabelEdgeGeometryDistance, totalDistanceTravelled,
                     maxDistance);
             startFraction = fractionAndDistanceCalculator.calculateFractionAndDistance(
-                            isoLabelEdgeGeometry,
-                            isoLabelEdgeGeometry.getStartPoint().
+                            isoLabelWayGeometry,
+                            isoLabelWayGeometry.getStartPoint().
                                     getCoordinate())
                     .getFraction();
             endFraction = fractionAndDistanceCalculator.calculateFractionAndDistance(
-                            isoLabelEdgeGeometry,
-                            isoLabelEdgeGeometry.getEndPoint().
+                            isoLabelWayGeometry,
+                            isoLabelWayGeometry.getEndPoint().
                                     getCoordinate())
                     .getFraction();
 
         }
         return IsochroneMatch.builder()
                 .matchedLinkId(roadSectionId)
-                .startFraction(new BigDecimal(startFraction)
+                .startFraction(BigDecimal.valueOf(startFraction)
                         .setScale(ROUNDING_DECIMAL_PLACES, RoundingMode.HALF_UP)
                         .doubleValue())
-                .endFraction(new BigDecimal(endFraction)
+                .endFraction(BigDecimal.valueOf(endFraction)
                         .setScale(ROUNDING_DECIMAL_PLACES, RoundingMode.HALF_UP)
                         .doubleValue())
                 .direction(edgeDirection)
-                .geometry(isoLabelEdgeGeometry)
+                .geometry(isoLabelWayGeometry)
                 .build();
 
+    }
+
+    private LineString getStartSegmentWayGeometryInTravelDirection(Direction edgeDirection) {
+        var startSegmentWayGeometry = startSegment
+                .getClosestEdge().fetchWayGeometry(ALL_NODES)
+                .toLineString(INCLUDE_ELEVATION);
+        var startSegmentWayGeometryInForwardDirection =
+                edgeIteratorStateReverseExtractor.hasReversed(startSegment.getClosestEdge())
+                        ? startSegmentWayGeometry.reverse()
+                        : startSegmentWayGeometry;
+        return edgeDirection == Direction.FORWARD ?
+                startSegmentWayGeometryInForwardDirection :
+                startSegmentWayGeometryInForwardDirection.reverse();
     }
 
     private LineString calculatePartialGeometry(LineString edgeGeometry, double isoLabelEdgeGeometryDistance,
@@ -152,10 +157,8 @@ public class IsochroneMatchMapper {
                 .transformFromRdNewToWgs84(linRefLine.extractLine(0, fraction * rdGeom.getLength()));
     }
 
-    private boolean isStartSegment(EdgeIteratorState edgeIteratorState, QueryResult startSegment) {
-        var flags = edgeIteratorState.getFlags();
-        var id = flagEncoder.getId(flags);
+    private boolean isStartSegment(int roadSectionId, QueryResult startSegment) {
         var startSegmentId = flagEncoder.getId(startSegment.getClosestEdge().getFlags());
-        return id == startSegmentId;
+        return roadSectionId == startSegmentId;
     }
 }
