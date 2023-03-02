@@ -1,8 +1,8 @@
 package nu.ndw.nls.routingmapmatcher.graphhopper.isochrone.mappers;
 
-import static com.graphhopper.storage.EdgeIteratorStateReverseExtractor.hasReversed;
 
 import com.graphhopper.routing.QueryGraph;
+import com.graphhopper.storage.EdgeIteratorStateReverseExtractor;
 import com.graphhopper.storage.index.QueryResult;
 import com.graphhopper.util.EdgeIteratorState;
 import java.math.BigDecimal;
@@ -30,19 +30,23 @@ public class IsochroneMatchMapper {
     private final FractionAndDistanceCalculator fractionAndDistanceCalculator;
     private final double maxDistance;
 
+    private final EdgeIteratorStateReverseExtractor edgeIteratorStateReverseExtractor;
+
     /**
      * Maps an IsoLabel to an IsochroneMatch with cropped geometries aligned to travelling direction and respective
      * start and end fractions.
      *
-     * @param isoLabel
-     * @return
+     * @param isoLabel the iso label to map
+     * @return an instance of IsochroneMatch
      */
     public IsochroneMatch mapToIsochroneMatch(IsoLabel isoLabel) {
         var currentEdge = queryGraph.getEdgeIteratorState(isoLabel.edge, isoLabel.adjNode);
-        /* Here the reversed boolean indicates the direction of travelling along the edge
-         *  with respect to the original alignment of the geometry (can be backward for bidirectional edges).
+        /*  Here the reversed boolean indicates the direction of travelling along the edge
+         *  with respect to the original alignment of the geometry
+         * (can be backward for bidirectional edges or for upstream isochrone searches).
          */
-        var edgeDirection = hasReversed(currentEdge) ? Direction.BACKWARD : Direction.FORWARD;
+        var edgeDirection = edgeIteratorStateReverseExtractor
+                .hasReversed(currentEdge) ? Direction.BACKWARD : Direction.FORWARD;
         var edgeFlags = currentEdge.getFlags();
         var roadSectionId = flagEncoder.getId(edgeFlags);
         var totalDistanceTravelled = isoLabel.distance;
@@ -73,7 +77,8 @@ public class IsochroneMatchMapper {
                     .getClosestEdge().fetchWayGeometry(ALL_NODES)
                     .toLineString(INCLUDE_ELEVATION);
             var totalStartSegmentGeometryInForwardDirection =
-                    hasReversed(startSegment.getClosestEdge()) ? totalStartSegmentGeometry.reverse()
+                    edgeIteratorStateReverseExtractor.hasReversed(startSegment.getClosestEdge())
+                            ? totalStartSegmentGeometry.reverse()
                             : totalStartSegmentGeometry;
             var totalStartSegmentGeometryInDirectionOfTravelling = edgeDirection == Direction.FORWARD ?
                     totalStartSegmentGeometryInForwardDirection :

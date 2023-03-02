@@ -20,15 +20,14 @@ import lombok.SneakyThrows;
  */
 public final class EdgeIteratorStateReverseExtractor {
 
-    private EdgeIteratorStateReverseExtractor() {
+    public EdgeIteratorStateReverseExtractor() {
     }
 
     @SneakyThrows
-    public static boolean hasReversed(final EdgeIteratorState closestEdge) {
+    public  boolean hasReversed(final EdgeIteratorState closestEdge) {
         if (closestEdge instanceof VirtualEdgeIteratorState) {
             return extractReversedFromVirtualEdge((VirtualEdgeIteratorState) closestEdge);
-        } else if (closestEdge instanceof EdgeIterable) {
-            final EdgeIterable edgeIterable = (EdgeIterable) closestEdge;
+        } else if (closestEdge instanceof EdgeIterable edgeIterable) {
             return edgeIterable.reverse;
         } else {
             throw new IllegalArgumentException(
@@ -39,11 +38,11 @@ public final class EdgeIteratorStateReverseExtractor {
 
 
     }
+
     private static boolean extractReversedFromVirtualEdge(VirtualEdgeIteratorState closestEdge)
             throws NoSuchFieldException, IllegalAccessException {
-        final VirtualEdgeIteratorState edgeIterable = closestEdge;
-        Field f = edgeIterable.getClass().getDeclaredField("reverse"); //NoSuchFieldException
-        f.setAccessible(true);
-        return (boolean) f.get(edgeIterable);
+        Field field = closestEdge.getClass().getDeclaredField("reverse"); //NoSuchFieldException
+        field.setAccessible(true);
+        return (boolean) field.get(closestEdge);
     }
 }

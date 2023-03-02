@@ -1,6 +1,5 @@
 package nu.ndw.nls.routingmapmatcher.graphhopper.singlepoint;
 
-import static com.graphhopper.storage.EdgeIteratorStateReverseExtractor.hasReversed;
 import static java.util.Comparator.comparing;
 import static java.util.Comparator.comparingDouble;
 import static nu.ndw.nls.routingmapmatcher.graphhopper.util.MatchUtil.getQueryResults;
@@ -13,6 +12,7 @@ import com.graphhopper.routing.util.EdgeFilter;
 import com.graphhopper.routing.util.FlagEncoder;
 import com.graphhopper.routing.weighting.ShortestWeighting;
 import com.graphhopper.routing.weighting.Weighting;
+import com.graphhopper.storage.EdgeIteratorStateReverseExtractor;
 import com.graphhopper.storage.IntsRef;
 import com.graphhopper.storage.index.LocationIndexTree;
 import com.graphhopper.storage.index.QueryResult;
@@ -74,6 +74,8 @@ public class GraphHopperSinglePointMapMatcher implements SinglePointMapMatcher {
     private final PointMatchingService pointMatchingService;
     private final CrsTransformer crsTransformer;
 
+    private final EdgeIteratorStateReverseExtractor edgeIteratorStateReverseExtractor;
+
     public GraphHopperSinglePointMapMatcher(NetworkGraphHopper network) {
         Preconditions.checkNotNull(network);
         List<FlagEncoder> flagEncoders = network.getEncodingManager().fetchEdgeEncoders();
@@ -85,7 +87,8 @@ public class GraphHopperSinglePointMapMatcher implements SinglePointMapMatcher {
         this.edgeFilter = EdgeFilter.ALL_EDGES;
         this.queryGraph = new QueryGraph(network.getGraphHopperStorage());
         Weighting weighting = new ShortestWeighting(flagEncoder);
-        this.isochroneService = new IsochroneService(flagEncoder, weighting);
+        this.edgeIteratorStateReverseExtractor = new EdgeIteratorStateReverseExtractor();
+        this.isochroneService = new IsochroneService(flagEncoder, weighting, edgeIteratorStateReverseExtractor);
         GeodeticCalculator geodeticCalculator = new GeodeticCalculator();
         this.bearingCalculator = new BearingCalculator(geodeticCalculator);
         this.pointMatchingService = new PointMatchingService(WGS84_GEOMETRY_FACTORY, this.bearingCalculator,
@@ -135,6 +138,7 @@ public class GraphHopperSinglePointMapMatcher implements SinglePointMapMatcher {
                 .candidateMatches(List.of(candidateMatchWithIsochrone))
                 .build();
     }
+
 
     @Override
     public SinglePointMatch match(SinglePointLocation singlePointLocation) {
@@ -219,7 +223,9 @@ public class GraphHopperSinglePointMapMatcher implements SinglePointMapMatcher {
            GraphHopper sometimes reverses the geometry direction with respect to the original direction. To fix this,
            an internal attribute of the edge iterator state is used, indicating it has done so or not.
         */
-        LineString originalGeometry = hasReversed(queryResult.getClosestEdge()) ? wayGeometry.reverse() : wayGeometry;
+        LineString originalGeometry =
+                edgeIteratorStateReverseExtractor.hasReversed(queryResult.getClosestEdge()) ? wayGeometry.reverse()
+                        : wayGeometry;
         Geometry cutoffGeometry = circle.intersection(originalGeometry);
         EdgeIteratorTravelDirection travelDirection = determineEdgeDirection(queryResult, flagEncoder);
         IntsRef flags = queryResult.getClosestEdge().getFlags();

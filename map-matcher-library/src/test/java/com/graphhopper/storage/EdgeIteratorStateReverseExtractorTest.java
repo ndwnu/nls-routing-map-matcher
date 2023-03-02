@@ -1,6 +1,5 @@
 package com.graphhopper.storage;
 
-import static com.graphhopper.storage.EdgeIteratorStateReverseExtractor.hasReversed;
 import static nu.ndw.nls.routingmapmatcher.graphhopper.util.MatchUtil.getQueryResults;
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -94,7 +93,8 @@ class EdgeIteratorStateReverseExtractorTest {
         var flags = reversedEdge.getFlags();
         int matchedLinkId = flagEncoder.getId(flags);
         assertThat(matchedLinkId).isEqualTo(ID_1);
-        assertThat(hasReversed(reversedQueryResult.getClosestEdge())).isTrue();
+        assertThat(new EdgeIteratorStateReverseExtractor()
+                .hasReversed(reversedQueryResult.getClosestEdge())).isTrue();
         assertThat(lineString_1.reverse())
                 .isEqualTo(reversedEdge.fetchWayGeometry(ALL_NODES).toLineString(false));
     }

@@ -4,7 +4,7 @@ import com.google.common.collect.Lists;
 import com.graphhopper.routing.Path;
 import com.graphhopper.routing.QueryGraph;
 import com.graphhopper.routing.weighting.Weighting;
-import com.graphhopper.storage.index.LocationIndexTree;
+import com.graphhopper.storage.EdgeIteratorStateReverseExtractor;
 import com.graphhopper.util.EdgeIteratorState;
 import java.util.List;
 import java.util.Set;
@@ -29,7 +29,7 @@ public class LineStringMatchUtil {
         GeometryFactory geometryFactory = new GeometryFactory(new PrecisionModel(), GlobalConstants.WGS84_SRID);
         this.pathUtil = new PathUtil(geometryFactory);
         this.flagEncoder = flagEncoder;
-        this.isochroneService = new IsochroneService(flagEncoder, weighting);
+        this.isochroneService = new IsochroneService(flagEncoder, weighting, new EdgeIteratorStateReverseExtractor());
     }
 
     public LineStringMatch createMatch(LineStringLocation lineStringLocation, Path path, QueryGraph queryGraph,
