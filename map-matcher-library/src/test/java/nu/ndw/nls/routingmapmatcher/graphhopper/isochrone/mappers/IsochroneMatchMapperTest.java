@@ -90,7 +90,7 @@ class IsochroneMatchMapperTest {
     }
 
     @Test
-    void when_start_segment_mapToIsochroneMatch_should_return_original_geometry() {
+    void mapToIsochroneMatch_ok_startSegment() {
         setupFixtureStartSegment(false, 0);
         var result = isochroneMatchMapper.mapToIsochroneMatch(isoLabel);
         assertThat(result.getMatchedLinkId()).isEqualTo(MATCHED_LINK_ID_ONE);
@@ -101,7 +101,7 @@ class IsochroneMatchMapperTest {
     }
 
     @Test
-    void when_start_segment_and_reversed_mapToIsochroneMatch_should_return_reversed_geometry() {
+    void mapToIsochroneMatch_ok_startSegment_reversed() {
         setupFixtureStartSegment(true, 0);
         var result = isochroneMatchMapper.mapToIsochroneMatch(isoLabel);
         assertThat(result.getMatchedLinkId()).isEqualTo(MATCHED_LINK_ID_ONE);
@@ -113,7 +113,7 @@ class IsochroneMatchMapperTest {
 
 
     @Test
-    void when_start_segment_exceeding_max_distance_mapToIsochroneMatch_should_return_cropped_geometry() {
+    void mapToIsochroneMatch_ok_startSegment_cropped_geometry() {
         var originalGeometry = isoLabelWayGeometry.copy();
         setupFixtureStartSegment(false, 250.30366999283603);
         var result = isochroneMatchMapper.mapToIsochroneMatch(isoLabel);
