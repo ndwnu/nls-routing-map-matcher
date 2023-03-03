@@ -8,10 +8,12 @@ import com.graphhopper.routing.QueryGraph;
 import com.graphhopper.routing.util.EdgeFilter;
 import com.graphhopper.routing.weighting.Weighting;
 import com.graphhopper.storage.EdgeIteratorStateReverseExtractor;
+import com.graphhopper.storage.IntsRef;
 import com.graphhopper.storage.SPTEntry;
 import com.graphhopper.storage.index.LocationIndexTree;
 import com.graphhopper.storage.index.QueryResult;
 import com.graphhopper.util.EdgeIteratorState;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -24,9 +26,6 @@ import nu.ndw.nls.routingmapmatcher.graphhopper.isochrone.Isochrone.IsoLabel;
 import nu.ndw.nls.routingmapmatcher.graphhopper.isochrone.mappers.IsochroneMatchMapper;
 import nu.ndw.nls.routingmapmatcher.graphhopper.model.EdgeIteratorTravelDirection;
 import nu.ndw.nls.routingmapmatcher.graphhopper.model.MatchedPoint;
-import nu.ndw.nls.routingmapmatcher.graphhopper.util.CrsTransformer;
-import nu.ndw.nls.routingmapmatcher.graphhopper.util.FractionAndDistanceCalculator;
-import org.geotools.referencing.GeodeticCalculator;
 
 @RequiredArgsConstructor
 public class IsochroneService {
@@ -38,6 +37,7 @@ public class IsochroneService {
     private final Weighting weighting;
 
     private final EdgeIteratorStateReverseExtractor edgeIteratorStateReverseExtractor;
+    private final IsochroneMatchMapper isoLabelMapper;
 
     /**
      * Performs an isochrone search and returns a list of isochrone matches containing exact cropped geometries with
@@ -51,7 +51,7 @@ public class IsochroneService {
      * the direction of travelling. Start and en fraction are with respect to this alignment (positive negative)
      */
     public List<IsochroneMatch> getUpstreamIsochroneMatches(MatchedPoint matchedPoint,
-            final QueryGraph queryGraph,
+            QueryGraph queryGraph,
             BaseLocation location,
             LocationIndexTree locationIndexTree) {
         return getIsochroneMatches(matchedPoint, queryGraph, location.getUpstreamIsochrone(),
@@ -59,7 +59,7 @@ public class IsochroneService {
     }
 
     public List<IsochroneMatch> getDownstreamIsochroneMatches(MatchedPoint matchedPoint,
-            final QueryGraph queryGraph,
+            QueryGraph queryGraph,
             BaseLocation location,
             LocationIndexTree locationIndexTree) {
         return getIsochroneMatches(matchedPoint, queryGraph, location.getDownstreamIsochrone(),
@@ -67,7 +67,7 @@ public class IsochroneService {
     }
 
     private List<IsochroneMatch> getIsochroneMatches(MatchedPoint matchedPoint,
-            final QueryGraph queryGraph,
+            QueryGraph queryGraph,
             double isochroneValue,
             IsochroneUnit isochroneUnit,
             LocationIndexTree locationIndexTree,
@@ -94,19 +94,11 @@ public class IsochroneService {
         double maxDistance =
                 IsochroneUnit.METERS == isochroneUnit ? isochroneValue :
                         (isochroneValue * (averageSpeed * METERS / SECONDS_PER_HOUR));
-        IsochroneMatchMapper isoLabelMapper = IsochroneMatchMapper
-                .builder()
-                .crsTransformer(new CrsTransformer())
-                .fractionAndDistanceCalculator(new FractionAndDistanceCalculator(new GeodeticCalculator()))
-                .maxDistance(maxDistance)
-                .startSegment(startSegment)
-                .flagEncoder(flagEncoder)
-                .queryGraph(queryGraph)
-                .edgeIteratorStateReverseExtractor(edgeIteratorStateReverseExtractor)
-                .build();
+
         // down stream false upstream true
         boolean searchDirectionReversed = !reverseFlow && matchedPoint.isReversed();
-        return labels.stream()
+        List<IsochroneMatch> isochroneMatches = new ArrayList<>();
+        labels.stream()
                 // With bidirectional start segments the search goes two ways for both down and upstream isochrones.
                 // The  branches that are starting in the wrong direction of travelling
                 // (as determined by the nearest match) are filtered out.
@@ -115,8 +107,12 @@ public class IsochroneService {
                         startSegment,
                         queryGraph))
                 .sorted(comparing(isoLabel -> isoLabel.distance))
-                .map(isoLabelMapper::mapToIsochroneMatch)
-                .collect(Collectors.toList());
+                .forEach(isoLabel -> {
+                    // todo update max distance
+                    isochroneMatches.add(
+                            isoLabelMapper.mapToIsochroneMatch(isoLabel, maxDistance, queryGraph, startSegment));
+                });
+        return isochroneMatches;
     }
 
     private Isochrone configureIsochrone(QueryGraph queryGraph, double isochroneValue, IsochroneUnit isochroneUnit,
@@ -155,16 +151,15 @@ public class IsochroneService {
     }
 
     private boolean isStartSegment(EdgeIteratorState edgeIteratorState, QueryResult startSegment) {
-        var flags = edgeIteratorState.getFlags();
-        var id = flagEncoder.getId(flags);
-        var startSegmentId = flagEncoder.getId(startSegment.getClosestEdge().getFlags());
+        IntsRef flags = edgeIteratorState.getFlags();
+        int id = flagEncoder.getId(flags);
+        int startSegmentId = flagEncoder.getId(startSegment.getClosestEdge().getFlags());
         return id == startSegmentId;
     }
 
     /**
      * This method recursively goes through the parent list to find the start segment. It then determines if the start
-     * segment is in the correct direction for the upstream or downstream query. The line is converted to rd-new to get
-     * a more precise result in meters and then converted back to wgs-84
+     * segment is in the correct direction for the upstream or downstream query.
      *
      * @param reverse      Indicating the correct direction
      * @param isoLabel     The label to be checked

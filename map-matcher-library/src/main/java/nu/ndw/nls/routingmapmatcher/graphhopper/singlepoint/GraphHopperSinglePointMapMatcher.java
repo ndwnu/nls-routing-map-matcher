@@ -34,6 +34,7 @@ import nu.ndw.nls.routingmapmatcher.domain.model.singlepoint.SinglePointMatchWit
 import nu.ndw.nls.routingmapmatcher.graphhopper.LinkFlagEncoder;
 import nu.ndw.nls.routingmapmatcher.graphhopper.NetworkGraphHopper;
 import nu.ndw.nls.routingmapmatcher.graphhopper.isochrone.IsochroneService;
+import nu.ndw.nls.routingmapmatcher.graphhopper.isochrone.mappers.IsochroneMatchMapper;
 import nu.ndw.nls.routingmapmatcher.graphhopper.model.EdgeIteratorTravelDirection;
 import nu.ndw.nls.routingmapmatcher.graphhopper.model.MatchedPoint;
 import nu.ndw.nls.routingmapmatcher.graphhopper.model.MatchedQueryResult;
@@ -87,12 +88,22 @@ public class GraphHopperSinglePointMapMatcher implements SinglePointMapMatcher {
         this.edgeFilter = EdgeFilter.ALL_EDGES;
         this.queryGraph = new QueryGraph(network.getGraphHopperStorage());
         Weighting weighting = new ShortestWeighting(flagEncoder);
-        this.edgeIteratorStateReverseExtractor = new EdgeIteratorStateReverseExtractor();
-        this.isochroneService = new IsochroneService(flagEncoder, weighting, edgeIteratorStateReverseExtractor);
         GeodeticCalculator geodeticCalculator = new GeodeticCalculator();
+        FractionAndDistanceCalculator fractionAndDistanceCalculator = new FractionAndDistanceCalculator(
+                geodeticCalculator);
+        this.edgeIteratorStateReverseExtractor = new EdgeIteratorStateReverseExtractor();
+        this.isochroneService = new IsochroneService(flagEncoder, weighting, edgeIteratorStateReverseExtractor,
+                IsochroneMatchMapper
+                        .builder()
+                        .crsTransformer(new CrsTransformer())
+                        .fractionAndDistanceCalculator(fractionAndDistanceCalculator)
+                        .flagEncoder(flagEncoder)
+                        .edgeIteratorStateReverseExtractor(edgeIteratorStateReverseExtractor)
+                        .build());
         this.bearingCalculator = new BearingCalculator(geodeticCalculator);
-        this.pointMatchingService = new PointMatchingService(WGS84_GEOMETRY_FACTORY, this.bearingCalculator,
-                new FractionAndDistanceCalculator(geodeticCalculator));
+        this.pointMatchingService = new PointMatchingService(WGS84_GEOMETRY_FACTORY,
+                this.bearingCalculator,
+                fractionAndDistanceCalculator);
         this.crsTransformer = new CrsTransformer();
     }
 
