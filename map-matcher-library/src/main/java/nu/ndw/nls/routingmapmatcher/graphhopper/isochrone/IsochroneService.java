@@ -56,7 +56,7 @@ public class IsochroneService {
     }
 
     /**
-     * Performs an down-stream isochrone search and returns a list of isochrone matches containing exact cropped
+     * Performs a down-stream isochrone search and returns a list of isochrone matches containing exact cropped
      * geometries with start and end fractions.
      *
      * @param matchedPoint      The nearest point found by the nearest match from which to start the isochrone search
