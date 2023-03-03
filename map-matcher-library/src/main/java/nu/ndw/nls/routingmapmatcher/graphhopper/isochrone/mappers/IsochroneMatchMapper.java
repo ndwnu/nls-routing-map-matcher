@@ -4,6 +4,7 @@ package nu.ndw.nls.routingmapmatcher.graphhopper.isochrone.mappers;
 import com.graphhopper.routing.QueryGraph;
 import com.graphhopper.storage.EdgeIteratorStateReverseExtractor;
 import com.graphhopper.storage.index.QueryResult;
+import com.graphhopper.util.EdgeIteratorState;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import lombok.Builder;
@@ -39,22 +40,22 @@ public class IsochroneMatchMapper {
      * @return an instance of IsochroneMatch
      */
     public IsochroneMatch mapToIsochroneMatch(IsoLabel isoLabel) {
-        var currentEdge = queryGraph.getEdgeIteratorState(isoLabel.edge, isoLabel.adjNode);
+        EdgeIteratorState currentEdge = queryGraph.getEdgeIteratorState(isoLabel.edge, isoLabel.adjNode);
         /*  Here the reversed boolean indicates the direction of travelling along the edge
          *  with respect to the original alignment of the geometry
          * (can be backward for bidirectional edges or for upstream isochrone searches).
          */
-        var edgeDirection = edgeIteratorStateReverseExtractor
+        Direction edgeDirection = edgeIteratorStateReverseExtractor
                 .hasReversed(currentEdge) ? Direction.BACKWARD : Direction.FORWARD;
-        var roadSectionId = flagEncoder.getId(currentEdge.getFlags());
-        var totalDistanceTravelled = isoLabel.distance;
-        var startFraction = 0D;
-        var endFraction = 1D;
+        int roadSectionId = flagEncoder.getId(currentEdge.getFlags());
+        double totalDistanceTravelled = isoLabel.distance;
+        double startFraction = 0D;
+        double endFraction = 1D;
         // This is the entire way geometry except for the start segment which is split up at the start point
-        var isoLabelWayGeometry = currentEdge
+        LineString isoLabelWayGeometry = currentEdge
                 .fetchWayGeometry(ALL_NODES)
                 .toLineString(INCLUDE_ELEVATION);
-        var isoLabelEdgeGeometryDistance = fractionAndDistanceCalculator.calculateFractionAndDistance(
+        double isoLabelEdgeGeometryDistance = fractionAndDistanceCalculator.calculateFractionAndDistance(
                         isoLabelWayGeometry,
                         isoLabelWayGeometry.getStartPoint().getCoordinate())
                 .getTotalDistance();
@@ -72,20 +73,19 @@ public class IsochroneMatchMapper {
                         isoLabelEdgeGeometryDistance, totalDistanceTravelled,
                         maxDistance);
             }
-
             LineString startSegmentWayGeometryInTravelDirection = getStartSegmentWayGeometryInTravelDirection(
                     edgeDirection);
-            endFraction = fractionAndDistanceCalculator.calculateFractionAndDistance(
-                            startSegmentWayGeometryInTravelDirection,
-                            isoLabelWayGeometry.getEndPoint().
-                                    getCoordinate())
-                    .getFraction();
+
             startFraction = fractionAndDistanceCalculator.calculateFractionAndDistance(
                             startSegmentWayGeometryInTravelDirection,
                             isoLabelWayGeometry.getStartPoint().
                                     getCoordinate())
                     .getFraction();
-
+            endFraction = fractionAndDistanceCalculator.calculateFractionAndDistance(
+                            startSegmentWayGeometryInTravelDirection,
+                            isoLabelWayGeometry.getEndPoint().
+                                    getCoordinate())
+                    .getFraction();
             // If the total distance travelled exceeds the maximum distance cut the linestring accordingly.
         } else if (totalDistanceTravelled > maxDistance) {
             isoLabelWayGeometry = calculatePartialGeometry(isoLabelWayGeometry,
@@ -118,10 +118,10 @@ public class IsochroneMatchMapper {
     }
 
     private LineString getStartSegmentWayGeometryInTravelDirection(Direction edgeDirection) {
-        var startSegmentWayGeometry = startSegment
+        LineString startSegmentWayGeometry = startSegment
                 .getClosestEdge().fetchWayGeometry(ALL_NODES)
                 .toLineString(INCLUDE_ELEVATION);
-        var startSegmentWayGeometryInForwardDirection =
+        LineString startSegmentWayGeometryInForwardDirection =
                 edgeIteratorStateReverseExtractor.hasReversed(startSegment.getClosestEdge())
                         ? startSegmentWayGeometry.reverse()
                         : startSegmentWayGeometry;
@@ -132,9 +132,9 @@ public class IsochroneMatchMapper {
 
     private LineString calculatePartialGeometry(LineString edgeGeometry, double isoLabelEdgeGeometryDistance,
             double totalDistanceTravelled, double maxDistance) {
-        var remainingDistanceOnEdge = isoLabelEdgeGeometryDistance - (maxDistance - (totalDistanceTravelled
+        double distanceToEndOfEdge = isoLabelEdgeGeometryDistance - (maxDistance - (totalDistanceTravelled
                 - isoLabelEdgeGeometryDistance));
-        var partialFraction = (isoLabelEdgeGeometryDistance - remainingDistanceOnEdge)
+        double partialFraction = (isoLabelEdgeGeometryDistance - distanceToEndOfEdge)
                 / isoLabelEdgeGeometryDistance;
         return getSubLineString(edgeGeometry, partialFraction);
 

@@ -17,6 +17,7 @@ import nu.ndw.nls.routingmapmatcher.graphhopper.LinkFlagEncoder;
 import nu.ndw.nls.routingmapmatcher.graphhopper.isochrone.Isochrone.IsoLabel;
 import nu.ndw.nls.routingmapmatcher.graphhopper.util.CrsTransformer;
 import nu.ndw.nls.routingmapmatcher.graphhopper.util.FractionAndDistanceCalculator;
+import org.assertj.core.data.Percentage;
 import org.geotools.referencing.GeodeticCalculator;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -60,6 +61,7 @@ class IsochroneMatchMapperTest {
     private IsochroneMatchMapper isochroneMatchMapper;
 
     private IsoLabel isoLabel;
+    private FractionAndDistanceCalculator fractionAndDistanceCalculator;
 
     @BeforeEach
     void setup() {
@@ -74,12 +76,13 @@ class IsochroneMatchMapperTest {
                 COORDINATE_1,
                 COORDINATE_2});
 
+        fractionAndDistanceCalculator = new FractionAndDistanceCalculator(new GeodeticCalculator());
         isochroneMatchMapper = IsochroneMatchMapper
                 .builder()
                 .crsTransformer(new CrsTransformer())
                 .flagEncoder(flagEncoder)
                 .maxDistance(MAX_DISTANCE)
-                .fractionAndDistanceCalculator(new FractionAndDistanceCalculator(new GeodeticCalculator()))
+                .fractionAndDistanceCalculator(fractionAndDistanceCalculator)
                 .queryGraph(queryGraph)
                 .startSegment(startSegment)
                 .edgeIteratorStateReverseExtractor(edgeIteratorStateReverseExtractor)
@@ -87,8 +90,8 @@ class IsochroneMatchMapperTest {
     }
 
     @Test
-    void when_isolabel_is_start_segment_mapToIsochroneMatch_should_return_original_geometry() {
-        setupFixtureForEgdeSegmentIsStartSegmentWithTravelledDistance(false, 0);
+    void when_start_segment_mapToIsochroneMatch_should_return_original_geometry() {
+        setupFixtureStartSegment(false, 0);
         var result = isochroneMatchMapper.mapToIsochroneMatch(isoLabel);
         assertThat(result.getMatchedLinkId()).isEqualTo(MATCHED_LINK_ID_ONE);
         assertThat(result.getStartFraction()).isEqualTo(0);
@@ -98,8 +101,8 @@ class IsochroneMatchMapperTest {
     }
 
     @Test
-    void when_isolabel_is_start_segment_and_reversed_mapToIsochroneMatch_should_return_reversed_geometry() {
-        setupFixtureForEgdeSegmentIsStartSegmentWithTravelledDistance(true, 0);
+    void when_start_segment_and_reversed_mapToIsochroneMatch_should_return_reversed_geometry() {
+        setupFixtureStartSegment(true, 0);
         var result = isochroneMatchMapper.mapToIsochroneMatch(isoLabel);
         assertThat(result.getMatchedLinkId()).isEqualTo(MATCHED_LINK_ID_ONE);
         assertThat(result.getStartFraction()).isEqualTo(0.366238940319);
@@ -108,33 +111,55 @@ class IsochroneMatchMapperTest {
         assertThat(result.getGeometry()).isEqualTo(isoLabelWayGeometry.reverse());
     }
 
-    private void setupFixtureForEgdeSegmentIsStartSegmentWithTravelledDistance(boolean reversed, int distance) {
-        int edgeId = 1;
-        int adjNode = 2;
-        double weight = 0;
-        long time = 0;
-        isoLabel = createIsoLabel(edgeId, adjNode, weight, time, distance);
-        // If reversed EdgeIterator returns reversed geometry
-        var wayGeometry = reversed ? isoLabelWayGeometry.reverse() : isoLabelWayGeometry;
-        when(queryGraph.getEdgeIteratorState(edgeId, adjNode)).thenReturn(edgeIteratorState);
-        when(edgeIteratorStateReverseExtractor
-                .hasReversed(edgeIteratorState)).thenReturn(reversed, false);
-        when(edgeIteratorState.getFlags()).thenReturn(intsRef);
-        when(startSegment.getClosestEdge()).thenReturn(edgeIteratorState);
-        when(flagEncoder.getId(intsRef)).thenReturn(MATCHED_LINK_ID_ONE, MATCHED_LINK_ID_ONE);
-        when(edgeIteratorState
-                .fetchWayGeometry(3))
-                .thenReturn(pointList);
+
+    @Test
+    void when_start_segment_exceeding_max_distance_mapToIsochroneMatch_should_return_cropped_geometry() {
+        var originalGeometry = isoLabelWayGeometry.copy();
+        setupFixtureStartSegment(false, 250.30366999283603);
+        var result = isochroneMatchMapper.mapToIsochroneMatch(isoLabel);
+        assertThat(result.getMatchedLinkId()).isEqualTo(MATCHED_LINK_ID_ONE);
+        assertThat(result.getStartFraction()).isEqualTo(2.285606E-5);
+        assertThat(result.getEndFraction()).isEqualTo(0.506377235259);
+        assertThat(result.getDirection()).isEqualTo(Direction.FORWARD);
+        assertThat(result.getGeometry().getLength()).isLessThan(originalGeometry.getLength());
+        var fractionAndDistance = fractionAndDistanceCalculator.calculateFractionAndDistance(
+                result.getGeometry(),
+                result.getGeometry().getStartPoint().getCoordinate());
+        assertThat(fractionAndDistance.getTotalDistance()).isCloseTo(MAX_DISTANCE, Percentage
+                .withPercentage(0.0001));
+
+    }
+
+
+
+    private void setupFixtureStartSegment(boolean reversed, double distance) {
+        LineString wayGeometry = setupFixture(reversed, distance, MATCHED_LINK_ID_ONE);
         when(pointList.toLineString(false))
                 .thenReturn(wayGeometry, startSegmentWayGeometry);
     }
 
+    private LineString setupFixture(boolean reversed, double distance, int startSegmentId) {
+        isoLabel = createIsoLabel(distance);
+        // If reversed EdgeIterator returns reversed geometry
+        var wayGeometry = reversed ? isoLabelWayGeometry.reverse() : isoLabelWayGeometry;
+        when(queryGraph.getEdgeIteratorState(isoLabel.edge, isoLabel.adjNode)).thenReturn(edgeIteratorState);
+        when(edgeIteratorStateReverseExtractor
+                .hasReversed(edgeIteratorState)).thenReturn(reversed, false);
+        when(edgeIteratorState.getFlags()).thenReturn(intsRef);
+        when(startSegment.getClosestEdge()).thenReturn(edgeIteratorState);
+        when(flagEncoder.getId(intsRef)).thenReturn(MATCHED_LINK_ID_ONE, startSegmentId);
+        when(edgeIteratorState
+                .fetchWayGeometry(3))
+                .thenReturn(pointList);
+        return wayGeometry;
+    }
+
     @SneakyThrows
-    private static IsoLabel createIsoLabel(int edgeId,
-            int adjNode,
-            double weight,
-            long time,
-            double distance) {
+    private static IsoLabel createIsoLabel(double distance) {
+        int edgeId = 1;
+        int adjNode = 2;
+        double weight = 0;
+        long time = 0;
         Constructor<IsoLabel> constructor = IsoLabel.class.getDeclaredConstructor(
                 int.class,
                 int.class,
