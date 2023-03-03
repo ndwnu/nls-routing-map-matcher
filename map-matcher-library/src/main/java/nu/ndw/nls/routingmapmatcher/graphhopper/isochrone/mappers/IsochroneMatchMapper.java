@@ -86,13 +86,13 @@ public class IsochroneMatchMapper {
                     .getFraction();
             // If the total distance travelled exceeds the maximum distance cut the linestring accordingly.
         } else if (totalDistanceTravelled > maxDistance) {
-            LineString croppedGeometry = calculatePartialGeometry(isoLabelWayGeometry,
+            LineString originalGeometry = (LineString) isoLabelWayGeometry.copy();
+            isoLabelWayGeometry = calculatePartialGeometry(isoLabelWayGeometry,
                     isoLabelEdgeGeometryDistance, totalDistanceTravelled,
                     maxDistance);
-
             endFraction = fractionAndDistanceCalculator.calculateFractionAndDistance(
-                            isoLabelWayGeometry,
-                            croppedGeometry.getEndPoint().
+                            originalGeometry,
+                            isoLabelWayGeometry.getEndPoint().
                                     getCoordinate())
                     .getFraction();
 
