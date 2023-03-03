@@ -7,7 +7,6 @@ import com.graphhopper.storage.index.QueryResult;
 import com.graphhopper.util.EdgeIteratorState;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import lombok.Builder;
 import lombok.RequiredArgsConstructor;
 import nu.ndw.nls.routingmapmatcher.domain.model.IsochroneMatch;
 import nu.ndw.nls.routingmapmatcher.domain.model.IsochroneMatch.Direction;
@@ -32,6 +31,7 @@ public class IsochroneMatchMapper {
     /**
      * Maps an IsoLabel to an IsochroneMatch with cropped geometries aligned to travelling direction and respective
      * start and end fractions.
+     *
      * @param isoLabel the iso label to map
      * @return an instance of IsochroneMatch
      */
@@ -86,14 +86,13 @@ public class IsochroneMatchMapper {
                     .getFraction();
             // If the total distance travelled exceeds the maximum distance cut the linestring accordingly.
         } else if (totalDistanceTravelled > maxDistance) {
-            LineString originalGeometry = (LineString) isoLabelWayGeometry.copy();
-            isoLabelWayGeometry = calculatePartialGeometry(isoLabelWayGeometry,
+            LineString croppedGeometry = calculatePartialGeometry(isoLabelWayGeometry,
                     isoLabelEdgeGeometryDistance, totalDistanceTravelled,
                     maxDistance);
 
             endFraction = fractionAndDistanceCalculator.calculateFractionAndDistance(
-                            originalGeometry,
-                            isoLabelWayGeometry.getEndPoint().
+                            isoLabelWayGeometry,
+                            croppedGeometry.getEndPoint().
                                     getCoordinate())
                     .getFraction();
 
@@ -112,6 +111,11 @@ public class IsochroneMatchMapper {
                 .geometry(isoLabelWayGeometry)
                 .build();
 
+    }
+
+    public boolean isStartSegment(int roadSectionId, QueryResult startSegment) {
+        var startSegmentId = flagEncoder.getId(startSegment.getClosestEdge().getFlags());
+        return roadSectionId == startSegmentId;
     }
 
     private LineString getStartSegmentWayGeometryInTravelDirection(Direction edgeDirection, QueryResult startSegment) {
@@ -138,8 +142,9 @@ public class IsochroneMatchMapper {
     }
 
     /**
-     * Extraction of a sub-LineString from an existing line, starting from 0;
-     * The line is converted to rd-new to get a more precise result in meters and then converted back to wgs-84
+     * Extraction of a sub-LineString from an existing line, starting from 0; The line is converted to rd-new to get a
+     * more precise result in meters and then converted back to wgs-84
+     *
      * @param ls       the line from which we extract the sub LineString ()
      * @param fraction [0..1], the length until where we want the substring to go
      * @return the sub-LineString
@@ -154,8 +159,5 @@ public class IsochroneMatchMapper {
                 .transformFromRdNewToWgs84(linRefLine.extractLine(0, fraction * rdGeom.getLength()));
     }
 
-    private boolean isStartSegment(int roadSectionId, QueryResult startSegment) {
-        var startSegmentId = flagEncoder.getId(startSegment.getClosestEdge().getFlags());
-        return roadSectionId == startSegmentId;
-    }
+
 }
