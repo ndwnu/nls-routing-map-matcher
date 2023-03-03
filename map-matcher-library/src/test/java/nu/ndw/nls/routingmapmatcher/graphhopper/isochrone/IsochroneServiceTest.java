@@ -77,6 +77,8 @@ class IsochroneServiceTest {
                 .build();
         var isoLabel = createIsoLabel(100, 0);
         setupFixture(isoLabel);
+        when(startEdge.get(any(BooleanEncodedValue.class))).thenReturn(true);
+        when(startEdge.getReverse(any(BooleanEncodedValue.class))).thenReturn(false);
         when(location.getUpstreamIsochrone()).thenReturn(ISOCHRONE_VALUE);
         when(location.getUpstreamIsochroneUnit()).thenReturn(IsochroneUnit.METERS);
         when(isochroneMatchMapper.mapToIsochroneMatch(isoLabel, ISOCHRONE_VALUE, queryGraph, startSegment)).thenReturn(
