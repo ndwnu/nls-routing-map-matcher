@@ -13,7 +13,6 @@ import com.graphhopper.storage.SPTEntry;
 import com.graphhopper.storage.index.LocationIndexTree;
 import com.graphhopper.storage.index.QueryResult;
 import com.graphhopper.util.EdgeIteratorState;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -33,6 +32,7 @@ public class IsochroneService {
     private static final int ROOT_PARENT = -1;
     private static final int METERS = 1000;
     private static final int SECONDS_PER_HOUR = 3600;
+    private static final int MILLISECONDS = 1000;
     private final LinkFlagEncoder flagEncoder;
     private final Weighting weighting;
 
@@ -78,41 +78,77 @@ public class IsochroneService {
         QueryResult startSegment
                 = locationIndexTree
                 .findClosest(latitude, longitude, EdgeFilter.ALL_EDGES);
-        /* Lookup will create virtual edges based on the snapped point, thereby cutting the segment in 2 line strings.
-           It also sets the closestNode of the matchedQueryResult to the virtual node id. In this way it creates a
-           start point for isochrone calculation based on the snapped point coordinates.
-        **/
-        queryGraph.lookup(List.of(startSegment));
-        double averageSpeed = startSegment.getClosestEdge().get(flagEncoder.getAverageSpeedEnc());
-        /*  Specify the maximum distance on which to crop the geometries use meters
-            or seconds * meters per second from averageSpeed info of start segment
-        **/
 
+        /*
+            Lookup will create virtual edges based on the snapped point, thereby cutting the segment in 2 line strings.
+            It also sets the closestNode of the matchedQueryResult to the virtual node id. In this way it creates a
+            start point for isochrone calculation based on the snapped point coordinates.
+        */
+
+        queryGraph.lookup(List.of(startSegment));
         Isochrone isochrone = configureIsochrone(queryGraph, isochroneValue, isochroneUnit, reverseFlow);
+
         // Here the ClosestNode is the virtual node id created by the queryGraph.lookup.
         List<IsoLabel> labels = isochrone.search(startSegment.getClosestNode());
-        double maxDistance =
-                IsochroneUnit.METERS == isochroneUnit ? isochroneValue :
-                        (isochroneValue * (averageSpeed * METERS / SECONDS_PER_HOUR));
-
         // down stream false upstream true
         boolean searchDirectionReversed = !reverseFlow && matchedPoint.isReversed();
-        List<IsochroneMatch> isochroneMatches = new ArrayList<>();
-        labels.stream()
-                // With bidirectional start segments the search goes two ways for both down and upstream isochrones.
-                // The  branches that are starting in the wrong direction of travelling
-                // (as determined by the nearest match) are filtered out.
+        return labels.stream()
+                /*
+                    With bidirectional start segments the search goes two ways for both down and upstream isochrones.
+                    The  branches that are starting in the wrong direction of travelling
+                    (as determined by the nearest match) are filtered out.
+                */
                 .filter(isoLabel -> isSegmentFromStartSegmentInCorrectDirection(searchDirectionReversed,
                         isoLabel,
                         startSegment,
                         queryGraph))
+
                 .sorted(comparing(isoLabel -> isoLabel.distance))
-                .forEach(isoLabel -> {
-                    // todo update max distance
-                    isochroneMatches.add(
-                            isoLabelMapper.mapToIsochroneMatch(isoLabel, maxDistance, queryGraph, startSegment));
-                });
-        return isochroneMatches;
+                .map(isoLabel -> {
+                      /*
+                            Specify the maximum distance on which to crop the geometries use meters
+                            or accumulate dynamically based on the average speed of the iso-label in case of seconds.
+                       */
+                    double maxDistance = IsochroneUnit.METERS == isochroneUnit ? isochroneValue
+                            : calculateMaxDistance(queryGraph, isochroneValue, 0, isoLabel);
+                    return isoLabelMapper.mapToIsochroneMatch(isoLabel, maxDistance, queryGraph, startSegment);
+                }).collect(Collectors.toList());
+    }
+
+    /**
+     * This method recursively calculates the max distance based on the time it takes to traverse an entire branch of
+     * road sections. It takes the encoded average speed of each traversed road section.
+     * Used for time based isochrone searches.
+     *
+     * @param queryGraph           the query graph to get the average speed from the edge
+     * @param maximumTimeInSeconds the maximum time in seconds
+     * @param maxDistance          the accumulated distance
+     * @param isoLabel             the isoLabel
+     */
+    private double calculateMaxDistance(QueryGraph queryGraph, double maximumTimeInSeconds,
+            double maxDistance,
+            IsoLabel isoLabel) {
+        EdgeIteratorState currentEdge = queryGraph.getEdgeIteratorState(isoLabel.edge,
+                isoLabel.adjNode);
+        double averageSpeed = currentEdge.get(flagEncoder.getAverageSpeedEnc());
+        double distanceDeltaInMeters =
+                isoLabel.distance - ((IsoLabel) isoLabel.parent).distance;
+        double timeToTraverseInSeconds =
+                distanceDeltaInMeters / (averageSpeed * METERS / SECONDS_PER_HOUR);
+        double totalTime = (double) isoLabel.time / 1000;
+        if (totalTime <= maximumTimeInSeconds) {
+            maxDistance +=
+                    timeToTraverseInSeconds * (averageSpeed * METERS / SECONDS_PER_HOUR);
+        } else {
+            maxDistance +=
+                    (maximumTimeInSeconds - (totalTime - timeToTraverseInSeconds)) * (
+                            averageSpeed * METERS / SECONDS_PER_HOUR);
+        }
+        // Traverse back to the start segment
+        if (isoLabel.parent.edge != ROOT_PARENT) {
+            return calculateMaxDistance(queryGraph, maximumTimeInSeconds, maxDistance, (IsoLabel) isoLabel.parent);
+        }
+        return maxDistance;
     }
 
     private Isochrone configureIsochrone(QueryGraph queryGraph, double isochroneValue, IsochroneUnit isochroneUnit,
