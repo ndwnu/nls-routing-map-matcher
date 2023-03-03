@@ -20,6 +20,7 @@ import nu.ndw.nls.routingmapmatcher.domain.model.IsochroneMatch;
 import nu.ndw.nls.routingmapmatcher.domain.model.IsochroneUnit;
 import nu.ndw.nls.routingmapmatcher.domain.model.base.BaseLocation;
 import nu.ndw.nls.routingmapmatcher.graphhopper.LinkFlagEncoder;
+import nu.ndw.nls.routingmapmatcher.graphhopper.isochrone.Isochrone.IsoLabel;
 import nu.ndw.nls.routingmapmatcher.graphhopper.isochrone.mappers.IsochroneMatchMapper;
 import nu.ndw.nls.routingmapmatcher.graphhopper.model.EdgeIteratorTravelDirection;
 import nu.ndw.nls.routingmapmatcher.graphhopper.model.MatchedPoint;
@@ -78,7 +79,7 @@ public class IsochroneService {
                 = locationIndexTree
                 .findClosest(latitude, longitude, EdgeFilter.ALL_EDGES);
         /* Lookup will create virtual edges based on the snapped point, thereby cutting the segment in 2 line strings.
-           It also sets the closestNode of the matchedQueryResult to the virtual node id in this way it creates a
+           It also sets the closestNode of the matchedQueryResult to the virtual node id. In this way it creates a
            start point for isochrone calculation based on the snapped point coordinates.
         **/
         queryGraph.lookup(List.of(startSegment));
@@ -89,11 +90,11 @@ public class IsochroneService {
 
         Isochrone isochrone = configureIsochrone(queryGraph, isochroneValue, isochroneUnit, reverseFlow);
         // Here the ClosestNode is the virtual node id created by the queryGraph.lookup.
-        var labels = isochrone.search(startSegment.getClosestNode());
+        List<IsoLabel> labels = isochrone.search(startSegment.getClosestNode());
         double maxDistance =
                 IsochroneUnit.METERS == isochroneUnit ? isochroneValue :
                         (isochroneValue * (averageSpeed * METERS / SECONDS_PER_HOUR));
-        var isoLabelMapper = IsochroneMatchMapper
+        IsochroneMatchMapper isoLabelMapper = IsochroneMatchMapper
                 .builder()
                 .crsTransformer(new CrsTransformer())
                 .fractionAndDistanceCalculator(new FractionAndDistanceCalculator(new GeodeticCalculator()))
@@ -162,7 +163,8 @@ public class IsochroneService {
 
     /**
      * This method recursively goes through the parent list to find the start segment. It then determines if the start
-     * segment is in the correct direction for the upstream or downstream query.
+     * segment is in the correct direction for the upstream or downstream query. The line is converted to rd-new to get
+     * a more precise result in meters and then converted back to wgs-84
      *
      * @param reverse      Indicating the correct direction
      * @param isoLabel     The label to be checked
