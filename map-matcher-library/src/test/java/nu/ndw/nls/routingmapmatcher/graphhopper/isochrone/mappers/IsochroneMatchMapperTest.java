@@ -85,13 +85,9 @@ class IsochroneMatchMapperTest {
                 COORDINATE_2});
 
         fractionAndDistanceCalculator = new FractionAndDistanceCalculator(new GeodeticCalculator());
-        isochroneMatchMapper = IsochroneMatchMapper
-                .builder()
-                .crsTransformer(new CrsTransformer())
-                .flagEncoder(flagEncoder)
-                .fractionAndDistanceCalculator(fractionAndDistanceCalculator)
-                .edgeIteratorStateReverseExtractor(edgeIteratorStateReverseExtractor)
-                .build();
+        isochroneMatchMapper = new IsochroneMatchMapper(new CrsTransformer(), flagEncoder,
+                fractionAndDistanceCalculator, edgeIteratorStateReverseExtractor);
+
     }
 
     @Test
@@ -145,7 +141,7 @@ class IsochroneMatchMapperTest {
     @Test
     void mapToIsochroneMatch_ok_cropped_geometry() {
         var originalGeometry = isoLabelWayGeometry.copy();
-        setupFixture(false, 250.30366999283603,2);
+        setupFixture(false, 250.30366999283603, 2);
         when(pointList.toLineString(INCLUDE_ELEVATION))
                 .thenReturn(isoLabelWayGeometry);
         var result = isochroneMatchMapper.mapToIsochroneMatch(isoLabel, MAX_DISTANCE,

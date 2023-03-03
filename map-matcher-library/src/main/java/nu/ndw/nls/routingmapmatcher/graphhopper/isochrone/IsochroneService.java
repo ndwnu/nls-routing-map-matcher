@@ -6,7 +6,6 @@ import static nu.ndw.nls.routingmapmatcher.graphhopper.util.PathUtil.determineEd
 
 import com.graphhopper.routing.QueryGraph;
 import com.graphhopper.routing.util.EdgeFilter;
-import com.graphhopper.routing.weighting.Weighting;
 import com.graphhopper.storage.EdgeIteratorStateReverseExtractor;
 import com.graphhopper.storage.IntsRef;
 import com.graphhopper.storage.SPTEntry;
@@ -34,10 +33,9 @@ public class IsochroneService {
     private static final int SECONDS_PER_HOUR = 3600;
     private static final int MILLISECONDS = 1000;
     private final LinkFlagEncoder flagEncoder;
-    private final Weighting weighting;
-
     private final EdgeIteratorStateReverseExtractor edgeIteratorStateReverseExtractor;
     private final IsochroneMatchMapper isoLabelMapper;
+    private final IsochroneFactory isochroneFactory;
 
     /**
      * Performs an isochrone search and returns a list of isochrone matches containing exact cropped geometries with
@@ -96,8 +94,7 @@ public class IsochroneService {
         */
 
         queryGraph.lookup(List.of(startSegment));
-        Isochrone isochrone = configureIsochrone(queryGraph, isochroneValue, isochroneUnit, reverseFlow);
-
+        Isochrone isochrone = isochroneFactory.createIsochrone(queryGraph, isochroneValue, isochroneUnit, reverseFlow);
         // Here the ClosestNode is the virtual node id created by the queryGraph.lookup.
         List<IsoLabel> labels = isochrone.search(startSegment.getClosestNode());
         // down stream false upstream true
@@ -161,23 +158,10 @@ public class IsochroneService {
         return maxDistance;
     }
 
-    private Isochrone configureIsochrone(QueryGraph queryGraph, double isochroneValue, IsochroneUnit isochroneUnit,
-            boolean reverseFlow) {
-        Isochrone isochrone = new Isochrone(queryGraph, this.weighting, reverseFlow);
-        if (isochroneUnit == IsochroneUnit.METERS) {
-            isochrone.setDistanceLimit(isochroneValue);
-        } else if (isochroneUnit == IsochroneUnit.SECONDS) {
-            isochrone.setTimeLimit(isochroneValue);
-        } else {
-            throw new IllegalArgumentException("Unexpected isochrone unit");
-        }
-        return isochrone;
-    }
-
 
     private Set<Integer> getIsochroneLinkIds(QueryGraph queryGraph, boolean reverse, double isochroneValue,
             IsochroneUnit isochroneUnit, int nodeId) {
-        Isochrone isochrone = configureIsochrone(queryGraph, isochroneValue, isochroneUnit, reverse);
+        Isochrone isochrone = isochroneFactory.createIsochrone(queryGraph, isochroneValue, isochroneUnit, reverse);
         List<Isochrone.IsoLabel> labels = isochrone.search(nodeId);
         return labels.stream()
                 .map(l -> queryGraph.getEdgeIteratorState(l.edge, l.adjNode))
