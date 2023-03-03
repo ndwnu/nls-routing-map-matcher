@@ -1,5 +1,6 @@
 package nu.ndw.nls.routingmapmatcher.graphhopper.isochrone.mappers;
 
+import static nu.ndw.nls.routingmapmatcher.graphhopper.isochrone.IsochroneTestHelper.createIsoLabel;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
 
@@ -9,8 +10,6 @@ import com.graphhopper.storage.IntsRef;
 import com.graphhopper.storage.index.QueryResult;
 import com.graphhopper.util.EdgeIteratorState;
 import com.graphhopper.util.PointList;
-import java.lang.reflect.Constructor;
-import lombok.SneakyThrows;
 import nu.ndw.nls.routingmapmatcher.constants.GlobalConstants;
 import nu.ndw.nls.routingmapmatcher.domain.model.IsochroneMatch.Direction;
 import nu.ndw.nls.routingmapmatcher.graphhopper.LinkFlagEncoder;
@@ -173,7 +172,7 @@ class IsochroneMatchMapperTest {
     }
 
     private void setupFixture(boolean reversed, double distance, int startSegmentId) {
-        isoLabel = createIsoLabel(distance);
+        isoLabel = createIsoLabel(distance, 0);
         when(queryGraph.getEdgeIteratorState(isoLabel.edge, isoLabel.adjNode)).thenReturn(edgeIteratorState);
         when(edgeIteratorStateReverseExtractor
                 .hasReversed(edgeIteratorState)).thenReturn(reversed, false);
@@ -189,19 +188,5 @@ class IsochroneMatchMapperTest {
 
     }
 
-    @SneakyThrows
-    private static IsoLabel createIsoLabel(double distance) {
-        int edgeId = 1;
-        int adjNode = 2;
-        double weight = 0;
-        long time = 0;
-        Constructor<IsoLabel> constructor = IsoLabel.class.getDeclaredConstructor(
-                int.class,
-                int.class,
-                double.class,
-                long.class,
-                double.class);
-        constructor.setAccessible(true);
-        return constructor.newInstance(edgeId, adjNode, weight, time, distance);
-    }
+
 }
