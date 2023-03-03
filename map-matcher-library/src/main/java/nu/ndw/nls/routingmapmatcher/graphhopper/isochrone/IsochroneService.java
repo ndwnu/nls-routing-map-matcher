@@ -31,6 +31,8 @@ import org.geotools.referencing.GeodeticCalculator;
 public class IsochroneService {
 
     private static final int ROOT_PARENT = -1;
+    private static final int METERS = 1000;
+    private static final int SECONDS_PER_HOUR = 3600;
     private final LinkFlagEncoder flagEncoder;
     private final Weighting weighting;
 
@@ -69,10 +71,10 @@ public class IsochroneService {
             IsochroneUnit isochroneUnit,
             LocationIndexTree locationIndexTree,
             boolean reverseFlow) {
-        final double latitude = matchedPoint.getSnappedPoint().getY();
-        final double longitude = matchedPoint.getSnappedPoint().getX();
+        double latitude = matchedPoint.getSnappedPoint().getY();
+        double longitude = matchedPoint.getSnappedPoint().getX();
         // Get the  start segment for the isochrone calculation
-        var startSegment
+        QueryResult startSegment
                 = locationIndexTree
                 .findClosest(latitude, longitude, EdgeFilter.ALL_EDGES);
         /* Lookup will create virtual edges based on the snapped point, thereby cutting the segment in 2 line strings.
@@ -80,25 +82,17 @@ public class IsochroneService {
            start point for isochrone calculation based on the snapped point coordinates.
         **/
         queryGraph.lookup(List.of(startSegment));
-        // down stream false upstream true
-        var searchDirectionReversed = !reverseFlow && matchedPoint.isReversed();
-
-        var averageSpeed = startSegment.getClosestEdge().get(flagEncoder.getAverageSpeedEnc());
+        double averageSpeed = startSegment.getClosestEdge().get(flagEncoder.getAverageSpeedEnc());
         /*  Specify the maximum distance on which to crop the geometries use meters
             or seconds * meters per second from averageSpeed info of start segment
         **/
-        var maxDistance =
-                IsochroneUnit.METERS == isochroneUnit ? isochroneValue : isochroneValue * (averageSpeed * 1000 / 3600);
-        var isochrone = new Isochrone(queryGraph, this.weighting, reverseFlow);
-        if (isochroneUnit == IsochroneUnit.METERS) {
-            isochrone.setDistanceLimit(isochroneValue);
-        } else if (isochroneUnit == IsochroneUnit.SECONDS) {
-            isochrone.setTimeLimit(isochroneValue);
-        } else {
-            throw new IllegalArgumentException("Unexpected isochrone unit");
-        }
+
+        Isochrone isochrone = configureIsochrone(queryGraph, isochroneValue, isochroneUnit, reverseFlow);
         // Here the ClosestNode is the virtual node id created by the queryGraph.lookup.
         var labels = isochrone.search(startSegment.getClosestNode());
+        double maxDistance =
+                IsochroneUnit.METERS == isochroneUnit ? isochroneValue :
+                        (isochroneValue * (averageSpeed * METERS / SECONDS_PER_HOUR));
         var isoLabelMapper = IsochroneMatchMapper
                 .builder()
                 .crsTransformer(new CrsTransformer())
@@ -109,17 +103,32 @@ public class IsochroneService {
                 .queryGraph(queryGraph)
                 .edgeIteratorStateReverseExtractor(edgeIteratorStateReverseExtractor)
                 .build();
+        // down stream false upstream true
+        boolean searchDirectionReversed = !reverseFlow && matchedPoint.isReversed();
         return labels.stream()
                 // With bidirectional start segments the search goes two ways for both down and upstream isochrones.
                 // The  branches that are starting in the wrong direction of travelling
                 // (as determined by the nearest match) are filtered out.
-                .filter(isoLabel -> segmentIsFromStartSegmentInCorrectDirection(searchDirectionReversed,
+                .filter(isoLabel -> isSegmentFromStartSegmentInCorrectDirection(searchDirectionReversed,
                         isoLabel,
                         startSegment,
                         queryGraph))
                 .sorted(comparing(isoLabel -> isoLabel.distance))
                 .map(isoLabelMapper::mapToIsochroneMatch)
                 .collect(Collectors.toList());
+    }
+
+    private Isochrone configureIsochrone(QueryGraph queryGraph, double isochroneValue, IsochroneUnit isochroneUnit,
+            boolean reverseFlow) {
+        Isochrone isochrone = new Isochrone(queryGraph, this.weighting, reverseFlow);
+        if (isochroneUnit == IsochroneUnit.METERS) {
+            isochrone.setDistanceLimit(isochroneValue);
+        } else if (isochroneUnit == IsochroneUnit.SECONDS) {
+            isochrone.setTimeLimit(isochroneValue);
+        } else {
+            throw new IllegalArgumentException("Unexpected isochrone unit");
+        }
+        return isochrone;
     }
 
 
@@ -135,14 +144,7 @@ public class IsochroneService {
 
     private Set<Integer> getIsochroneLinkIds(QueryGraph queryGraph, boolean reverse, double isochroneValue,
             IsochroneUnit isochroneUnit, int nodeId) {
-        Isochrone isochrone = new Isochrone(queryGraph, this.weighting, reverse);
-        if (isochroneUnit == IsochroneUnit.METERS) {
-            isochrone.setDistanceLimit(isochroneValue);
-        } else if (isochroneUnit == IsochroneUnit.SECONDS) {
-            isochrone.setTimeLimit(isochroneValue);
-        } else {
-            throw new IllegalArgumentException("Unexpected isochrone unit");
-        }
+        Isochrone isochrone = configureIsochrone(queryGraph, isochroneValue, isochroneUnit, reverse);
         List<Isochrone.IsoLabel> labels = isochrone.search(nodeId);
         return labels.stream()
                 .map(l -> queryGraph.getEdgeIteratorState(l.edge, l.adjNode))
@@ -168,19 +170,20 @@ public class IsochroneService {
      * @param queryGraph   the context from which to get the currentEdge
      * @return boolean indicating the correct direction
      */
-    private boolean segmentIsFromStartSegmentInCorrectDirection(boolean reverse, SPTEntry isoLabel,
+    private boolean isSegmentFromStartSegmentInCorrectDirection(boolean reverse, SPTEntry isoLabel,
             QueryResult startSegment, QueryGraph queryGraph) {
-        var currentEdge = queryGraph.getEdgeIteratorState(isoLabel.edge, isoLabel.adjNode);
+
         // If the start segment not bidirectional the search returns the right results
         EdgeIteratorTravelDirection edgeIteratorTravelDirection = determineEdgeDirection(startSegment, flagEncoder);
         if (EdgeIteratorTravelDirection.BOTH_DIRECTIONS != edgeIteratorTravelDirection) {
             return true;
         }
+        var currentEdge = queryGraph.getEdgeIteratorState(isoLabel.edge, isoLabel.adjNode);
         if (isStartSegment(currentEdge, startSegment)) {
             return edgeIteratorStateReverseExtractor.hasReversed(currentEdge) == reverse;
         }
         if (isoLabel.parent.edge != ROOT_PARENT) {
-            return segmentIsFromStartSegmentInCorrectDirection(reverse, isoLabel.parent, startSegment, queryGraph);
+            return isSegmentFromStartSegmentInCorrectDirection(reverse, isoLabel.parent, startSegment, queryGraph);
         }
         return true;
     }

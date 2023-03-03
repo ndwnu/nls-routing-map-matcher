@@ -4,7 +4,6 @@ import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
-import lombok.Value;
 import org.locationtech.jts.geom.LineString;
 
 
@@ -19,7 +18,7 @@ public class IsochroneMatch {
     private final int matchedLinkId;
     @ToString.Exclude
     private final LineString geometry;
-    private final Double startFraction;
-    private final Double endFraction;
+    private final double startFraction;
+    private final double endFraction;
     private final Direction direction;
 }
