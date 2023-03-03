@@ -24,21 +24,19 @@ public class IsochroneMatchMapper {
     private static final int ALL_NODES = 3;
     private static final int ROUNDING_DECIMAL_PLACES = 12;
     private final CrsTransformer crsTransformer;
-    private final QueryResult startSegment;
-    private final QueryGraph queryGraph;
     private final LinkFlagEncoder flagEncoder;
     private final FractionAndDistanceCalculator fractionAndDistanceCalculator;
-    private final double maxDistance;
     private final EdgeIteratorStateReverseExtractor edgeIteratorStateReverseExtractor;
 
     /**
      * Maps an IsoLabel to an IsochroneMatch with cropped geometries aligned to travelling direction and respective
      * start and end fractions.
-     *
      * @param isoLabel the iso label to map
      * @return an instance of IsochroneMatch
      */
-    public IsochroneMatch mapToIsochroneMatch(IsoLabel isoLabel) {
+    public IsochroneMatch mapToIsochroneMatch(IsoLabel isoLabel,
+            double maxDistance,
+            QueryGraph queryGraph, QueryResult startSegment) {
         EdgeIteratorState currentEdge = queryGraph.getEdgeIteratorState(isoLabel.edge, isoLabel.adjNode);
         /*  Here the reversed boolean indicates the direction of travelling along the edge
          *  with respect to the original alignment of the geometry
@@ -73,7 +71,7 @@ public class IsochroneMatchMapper {
                         maxDistance);
             }
             LineString startSegmentWayGeometryInTravelDirection = getStartSegmentWayGeometryInTravelDirection(
-                    edgeDirection);
+                    edgeDirection, startSegment);
 
             startFraction = fractionAndDistanceCalculator.calculateFractionAndDistance(
                             startSegmentWayGeometryInTravelDirection,
@@ -87,12 +85,13 @@ public class IsochroneMatchMapper {
                     .getFraction();
             // If the total distance travelled exceeds the maximum distance cut the linestring accordingly.
         } else if (totalDistanceTravelled > maxDistance) {
+            LineString originalGeometry = (LineString) isoLabelWayGeometry.copy();
             isoLabelWayGeometry = calculatePartialGeometry(isoLabelWayGeometry,
                     isoLabelEdgeGeometryDistance, totalDistanceTravelled,
                     maxDistance);
 
             endFraction = fractionAndDistanceCalculator.calculateFractionAndDistance(
-                            isoLabelWayGeometry,
+                            originalGeometry,
                             isoLabelWayGeometry.getEndPoint().
                                     getCoordinate())
                     .getFraction();
@@ -114,7 +113,7 @@ public class IsochroneMatchMapper {
 
     }
 
-    private LineString getStartSegmentWayGeometryInTravelDirection(Direction edgeDirection) {
+    private LineString getStartSegmentWayGeometryInTravelDirection(Direction edgeDirection, QueryResult startSegment) {
         LineString startSegmentWayGeometry = startSegment
                 .getClosestEdge().fetchWayGeometry(ALL_NODES)
                 .toLineString(INCLUDE_ELEVATION);
@@ -139,7 +138,7 @@ public class IsochroneMatchMapper {
 
     /**
      * Extraction of a sub-LineString from an existing line, starting from 0;
-     *
+     * The line is converted to rd-new to get a more precise result in meters and then converted back to wgs-84
      * @param ls       the line from which we extract the sub LineString ()
      * @param fraction [0..1], the length until where we want the substring to go
      * @return the sub-LineString

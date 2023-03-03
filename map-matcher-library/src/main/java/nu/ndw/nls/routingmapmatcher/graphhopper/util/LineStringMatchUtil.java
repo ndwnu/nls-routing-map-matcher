@@ -29,7 +29,8 @@ public class LineStringMatchUtil {
         GeometryFactory geometryFactory = new GeometryFactory(new PrecisionModel(), GlobalConstants.WGS84_SRID);
         this.pathUtil = new PathUtil(geometryFactory);
         this.flagEncoder = flagEncoder;
-        this.isochroneService = new IsochroneService(flagEncoder, weighting, new EdgeIteratorStateReverseExtractor());
+        this.isochroneService = new IsochroneService(flagEncoder, weighting, new EdgeIteratorStateReverseExtractor(),
+                null);
     }
 
     public LineStringMatch createMatch(LineStringLocation lineStringLocation, Path path, QueryGraph queryGraph,
