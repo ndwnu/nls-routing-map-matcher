@@ -29,7 +29,6 @@ public class IsochroneMatchMapper {
     private final LinkFlagEncoder flagEncoder;
     private final FractionAndDistanceCalculator fractionAndDistanceCalculator;
     private final double maxDistance;
-
     private final EdgeIteratorStateReverseExtractor edgeIteratorStateReverseExtractor;
 
     /**
@@ -91,11 +90,7 @@ public class IsochroneMatchMapper {
             isoLabelWayGeometry = calculatePartialGeometry(isoLabelWayGeometry,
                     isoLabelEdgeGeometryDistance, totalDistanceTravelled,
                     maxDistance);
-            startFraction = fractionAndDistanceCalculator.calculateFractionAndDistance(
-                            isoLabelWayGeometry,
-                            isoLabelWayGeometry.getStartPoint().
-                                    getCoordinate())
-                    .getFraction();
+
             endFraction = fractionAndDistanceCalculator.calculateFractionAndDistance(
                             isoLabelWayGeometry,
                             isoLabelWayGeometry.getEndPoint().
@@ -105,9 +100,11 @@ public class IsochroneMatchMapper {
         }
         return IsochroneMatch.builder()
                 .matchedLinkId(roadSectionId)
+                // Rounding here to avoid near zero fraction
                 .startFraction(BigDecimal.valueOf(startFraction)
                         .setScale(ROUNDING_DECIMAL_PLACES, RoundingMode.HALF_UP)
                         .doubleValue())
+                // Rounding here to avoid near one fraction
                 .endFraction(BigDecimal.valueOf(endFraction)
                         .setScale(ROUNDING_DECIMAL_PLACES, RoundingMode.HALF_UP)
                         .doubleValue())
