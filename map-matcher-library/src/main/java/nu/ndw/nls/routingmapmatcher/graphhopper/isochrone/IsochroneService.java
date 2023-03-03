@@ -66,6 +66,16 @@ public class IsochroneService {
                 location.getDownstreamIsochroneUnit(), locationIndexTree, false);
     }
 
+    public Set<Integer> getUpstreamLinkIds(QueryGraph queryGraph, BaseLocation location, int nodeId) {
+        return getIsochroneLinkIds(queryGraph, true, location.getUpstreamIsochrone(),
+                location.getUpstreamIsochroneUnit(), nodeId);
+    }
+
+    public Set<Integer> getDownstreamLinkIds(QueryGraph queryGraph, BaseLocation location, int nodeId) {
+        return getIsochroneLinkIds(queryGraph, false, location.getDownstreamIsochrone(),
+                location.getDownstreamIsochroneUnit(), nodeId);
+    }
+
     private List<IsochroneMatch> getIsochroneMatches(MatchedPoint matchedPoint,
             QueryGraph queryGraph,
             double isochroneValue,
@@ -102,7 +112,6 @@ public class IsochroneService {
                         isoLabel,
                         startSegment,
                         queryGraph))
-
                 .sorted(comparing(isoLabel -> isoLabel.distance))
                 .map(isoLabel -> {
                       /*
@@ -112,13 +121,14 @@ public class IsochroneService {
                     double maxDistance = IsochroneUnit.METERS == isochroneUnit ? isochroneValue
                             : calculateMaxDistance(queryGraph, isochroneValue, 0, isoLabel);
                     return isoLabelMapper.mapToIsochroneMatch(isoLabel, maxDistance, queryGraph, startSegment);
-                }).collect(Collectors.toList());
+                })
+                .collect(Collectors.toList());
     }
 
     /**
      * This method recursively calculates the max distance based on the time it takes to traverse an entire branch of
-     * road sections. It takes the encoded average speed of each traversed road section.
-     * Used for time based isochrone searches.
+     * road sections. It takes the encoded average speed of each traversed road section. Used for time based isochrone
+     * searches.
      *
      * @param queryGraph           the query graph to get the average speed from the edge
      * @param maximumTimeInSeconds the maximum time in seconds
@@ -135,7 +145,7 @@ public class IsochroneService {
                 isoLabel.distance - ((IsoLabel) isoLabel.parent).distance;
         double timeToTraverseInSeconds =
                 distanceDeltaInMeters / (averageSpeed * METERS / SECONDS_PER_HOUR);
-        double totalTime = (double) isoLabel.time / 1000;
+        double totalTime = (double) isoLabel.time / MILLISECONDS;
         if (totalTime <= maximumTimeInSeconds) {
             maxDistance +=
                     timeToTraverseInSeconds * (averageSpeed * METERS / SECONDS_PER_HOUR);
@@ -164,16 +174,6 @@ public class IsochroneService {
         return isochrone;
     }
 
-
-    public Set<Integer> getUpstreamLinkIds(QueryGraph queryGraph, BaseLocation location, int nodeId) {
-        return getIsochroneLinkIds(queryGraph, true, location.getUpstreamIsochrone(),
-                location.getUpstreamIsochroneUnit(), nodeId);
-    }
-
-    public Set<Integer> getDownstreamLinkIds(QueryGraph queryGraph, BaseLocation location, int nodeId) {
-        return getIsochroneLinkIds(queryGraph, false, location.getDownstreamIsochrone(),
-                location.getDownstreamIsochroneUnit(), nodeId);
-    }
 
     private Set<Integer> getIsochroneLinkIds(QueryGraph queryGraph, boolean reverse, double isochroneValue,
             IsochroneUnit isochroneUnit, int nodeId) {
