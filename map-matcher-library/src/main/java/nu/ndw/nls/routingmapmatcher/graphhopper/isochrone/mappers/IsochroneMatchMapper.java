@@ -8,6 +8,7 @@ import com.graphhopper.util.EdgeIteratorState;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import lombok.Builder;
+import lombok.RequiredArgsConstructor;
 import nu.ndw.nls.routingmapmatcher.domain.model.IsochroneMatch;
 import nu.ndw.nls.routingmapmatcher.domain.model.IsochroneMatch.Direction;
 import nu.ndw.nls.routingmapmatcher.graphhopper.LinkFlagEncoder;
@@ -17,7 +18,7 @@ import nu.ndw.nls.routingmapmatcher.graphhopper.util.FractionAndDistanceCalculat
 import org.locationtech.jts.geom.LineString;
 import org.locationtech.jts.linearref.LengthIndexedLine;
 
-@Builder
+@RequiredArgsConstructor
 public class IsochroneMatchMapper {
 
     private static final boolean INCLUDE_ELEVATION = false;
