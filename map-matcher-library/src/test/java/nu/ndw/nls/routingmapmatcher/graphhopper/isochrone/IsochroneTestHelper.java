@@ -21,4 +21,16 @@ public final class IsochroneTestHelper {
         return constructor.newInstance(edgeId, adjNode, weight, time, distance);
     }
 
+    @SneakyThrows
+    public static IsoLabel createIsoLabel(double distance,long time,int edgeId,int adjNode,double weight) {
+        Constructor<IsoLabel> constructor = IsoLabel.class.getDeclaredConstructor(
+                int.class,
+                int.class,
+                double.class,
+                long.class,
+                double.class);
+        constructor.setAccessible(true);
+        return constructor.newInstance(edgeId, adjNode, weight, time, distance);
+    }
+
 }
