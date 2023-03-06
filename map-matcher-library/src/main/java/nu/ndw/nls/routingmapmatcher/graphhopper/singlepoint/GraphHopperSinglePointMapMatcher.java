@@ -77,12 +77,14 @@ public class GraphHopperSinglePointMapMatcher implements SinglePointMapMatcher {
     private final CrsTransformer crsTransformer;
 
     private final EdgeIteratorStateReverseExtractor edgeIteratorStateReverseExtractor;
+    private final NetworkGraphHopper network;
 
     public GraphHopperSinglePointMapMatcher(NetworkGraphHopper network) {
         Preconditions.checkNotNull(network);
         List<FlagEncoder> flagEncoders = network.getEncodingManager().fetchEdgeEncoders();
         Preconditions.checkArgument(flagEncoders.size() == 1);
         Preconditions.checkArgument(flagEncoders.get(0) instanceof LinkFlagEncoder);
+        this.network = network;
 
         this.flagEncoder = (LinkFlagEncoder) flagEncoders.get(0);
         this.locationIndexTree = (LocationIndexTree) network.getLocationIndex();
@@ -126,11 +128,13 @@ public class GraphHopperSinglePointMapMatcher implements SinglePointMapMatcher {
         MatchedPoint closestMatchedPoint = matches.get(0);
         List<IsochroneMatch> upstream =
                 singlePointLocation.getUpstreamIsochroneUnit() == null ? Collections.emptyList() : isochroneService
-                        .getUpstreamIsochroneMatches(closestMatchedPoint, queryGraph, singlePointLocation,
+                        .getUpstreamIsochroneMatches(closestMatchedPoint,
+                                new QueryGraph(network.getGraphHopperStorage()), singlePointLocation,
                                 locationIndexTree);
         List<IsochroneMatch> downstream =
                 singlePointLocation.getDownstreamIsochroneUnit() == null ? Collections.emptyList() : isochroneService
-                        .getDownstreamIsochroneMatches(closestMatchedPoint, queryGraph, singlePointLocation,
+                        .getDownstreamIsochroneMatches(closestMatchedPoint,
+                                new QueryGraph(network.getGraphHopperStorage()), singlePointLocation,
                                 locationIndexTree);
         CandidateMatchWithIsochrone candidateMatchWithIsochrone = CandidateMatchWithIsochrone
                 .builder()
