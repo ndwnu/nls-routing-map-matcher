@@ -107,8 +107,7 @@ public class IsochroneService {
         Isochrone isochrone = isochroneFactory.createIsochrone(queryGraph, isochroneValue, isochroneUnit, reverseFlow);
         // Here the ClosestNode is the virtual node id created by the queryGraph.lookup.
         List<IsoLabel> labels = isochrone.search(startSegment.getClosestNode());
-        // down stream false upstream true
-        boolean searchDirectionReversed = !reverseFlow && matchedPoint.isReversed();
+        boolean searchDirectionReversed = matchedPoint.isReversed() != reverseFlow;
         return labels.stream()
                 /*
                     With bidirectional start segments the search goes two ways for both down and upstream isochrones.
