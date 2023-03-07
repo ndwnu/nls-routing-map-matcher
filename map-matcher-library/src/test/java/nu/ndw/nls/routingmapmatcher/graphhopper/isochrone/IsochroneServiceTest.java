@@ -132,14 +132,9 @@ class IsochroneServiceTest {
                 .reversed(false)
                 .snappedPoint(point)
                 .build();
-        var rootLabel = createIsoLabel(0, 0, -1, -1, 0);
-        // start segment with average speed 50 km ph  traverses 100 meters in  100 / ((50 * 1000 / 3600)) seconds ~ 7.2 seconds;
-        var startLabel = createIsoLabel(100, 7200, 1, 1, 10800);
-        startLabel.parent = rootLabel;
-        // end segment with average speed 100 km ph  traverses 100 meters in 100 / ((100 * 1000 / 3600)) ~ 3.6  seconds
-        var endLabel = createIsoLabel(200, 10800, 2, 2, 10800);
-        // the max distance based on 8 seconds will be around 100 + (0.8 * 27.7 meters/second) ~ 122.2 meters
-        endLabel.parent = startLabel;
+
+
+        var endLabel = createIsoLabel(200, 10800, 1, 2, 10800);
         setupFixture(endLabel);
         when(startEdge.get(any(BooleanEncodedValue.class))).thenReturn(true);
         when(startEdge.getReverse(any(BooleanEncodedValue.class))).thenReturn(false);
@@ -148,7 +143,8 @@ class IsochroneServiceTest {
         when(queryGraph.getEdgeIteratorState(anyInt(), anyInt()))
                 .thenReturn(currentEdge);
         when(flagEncoder.getAverageSpeedEnc()).thenReturn(decimalEncodedValue);
-        when(currentEdge.get(decimalEncodedValue)).thenReturn(100D, 50D);
+        // Segment with average speed of 100 km ph 27.77 meters/second
+        when(currentEdge.get(decimalEncodedValue)).thenReturn(100D);
         isochroneService.getUpstreamIsochroneMatches(matchedPoint, queryGraph, location, locationIndexTree);
         verify(queryGraph).lookup(List.of(startSegment));
         verify(isochroneMatchMapper).mapToIsochroneMatch(eq(endLabel),
@@ -157,6 +153,7 @@ class IsochroneServiceTest {
         verify(isochroneFactory).createIsochrone(queryGraph, ISOCHRONE_VALUE_SECONDS,
                 IsochroneUnit.SECONDS, true);
         var maxDistance = maxDistanceArgumentCaptor.getValue();
+        // The max distance based on 8 seconds will be around 200 - ((10.8-8) * 27.77 meters/second) ~ 122.2 meters
         assertThat(maxDistance).isCloseTo(122.2, Percentage.withPercentage(0.1));
     }
 
