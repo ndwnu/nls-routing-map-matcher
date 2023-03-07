@@ -182,7 +182,6 @@ class IsochroneServiceTest {
 
     }
 
-
     @Test
     void getUpstreamLinkIds_ok() {
         when(isochroneFactory.createIsochrone(queryGraph, ISOCHRONE_VALUE_METERS,
