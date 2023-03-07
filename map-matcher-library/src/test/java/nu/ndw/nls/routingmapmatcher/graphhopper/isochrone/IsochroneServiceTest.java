@@ -222,7 +222,7 @@ class IsochroneServiceTest {
         when(startEdge.getReverse(any(BooleanEncodedValue.class))).thenReturn(true);
         when(isochroneMatchMapper.isStartSegment(0, startSegment)).thenReturn(true);
         when(queryGraph.getEdgeIteratorState(isoLabel.edge, isoLabel.adjNode)).thenReturn(currentEdge);
-        when(edgeIteratorStateReverseExtractor.hasReversed(currentEdge)).thenReturn(true);
+        when(edgeIteratorStateReverseExtractor.hasReversed(currentEdge)).thenReturn(false);
     }
 
 

@@ -196,15 +196,19 @@ public class IsochroneService {
         EdgeIteratorTravelDirection edgeIteratorTravelDirection = determineEdgeDirection(startSegment, flagEncoder);
         if (EdgeIteratorTravelDirection.BOTH_DIRECTIONS != edgeIteratorTravelDirection) {
             return true;
+        } else {
+            boolean isCorrect = true;
+            EdgeIteratorState currentEdge = queryGraph.getEdgeIteratorState(isoLabel.edge, isoLabel.adjNode);
+            int roadSectionId = flagEncoder.getId(currentEdge.getFlags());
+            if (isochroneMatchMapper.isStartSegment(roadSectionId, startSegment)) {
+                isCorrect = edgeIteratorStateReverseExtractor.hasReversed(currentEdge) == reverse;
+            }
+            if (isoLabel.parent.edge != ROOT_PARENT) {
+                return isSegmentFromStartSegmentInCorrectDirection(reverse, isoLabel.parent, startSegment, queryGraph);
+            }
+            return isCorrect;
         }
-        EdgeIteratorState currentEdge = queryGraph.getEdgeIteratorState(isoLabel.edge, isoLabel.adjNode);
-        int roadSectionId = flagEncoder.getId(currentEdge.getFlags());
-        if (isochroneMatchMapper.isStartSegment(roadSectionId, startSegment)) {
-            return edgeIteratorStateReverseExtractor.hasReversed(currentEdge) == reverse;
-        }
-        if (isoLabel.parent.edge != ROOT_PARENT) {
-            return isSegmentFromStartSegmentInCorrectDirection(reverse, isoLabel.parent, startSegment, queryGraph);
-        }
-        return true;
+
+
     }
 }
