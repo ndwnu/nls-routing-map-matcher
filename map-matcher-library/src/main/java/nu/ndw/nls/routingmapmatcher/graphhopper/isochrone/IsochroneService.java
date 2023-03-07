@@ -125,44 +125,36 @@ public class IsochroneService {
                             or accumulate dynamically based on the average speed of the iso-label in case of seconds.
                        */
                     double maxDistance = IsochroneUnit.METERS == isochroneUnit ? isochroneValue
-                            : calculateMaxDistance(queryGraph, isochroneValue, 0, isoLabel);
+                            : calculateMaxDistance(queryGraph, isochroneValue, isoLabel);
                     return isochroneMatchMapper.mapToIsochroneMatch(isoLabel, maxDistance, queryGraph, startSegment);
                 })
                 .collect(Collectors.toList());
     }
 
     /**
-     * This method recursively calculates the max distance based on the time it takes to traverse an entire branch of
-     * road sections. It takes the encoded average speed of each traversed road section. Used for time based isochrone
-     * searches.
+     * This method calculates the max distance based on the time it takes to traverse an entire branch of road sections.
+     * It takes the encoded average speed of the road section. Used for time based isochrone searches.
      *
      * @param queryGraph           the query graph to get the average speed from the edge
      * @param maximumTimeInSeconds the maximum time in seconds
-     * @param maxDistance          the accumulated distance
      * @param isoLabel             the isoLabel
      */
     private double calculateMaxDistance(QueryGraph queryGraph, double maximumTimeInSeconds,
-            double maxDistance,
             IsoLabel isoLabel) {
         EdgeIteratorState currentEdge = queryGraph.getEdgeIteratorState(isoLabel.edge,
                 isoLabel.adjNode);
         double averageSpeed = currentEdge.get(flagEncoder.getAverageSpeedEnc());
-        double distanceDeltaInMeters =
-                isoLabel.distance - ((IsoLabel) isoLabel.parent).distance;
-        double timeToTraverseInSeconds =
-                distanceDeltaInMeters / (averageSpeed * METERS / SECONDS_PER_HOUR);
         double totalTime = (double) isoLabel.time / MILLISECONDS;
+        double maxDistance;
         if (totalTime <= maximumTimeInSeconds) {
-            maxDistance +=
-                    timeToTraverseInSeconds * (averageSpeed * METERS / SECONDS_PER_HOUR);
+            maxDistance = isoLabel.distance;
         } else {
-            maxDistance +=
-                    (maximumTimeInSeconds - (totalTime - timeToTraverseInSeconds)) * (
-                            averageSpeed * METERS / SECONDS_PER_HOUR);
-        }
-        // Traverse back to the start segment
-        if (isoLabel.parent.edge != ROOT_PARENT) {
-            return calculateMaxDistance(queryGraph, maximumTimeInSeconds, maxDistance, (IsoLabel) isoLabel.parent);
+            /*  Assuming that the iso label values for distance
+                and time are correctly calculated based on the average speed.
+                We can then calculate the max distance by subtracting the time difference * metersPerSecond
+             */
+            double metersPerSecond = averageSpeed * METERS / SECONDS_PER_HOUR;
+            maxDistance = isoLabel.distance - ((totalTime - maximumTimeInSeconds) * metersPerSecond);
         }
         return maxDistance;
     }
