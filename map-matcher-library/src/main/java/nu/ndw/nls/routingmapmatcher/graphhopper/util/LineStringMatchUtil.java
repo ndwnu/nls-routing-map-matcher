@@ -4,6 +4,7 @@ import com.google.common.collect.Lists;
 import com.graphhopper.routing.Path;
 import com.graphhopper.routing.QueryGraph;
 import com.graphhopper.routing.weighting.Weighting;
+import com.graphhopper.storage.EdgeIteratorStateReverseExtractor;
 import com.graphhopper.util.EdgeIteratorState;
 import java.util.List;
 import java.util.Set;
@@ -13,6 +14,7 @@ import nu.ndw.nls.routingmapmatcher.domain.model.MatchStatus;
 import nu.ndw.nls.routingmapmatcher.domain.model.linestring.LineStringLocation;
 import nu.ndw.nls.routingmapmatcher.domain.model.linestring.LineStringMatch;
 import nu.ndw.nls.routingmapmatcher.graphhopper.LinkFlagEncoder;
+import nu.ndw.nls.routingmapmatcher.graphhopper.isochrone.IsochroneFactory;
 import nu.ndw.nls.routingmapmatcher.graphhopper.isochrone.IsochroneService;
 import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.LineString;
@@ -28,7 +30,8 @@ public class LineStringMatchUtil {
         GeometryFactory geometryFactory = new GeometryFactory(new PrecisionModel(), GlobalConstants.WGS84_SRID);
         this.pathUtil = new PathUtil(geometryFactory);
         this.flagEncoder = flagEncoder;
-        this.isochroneService = new IsochroneService(flagEncoder, weighting);
+        this.isochroneService = new IsochroneService(flagEncoder,new EdgeIteratorStateReverseExtractor(),
+                null,new IsochroneFactory(weighting));
     }
 
     public LineStringMatch createMatch(LineStringLocation lineStringLocation, Path path, QueryGraph queryGraph,

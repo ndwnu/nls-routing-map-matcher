@@ -2,6 +2,7 @@ package nu.ndw.nls.routingmapmatcher.graphhopper.util;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import nu.ndw.nls.routingmapmatcher.graphhopper.model.FractionAndDistance;
 import org.geotools.referencing.GeodeticCalculator;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.LineString;
@@ -12,10 +13,10 @@ import org.locationtech.jts.linearref.LocationIndexedLine;
 @Slf4j
 public class FractionAndDistanceCalculator {
 
-    public static final double NEAR_ZERO = 0.00000000000001;
+    private static final double NEAR_ZERO = 0.00000000000001;
     private final GeodeticCalculator geodeticCalculator;
 
-    public double calculateFraction(LineString line, Coordinate snappedPointCoordinate) {
+    public FractionAndDistance calculateFractionAndDistance(LineString line, Coordinate snappedPointCoordinate) {
         LocationIndexedLine locationIndexedLine = new LocationIndexedLine(line);
         LinearLocation snappedPointLocation = locationIndexedLine.indexOf(snappedPointCoordinate);
         Coordinate[] coordinates = line.getCoordinates();
@@ -38,7 +39,12 @@ public class FractionAndDistanceCalculator {
 
         log.trace("Total (geometrical) edge length: {}, snapped point path length {}. Fraction: {}", sumOfPathLengths,
                 pathDistanceToSnappedPoint, fraction);
-        return fraction;
+        return FractionAndDistance
+                .builder()
+                .fraction(fraction)
+                .fractionDistance(pathDistanceToSnappedPoint)
+                .totalDistance(sumOfPathLengths)
+                .build();
     }
 
     public double calculateDistance(Coordinate from, Coordinate to) {
