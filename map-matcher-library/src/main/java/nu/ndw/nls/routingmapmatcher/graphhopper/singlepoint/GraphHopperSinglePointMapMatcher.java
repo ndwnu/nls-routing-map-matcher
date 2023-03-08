@@ -108,7 +108,11 @@ public class GraphHopperSinglePointMapMatcher implements SinglePointMapMatcher {
                 fractionAndDistanceCalculator);
         this.crsTransformer = new CrsTransformer();
     }
-
+    /*  Todo: this should be integrated into the existing match method.
+         For now only the first is with shortest distance.
+     *  Proposal: introduce two smart enums. Filter and Sort in the SinglePointLocation
+     *  with lambdas Filter.ALL (default) Filter.FIRST Sort.RELIABILITY (default) Sort.DISTANCE
+     * */
     @Override
     public SinglePointMatchWithIsochrone matchWithIsochrone(SinglePointLocation singlePointLocation) {
         Preconditions.checkNotNull(singlePointLocation);
