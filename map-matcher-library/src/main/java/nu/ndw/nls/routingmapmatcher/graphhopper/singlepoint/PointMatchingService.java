@@ -67,7 +67,7 @@ public class PointMatchingService {
         Coordinate snappedCoordinate = snappedPointSegment.closestPoint(inputCoordinate);
 
         Point snappedPoint = geometryFactory.createPoint(snappedCoordinate);
-        var fraction = fractionAndDistanceCalculator
+        double fraction = fractionAndDistanceCalculator
                 .calculateFractionAndDistance(originalGeometry, snappedCoordinate).getFraction();
         double distance = fractionAndDistanceCalculator.calculateDistance(inputCoordinate, snappedCoordinate);
         double bearing = bearingCalculator.calculateBearing(snappedPointSegment.p0, snappedPointSegment.p1);

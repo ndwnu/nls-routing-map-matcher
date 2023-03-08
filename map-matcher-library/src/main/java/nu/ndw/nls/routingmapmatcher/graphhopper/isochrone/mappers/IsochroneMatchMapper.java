@@ -14,6 +14,7 @@ import nu.ndw.nls.routingmapmatcher.graphhopper.LinkFlagEncoder;
 import nu.ndw.nls.routingmapmatcher.graphhopper.isochrone.Isochrone.IsoLabel;
 import nu.ndw.nls.routingmapmatcher.graphhopper.util.CrsTransformer;
 import nu.ndw.nls.routingmapmatcher.graphhopper.util.FractionAndDistanceCalculator;
+import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.LineString;
 import org.locationtech.jts.linearref.LengthIndexedLine;
 
@@ -114,7 +115,7 @@ public class IsochroneMatchMapper {
     }
 
     public boolean isStartSegment(int roadSectionId, QueryResult startSegment) {
-        var startSegmentId = flagEncoder.getId(startSegment.getClosestEdge().getFlags());
+        int startSegmentId = flagEncoder.getId(startSegment.getClosestEdge().getFlags());
         return roadSectionId == startSegmentId;
     }
 
@@ -153,7 +154,7 @@ public class IsochroneMatchMapper {
         if (fraction >= 1) {
             return ls;
         }
-        var rdGeom = crsTransformer.transformFromWgs84ToRdNew(ls);
+        Geometry rdGeom = crsTransformer.transformFromWgs84ToRdNew(ls);
         LengthIndexedLine linRefLine = new LengthIndexedLine(rdGeom);
         return (LineString) crsTransformer
                 .transformFromRdNewToWgs84(linRefLine.extractLine(0, fraction * rdGeom.getLength()));

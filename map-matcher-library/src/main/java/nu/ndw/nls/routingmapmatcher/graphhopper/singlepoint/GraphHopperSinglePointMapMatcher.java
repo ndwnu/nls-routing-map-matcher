@@ -207,7 +207,7 @@ public class GraphHopperSinglePointMapMatcher implements SinglePointMapMatcher {
 
     private Stream<CandidateMatch> createMatch(QueryResult queryResult, Polygon circle,
             SinglePointLocation singlePointLocation) {
-        var nodeId = queryResult.getClosestNode();
+        int nodeId = queryResult.getClosestNode();
         Set<Integer> upstreamLinkIds = singlePointLocation.getUpstreamIsochroneUnit() != null ?
                 isochroneService.getUpstreamLinkIds(queryGraph, singlePointLocation, nodeId) : null;
         Set<Integer> downstreamLinkIds = singlePointLocation.getDownstreamIsochroneUnit() != null ?
