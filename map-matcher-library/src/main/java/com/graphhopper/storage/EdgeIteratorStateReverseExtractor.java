@@ -21,7 +21,7 @@ import lombok.SneakyThrows;
 public final class EdgeIteratorStateReverseExtractor {
 
     @SneakyThrows
-    public  boolean hasReversed(final EdgeIteratorState closestEdge) {
+    public  boolean hasReversed( EdgeIteratorState closestEdge) {
         if (closestEdge instanceof VirtualEdgeIteratorState virtualEdgeIteratorState) {
             return extractReversedFromVirtualEdge( virtualEdgeIteratorState);
         } else if (closestEdge instanceof EdgeIterable edgeIterable) {
