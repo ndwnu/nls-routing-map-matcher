@@ -117,15 +117,9 @@ public class PathUtil {
 
     private EdgeIteratorState findOriginalEdge(EdgeIteratorState edge, QueryGraph queryGraph) {
         EdgeIteratorState originalEdge;
-        if (queryGraph.isVirtualEdge(edge.getEdge())) {
-            if (queryGraph.isVirtualNode(edge.getBaseNode())) {
-                originalEdge = queryGraph.getOriginalEdgeFromVirtNode(edge.getBaseNode());
-            } else if (queryGraph.isVirtualNode(edge.getAdjNode())) {
-                originalEdge = queryGraph.getOriginalEdgeFromVirtNode(edge.getAdjNode());
-            } else {
-                throw new IllegalStateException(
-                        "Unexpected state: at least one node of a virtual edge should be virtual");
-            }
+        if (edge instanceof VirtualEdgeIteratorState) {
+            originalEdge = queryGraph.getEdgeIteratorStateForKey(
+                    ((VirtualEdgeIteratorState) edge).getOriginalEdgeKey());
         } else {
             originalEdge = edge;
         }
