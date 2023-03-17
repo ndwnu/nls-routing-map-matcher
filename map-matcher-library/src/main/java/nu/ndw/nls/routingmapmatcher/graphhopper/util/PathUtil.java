@@ -1,8 +1,12 @@
 package nu.ndw.nls.routingmapmatcher.graphhopper.util;
 
-import com.graphhopper.routing.QueryGraph;
-import com.graphhopper.storage.IntsRef;
-import com.graphhopper.storage.index.QueryResult;
+import static nu.ndw.nls.routingmapmatcher.graphhopper.LinkWayIdEncodedValuesFactory.ID_NAME;
+
+import com.graphhopper.routing.ev.VehicleAccess;
+import com.graphhopper.routing.querygraph.QueryGraph;
+import com.graphhopper.routing.querygraph.VirtualEdgeIteratorState;
+import com.graphhopper.routing.util.EncodingManager;
+import com.graphhopper.storage.index.Snap;
 import com.graphhopper.util.EdgeExplorer;
 import com.graphhopper.util.EdgeIterator;
 import com.graphhopper.util.EdgeIteratorState;
@@ -12,7 +16,6 @@ import java.util.Collection;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import nu.ndw.nls.routingmapmatcher.domain.exception.RoutingMapMatcherException;
-import nu.ndw.nls.routingmapmatcher.graphhopper.LinkFlagEncoder;
 import nu.ndw.nls.routingmapmatcher.graphhopper.model.EdgeIteratorTravelDirection;
 import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.LineString;
@@ -37,17 +40,17 @@ public class PathUtil {
             PackedCoordinateSequence.Double coordinateSequence =
                     new PackedCoordinateSequence.Double(points.size(), DIMENSIONS, MEASURES);
             for (int index = 0; index < points.size(); index++) {
-                coordinateSequence.setOrdinate(index, 0, points.getLongitude(index));
-                coordinateSequence.setOrdinate(index, 1, points.getLatitude(index));
+                coordinateSequence.setOrdinate(index, 0, points.getLon(index));
+                coordinateSequence.setOrdinate(index, 1, points.getLat(index));
             }
             lineString = geometryFactory.createLineString(coordinateSequence);
         } else if (points.size() == 1) {
             PackedCoordinateSequence.Double coordinateSequence =
                     new PackedCoordinateSequence.Double(MINIMUM_LENGTH, DIMENSIONS, MEASURES);
-            coordinateSequence.setOrdinate(0, 0, points.getLongitude(0));
-            coordinateSequence.setOrdinate(0, 1, points.getLatitude(0));
-            coordinateSequence.setOrdinate(1, 0, points.getLongitude(0));
-            coordinateSequence.setOrdinate(1, 1, points.getLatitude(0));
+            coordinateSequence.setOrdinate(0, 0, points.getLon(0));
+            coordinateSequence.setOrdinate(0, 1, points.getLat(0));
+            coordinateSequence.setOrdinate(1, 0, points.getLon(0));
+            coordinateSequence.setOrdinate(1, 1, points.getLat(0));
             lineString = geometryFactory.createLineString(coordinateSequence);
         } else {
             throw new RoutingMapMatcherException("Unexpected: no points");
@@ -55,12 +58,12 @@ public class PathUtil {
         return lineString;
     }
 
-    public List<Integer> determineMatchedLinkIds(LinkFlagEncoder flagEncoder, Collection<EdgeIteratorState> edges) {
+    public List<Integer> determineMatchedLinkIds(EncodingManager encodingManager, Collection<EdgeIteratorState> edges) {
         List<Integer> matchedLinkIds = new ArrayList<>(edges.size());
         Integer previousMatchedLinkId = null;
         for (EdgeIteratorState edge : edges) {
-            IntsRef flags = edge.getFlags();
-            Integer matchedLinkId = flagEncoder.getId(flags);
+
+            Integer matchedLinkId = edge.get(encodingManager.getIntEncodedValue(ID_NAME));
             if (previousMatchedLinkId == null || !previousMatchedLinkId.equals(matchedLinkId)) {
                 matchedLinkIds.add(matchedLinkId);
             }
@@ -79,16 +82,16 @@ public class PathUtil {
      * return results in reverse direction.
      *
      * @param queryResult
-     * @param flagEncoder
+     * @param encodingManager
      * @return travel direction on this specific edge
      */
-    public static EdgeIteratorTravelDirection determineEdgeDirection(QueryResult queryResult,
-            LinkFlagEncoder flagEncoder) {
+    public static EdgeIteratorTravelDirection determineEdgeDirection(Snap queryResult,
+            EncodingManager encodingManager) {
         EdgeIteratorState edge = queryResult.getClosestEdge();
-
-        boolean edgeCanBeTraveledFromBaseToAdjacent = edge.get(flagEncoder.getAccessEnc());
-        boolean edgeCanBeTraveledFromAdjacentToBase = edge.getReverse(flagEncoder.getAccessEnc());
-
+        boolean edgeCanBeTraveledFromBaseToAdjacent = edge.get(
+                encodingManager.getBooleanEncodedValue(VehicleAccess.key("car")));
+        boolean edgeCanBeTraveledFromAdjacentToBase = edge.getReverse(
+                encodingManager.getBooleanEncodedValue(VehicleAccess.key("car")));
         if (edgeCanBeTraveledFromAdjacentToBase && edgeCanBeTraveledFromBaseToAdjacent) {
             return EdgeIteratorTravelDirection.BOTH_DIRECTIONS;
         } else if (edgeCanBeTraveledFromAdjacentToBase) {
@@ -162,7 +165,10 @@ public class PathUtil {
             // This could be the case when an edge has exactly one virtual node and that edge has the same node as
             // start node and end node; in this situation the value of distanceInOtherDirection should be 0
             if (!distanceInOtherDirectionIsPositive) {
-                distanceInOtherDirection = queryGraph.getOriginalEdgeFromVirtNode(virtualNode).getDistance() -
+                int originalEdgeKey = ((VirtualEdgeIteratorState) queryGraph.getEdgeIteratorStateForKey(
+                        virtualNode * 2))
+                        .getOriginalEdgeKey();
+                distanceInOtherDirection = queryGraph.getEdgeIteratorStateForKey(originalEdgeKey).getDistance() -
                         pathEdge.getDistance();
             } else {
                 throw new RoutingMapMatcherException("Unexpected: distance not correctly calculated");

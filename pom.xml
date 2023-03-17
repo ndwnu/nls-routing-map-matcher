@@ -20,8 +20,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.javadoc.failOnError>false</maven.javadoc.failOnError>
         <lombok.version>1.18.26</lombok.version>
-        <graphhopper-core.version>0.12.0</graphhopper-core.version>
-        <graphhopper-map-matching-core.version>0.12.0-3</graphhopper-map-matching-core.version>
+        <graphhopper.version>7.0</graphhopper.version>
         <jts-core.version>1.19.0</jts-core.version>
         <guava.version>31.1-jre</guava.version>
         <hamcrest.version>2.2</hamcrest.version>
@@ -110,18 +109,12 @@
             <dependency>
                 <groupId>com.graphhopper</groupId>
                 <artifactId>graphhopper-core</artifactId>
-                <version>${graphhopper-core.version}</version>
+                <version>${graphhopper.version}</version>
             </dependency>
             <dependency>
                 <groupId>com.graphhopper</groupId>
-                <artifactId>graphhopper-map-matching-core</artifactId>
-                <version>${graphhopper-map-matching-core.version}</version>
-                <exclusions>
-                    <exclusion>
-                        <groupId>com.graphhopper</groupId>
-                        <artifactId>graphhopper-reader-osm</artifactId>
-                    </exclusion>
-                </exclusions>
+                <artifactId>graphhopper-map-matching</artifactId>
+                <version>${graphhopper.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.projectlombok</groupId>

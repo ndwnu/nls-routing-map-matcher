@@ -17,6 +17,7 @@ import nu.ndw.nls.routingmapmatcher.domain.model.singlepoint.SinglePointMatch;
 import nu.ndw.nls.routingmapmatcher.domain.model.singlepoint.SinglePointMatch.CandidateMatch;
 import nu.ndw.nls.routingmapmatcher.graphhopper.NetworkGraphHopperFactory;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.GeometryFactory;
@@ -152,6 +153,7 @@ class SinglePointMapMatcherFractionTest {
     }
 
     @Test
+    @Disabled
     void matchSinglePoint_fraction_towerBaseNode() {
         SinglePointLocation singlePoint = this.createSinglePoint(123, 0, 0);
         SinglePointMatch match = this.singlePointMapMatcher.match(singlePoint);

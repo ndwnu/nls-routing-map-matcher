@@ -1,33 +1,33 @@
 package nu.ndw.nls.routingmapmatcher.graphhopper.starttoend;
 
+import static com.graphhopper.util.Parameters.Algorithms.DIJKSTRA_BI;
 import static nu.ndw.nls.routingmapmatcher.graphhopper.util.MatchUtil.getQueryResults;
 
 import com.google.common.base.Preconditions;
 import com.graphhopper.routing.AlgorithmOptions;
 import com.graphhopper.routing.Path;
-import com.graphhopper.routing.QueryGraph;
 import com.graphhopper.routing.RoutingAlgorithm;
 import com.graphhopper.routing.RoutingAlgorithmFactory;
+import com.graphhopper.routing.RoutingAlgorithmFactorySimple;
+import com.graphhopper.routing.ev.VehicleAccess;
+import com.graphhopper.routing.ev.VehicleSpeed;
+import com.graphhopper.routing.querygraph.QueryGraph;
 import com.graphhopper.routing.util.EdgeFilter;
-import com.graphhopper.routing.util.FlagEncoder;
-import com.graphhopper.routing.util.HintsMap;
+import com.graphhopper.routing.util.EncodingManager;
 import com.graphhopper.routing.weighting.ShortestWeighting;
 import com.graphhopper.routing.weighting.Weighting;
-import com.graphhopper.storage.Graph;
+import com.graphhopper.storage.BaseGraph;
 import com.graphhopper.storage.index.LocationIndexTree;
-import com.graphhopper.storage.index.QueryResult;
-import com.graphhopper.util.Parameters;
+import com.graphhopper.storage.index.Snap;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import lombok.Value;
 import nu.ndw.nls.routingmapmatcher.domain.StartToEndMapMatcher;
 import nu.ndw.nls.routingmapmatcher.domain.model.MatchStatus;
 import nu.ndw.nls.routingmapmatcher.domain.model.linestring.LineStringLocation;
 import nu.ndw.nls.routingmapmatcher.domain.model.linestring.LineStringMatch;
-import nu.ndw.nls.routingmapmatcher.graphhopper.LinkFlagEncoder;
 import nu.ndw.nls.routingmapmatcher.graphhopper.NetworkGraphHopper;
 import nu.ndw.nls.routingmapmatcher.graphhopper.util.LineStringMatchUtil;
 import nu.ndw.nls.routingmapmatcher.graphhopper.util.LineStringScoreUtil;
@@ -40,9 +40,13 @@ public class GraphHopperStartToEndMapMatcher implements StartToEndMapMatcher {
      */
     private static final double MAXIMUM_CANDIDATE_DISTANCE_IN_METERS = 20.0;
 
-    private final Graph routingGraph;
+    private final BaseGraph routingGraph;
+
+    private final NetworkGraphHopper networkGraphHopper;
     private final LocationIndexTree locationIndexTree;
     private final EdgeFilter edgeFilter;
+
+    private final EncodingManager encodingManager;
 
     private final RoutingAlgorithmFactory algorithmFactory;
     private final AlgorithmOptions algorithmOptions;
@@ -50,35 +54,28 @@ public class GraphHopperStartToEndMapMatcher implements StartToEndMapMatcher {
     private final LineStringMatchUtil lineStringMatchUtil;
     private final LineStringScoreUtil lineStringScoreUtil;
 
-    public GraphHopperStartToEndMapMatcher(NetworkGraphHopper graphHopper) {
-        Preconditions.checkNotNull(graphHopper);
-        List<FlagEncoder> flagEncoders = graphHopper.getEncodingManager().fetchEdgeEncoders();
-        Preconditions.checkArgument(flagEncoders.size() == 1);
-        Preconditions.checkArgument(flagEncoders.get(0) instanceof LinkFlagEncoder);
+    public GraphHopperStartToEndMapMatcher(NetworkGraphHopper networkGraphHopper) {
+        Preconditions.checkNotNull(networkGraphHopper);
+        EncodingManager encodingManager = networkGraphHopper.getEncodingManager();
 
-        LinkFlagEncoder flagEncoder = (LinkFlagEncoder) flagEncoders.get(0);
-        this.routingGraph = graphHopper.getGraphHopperStorage();
-        this.locationIndexTree = (LocationIndexTree) graphHopper.getLocationIndex();
+        this.routingGraph = networkGraphHopper.getBaseGraph();
+
+        this.algorithmOptions = new AlgorithmOptions().setAlgorithm(DIJKSTRA_BI);
+        this.algorithmFactory = new RoutingAlgorithmFactorySimple();
+        this.locationIndexTree = (LocationIndexTree) networkGraphHopper.getLocationIndex();
         this.edgeFilter = EdgeFilter.ALL_EDGES;
-
-        HintsMap hints = new HintsMap();
-        hints.put(Parameters.CH.DISABLE, true);
-        hints.setVehicle(flagEncoder.toString());
-        this.algorithmFactory = graphHopper.getAlgorithmFactory(hints);
-
-        String algorithm = Parameters.Algorithms.DIJKSTRA_BI;
-        Weighting weighting = new ShortestWeighting(flagEncoder);
-        this.algorithmOptions = new AlgorithmOptions(algorithm, weighting);
-
-        this.lineStringMatchUtil = new LineStringMatchUtil(flagEncoder, weighting);
+        this.encodingManager = networkGraphHopper.getEncodingManager();
+        this.networkGraphHopper = networkGraphHopper;
+        this.lineStringMatchUtil = new LineStringMatchUtil(routingGraph, encodingManager);
         this.lineStringScoreUtil = new LineStringScoreUtil();
     }
 
     public LineStringMatch match(LineStringLocation lineStringLocation) {
         Preconditions.checkNotNull(lineStringLocation);
 
-        List<QueryResult> startCandidates = findCandidates(lineStringLocation.getGeometry().getStartPoint());
-        List<QueryResult> endCandidates = findCandidates(lineStringLocation.getGeometry().getEndPoint());
+        List<Snap> startCandidates = findCandidates(networkGraphHopper,
+                lineStringLocation.getGeometry().getStartPoint());
+        List<Snap> endCandidates = findCandidates(networkGraphHopper, lineStringLocation.getGeometry().getEndPoint());
 
         QueryGraph queryGraph = createQueryGraphAndAssignClosestNodePerCandidate(startCandidates, endCandidates);
         startCandidates = deduplicateCandidatesByClosestNode(startCandidates);
@@ -88,48 +85,48 @@ public class GraphHopperStartToEndMapMatcher implements StartToEndMapMatcher {
                 lineStringLocation);
 
         return candidatePaths.stream()
-                .max(Comparator.comparingDouble(Candidate::getScore))
-                .map(candidate -> lineStringMatchUtil.createMatch(lineStringLocation, candidate.getPath(), queryGraph,
-                        candidate.getScore()))
+                .max(Comparator.comparingDouble(Candidate::score))
+                .map(candidate -> lineStringMatchUtil.createMatch(lineStringLocation, candidate.path(), queryGraph,
+                        candidate.score()))
                 .orElseGet(() -> lineStringMatchUtil.createFailedMatch(lineStringLocation, MatchStatus.NO_MATCH));
     }
 
-    private List<QueryResult> findCandidates(Point point) {
-        return getQueryResults(point, MAXIMUM_CANDIDATE_DISTANCE_IN_METERS, locationIndexTree, edgeFilter);
+    private List<Snap> findCandidates(NetworkGraphHopper network, Point point) {
+        return getQueryResults(network, point, MAXIMUM_CANDIDATE_DISTANCE_IN_METERS, locationIndexTree, edgeFilter);
     }
 
-    private QueryGraph createQueryGraphAndAssignClosestNodePerCandidate(List<QueryResult> startCandidates,
-            List<QueryResult> endCandidates) {
-        List<QueryResult> allCandidates = new ArrayList<>(startCandidates.size() + endCandidates.size());
+    private QueryGraph createQueryGraphAndAssignClosestNodePerCandidate(List<Snap> startCandidates,
+            List<Snap> endCandidates) {
+        List<Snap> allCandidates = new ArrayList<>(startCandidates.size() + endCandidates.size());
         allCandidates.addAll(startCandidates);
         allCandidates.addAll(endCandidates);
-        QueryGraph queryGraph = new QueryGraph(routingGraph);
-        queryGraph.setUseEdgeExplorerCache(true);
-        queryGraph.lookup(allCandidates);
-        return queryGraph;
+        return QueryGraph.create(routingGraph, allCandidates);
     }
 
-    private List<QueryResult> deduplicateCandidatesByClosestNode(List<QueryResult> candidates) {
-        List<QueryResult> deduplicatedCandidates = new ArrayList<>(candidates.size());
-        Map<Integer, QueryResult> candidatePerClosestNode = new HashMap<>();
-        for (QueryResult queryResult : candidates) {
+    private List<Snap> deduplicateCandidatesByClosestNode(List<Snap> candidates) {
+        List<Snap> deduplicatedCandidates = new ArrayList<>(candidates.size());
+        Map<Integer, Snap> candidatePerClosestNode = new HashMap<>();
+        for (Snap queryResult : candidates) {
             candidatePerClosestNode.put(queryResult.getClosestNode(), queryResult);
         }
         deduplicatedCandidates.addAll(candidatePerClosestNode.values());
         return deduplicatedCandidates;
     }
 
-    private List<Candidate> createCandidatePaths(QueryGraph queryGraph, List<QueryResult> startCandidates,
-            List<QueryResult> endCandidates, LineStringLocation lineStringLocation) {
+    private List<Candidate> createCandidatePaths(QueryGraph queryGraph, List<Snap> startCandidates,
+            List<Snap> endCandidates, LineStringLocation lineStringLocation) {
         List<Candidate> candidatePaths = new ArrayList<>(startCandidates.size() * endCandidates.size());
-        for (QueryResult startCandidate : startCandidates) {
-            for (QueryResult endCandidate : endCandidates) {
+        for (Snap startCandidate : startCandidates) {
+            for (Snap endCandidate : endCandidates) {
                 int fromNode = startCandidate.getClosestNode();
                 int toNode = endCandidate.getClosestNode();
-
-                RoutingAlgorithm routingAlgorithm = algorithmFactory.createAlgo(queryGraph, algorithmOptions);
+                Weighting weighting = new ShortestWeighting(
+                        encodingManager.getBooleanEncodedValue(VehicleAccess.key("car")),
+                        encodingManager.getDecimalEncodedValue(
+                                VehicleSpeed.key("car")));
+                RoutingAlgorithm routingAlgorithm = algorithmFactory.createAlgo(queryGraph, weighting,
+                        algorithmOptions);
                 Path path = routingAlgorithm.calcPath(fromNode, toNode);
-
                 if (path.isFound() && path.getEdgeCount() > 0) {
                     double score = lineStringScoreUtil.calculateCandidatePathScore(path, lineStringLocation);
                     candidatePaths.add(new Candidate(path, score));
@@ -139,10 +136,7 @@ public class GraphHopperStartToEndMapMatcher implements StartToEndMapMatcher {
         return candidatePaths;
     }
 
-    @Value
-    private static class Candidate {
+    private record Candidate(Path path, double score) {
 
-        Path path;
-        double score;
     }
 }
