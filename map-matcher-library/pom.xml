@@ -18,13 +18,7 @@
         </dependency>
         <dependency>
             <groupId>com.graphhopper</groupId>
-            <artifactId>graphhopper-map-matching-core</artifactId>
-            <exclusions>
-                <exclusion>
-                    <groupId>com.graphhopper</groupId>
-                    <artifactId>graphhopper-reader-osm</artifactId>
-                </exclusion>
-            </exclusions>
+            <artifactId>graphhopper-map-matching</artifactId>
         </dependency>
         <dependency>
             <groupId>org.projectlombok</groupId>

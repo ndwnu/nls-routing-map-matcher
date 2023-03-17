@@ -2,20 +2,26 @@ package nu.ndw.nls.routingmapmatcher.graphhopper.singlepoint;
 
 import static java.util.Comparator.comparing;
 import static java.util.Comparator.comparingDouble;
+import static nu.ndw.nls.routingmapmatcher.graphhopper.LinkWayIdEncodedValuesFactory.ID_NAME;
 import static nu.ndw.nls.routingmapmatcher.graphhopper.util.MatchUtil.getQueryResults;
 import static nu.ndw.nls.routingmapmatcher.graphhopper.util.PathUtil.determineEdgeDirection;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
-import com.graphhopper.routing.QueryGraph;
+import com.graphhopper.routing.ev.BooleanEncodedValue;
+import com.graphhopper.routing.ev.DecimalEncodedValue;
+import com.graphhopper.routing.ev.VehicleAccess;
+import com.graphhopper.routing.ev.VehicleSpeed;
+import com.graphhopper.routing.querygraph.QueryGraph;
 import com.graphhopper.routing.util.EdgeFilter;
-import com.graphhopper.routing.util.FlagEncoder;
+import com.graphhopper.routing.util.EncodingManager;
 import com.graphhopper.routing.weighting.ShortestWeighting;
 import com.graphhopper.routing.weighting.Weighting;
+import com.graphhopper.storage.BaseGraph;
 import com.graphhopper.storage.EdgeIteratorStateReverseExtractor;
-import com.graphhopper.storage.IntsRef;
 import com.graphhopper.storage.index.LocationIndexTree;
-import com.graphhopper.storage.index.QueryResult;
+import com.graphhopper.storage.index.Snap;
+import com.graphhopper.util.FetchMode;
 import com.graphhopper.util.PointList;
 import java.util.Collections;
 import java.util.List;
@@ -31,10 +37,9 @@ import nu.ndw.nls.routingmapmatcher.domain.model.singlepoint.SinglePointMatch;
 import nu.ndw.nls.routingmapmatcher.domain.model.singlepoint.SinglePointMatch.CandidateMatch;
 import nu.ndw.nls.routingmapmatcher.domain.model.singlepoint.SinglePointMatchWithIsochrone;
 import nu.ndw.nls.routingmapmatcher.domain.model.singlepoint.SinglePointMatchWithIsochrone.CandidateMatchWithIsochrone;
-import nu.ndw.nls.routingmapmatcher.graphhopper.LinkFlagEncoder;
 import nu.ndw.nls.routingmapmatcher.graphhopper.NetworkGraphHopper;
-import nu.ndw.nls.routingmapmatcher.graphhopper.isochrone.IsochroneFactory;
 import nu.ndw.nls.routingmapmatcher.graphhopper.isochrone.IsochroneService;
+import nu.ndw.nls.routingmapmatcher.graphhopper.isochrone.ShortestPathTreeFactory;
 import nu.ndw.nls.routingmapmatcher.graphhopper.isochrone.mappers.IsochroneMatchMapper;
 import nu.ndw.nls.routingmapmatcher.graphhopper.model.EdgeIteratorTravelDirection;
 import nu.ndw.nls.routingmapmatcher.graphhopper.model.MatchedPoint;
@@ -55,7 +60,7 @@ import org.locationtech.jts.util.GeometricShapeFactory;
 public class GraphHopperSinglePointMapMatcher implements SinglePointMapMatcher {
 
     private static final int RADIUS_TO_DIAMETER = 2;
-    private static final int ALL_NODES = 3;
+
     private static final boolean INCLUDE_ELEVATION = false;
     private static final int NUM_POINTS = 100;
     private static final int MIN_RELIABILITY_SCORE = 0;
@@ -66,11 +71,10 @@ public class GraphHopperSinglePointMapMatcher implements SinglePointMapMatcher {
     private static final GeometryFactory RD_NEW_GEOMETRY_FACTORY = new GeometryFactory(new PrecisionModel(),
             GlobalConstants.RD_NEW_SRID);
 
-    private final LinkFlagEncoder flagEncoder;
     private final LocationIndexTree locationIndexTree;
     private final EdgeFilter edgeFilter;
 
-    private final QueryGraph queryGraph;
+
     private final IsochroneService isochroneService;
     private final BearingCalculator bearingCalculator;
     private final PointMatchingService pointMatchingService;
@@ -79,28 +83,28 @@ public class GraphHopperSinglePointMapMatcher implements SinglePointMapMatcher {
     private final EdgeIteratorStateReverseExtractor edgeIteratorStateReverseExtractor;
     private final NetworkGraphHopper network;
 
+    private final BaseGraph baseGraph;
+
     public GraphHopperSinglePointMapMatcher(NetworkGraphHopper network) {
         Preconditions.checkNotNull(network);
-        List<FlagEncoder> flagEncoders = network.getEncodingManager().fetchEdgeEncoders();
-        Preconditions.checkArgument(flagEncoders.size() == 1);
-        Preconditions.checkArgument(flagEncoders.get(0) instanceof LinkFlagEncoder);
         this.network = network;
-
-        this.flagEncoder = (LinkFlagEncoder) flagEncoders.get(0);
         this.locationIndexTree = (LocationIndexTree) network.getLocationIndex();
         this.edgeFilter = EdgeFilter.ALL_EDGES;
-        this.queryGraph = new QueryGraph(network.getGraphHopperStorage());
-        Weighting weighting = new ShortestWeighting(flagEncoder);
+        baseGraph = network.getBaseGraph();
+        EncodingManager encodingManager = network.getEncodingManager();
+        BooleanEncodedValue accessEnc = encodingManager.getBooleanEncodedValue(VehicleAccess.key("car"));
+        DecimalEncodedValue speedEnc = encodingManager.getDecimalEncodedValue(VehicleSpeed.key("car"));
+        Weighting weighting = new ShortestWeighting(accessEnc, speedEnc);
         GeodeticCalculator geodeticCalculator = new GeodeticCalculator();
         FractionAndDistanceCalculator fractionAndDistanceCalculator = new FractionAndDistanceCalculator(
                 geodeticCalculator);
         this.edgeIteratorStateReverseExtractor = new EdgeIteratorStateReverseExtractor();
-        this.isochroneService = new IsochroneService(flagEncoder,
+        this.isochroneService = new IsochroneService(encodingManager, baseGraph,
                 edgeIteratorStateReverseExtractor,
-                new IsochroneMatchMapper(new CrsTransformer(), flagEncoder,
+                new IsochroneMatchMapper(new CrsTransformer(), encodingManager,
                         fractionAndDistanceCalculator,
                         edgeIteratorStateReverseExtractor),
-                new IsochroneFactory(weighting)
+                new ShortestPathTreeFactory(weighting)
         );
         this.bearingCalculator = new BearingCalculator(geodeticCalculator);
         this.pointMatchingService = new PointMatchingService(WGS84_GEOMETRY_FACTORY,
@@ -108,6 +112,7 @@ public class GraphHopperSinglePointMapMatcher implements SinglePointMapMatcher {
                 fractionAndDistanceCalculator);
         this.crsTransformer = new CrsTransformer();
     }
+
     /*  Todo: this should be integrated into the existing match method.
          For now only the first match is returned with shortest distance.
      *  Proposal: introduce two smart enums. Filter and Sort in the SinglePointLocation
@@ -118,7 +123,7 @@ public class GraphHopperSinglePointMapMatcher implements SinglePointMapMatcher {
         Preconditions.checkNotNull(singlePointLocation);
         Point inputPoint = singlePointLocation.getPoint();
         double inputRadius = singlePointLocation.getCutoffDistance();
-        List<QueryResult> queryResults = findCandidates(inputPoint, inputRadius);
+        List<Snap> queryResults = findCandidates(inputPoint, inputRadius);
         Polygon circle = createCircle(inputPoint, RADIUS_TO_DIAMETER * inputRadius);
         List<MatchedPoint> matches = queryResults.stream()
                 .filter(qr -> intersects(circle, qr))
@@ -132,13 +137,13 @@ public class GraphHopperSinglePointMapMatcher implements SinglePointMapMatcher {
         MatchedPoint closestMatchedPoint = matches.get(0);
         List<IsochroneMatch> upstream =
                 singlePointLocation.getUpstreamIsochroneUnit() == null ? Collections.emptyList() : isochroneService
-                        .getUpstreamIsochroneMatches(closestMatchedPoint,
-                                new QueryGraph(network.getGraphHopperStorage()), singlePointLocation,
+                        .getUpstreamIsochroneMatches(closestMatchedPoint
+                                , singlePointLocation,
                                 locationIndexTree);
         List<IsochroneMatch> downstream =
                 singlePointLocation.getDownstreamIsochroneUnit() == null ? Collections.emptyList() : isochroneService
                         .getDownstreamIsochroneMatches(closestMatchedPoint,
-                                new QueryGraph(network.getGraphHopperStorage()), singlePointLocation,
+                                singlePointLocation,
                                 locationIndexTree);
         CandidateMatchWithIsochrone candidateMatchWithIsochrone = CandidateMatchWithIsochrone
                 .builder()
@@ -164,18 +169,20 @@ public class GraphHopperSinglePointMapMatcher implements SinglePointMapMatcher {
         Preconditions.checkNotNull(singlePointLocation);
         Point inputPoint = singlePointLocation.getPoint();
         double inputRadius = singlePointLocation.getCutoffDistance();
-        List<QueryResult> queryResults = findCandidates(inputPoint, inputRadius);
-
+        List<Snap> queryResults = findCandidates(inputPoint, inputRadius);
+        QueryGraph queryGraph;
         if (singlePointLocation.getUpstreamIsochroneUnit() != null ||
                 singlePointLocation.getDownstreamIsochroneUnit() != null) {
-            queryGraph.lookup(queryResults);
+            queryGraph = QueryGraph.create(baseGraph, queryResults);
+        } else {
+            queryGraph = QueryGraph.create(baseGraph, Collections.emptyList());
         }
 
         Polygon circle = createCircle(inputPoint, RADIUS_TO_DIAMETER * inputRadius);
         // Crop geometry to only include segments in search radius
         List<CandidateMatch> candidateMatches = queryResults.stream()
                 .filter(qr -> intersects(circle, qr))
-                .flatMap(qr -> createMatch(qr, circle, singlePointLocation))
+                .flatMap(qr -> createMatch(queryGraph, qr, circle, singlePointLocation))
                 .sorted(comparingDouble(CandidateMatch::getReliability).reversed())
                 .toList();
         if (candidateMatches.isEmpty()) {
@@ -189,8 +196,8 @@ public class GraphHopperSinglePointMapMatcher implements SinglePointMapMatcher {
                 .build();
     }
 
-    private boolean intersects(Polygon circle, QueryResult queryResult) {
-        PointList pl = queryResult.getClosestEdge().fetchWayGeometry(ALL_NODES);
+    private boolean intersects(Polygon circle, Snap queryResult) {
+        PointList pl = queryResult.getClosestEdge().fetchWayGeometry(FetchMode.ALL);
         return circle.intersects(pl.toLineString(INCLUDE_ELEVATION));
     }
 
@@ -205,11 +212,11 @@ public class GraphHopperSinglePointMapMatcher implements SinglePointMapMatcher {
         return (Polygon) crsTransformer.transformFromRdNewToWgs84(ellipseRd);
     }
 
-    private List<QueryResult> findCandidates(Point point, double radius) {
-        return getQueryResults(point, radius, locationIndexTree, edgeFilter);
+    private List<Snap> findCandidates(Point point, double radius) {
+        return getQueryResults(network, point, radius, locationIndexTree, edgeFilter);
     }
 
-    private Stream<CandidateMatch> createMatch(QueryResult queryResult, Polygon circle,
+    private Stream<CandidateMatch> createMatch(QueryGraph queryGraph, Snap queryResult, Polygon circle,
             SinglePointLocation singlePointLocation) {
         int nodeId = queryResult.getClosestNode();
         Set<Integer> upstreamLinkIds = singlePointLocation.getUpstreamIsochroneUnit() != null ?
@@ -231,10 +238,10 @@ public class GraphHopperSinglePointMapMatcher implements SinglePointMapMatcher {
                         .build());
     }
 
-    private List<MatchedPoint> calculateMatches(QueryResult queryResult, Polygon circle,
+    private List<MatchedPoint> calculateMatches(Snap queryResult, Polygon circle,
             SinglePointLocation singlePointLocation) {
         LineString wayGeometry = queryResult.getClosestEdge()
-                .fetchWayGeometry(ALL_NODES)
+                .fetchWayGeometry(FetchMode.ALL)
                 .toLineString(false);
         /*
            The geometry direction of the edge iterator wayGeometry does not necessarily reflect the direction of a
@@ -246,9 +253,9 @@ public class GraphHopperSinglePointMapMatcher implements SinglePointMapMatcher {
                 edgeIteratorStateReverseExtractor.hasReversed(queryResult.getClosestEdge()) ? wayGeometry.reverse()
                         : wayGeometry;
         Geometry cutoffGeometry = circle.intersection(originalGeometry);
-        EdgeIteratorTravelDirection travelDirection = determineEdgeDirection(queryResult, flagEncoder);
-        IntsRef flags = queryResult.getClosestEdge().getFlags();
-        int matchedLinkId = flagEncoder.getId(flags);
+        EdgeIteratorTravelDirection travelDirection = determineEdgeDirection(queryResult, network.getEncodingManager());
+        int matchedLinkId = queryResult.getClosestEdge().get(network.getEncodingManager()
+                .getIntEncodedValue(ID_NAME));
         var matchedQueryResult = MatchedQueryResult.builder()
                 .matchedLinkId(matchedLinkId)
                 .inputPoint(singlePointLocation.getPoint())

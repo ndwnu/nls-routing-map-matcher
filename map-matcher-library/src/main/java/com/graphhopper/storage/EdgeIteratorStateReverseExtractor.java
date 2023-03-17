@@ -1,7 +1,7 @@
 package com.graphhopper.storage;
 
-import com.graphhopper.routing.VirtualEdgeIteratorState;
-import com.graphhopper.storage.BaseGraph.EdgeIterable;
+import com.graphhopper.routing.querygraph.VirtualEdgeIteratorState;
+import com.graphhopper.storage.BaseGraph.EdgeIteratorStateImpl;
 import com.graphhopper.util.EdgeIteratorState;
 import java.lang.reflect.Field;
 import lombok.SneakyThrows;
@@ -21,10 +21,10 @@ import lombok.SneakyThrows;
 public final class EdgeIteratorStateReverseExtractor {
 
     @SneakyThrows
-    public  boolean hasReversed( EdgeIteratorState closestEdge) {
+    public boolean hasReversed(EdgeIteratorState closestEdge) {
         if (closestEdge instanceof VirtualEdgeIteratorState virtualEdgeIteratorState) {
-            return extractReversedFromVirtualEdge( virtualEdgeIteratorState);
-        } else if (closestEdge instanceof EdgeIterable edgeIterable) {
+            return extractReversedFromVirtualEdge(virtualEdgeIteratorState);
+        } else if (closestEdge instanceof EdgeIteratorStateImpl edgeIterable) {
             return edgeIterable.reverse;
         } else {
             throw new IllegalArgumentException(

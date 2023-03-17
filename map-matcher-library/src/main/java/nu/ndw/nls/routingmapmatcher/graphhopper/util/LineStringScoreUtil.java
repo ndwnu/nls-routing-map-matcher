@@ -66,8 +66,8 @@ public class LineStringScoreUtil {
         CoordinateSequence geometryCoordinates = geometry.getCoordinateSequence();
         double maximumDistanceInMeters = 0.0;
         for (int index = 0; index < pathPointList.size(); index++) {
-            double latitude = pathPointList.getLatitude(index);
-            double longitude = pathPointList.getLongitude(index);
+            double latitude = pathPointList.getLat(index);
+            double longitude = pathPointList.getLon(index);
             double smallestDistanceToLtcLink = calculateSmallestDistanceToCoordinateSequence(latitude, longitude,
                     geometryCoordinates);
             maximumDistanceInMeters = Math.max(maximumDistanceInMeters, smallestDistanceToLtcLink);
@@ -85,9 +85,9 @@ public class LineStringScoreUtil {
             CoordinateSequence coordinateSequence) {
         double smallestDistanceToLtcLink = Double.MAX_VALUE;
         for (int index = 1; index < coordinateSequence.size(); index++) {
-            double normalizedDistance = distanceCalc.calcNormalizedEdgeDistanceNew(latitude, longitude,
+            double normalizedDistance = distanceCalc.calcNormalizedEdgeDistance(latitude, longitude,
                     coordinateSequence.getY(index - 1), coordinateSequence.getX(index - 1),
-                    coordinateSequence.getY(index), coordinateSequence.getX(index), REDUCE_TO_SEGMENT);
+                    coordinateSequence.getY(index), coordinateSequence.getX(index));
             double distanceInMeters = distanceCalc.calcDenormalizedDist(normalizedDistance);
             smallestDistanceToLtcLink = Math.min(smallestDistanceToLtcLink, distanceInMeters);
         }
@@ -97,9 +97,10 @@ public class LineStringScoreUtil {
     private double calculateSmallestDistanceToPointList(double latitude, double longitude, PointList pointList) {
         double smallestDistanceToLtcLink = Double.MAX_VALUE;
         for (int index = 1; index < pointList.size(); index++) {
-            double normalizedDistance = distanceCalc.calcNormalizedEdgeDistanceNew(latitude, longitude,
-                    pointList.getLatitude(index - 1), pointList.getLongitude(index - 1),
-                    pointList.getLatitude(index), pointList.getLongitude(index), REDUCE_TO_SEGMENT);
+            /*Todo: investigate impact of REDUCE_TO_SEGMENT removed in this version*/
+            double normalizedDistance = distanceCalc.calcNormalizedEdgeDistance(latitude, longitude,
+                    pointList.getLat(index - 1), pointList.getLon(index - 1),
+                    pointList.getLat(index), pointList.getLon(index));
             double distanceInMeters = distanceCalc.calcDenormalizedDist(normalizedDistance);
             smallestDistanceToLtcLink = Math.min(smallestDistanceToLtcLink, distanceInMeters);
         }
