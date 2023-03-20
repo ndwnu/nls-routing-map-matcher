@@ -104,7 +104,8 @@ public class GraphHopperSinglePointMapMatcher implements SinglePointMapMatcher {
                 new IsochroneMatchMapper(new CrsTransformer(), encodingManager,
                         fractionAndDistanceCalculator,
                         edgeIteratorStateReverseExtractor),
-                new ShortestPathTreeFactory(weighting)
+                new ShortestPathTreeFactory(weighting),
+                this.locationIndexTree
         );
         this.bearingCalculator = new BearingCalculator(geodeticCalculator);
         this.pointMatchingService = new PointMatchingService(WGS84_GEOMETRY_FACTORY,
@@ -138,13 +139,11 @@ public class GraphHopperSinglePointMapMatcher implements SinglePointMapMatcher {
         List<IsochroneMatch> upstream =
                 singlePointLocation.getUpstreamIsochroneUnit() == null ? Collections.emptyList() : isochroneService
                         .getUpstreamIsochroneMatches(closestMatchedPoint
-                                , singlePointLocation,
-                                locationIndexTree);
+                                , singlePointLocation);
         List<IsochroneMatch> downstream =
                 singlePointLocation.getDownstreamIsochroneUnit() == null ? Collections.emptyList() : isochroneService
                         .getDownstreamIsochroneMatches(closestMatchedPoint,
-                                singlePointLocation,
-                                locationIndexTree);
+                                singlePointLocation);
         CandidateMatchWithIsochrone candidateMatchWithIsochrone = CandidateMatchWithIsochrone
                 .builder()
                 .matchedLinkId(closestMatchedPoint.getMatchedLinkId())

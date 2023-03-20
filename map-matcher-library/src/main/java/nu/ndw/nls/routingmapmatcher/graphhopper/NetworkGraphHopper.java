@@ -3,6 +3,7 @@ package nu.ndw.nls.routingmapmatcher.graphhopper;
 import com.graphhopper.GraphHopper;
 import com.graphhopper.coll.GHLongIntBTree;
 import com.graphhopper.coll.LongIntMap;
+import com.graphhopper.storage.index.LocationIndexTree;
 import com.graphhopper.util.Helper;
 import java.text.DateFormat;
 import java.util.Date;
@@ -39,6 +40,11 @@ public class NetworkGraphHopper extends GraphHopper implements Network {
         DateFormat f = Helper.createFormatter();
         getProperties().put("datareader.import.date", f.format(new Date()));
         this.writeEncodingManagerToProperties();
+    }
+
+    @Override
+    public LocationIndexTree getLocationIndex() {
+        return (LocationIndexTree) super.getLocationIndex();
     }
 
 

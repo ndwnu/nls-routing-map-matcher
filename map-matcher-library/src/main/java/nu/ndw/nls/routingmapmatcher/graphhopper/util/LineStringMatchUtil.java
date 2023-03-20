@@ -21,6 +21,7 @@ import nu.ndw.nls.routingmapmatcher.domain.exception.RoutingMapMatcherException;
 import nu.ndw.nls.routingmapmatcher.domain.model.MatchStatus;
 import nu.ndw.nls.routingmapmatcher.domain.model.linestring.LineStringLocation;
 import nu.ndw.nls.routingmapmatcher.domain.model.linestring.LineStringMatch;
+import nu.ndw.nls.routingmapmatcher.graphhopper.NetworkGraphHopper;
 import nu.ndw.nls.routingmapmatcher.graphhopper.isochrone.ShortestPathTreeFactory;
 import nu.ndw.nls.routingmapmatcher.graphhopper.isochrone.IsochroneService;
 import org.locationtech.jts.geom.GeometryFactory;
@@ -44,6 +45,10 @@ public class LineStringMatchUtil {
         Weighting weighting = new ShortestWeighting(accessEnc, speedEnc);
         this.isochroneService = new IsochroneService(encodingManager, baseGraph, new EdgeIteratorStateReverseExtractor(),
                 null,new ShortestPathTreeFactory(weighting), locationIndexTree);
+    }
+
+    public LineStringMatchUtil(NetworkGraphHopper networkGraphHopper) {
+        this(networkGraphHopper.getLocationIndex(), networkGraphHopper.getBaseGraph(), networkGraphHopper.getEncodingManager());
     }
 
     public LineStringMatch createMatch(LineStringLocation lineStringLocation, Path path, QueryGraph queryGraph,

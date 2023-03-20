@@ -56,13 +56,12 @@ public class GraphHopperStartToEndMapMatcher implements StartToEndMapMatcher {
 
     public GraphHopperStartToEndMapMatcher(NetworkGraphHopper networkGraphHopper) {
         Preconditions.checkNotNull(networkGraphHopper);
-        EncodingManager encodingManager = networkGraphHopper.getEncodingManager();
 
         this.routingGraph = networkGraphHopper.getBaseGraph();
 
         this.algorithmOptions = new AlgorithmOptions().setAlgorithm(DIJKSTRA_BI);
         this.algorithmFactory = new RoutingAlgorithmFactorySimple();
-        this.locationIndexTree = (LocationIndexTree) networkGraphHopper.getLocationIndex();
+        this.locationIndexTree = networkGraphHopper.getLocationIndex();
         this.edgeFilter = EdgeFilter.ALL_EDGES;
         this.encodingManager = networkGraphHopper.getEncodingManager();
         this.networkGraphHopper = networkGraphHopper;
@@ -73,9 +72,8 @@ public class GraphHopperStartToEndMapMatcher implements StartToEndMapMatcher {
     public LineStringMatch match(LineStringLocation lineStringLocation) {
         Preconditions.checkNotNull(lineStringLocation);
 
-        List<Snap> startCandidates = findCandidates(networkGraphHopper,
-                lineStringLocation.getGeometry().getStartPoint());
-        List<Snap> endCandidates = findCandidates(networkGraphHopper, lineStringLocation.getGeometry().getEndPoint());
+        List<Snap> startCandidates = findCandidates(lineStringLocation.getGeometry().getStartPoint());
+        List<Snap> endCandidates = findCandidates(lineStringLocation.getGeometry().getEndPoint());
 
         QueryGraph queryGraph = createQueryGraphAndAssignClosestNodePerCandidate(startCandidates, endCandidates);
         startCandidates = deduplicateCandidatesByClosestNode(startCandidates);
@@ -91,8 +89,9 @@ public class GraphHopperStartToEndMapMatcher implements StartToEndMapMatcher {
                 .orElseGet(() -> lineStringMatchUtil.createFailedMatch(lineStringLocation, MatchStatus.NO_MATCH));
     }
 
-    private List<Snap> findCandidates(NetworkGraphHopper network, Point point) {
-        return getQueryResults(network, point, MAXIMUM_CANDIDATE_DISTANCE_IN_METERS, locationIndexTree, edgeFilter);
+    private List<Snap> findCandidates(Point point) {
+        return getQueryResults(networkGraphHopper, point, MAXIMUM_CANDIDATE_DISTANCE_IN_METERS, locationIndexTree,
+                edgeFilter);
     }
 
     private QueryGraph createQueryGraphAndAssignClosestNodePerCandidate(List<Snap> startCandidates,
