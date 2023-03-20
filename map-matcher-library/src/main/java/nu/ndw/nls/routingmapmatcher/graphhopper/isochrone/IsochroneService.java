@@ -39,6 +39,7 @@ public class IsochroneService {
     private final EdgeIteratorStateReverseExtractor edgeIteratorStateReverseExtractor;
     private final IsochroneMatchMapper isochroneMatchMapper;
     private final ShortestPathTreeFactory shortestPathTreeFactory;
+    private final LocationIndexTree locationIndexTree;
 
     /**
      * Performs an up-stream isochrone search and returns a list of isochrone matches containing exact cropped
@@ -106,7 +107,7 @@ public class IsochroneService {
         isochrone.search(startSegment.getClosestNode(), isoLabels::add);
         boolean searchDirectionReversed = matchedPoint.isReversed() != reverseFlow;
         return isoLabels.stream()
-                .filter(l-> l.edge!=ROOT_PARENT)
+                .filter(isoLabel-> isoLabel.edge!=ROOT_PARENT)
                 /*
                     With bidirectional start segments the search goes two ways for both down and upstream isochrones.
                     The  branches that are starting in the wrong direction of travelling
