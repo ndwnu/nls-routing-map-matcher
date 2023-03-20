@@ -25,7 +25,7 @@ steps:
   - task: MavenAuthenticate@0
     displayName: 'Maven Authenticate'
     inputs:
-      artifactsFeeds: CBM
+      artifactsFeeds: NLS
 
   - task: Maven@3
     displayName: Maven build
