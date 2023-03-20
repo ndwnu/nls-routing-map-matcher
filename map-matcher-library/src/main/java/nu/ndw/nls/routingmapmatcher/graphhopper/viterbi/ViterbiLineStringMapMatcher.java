@@ -88,11 +88,10 @@ public class ViterbiLineStringMapMatcher implements LineStringMapMatcher {
         this.distanceCalc = new CustomDistanceCalc();
         //mapMatching.setDistanceCalc(distanceCalc);
         // mapMatching.setMeasurementErrorSigma
-        this.locationIndexTree = (LocationIndexTree) networkGraphHopper.getLocationIndex();
+        this.locationIndexTree = networkGraphHopper.getLocationIndex();
         this.edgeFilter = EdgeFilter.ALL_EDGES;
         this.queryGraphExtractor = new QueryGraphExtractor();
-        this.lineStringMatchUtil = new LineStringMatchUtil(networkGraphHopper.getBaseGraph(),
-                networkGraphHopper.getEncodingManager());
+        this.lineStringMatchUtil = new LineStringMatchUtil(networkGraphHopper);
         this.lineStringScoreUtil = new LineStringScoreUtil();
     }
 

@@ -88,7 +88,7 @@ public class GraphHopperSinglePointMapMatcher implements SinglePointMapMatcher {
     public GraphHopperSinglePointMapMatcher(NetworkGraphHopper network) {
         Preconditions.checkNotNull(network);
         this.network = network;
-        this.locationIndexTree = (LocationIndexTree) network.getLocationIndex();
+        this.locationIndexTree = network.getLocationIndex();
         this.edgeFilter = EdgeFilter.ALL_EDGES;
         baseGraph = network.getBaseGraph();
         EncodingManager encodingManager = network.getEncodingManager();
