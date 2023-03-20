@@ -45,17 +45,14 @@ public class IsochroneService {
      * geometries with start and end fractions.
      *
      * @param matchedPoint      The nearest point found by the nearest match from which to start the isochrone search
-     * @param queryGraph        The query graph to use in the isochrone search
      * @param location          Base location containing isochrone specifications
-     * @param locationIndexTree The spatial index to retrieve the start segment from
      * @return A list of isochrone matches with the geometries cropped to the max distance. The geometry is aligned in
      * the direction of travelling. Start and en fraction are with respect to this alignment (positive negative)
      */
     public List<IsochroneMatch> getUpstreamIsochroneMatches(MatchedPoint matchedPoint,
-            BaseLocation location,
-            LocationIndexTree locationIndexTree) {
+            BaseLocation location) {
         return getIsochroneMatches(matchedPoint, location.getUpstreamIsochrone(),
-                location.getUpstreamIsochroneUnit(), locationIndexTree, true);
+                location.getUpstreamIsochroneUnit(), true);
     }
 
     /**
@@ -63,17 +60,14 @@ public class IsochroneService {
      * geometries with start and end fractions.
      *
      * @param matchedPoint      The nearest point found by the nearest match from which to start the isochrone search
-     * @param queryGraph        The query graph to use in the isochrone search
      * @param location          Base location containing isochrone specifications
-     * @param locationIndexTree The spatial index to retrieve the start segment from
      * @return A list of isochrone matches with the geometries cropped to the max distance. The geometry is aligned in
      * the direction of travelling. Start and en fraction are with respect to this alignment (positive negative)
      */
     public List<IsochroneMatch> getDownstreamIsochroneMatches(MatchedPoint matchedPoint,
-            BaseLocation location,
-            LocationIndexTree locationIndexTree) {
+            BaseLocation location) {
         return getIsochroneMatches(matchedPoint, location.getDownstreamIsochrone(),
-                location.getDownstreamIsochroneUnit(), locationIndexTree, false);
+                location.getDownstreamIsochroneUnit(), false);
     }
 
     public Set<Integer> getUpstreamLinkIds(QueryGraph queryGraph, BaseLocation location, int nodeId) {
@@ -89,7 +83,7 @@ public class IsochroneService {
     private List<IsochroneMatch> getIsochroneMatches(MatchedPoint matchedPoint,
             double isochroneValue,
             IsochroneUnit isochroneUnit,
-            LocationIndexTree locationIndexTree,
+
             boolean reverseFlow) {
         double latitude = matchedPoint.getSnappedPoint().getY();
         double longitude = matchedPoint.getSnappedPoint().getX();

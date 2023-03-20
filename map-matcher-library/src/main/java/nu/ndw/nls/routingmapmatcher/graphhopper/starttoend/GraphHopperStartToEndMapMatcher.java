@@ -66,7 +66,7 @@ public class GraphHopperStartToEndMapMatcher implements StartToEndMapMatcher {
         this.edgeFilter = EdgeFilter.ALL_EDGES;
         this.encodingManager = networkGraphHopper.getEncodingManager();
         this.networkGraphHopper = networkGraphHopper;
-        this.lineStringMatchUtil = new LineStringMatchUtil(routingGraph, encodingManager);
+        this.lineStringMatchUtil = new LineStringMatchUtil(networkGraphHopper);
         this.lineStringScoreUtil = new LineStringScoreUtil();
     }
 

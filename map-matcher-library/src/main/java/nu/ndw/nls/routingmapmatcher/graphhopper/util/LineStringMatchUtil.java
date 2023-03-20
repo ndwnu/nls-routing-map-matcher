@@ -12,6 +12,7 @@ import com.graphhopper.routing.weighting.ShortestWeighting;
 import com.graphhopper.routing.weighting.Weighting;
 import com.graphhopper.storage.BaseGraph;
 import com.graphhopper.storage.EdgeIteratorStateReverseExtractor;
+import com.graphhopper.storage.index.LocationIndexTree;
 import com.graphhopper.util.EdgeIteratorState;
 import java.util.List;
 import java.util.Set;
@@ -34,15 +35,15 @@ public class LineStringMatchUtil {
 
 
 
-    public LineStringMatchUtil(BaseGraph baseGraph,EncodingManager encodingManager) {
+    private LineStringMatchUtil(LocationIndexTree locationIndexTree, BaseGraph baseGraph, EncodingManager encodingManager) {
         GeometryFactory geometryFactory = new GeometryFactory(new PrecisionModel(), GlobalConstants.WGS84_SRID);
         this.pathUtil = new PathUtil(geometryFactory);
         this.encodingManager = encodingManager;
         BooleanEncodedValue accessEnc = encodingManager.getBooleanEncodedValue(VehicleAccess.key("car"));
         DecimalEncodedValue speedEnc = encodingManager.getDecimalEncodedValue(VehicleSpeed.key("car"));
         Weighting weighting = new ShortestWeighting(accessEnc, speedEnc);
-        this.isochroneService = new IsochroneService(encodingManager,baseGraph,new EdgeIteratorStateReverseExtractor(),
-                null,new ShortestPathTreeFactory(weighting));
+        this.isochroneService = new IsochroneService(encodingManager, baseGraph, new EdgeIteratorStateReverseExtractor(),
+                null,new ShortestPathTreeFactory(weighting), locationIndexTree);
     }
 
     public LineStringMatch createMatch(LineStringLocation lineStringLocation, Path path, QueryGraph queryGraph,
