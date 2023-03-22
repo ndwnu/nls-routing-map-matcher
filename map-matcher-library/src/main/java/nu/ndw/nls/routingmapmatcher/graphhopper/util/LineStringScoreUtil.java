@@ -1,7 +1,7 @@
 package nu.ndw.nls.routingmapmatcher.graphhopper.util;
 
 import com.graphhopper.routing.Path;
-import com.graphhopper.util.DistancePlaneProjection;
+import com.graphhopper.util.DistanceCalcNew;
 import com.graphhopper.util.PointList;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -19,7 +19,7 @@ public class LineStringScoreUtil {
     private static final double DISTANCE_PENALTY_FACTOR = 1.5;
     private static final double PATH_LENGTH_DIFFERENCE_PENALTY_FACTOR = 0.1;
 
-    private final DistancePlaneProjection distanceCalc = new DistancePlaneProjection();
+    private final DistanceCalcNew distanceCalc = new DistanceCalcNew();
 
     public double calculateCandidatePathScore(Path path, LineStringLocation lineStringLocation) {
         if (ReliabilityCalculationType.POINT_OBSERVATIONS == lineStringLocation.getReliabilityCalculationType()) {
@@ -85,9 +85,9 @@ public class LineStringScoreUtil {
             CoordinateSequence coordinateSequence) {
         double smallestDistanceToLtcLink = Double.MAX_VALUE;
         for (int index = 1; index < coordinateSequence.size(); index++) {
-            double normalizedDistance = distanceCalc.calcNormalizedEdgeDistance(latitude, longitude,
+            double normalizedDistance = distanceCalc.calcNormalizedEdgeDistanceNew(latitude, longitude,
                     coordinateSequence.getY(index - 1), coordinateSequence.getX(index - 1),
-                    coordinateSequence.getY(index), coordinateSequence.getX(index));
+                    coordinateSequence.getY(index), coordinateSequence.getX(index), REDUCE_TO_SEGMENT);
             double distanceInMeters = distanceCalc.calcDenormalizedDist(normalizedDistance);
             smallestDistanceToLtcLink = Math.min(smallestDistanceToLtcLink, distanceInMeters);
         }
@@ -98,9 +98,9 @@ public class LineStringScoreUtil {
         double smallestDistanceToLtcLink = Double.MAX_VALUE;
         for (int index = 1; index < pointList.size(); index++) {
             /*Todo: investigate impact of REDUCE_TO_SEGMENT removed in this version*/
-            double normalizedDistance = distanceCalc.calcNormalizedEdgeDistance(latitude, longitude,
+            double normalizedDistance = distanceCalc.calcNormalizedEdgeDistanceNew(latitude, longitude,
                     pointList.getLat(index - 1), pointList.getLon(index - 1),
-                    pointList.getLat(index), pointList.getLon(index));
+                    pointList.getLat(index), pointList.getLon(index), REDUCE_TO_SEGMENT);
             double distanceInMeters = distanceCalc.calcDenormalizedDist(normalizedDistance);
             smallestDistanceToLtcLink = Math.min(smallestDistanceToLtcLink, distanceInMeters);
         }

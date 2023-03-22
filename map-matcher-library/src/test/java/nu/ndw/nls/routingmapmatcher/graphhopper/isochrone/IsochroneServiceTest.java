@@ -66,7 +66,7 @@ class IsochroneServiceTest {
     @Mock
     private IsochroneMatchMapper isochroneMatchMapper;
     @Mock
-    private ShortestPathTreeFactory isochroneFactory;
+    private ShortestPathTreeFactory shortestPathTreeFactory;
     @Mock
     private QueryGraph queryGraph;
     @Mock
@@ -91,8 +91,6 @@ class IsochroneServiceTest {
     private BooleanEncodedValue booleanEncodedValue;
     @Captor
     private ArgumentCaptor<Double> maxDistanceArgumentCaptor;
-    @Captor
-    private ArgumentCaptor<Consumer<IsoLabel>> isoLabelConsumer;
 
     @Mock
     private IntEncodedValue intEncodedValue;
@@ -118,9 +116,7 @@ class IsochroneServiceTest {
                 startSegment))
                 .thenReturn(IsochroneMatch.builder().build());
         wrapWithStaticMock(() -> isochroneService.getUpstreamIsochroneMatches(matchedPoint, location));
-
-        //verify(queryGraph).lookup(List.of(startSegment));
-        verify(isochroneFactory).createShortestPathtree(queryGraph, ISOCHRONE_VALUE_METERS,
+        verify(shortestPathTreeFactory).createShortestPathtree(queryGraph, ISOCHRONE_VALUE_METERS,
                 IsochroneUnit.METERS, true);
 
 
@@ -137,9 +133,7 @@ class IsochroneServiceTest {
         setupFixtureForFilter(isoLabel);
         when(location.getUpstreamIsochrone()).thenReturn(ISOCHRONE_VALUE_METERS);
         when(location.getUpstreamIsochroneUnit()).thenReturn(IsochroneUnit.METERS);
-        //QueryGraph.
         wrapWithStaticMock(() -> isochroneService.getUpstreamIsochroneMatches(matchedPoint, location));
-        //verify(queryGraph).lookup(List.of(startSegment));
         verifyNoMoreInteractions(isochroneMatchMapper);
     }
 
@@ -164,11 +158,10 @@ class IsochroneServiceTest {
         when(encodingManager.getDecimalEncodedValue(VehicleSpeed.key("car"))).thenReturn(decimalEncodedValue);
         when(currentEdge.get(decimalEncodedValue)).thenReturn(SPEED);
         wrapWithStaticMock(() -> isochroneService.getUpstreamIsochroneMatches(matchedPoint, location));
-        //verify(queryGraph).lookup(List.of(startSegment));
         verify(isochroneMatchMapper).mapToIsochroneMatch(eq(endLabel),
                 maxDistanceArgumentCaptor.capture(), eq(queryGraph),
                 eq(startSegment));
-        verify(isochroneFactory).createShortestPathtree(queryGraph, ISOCHRONE_VALUE_SECONDS,
+        verify(shortestPathTreeFactory).createShortestPathtree(queryGraph, ISOCHRONE_VALUE_SECONDS,
                 IsochroneUnit.SECONDS, true);
         Double maxDistance = maxDistanceArgumentCaptor.getValue();
         // The max distance based on 8 seconds will be around 200 - ((10.8-8) * 27.77 meters/second) ~ 122.2 meters
@@ -200,14 +193,14 @@ class IsochroneServiceTest {
                 startSegment)).thenReturn(
                 IsochroneMatch.builder().build());
         wrapWithStaticMock(() -> isochroneService.getDownstreamIsochroneMatches(matchedPoint, location));
-        verify(isochroneFactory).createShortestPathtree(queryGraph, ISOCHRONE_VALUE_METERS,
+        verify(shortestPathTreeFactory).createShortestPathtree(queryGraph, ISOCHRONE_VALUE_METERS,
                 IsochroneUnit.METERS, false);
 
     }
 
     @Test
     void getUpstreamLinkIds_ok() {
-        when(isochroneFactory.createShortestPathtree(queryGraph, ISOCHRONE_VALUE_METERS,
+        when(shortestPathTreeFactory.createShortestPathtree(queryGraph, ISOCHRONE_VALUE_METERS,
                 IsochroneUnit.METERS, true))
                 .thenReturn(shortestPathTree);
         when(location.getUpstreamIsochrone()).thenReturn(ISOCHRONE_VALUE_METERS);
@@ -217,7 +210,7 @@ class IsochroneServiceTest {
             Consumer<IsoLabel> callback = ans.getArgument(1, Consumer.class);
             callback.accept(isoLabel);
             return null;
-        }).when(shortestPathTree).search(eq(START_NODE_ID), isoLabelConsumer.capture());
+        }).when(shortestPathTree).search(eq(START_NODE_ID), any());
         when(queryGraph.getEdgeIteratorState(anyInt(), anyInt())).thenReturn(currentEdge);
         when(encodingManager.getIntEncodedValue(ID_NAME)).thenReturn(intEncodedValue);
         when(currentEdge.get(intEncodedValue)).thenReturn(START_NODE_ID);
@@ -228,7 +221,7 @@ class IsochroneServiceTest {
 
     @Test
     void getDownstreamLinkIds_ok() {
-        when(isochroneFactory.createShortestPathtree(queryGraph, ISOCHRONE_VALUE_METERS,
+        when(shortestPathTreeFactory.createShortestPathtree(queryGraph, ISOCHRONE_VALUE_METERS,
                 IsochroneUnit.METERS, false))
                 .thenReturn(shortestPathTree);
         when(location.getDownstreamIsochrone()).thenReturn(ISOCHRONE_VALUE_METERS);
@@ -238,7 +231,7 @@ class IsochroneServiceTest {
             Consumer<IsoLabel> callback = ans.getArgument(1, Consumer.class);
             callback.accept(isoLabel);
             return null;
-        }).when(shortestPathTree).search(eq(START_NODE_ID), isoLabelConsumer.capture());
+        }).when(shortestPathTree).search(eq(START_NODE_ID), any());
         when(queryGraph.getEdgeIteratorState(anyInt(), anyInt())).thenReturn(currentEdge);
         when(encodingManager.getIntEncodedValue(ID_NAME)).thenReturn(intEncodedValue);
         when(currentEdge.get(intEncodedValue)).thenReturn(START_NODE_ID);
@@ -258,12 +251,11 @@ class IsochroneServiceTest {
 
 
     private void setupFixture(IsoLabel isoLabel) {
-
         doAnswer(ans -> {
             Consumer<IsoLabel> callback = ans.getArgument(1, Consumer.class);
             callback.accept(isoLabel);
             return null;
-        }).when(shortestPathTree).search(eq(START_NODE_ID), isoLabelConsumer.capture());
+        }).when(shortestPathTree).search(eq(START_NODE_ID), any());
 
         when(point.getY()).thenReturn(Y_COORDINATE);
         when(point.getX()).thenReturn(X_COORDINATE);
@@ -271,9 +263,7 @@ class IsochroneServiceTest {
                 EdgeFilter.ALL_EDGES))
                 .thenReturn(startSegment);
         when(startSegment.getClosestEdge()).thenReturn(startEdge);
-        //  when(encodingManager.getIntEncodedValue(ID_NAME)).thenReturn(intEncodedValue);
-        //when(currentEdge.get(intEncodedValue)).thenReturn(START_NODE_ID);
-        when(isochroneFactory.createShortestPathtree(any(),
+        when(shortestPathTreeFactory.createShortestPathtree(any(),
                 anyDouble(), any(), anyBoolean()))
                 .thenReturn(shortestPathTree);
         when(startSegment.getClosestNode()).thenReturn(START_NODE_ID);

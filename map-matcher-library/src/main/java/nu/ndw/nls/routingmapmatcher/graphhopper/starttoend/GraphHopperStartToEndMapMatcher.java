@@ -14,11 +14,13 @@ import com.graphhopper.routing.ev.VehicleSpeed;
 import com.graphhopper.routing.querygraph.QueryGraph;
 import com.graphhopper.routing.util.EdgeFilter;
 import com.graphhopper.routing.util.EncodingManager;
+import com.graphhopper.routing.util.TraversalMode;
 import com.graphhopper.routing.weighting.ShortestWeighting;
 import com.graphhopper.routing.weighting.Weighting;
 import com.graphhopper.storage.BaseGraph;
 import com.graphhopper.storage.index.LocationIndexTree;
 import com.graphhopper.storage.index.Snap;
+import com.graphhopper.util.PMap;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -59,7 +61,9 @@ public class GraphHopperStartToEndMapMatcher implements StartToEndMapMatcher {
 
         this.routingGraph = networkGraphHopper.getBaseGraph();
 
-        this.algorithmOptions = new AlgorithmOptions().setAlgorithm(DIJKSTRA_BI);
+        this.algorithmOptions = new AlgorithmOptions()
+                .setAlgorithm(DIJKSTRA_BI)
+                .setTraversalMode(TraversalMode.NODE_BASED);
         this.algorithmFactory = new RoutingAlgorithmFactorySimple();
         this.locationIndexTree = networkGraphHopper.getLocationIndex();
         this.edgeFilter = EdgeFilter.ALL_EDGES;
