@@ -10,13 +10,12 @@ import com.graphhopper.routing.ev.EncodedValueLookup;
 import com.graphhopper.routing.ev.VehicleSpeed;
 import com.graphhopper.routing.util.WayAccess;
 import com.graphhopper.routing.util.parsers.AbstractAverageSpeedParser;
-import com.graphhopper.routing.util.parsers.TagParser;
 import com.graphhopper.storage.IntsRef;
 import com.graphhopper.util.PMap;
 import nu.ndw.nls.routingmapmatcher.domain.model.Link;
 
 
-public class LinkCarAverageSpeedParser extends AbstractAverageSpeedParser{
+public class LinkCarAverageSpeedParser extends AbstractAverageSpeedParser {
 
     public static final double CAR_MAX_SPEED = 130;
 

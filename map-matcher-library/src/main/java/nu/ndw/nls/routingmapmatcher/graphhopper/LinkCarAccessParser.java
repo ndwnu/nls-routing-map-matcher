@@ -1,9 +1,9 @@
 package nu.ndw.nls.routingmapmatcher.graphhopper;
 
 
-
 import static nu.ndw.nls.routingmapmatcher.graphhopper.LinkCarVehicleTagParsersFactory.castToLink;
 import static nu.ndw.nls.routingmapmatcher.graphhopper.LinkCarVehicleTagParsersFactory.getAccess;
+
 import com.graphhopper.reader.ReaderWay;
 import com.graphhopper.routing.ev.BooleanEncodedValue;
 import com.graphhopper.routing.ev.EncodedValueLookup;
@@ -11,13 +11,12 @@ import com.graphhopper.routing.ev.VehicleAccess;
 import com.graphhopper.routing.util.TransportationMode;
 import com.graphhopper.routing.util.WayAccess;
 import com.graphhopper.routing.util.parsers.AbstractAccessParser;
-import com.graphhopper.routing.util.parsers.TagParser;
 import com.graphhopper.storage.IntsRef;
 import com.graphhopper.util.PMap;
 import nu.ndw.nls.routingmapmatcher.domain.model.Link;
 
 
-public class LinkCarAccessParser extends AbstractAccessParser{
+public class LinkCarAccessParser extends AbstractAccessParser {
 
     public LinkCarAccessParser(EncodedValueLookup lookup, PMap properties) {
         this(lookup.getBooleanEncodedValue(VehicleAccess.key(properties.getString("name", "car"))),
