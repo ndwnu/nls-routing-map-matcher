@@ -7,8 +7,15 @@ import static org.hamcrest.Matchers.is;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;
+import java.io.File;
+import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import lombok.SneakyThrows;
 import nu.ndw.nls.routingmapmatcher.constants.GlobalConstants;
@@ -21,14 +28,19 @@ import nu.ndw.nls.routingmapmatcher.domain.model.singlepoint.BearingFilter;
 import nu.ndw.nls.routingmapmatcher.domain.model.singlepoint.SinglePointLocation;
 import nu.ndw.nls.routingmapmatcher.domain.model.singlepoint.SinglePointMatchWithIsochrone;
 import nu.ndw.nls.routingmapmatcher.domain.model.singlepoint.SinglePointMatchWithIsochrone.CandidateMatchWithIsochrone;
+import nu.ndw.nls.routingmapmatcher.graphhopper.NetworkGraphHopper;
 import nu.ndw.nls.routingmapmatcher.graphhopper.NetworkGraphHopperFactory;
 import nu.ndw.nls.routingmapmatcher.graphhopper.viterbi.LinkDeserializer;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.junit.jupiter.api.Test;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.Point;
 import org.locationtech.jts.geom.PrecisionModel;
+import org.wololo.geojson.Feature;
+import org.wololo.geojson.GeoJSON;
+import org.wololo.jts2geojson.GeoJSONWriter;
 
 public class SinglePointMapMatcherWithIsochroneIT {
 
@@ -59,6 +71,23 @@ public class SinglePointMapMatcherWithIsochroneIT {
         GraphHopperSinglePointMapMatcherFactory graphHopperSinglePointMapMatcherFactory =
                 new GraphHopperSinglePointMapMatcherFactory(new NetworkGraphHopperFactory());
         singlePointMapMatcher = graphHopperSinglePointMapMatcherFactory.createMapMatcher(routingNetwork);
+        geometryFactory = new GeometryFactory(new PrecisionModel(), GlobalConstants.WGS84_SRID);
+    }
+
+
+
+    @SneakyThrows
+    private void setupNwbNetwork() {
+        RoutingNetwork routingNetwork = RoutingNetwork.builder()
+                .networkNameAndVersion("nwb_2022-07-01")
+                .linkSupplier(() -> Collections.emptyIterator())
+                .build();
+        var factory = new NetworkGraphHopperFactory();
+        NetworkGraphHopper nwbNetwork = factory.createNetwork(routingNetwork, true,
+                Path.of("graphhopper"));
+        GraphHopperSinglePointMapMatcherFactory graphHopperSinglePointMapMatcherFactory =
+                new GraphHopperSinglePointMapMatcherFactory(factory);
+        singlePointMapMatcher = graphHopperSinglePointMapMatcherFactory.createMapMatcher(nwbNetwork);
         geometryFactory = new GeometryFactory(new PrecisionModel(), GlobalConstants.WGS84_SRID);
     }
 
@@ -157,6 +186,44 @@ public class SinglePointMapMatcherWithIsochroneIT {
         assertThat(startPoint.getStartFraction(),is(0.327127525272));
         assertThat(startPoint.getEndFraction(),is(1.0));
         assertThat(startPoint.getDirection(),is(Direction.BACKWARD));
+    }
+
+    @SneakyThrows
+    @Test
+    void test_downStream_bidirectional(){
+        setupNwbNetwork();
+        Point point = geometryFactory.createPoint(new Coordinate(5.4267250, 52.179661));
+        var request = SinglePointLocation
+                .builder()
+                .id(ID)
+                .point(point)
+                .downstreamIsochrone(200)
+                .bearingFilter(new BearingFilter(260,10))
+                .downstreamIsochroneUnit(IsochroneUnit.METERS)
+                .cutoffDistance(CUTOFF_DISTANCE)
+                .build();
+        SinglePointMatchWithIsochrone result = singlePointMapMatcher.matchWithIsochrone(request);
+        assertThat(result.getCandidateMatches(), hasSize(1));
+        CandidateMatchWithIsochrone match = result.getCandidateMatches().get(0);
+
+        List<Feature> featuresJson = new ArrayList<>();
+        match.getDownstream().forEach(m -> {
+            Map<String, Object> properties = new HashMap<>();
+            properties.put("id", m.getMatchedLinkId());
+            properties.put("startFraction", m.getStartFraction());
+            properties.put("endFraction", m.getEndFraction());
+            properties.put("direction", m.getDirection());
+            GeoJSONWriter writer = new GeoJSONWriter();
+            var geometry = writer.write(m.getGeometry());
+            featuresJson.add(new Feature(m.getMatchedLinkId(), geometry, properties));
+
+        });
+        GeoJSONWriter writer = new GeoJSONWriter();
+        GeoJSON json = writer.write(featuresJson);
+        FileUtils.writeStringToFile(new File("/tmp/isochrone.geojson"), json.
+                toString(), Charset.defaultCharset().name());
+
+
     }
 
 }
