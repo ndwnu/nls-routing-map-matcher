@@ -34,8 +34,8 @@
     </properties>
     <repositories>
         <repository>
-            <id>CBM</id>
-            <url>https://pkgs.dev.azure.com/ndwnu/CBM/_packaging/CBM/maven/v1</url>
+            <id>NLS</id>
+            <url>https://pkgs.dev.azure.com/ndwnu/NLS/_packaging/NLS/maven/v1</url>
             <releases>
                 <enabled>true</enabled>
             </releases>
@@ -68,8 +68,8 @@
     </repositories>
     <distributionManagement>
         <repository>
-            <id>CBM</id>
-            <url>https://pkgs.dev.azure.com/ndwnu/CBM/_packaging/CBM/maven/v1</url>
+            <id>NLS</id>
+            <url>https://pkgs.dev.azure.com/ndwnu/NLS/_packaging/NLS/maven/v1</url>
         </repository>
     </distributionManagement>
     <dependencyManagement>
