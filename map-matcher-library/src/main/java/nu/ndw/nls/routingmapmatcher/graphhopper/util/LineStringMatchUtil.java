@@ -1,5 +1,7 @@
 package nu.ndw.nls.routingmapmatcher.graphhopper.util;
 
+import static nu.ndw.nls.routingmapmatcher.constants.GlobalConstants.VEHICLE_CAR;
+
 import com.google.common.collect.Lists;
 import com.graphhopper.routing.Path;
 import com.graphhopper.routing.ev.BooleanEncodedValue;
@@ -40,8 +42,8 @@ public class LineStringMatchUtil {
         GeometryFactory geometryFactory = new GeometryFactory(new PrecisionModel(), GlobalConstants.WGS84_SRID);
         this.pathUtil = new PathUtil(geometryFactory);
         this.encodingManager = encodingManager;
-        BooleanEncodedValue accessEnc = encodingManager.getBooleanEncodedValue(VehicleAccess.key("car"));
-        DecimalEncodedValue speedEnc = encodingManager.getDecimalEncodedValue(VehicleSpeed.key("car"));
+        BooleanEncodedValue accessEnc = encodingManager.getBooleanEncodedValue(VehicleAccess.key(VEHICLE_CAR));
+        DecimalEncodedValue speedEnc = encodingManager.getDecimalEncodedValue(VehicleSpeed.key(VEHICLE_CAR));
         Weighting weighting = new ShortestWeighting(accessEnc, speedEnc);
         this.isochroneService = new IsochroneService(encodingManager, baseGraph,
                 new EdgeIteratorStateReverseExtractor(),

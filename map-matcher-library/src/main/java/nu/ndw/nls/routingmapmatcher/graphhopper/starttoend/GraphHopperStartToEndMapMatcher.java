@@ -1,6 +1,7 @@
 package nu.ndw.nls.routingmapmatcher.graphhopper.starttoend;
 
 import static com.graphhopper.util.Parameters.Algorithms.DIJKSTRA_BI;
+import static nu.ndw.nls.routingmapmatcher.constants.GlobalConstants.VEHICLE_CAR;
 import static nu.ndw.nls.routingmapmatcher.graphhopper.util.MatchUtil.getQueryResults;
 
 import com.google.common.base.Preconditions;
@@ -47,29 +48,31 @@ public class GraphHopperStartToEndMapMatcher implements StartToEndMapMatcher {
     private final LocationIndexTree locationIndexTree;
     private final EdgeFilter edgeFilter;
 
-    private final EncodingManager encodingManager;
-
     private final RoutingAlgorithmFactory algorithmFactory;
     private final AlgorithmOptions algorithmOptions;
 
     private final LineStringMatchUtil lineStringMatchUtil;
     private final LineStringScoreUtil lineStringScoreUtil;
 
+    private final Weighting weighting;
+
     public GraphHopperStartToEndMapMatcher(NetworkGraphHopper networkGraphHopper) {
         Preconditions.checkNotNull(networkGraphHopper);
-
         this.routingGraph = networkGraphHopper.getBaseGraph();
-
         this.algorithmOptions = new AlgorithmOptions()
                 .setAlgorithm(DIJKSTRA_BI)
                 .setTraversalMode(TraversalMode.NODE_BASED);
         this.algorithmFactory = new RoutingAlgorithmFactorySimple();
         this.locationIndexTree = networkGraphHopper.getLocationIndex();
         this.edgeFilter = EdgeFilter.ALL_EDGES;
-        this.encodingManager = networkGraphHopper.getEncodingManager();
+        EncodingManager encodingManager = networkGraphHopper.getEncodingManager();
         this.networkGraphHopper = networkGraphHopper;
         this.lineStringMatchUtil = new LineStringMatchUtil(networkGraphHopper);
         this.lineStringScoreUtil = new LineStringScoreUtil();
+        this.weighting = new ShortestWeighting(
+                encodingManager.getBooleanEncodedValue(VehicleAccess.key(VEHICLE_CAR)),
+                encodingManager.getDecimalEncodedValue(
+                        VehicleSpeed.key(VEHICLE_CAR)));
     }
 
     public LineStringMatch match(LineStringLocation lineStringLocation) {
@@ -122,10 +125,6 @@ public class GraphHopperStartToEndMapMatcher implements StartToEndMapMatcher {
             for (Snap endCandidate : endCandidates) {
                 int fromNode = startCandidate.getClosestNode();
                 int toNode = endCandidate.getClosestNode();
-                Weighting weighting = new ShortestWeighting(
-                        encodingManager.getBooleanEncodedValue(VehicleAccess.key("car")),
-                        encodingManager.getDecimalEncodedValue(
-                                VehicleSpeed.key("car")));
                 RoutingAlgorithm routingAlgorithm = algorithmFactory.createAlgo(queryGraph, weighting,
                         algorithmOptions);
                 Path path = routingAlgorithm.calcPath(fromNode, toNode);

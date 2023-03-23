@@ -1,8 +1,10 @@
 package nu.ndw.nls.routingmapmatcher.graphhopper;
 
 
-import static nu.ndw.nls.routingmapmatcher.graphhopper.LinkCarVehicleTagParsersFactory.castToLink;
-import static nu.ndw.nls.routingmapmatcher.graphhopper.LinkCarVehicleTagParsersFactory.getAccess;
+
+import static nu.ndw.nls.routingmapmatcher.constants.GlobalConstants.VEHICLE_CAR;
+import static nu.ndw.nls.routingmapmatcher.graphhopper.NetworkReader.castToLink;
+import static nu.ndw.nls.routingmapmatcher.graphhopper.NetworkReader.getAccess;
 
 import com.graphhopper.reader.ReaderWay;
 import com.graphhopper.routing.ev.DecimalEncodedValue;
@@ -18,11 +20,12 @@ import nu.ndw.nls.routingmapmatcher.domain.model.Link;
 public class LinkCarAverageSpeedParser extends AbstractAverageSpeedParser {
 
     public static final double CAR_MAX_SPEED = 130;
+    public static final String NAME_PROPERTY = "name";
 
     public LinkCarAverageSpeedParser(EncodedValueLookup lookup, PMap properties) {
         this(
-                lookup.getDecimalEncodedValue(VehicleSpeed.key(properties.getString("name", "car"))),
-                lookup.getDecimalEncodedValue(VehicleSpeed.key(properties.getString("name", "car")))
+                lookup.getDecimalEncodedValue(VehicleSpeed.key(properties.getString(NAME_PROPERTY, VEHICLE_CAR))),
+                lookup.getDecimalEncodedValue(VehicleSpeed.key(properties.getString(NAME_PROPERTY, VEHICLE_CAR)))
                         .getNextStorableValue(CAR_MAX_SPEED)
         );
     }

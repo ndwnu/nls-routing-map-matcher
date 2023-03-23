@@ -1,9 +1,6 @@
 package nu.ndw.nls.routingmapmatcher.graphhopper;
 
 
-
-import static nu.ndw.nls.routingmapmatcher.graphhopper.LinkCarVehicleTagParsersFactory.castToLink;
-
 import com.google.common.base.Preconditions;
 import com.graphhopper.coll.LongIntMap;
 import com.graphhopper.reader.ReaderWay;
@@ -19,7 +16,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.function.Supplier;
 import lombok.extern.slf4j.Slf4j;
-
 import nu.ndw.nls.routingmapmatcher.domain.model.Link;
 import org.locationtech.jts.geom.Coordinate;
 
@@ -52,6 +48,20 @@ class NetworkReader {
         Iterator<Link> links = linkSupplier.get();
         readLinks(links);
         log.info("Finished reading links");
+    }
+
+    public static Link castToLink(ReaderWay way) {
+        Link link = (Link) way;
+        if (link == null) {
+            throw new IllegalStateException("Only Link Dto's are supported by this parser");
+        }
+        return link;
+    }
+
+    public static WayAccess getAccess(ReaderWay way) {
+        Link link = castToLink(way);
+        boolean access = link.getSpeedInKilometersPerHour() > 0.0 || link.getReverseSpeedInKilometersPerHour() > 0.0;
+        return access ? WayAccess.WAY : WayAccess.CAN_SKIP;
     }
 
     private void readLinks(Iterator<Link> links) {
@@ -92,12 +102,6 @@ class NetworkReader {
             baseGraph.getNodeAccess().setNode(internalNodeId, latitude, longitude);
         }
         return internalNodeId;
-    }
-
-    private WayAccess getAccess(ReaderWay way) {
-        Link link = castToLink(way);
-        boolean access = link.getSpeedInKilometersPerHour() > 0.0 || link.getReverseSpeedInKilometersPerHour() > 0.0;
-        return access ? WayAccess.WAY : WayAccess.CAN_SKIP;
     }
 
     private IntsRef determineWayFlags(Link link) {

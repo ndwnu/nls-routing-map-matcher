@@ -10,9 +10,9 @@ public class LinkWayIdEncodedValuesFactory implements EncodedValueFactory {
     private static final int TOTAL_BITS_FOR_ENCODING_INTS = 31;
 
     @Override
-    public EncodedValue create(String s, PMap pMap) {
+    public EncodedValue create(String name, PMap properties) {
         boolean idInTwoDirections = false;
-        return new IntEncodedValueImpl(s, TOTAL_BITS_FOR_ENCODING_INTS, idInTwoDirections);
+        return new IntEncodedValueImpl(name, TOTAL_BITS_FOR_ENCODING_INTS, idInTwoDirections);
     }
 
 }

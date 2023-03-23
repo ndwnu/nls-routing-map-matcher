@@ -7,9 +7,8 @@ import com.graphhopper.util.PMap;
 public class LinkCarVehicleEncodedValuesFactory implements VehicleEncodedValuesFactory {
 
     @Override
-    public VehicleEncodedValues createVehicleEncodedValues(String s, PMap pMap) {
-        return CarEncodedValues.car(pMap);
+    public VehicleEncodedValues createVehicleEncodedValues(String name, PMap properties) {
+        return CarEncodedValues.car(properties);
     }
-
 
 }
