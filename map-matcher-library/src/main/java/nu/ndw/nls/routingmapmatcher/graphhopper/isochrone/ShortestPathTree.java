@@ -21,8 +21,8 @@ import java.util.function.Consumer;
 /**
  * This class is a fork of the com.graphhopper.isochrone.algorithm.ShortestPathTree class. The inclusion logic is
  * different from the original class because the original current implementation differed from the previous
- * implementation in v 0.12. The previous implementation in v 0.12 included IsoLabels which had a partial limit. (ie a
- * road-segment of 100 meters which still could be travelled for 50 meters until reaching the limit where included) The
+ * implementation in v 0.12. The previous implementation in v 0.12 included IsoLabels which had a partial limit (ie a
+ * road-segment of 100 meters which still could be travelled for 50 meters until reaching the limit was included). The
  * current implementation in the graphhopper Library did not include those partial road-segments leading to unwanted
  * results for nls requirements. This class fixes this by replacing the original check for inclusion
  * getExploreValue(label) <= limit with (this.limit - getExploreValue(isoLabel.parent)) > 0.
