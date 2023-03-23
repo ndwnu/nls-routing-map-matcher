@@ -11,6 +11,7 @@ import com.graphhopper.util.PMap;
 public class CarEncodedValues extends VehicleEncodedValues {
 
 
+    private static final int DEFAULT_SPEED_BITS = 5;
     private final String name;
 
 
@@ -21,8 +22,8 @@ public class CarEncodedValues extends VehicleEncodedValues {
 
     public static CarEncodedValues car(PMap properties) {
         String name = properties.getString("name", "car");
-        int speedBits = properties.getInt("speed_bits", 5);
-        double speedFactor = properties.getDouble("speed_factor", 5);
+        int speedBits = properties.getInt("speed_bits", DEFAULT_SPEED_BITS);
+        double speedFactor = properties.getDouble("speed_factor", DEFAULT_SPEED_BITS);
         boolean speedTwoDirections = true;
         BooleanEncodedValue accessEnc = VehicleAccess.create(name);
         DecimalEncodedValue averageSpeedEnc = VehicleSpeed.create(name, speedBits, speedFactor, speedTwoDirections);

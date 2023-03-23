@@ -20,7 +20,6 @@ import com.graphhopper.routing.weighting.Weighting;
 import com.graphhopper.storage.BaseGraph;
 import com.graphhopper.storage.index.LocationIndexTree;
 import com.graphhopper.storage.index.Snap;
-import com.graphhopper.util.PMap;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;

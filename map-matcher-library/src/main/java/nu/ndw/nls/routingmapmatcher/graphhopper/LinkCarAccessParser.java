@@ -17,7 +17,7 @@ import com.graphhopper.util.PMap;
 import nu.ndw.nls.routingmapmatcher.domain.model.Link;
 
 
-public class LinkCarAccessParser extends AbstractAccessParser implements TagParser {
+public class LinkCarAccessParser extends AbstractAccessParser{
 
     public LinkCarAccessParser(EncodedValueLookup lookup, PMap properties) {
         this(lookup.getBooleanEncodedValue(VehicleAccess.key(properties.getString("name", "car"))),

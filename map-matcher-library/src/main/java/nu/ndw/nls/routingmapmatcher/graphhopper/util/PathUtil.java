@@ -27,6 +27,7 @@ public class PathUtil {
     private static final int MINIMUM_LENGTH = 2;
     private static final int DIMENSIONS = 2;
     private static final int MEASURES = 0;
+    private static final int KEY_FACTOR = 2;
 
     private final GeometryFactory geometryFactory;
 
@@ -160,7 +161,7 @@ public class PathUtil {
             // start node and end node; in this situation the value of distanceInOtherDirection should be 0
             if (!distanceInOtherDirectionIsPositive) {
                 int originalEdgeKey = ((VirtualEdgeIteratorState) queryGraph.getEdgeIteratorStateForKey(
-                        virtualNode * 2))
+                        virtualNode * KEY_FACTOR))
                         .getOriginalEdgeKey();
                 distanceInOtherDirection = queryGraph.getEdgeIteratorStateForKey(originalEdgeKey).getDistance() -
                         pathEdge.getDistance();

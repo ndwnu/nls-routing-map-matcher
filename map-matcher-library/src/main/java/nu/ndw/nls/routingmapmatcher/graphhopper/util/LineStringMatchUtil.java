@@ -22,8 +22,8 @@ import nu.ndw.nls.routingmapmatcher.domain.model.MatchStatus;
 import nu.ndw.nls.routingmapmatcher.domain.model.linestring.LineStringLocation;
 import nu.ndw.nls.routingmapmatcher.domain.model.linestring.LineStringMatch;
 import nu.ndw.nls.routingmapmatcher.graphhopper.NetworkGraphHopper;
-import nu.ndw.nls.routingmapmatcher.graphhopper.isochrone.ShortestPathTreeFactory;
 import nu.ndw.nls.routingmapmatcher.graphhopper.isochrone.IsochroneService;
+import nu.ndw.nls.routingmapmatcher.graphhopper.isochrone.ShortestPathTreeFactory;
 import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.LineString;
 import org.locationtech.jts.geom.PrecisionModel;
@@ -35,20 +35,22 @@ public class LineStringMatchUtil {
     private final IsochroneService isochroneService;
 
 
-
-    private LineStringMatchUtil(LocationIndexTree locationIndexTree, BaseGraph baseGraph, EncodingManager encodingManager) {
+    private LineStringMatchUtil(LocationIndexTree locationIndexTree, BaseGraph baseGraph,
+            EncodingManager encodingManager) {
         GeometryFactory geometryFactory = new GeometryFactory(new PrecisionModel(), GlobalConstants.WGS84_SRID);
         this.pathUtil = new PathUtil(geometryFactory);
         this.encodingManager = encodingManager;
         BooleanEncodedValue accessEnc = encodingManager.getBooleanEncodedValue(VehicleAccess.key("car"));
         DecimalEncodedValue speedEnc = encodingManager.getDecimalEncodedValue(VehicleSpeed.key("car"));
         Weighting weighting = new ShortestWeighting(accessEnc, speedEnc);
-        this.isochroneService = new IsochroneService(encodingManager, baseGraph, new EdgeIteratorStateReverseExtractor(),
-                null,new ShortestPathTreeFactory(weighting), locationIndexTree);
+        this.isochroneService = new IsochroneService(encodingManager, baseGraph,
+                new EdgeIteratorStateReverseExtractor(),
+                null, new ShortestPathTreeFactory(weighting), locationIndexTree);
     }
 
     public LineStringMatchUtil(NetworkGraphHopper networkGraphHopper) {
-        this(networkGraphHopper.getLocationIndex(), networkGraphHopper.getBaseGraph(), networkGraphHopper.getEncodingManager());
+        this(networkGraphHopper.getLocationIndex(), networkGraphHopper.getBaseGraph(),
+                networkGraphHopper.getEncodingManager());
     }
 
     public LineStringMatch createMatch(LineStringLocation lineStringLocation, Path path, QueryGraph queryGraph,

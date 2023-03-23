@@ -16,7 +16,7 @@ import com.graphhopper.util.PMap;
 import nu.ndw.nls.routingmapmatcher.domain.model.Link;
 
 
-public class LinkCarAverageSpeedParser extends AbstractAverageSpeedParser implements TagParser {
+public class LinkCarAverageSpeedParser extends AbstractAverageSpeedParser{
 
     public static final double CAR_MAX_SPEED = 130;
 

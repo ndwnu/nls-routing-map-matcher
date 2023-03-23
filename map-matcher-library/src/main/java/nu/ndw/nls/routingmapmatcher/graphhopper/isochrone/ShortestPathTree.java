@@ -42,7 +42,7 @@ public class ShortestPathTree extends AbstractRoutingAlgorithm {
             this.parent = parent;
         }
 
-        public boolean deleted = false;
+        public boolean deleted;
         public int node;
         public int edge;
         public double weight;
