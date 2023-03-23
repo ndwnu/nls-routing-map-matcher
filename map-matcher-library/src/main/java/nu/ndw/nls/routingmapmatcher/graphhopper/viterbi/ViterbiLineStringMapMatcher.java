@@ -24,7 +24,6 @@ import nu.ndw.nls.routingmapmatcher.domain.model.MatchStatus;
 import nu.ndw.nls.routingmapmatcher.domain.model.linestring.LineStringLocation;
 import nu.ndw.nls.routingmapmatcher.domain.model.linestring.LineStringMatch;
 import nu.ndw.nls.routingmapmatcher.graphhopper.NetworkGraphHopper;
-import nu.ndw.nls.routingmapmatcher.graphhopper.model.CustomDistanceCalc;
 import nu.ndw.nls.routingmapmatcher.graphhopper.util.LineStringMatchUtil;
 import nu.ndw.nls.routingmapmatcher.graphhopper.util.LineStringScoreUtil;
 import org.locationtech.jts.geom.Coordinate;
@@ -58,7 +57,6 @@ public class ViterbiLineStringMapMatcher implements LineStringMapMatcher {
      * See also the comment in {@link #convertToObservations(LineString)}
      */
     private static final double NEARBY_NDW_NETWORK_DISTANCE_IN_METERS = 2 * MEASUREMENT_ERROR_SIGMA_IN_METERS;
-    private static final double DISTANCE_CALCULATOR_CUSTOM_DISTANCE = 3 * MEASUREMENT_ERROR_SIGMA_IN_METERS;
 
     private static final GeometryFactory WGS84_GEOMETRY_FACTORY = new GeometryFactory(new PrecisionModel(),
             GlobalConstants.WGS84_SRID);
@@ -67,7 +65,6 @@ public class ViterbiLineStringMapMatcher implements LineStringMapMatcher {
     private static final int COORDINATES_LENGTH_START_END = 2;
 
     private final MapMatching mapMatching;
-    private final CustomDistanceCalc distanceCalc;
     private final LocationIndexTree locationIndexTree;
     private final EdgeFilter edgeFilter;
 
@@ -85,9 +82,6 @@ public class ViterbiLineStringMapMatcher implements LineStringMapMatcher {
         this.mapMatching = MapMatching.fromGraphHopper(networkGraphHopper, hints);
         mapMatching.setMeasurementErrorSigma(MEASUREMENT_ERROR_SIGMA_IN_METERS);
         mapMatching.setTransitionProbabilityBeta(TRANSITION_PROBABILITY_BETA);
-        this.distanceCalc = new CustomDistanceCalc();
-        //mapMatching.setDistanceCalc(distanceCalc);
-        // mapMatching.setMeasurementErrorSigma
         this.locationIndexTree = networkGraphHopper.getLocationIndex();
         this.edgeFilter = EdgeFilter.ALL_EDGES;
         this.queryGraphExtractor = new QueryGraphExtractor();
@@ -106,7 +100,7 @@ public class ViterbiLineStringMapMatcher implements LineStringMapMatcher {
         LineStringMatch lineStringMatch;
         if (observations.size() >= COORDINATES_LENGTH_START_END) {
             try {
-                preventFilteringWhileMapMatching(observations);
+
                 MatchResult matchResult = mapMatching.match(observations);
 
                 if (matchResult.getMergedPath().getEdgeCount() > 0) {
@@ -152,12 +146,6 @@ public class ViterbiLineStringMapMatcher implements LineStringMapMatcher {
             }
         }
         return false;
-    }
-
-    private void preventFilteringWhileMapMatching(List<Observation> observations) {
-        // When filtering there is no distance calculation for the first and last GPS coordinates
-        int numberOfCalls = Math.max(observations.size() - COORDINATES_LENGTH_START_END, 0);
-        distanceCalc.returnCustomDistanceForNextCalls(DISTANCE_CALCULATOR_CUSTOM_DISTANCE, numberOfCalls);
     }
 
     private LineStringMatch createMatch(MatchResult matchResult, LineStringLocation lineStringLocation) {
