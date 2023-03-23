@@ -3,7 +3,7 @@ package nu.ndw.nls.routingmapmatcher.graphhopper;
 
 
 import static nu.ndw.nls.routingmapmatcher.graphhopper.LinkCarVehicleTagParsersFactory.castToLink;
-
+import static nu.ndw.nls.routingmapmatcher.graphhopper.LinkCarVehicleTagParsersFactory.getAccess;
 import com.graphhopper.reader.ReaderWay;
 import com.graphhopper.routing.ev.BooleanEncodedValue;
 import com.graphhopper.routing.ev.EncodedValueLookup;
@@ -29,11 +29,6 @@ public class LinkCarAccessParser extends AbstractAccessParser implements TagPars
         super(accessEnc, transportationMode);
     }
 
-    public WayAccess getAccess(ReaderWay way) {
-        Link link = castToLink(way);
-        boolean access = link.getSpeedInKilometersPerHour() > 0.0 || link.getReverseSpeedInKilometersPerHour() > 0.0;
-        return access ? WayAccess.WAY : WayAccess.CAN_SKIP;
-    }
 
     @Override
     public void handleWayTags(IntsRef edgeFlags, ReaderWay readerWay) {

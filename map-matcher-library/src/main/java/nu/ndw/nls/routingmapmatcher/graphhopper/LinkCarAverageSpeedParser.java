@@ -2,11 +2,13 @@ package nu.ndw.nls.routingmapmatcher.graphhopper;
 
 
 import static nu.ndw.nls.routingmapmatcher.graphhopper.LinkCarVehicleTagParsersFactory.castToLink;
+import static nu.ndw.nls.routingmapmatcher.graphhopper.LinkCarVehicleTagParsersFactory.getAccess;
 
 import com.graphhopper.reader.ReaderWay;
 import com.graphhopper.routing.ev.DecimalEncodedValue;
 import com.graphhopper.routing.ev.EncodedValueLookup;
 import com.graphhopper.routing.ev.VehicleSpeed;
+import com.graphhopper.routing.util.WayAccess;
 import com.graphhopper.routing.util.parsers.AbstractAverageSpeedParser;
 import com.graphhopper.routing.util.parsers.TagParser;
 import com.graphhopper.storage.IntsRef;
@@ -15,12 +17,14 @@ import nu.ndw.nls.routingmapmatcher.domain.model.Link;
 
 
 public class LinkCarAverageSpeedParser extends AbstractAverageSpeedParser implements TagParser {
+
     public static final double CAR_MAX_SPEED = 130;
 
     public LinkCarAverageSpeedParser(EncodedValueLookup lookup, PMap properties) {
         this(
                 lookup.getDecimalEncodedValue(VehicleSpeed.key(properties.getString("name", "car"))),
-                lookup.getDecimalEncodedValue(VehicleSpeed.key(properties.getString("name", "car"))).getNextStorableValue(CAR_MAX_SPEED)
+                lookup.getDecimalEncodedValue(VehicleSpeed.key(properties.getString("name", "car")))
+                        .getNextStorableValue(CAR_MAX_SPEED)
         );
     }
 
@@ -30,6 +34,10 @@ public class LinkCarAverageSpeedParser extends AbstractAverageSpeedParser implem
 
     @Override
     public void handleWayTags(IntsRef edgeFlags, ReaderWay readerWay) {
+        WayAccess access = getAccess(readerWay);
+        if (access.canSkip()) {
+            return;
+        }
         Link link = castToLink(readerWay);
         setSpeed(false, edgeFlags, link.getSpeedInKilometersPerHour());
         setSpeed(true, edgeFlags, link.getReverseSpeedInKilometersPerHour());
