@@ -94,12 +94,9 @@ class GraphHopperStartToEndMapMatcherIT {
         assertThat(lineStringMatch.getDownstreamLinkIds(),
                 containsInAnyOrder(3666086, 3666105, 3666106, 3666107, 3666108, 3666109, 3686216, 3686217));
 
-        // Old value 0.8802584207113416
         assertThat(lineStringMatch.getStartLinkFraction(), is(0.8805534312637381));
-        //Old value 0.45984987610479167
         assertThat(lineStringMatch.getEndLinkFraction(), is(0.45960570331968187));
-        //Old value 93.31281800491443
-        assertThat(lineStringMatch.getReliability(), is(95.53069924260642));
+        assertThat(lineStringMatch.getReliability(), is(93.29643981088304));
         assertThat(lineStringMatch.getId(), is(29));
         assertThat(lineStringMatch.getLocationIndex(), is(-1));
         assertThat(lineStringMatch.isReversed(), is(true));

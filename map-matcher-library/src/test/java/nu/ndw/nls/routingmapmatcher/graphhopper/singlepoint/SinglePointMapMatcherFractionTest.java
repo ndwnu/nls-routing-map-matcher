@@ -1,5 +1,6 @@
 package nu.ndw.nls.routingmapmatcher.graphhopper.singlepoint;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -153,14 +154,18 @@ class SinglePointMapMatcherFractionTest {
     }
 
     @Test
-    @Disabled
-    void matchSinglePoint_fraction_towerBaseNode() {
+    void matchSinglePoint_fraction_towerBaseNode_returns_two_candidates_with_different_bearings() {
         SinglePointLocation singlePoint = this.createSinglePoint(123, 0, 0);
         SinglePointMatch match = this.singlePointMapMatcher.match(singlePoint);
-
-        CandidateMatch candidateMatch = match.getCandidateMatches().get(0);
-        assertEquals(1, candidateMatch.getMatchedLinkId());
-        assertEquals(0, candidateMatch.getFraction(), 0.001);
+        assertThat( match.getCandidateMatches()).hasSize(2);
+        CandidateMatch candidateMatch1 = match.getCandidateMatches().get(0);
+        assertEquals(0, candidateMatch1.getMatchedLinkId());
+        assertEquals(0, candidateMatch1.getBearing());
+        assertEquals(0, candidateMatch1.getFraction(), 0.001);
+        CandidateMatch candidateMatch2 = match.getCandidateMatches().get(1);
+        assertEquals(1, candidateMatch2.getMatchedLinkId());
+        assertEquals(90, candidateMatch2.getBearing());
+        assertEquals(0, candidateMatch2.getFraction(), 0.001);
     }
 
     @Test

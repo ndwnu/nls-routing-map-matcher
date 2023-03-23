@@ -1,6 +1,6 @@
 package com.graphhopper.util;
 
-public class DistanceCalcNew extends  DistancePlaneProjection{
+public class DistanceCalcCustom extends  DistancePlaneProjection{
     public double calcNormalizedEdgeDistanceNew(double r_lat_deg, double r_lon_deg, double a_lat_deg, double a_lon_deg, double b_lat_deg, double b_lon_deg, boolean reduceToSegment) {
         double shrinkFactor = this.calcShrinkFactor(a_lat_deg, b_lat_deg);
         double a_lon = a_lon_deg * shrinkFactor;

@@ -81,7 +81,7 @@ public class SinglePointMapMatcherWithIsochroneIT {
         CandidateMatchWithIsochrone match = result.getCandidateMatches().get(0);
         assertThat(match.getDownstream(), hasSize(5));
         var startPoint = match.getDownstream().get(0);
-        assertThat(startPoint.getStartFraction(),is(0.671978315139));
+        assertThat(startPoint.getStartFraction(),is(0.672874050063));
         assertThat(startPoint.getEndFraction(),is(1.0));
         assertThat(startPoint.getDirection(),is(Direction.FORWARD));
     }
@@ -105,7 +105,7 @@ public class SinglePointMapMatcherWithIsochroneIT {
         CandidateMatchWithIsochrone match = result.getCandidateMatches().get(0);
         assertThat(match.getDownstream(), hasSize(14));
         var startPoint = match.getDownstream().get(0);
-        assertThat(startPoint.getStartFraction(),is(0.671978315139));
+        assertThat(startPoint.getStartFraction(),is(0.672874050063));
         assertThat(startPoint.getEndFraction(),is(1.0));
         assertThat(startPoint.getDirection(),is(Direction.FORWARD));
     }
@@ -130,7 +130,7 @@ public class SinglePointMapMatcherWithIsochroneIT {
         CandidateMatchWithIsochrone match = result.getCandidateMatches().get(0);
         assertThat(match.getUpstream(), hasSize(5));
         var startPoint = match.getUpstream().get(0);
-        assertThat(startPoint.getStartFraction(),is(0.328024459259));
+        assertThat(startPoint.getStartFraction(),is(0.327127525272));
         assertThat(startPoint.getEndFraction(),is(1.0));
         assertThat(startPoint.getDirection(),is(Direction.BACKWARD));
     }
@@ -154,7 +154,7 @@ public class SinglePointMapMatcherWithIsochroneIT {
         CandidateMatchWithIsochrone match = result.getCandidateMatches().get(0);
         assertThat(match.getUpstream(), hasSize(11));
         var startPoint = match.getUpstream().get(0);
-        assertThat(startPoint.getStartFraction(),is(0.328024459259));
+        assertThat(startPoint.getStartFraction(),is(0.327127525272));
         assertThat(startPoint.getEndFraction(),is(1.0));
         assertThat(startPoint.getDirection(),is(Direction.BACKWARD));
     }

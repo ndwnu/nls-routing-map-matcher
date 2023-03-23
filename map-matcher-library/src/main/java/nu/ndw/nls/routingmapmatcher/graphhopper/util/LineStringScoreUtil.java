@@ -1,7 +1,7 @@
 package nu.ndw.nls.routingmapmatcher.graphhopper.util;
 
 import com.graphhopper.routing.Path;
-import com.graphhopper.util.DistanceCalcNew;
+import com.graphhopper.util.DistanceCalcCustom;
 import com.graphhopper.util.PointList;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -19,7 +19,7 @@ public class LineStringScoreUtil {
     private static final double DISTANCE_PENALTY_FACTOR = 1.5;
     private static final double PATH_LENGTH_DIFFERENCE_PENALTY_FACTOR = 0.1;
 
-    private final DistanceCalcNew distanceCalc = new DistanceCalcNew();
+    private final DistanceCalcCustom distanceCalc = new DistanceCalcCustom();
 
     public double calculateCandidatePathScore(Path path, LineStringLocation lineStringLocation) {
         if (ReliabilityCalculationType.POINT_OBSERVATIONS == lineStringLocation.getReliabilityCalculationType()) {
