@@ -30,7 +30,7 @@ public class CarEncodedValues extends VehicleEncodedValues {
         return new CarEncodedValues(name, accessEnc, averageSpeedEnc);
     }
 
-
+    @Override
     public String getName() {
         return name;
     }
