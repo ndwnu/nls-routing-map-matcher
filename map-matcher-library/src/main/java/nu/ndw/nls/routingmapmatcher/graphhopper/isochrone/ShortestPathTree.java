@@ -36,16 +36,13 @@ import java.util.PriorityQueue;
 import java.util.function.Consumer;
 
 /**
- * Computes a shortest path tree by a given weighting. Terminates when all shortest paths up to a given travel time,
- * distance, or weight have been explored.
- * <p>
- * IMPLEMENTATION NOTE: util.PriorityQueue doesn't support efficient removes. We work around this by giving the labels a
- * deleted flag, not remove()ing them, and popping deleted elements off both queues. Note to self/others: If you think
- * this optimization is not needed, please test it with a scenario where updates actually occur a lot, such as using
- * finite, non-zero u-turn costs.
- *
- * @author Peter Karich
- * @author Michael Zilske
+ * This class is a fork of the com.graphhopper.isochrone.algorithm.ShortestPathTree class. The inclusion logic is
+ * different from the original class because the original current implementation differed from the previous
+ * implementation in v 0.12. The previous implementation in v 0.12 included IsoLabels which had a partial limit. (ie a
+ * road-segment of 100 meters which still could be travelled for 50 meters until reaching the limit where included) The
+ * current implementation in the graphhopper Library did not include those partial road-segments leading to unwanted
+ * results for nls requirements. This class fixes this by replacing the original check for inclusion
+ * getExploreValue(label) <= limit with (this.limit - getExploreValue(isoLabel.parent)) > 0.
  */
 public class ShortestPathTree extends AbstractRoutingAlgorithm {
 
