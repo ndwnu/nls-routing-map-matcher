@@ -97,7 +97,6 @@ public class LineStringScoreUtil {
     private double calculateSmallestDistanceToPointList(double latitude, double longitude, PointList pointList) {
         double smallestDistanceToLtcLink = Double.MAX_VALUE;
         for (int index = 1; index < pointList.size(); index++) {
-            /*Todo: investigate impact of REDUCE_TO_SEGMENT removed in this version*/
             double normalizedDistance = distanceCalc.calcNormalizedEdgeDistanceNew(latitude, longitude,
                     pointList.getLat(index - 1), pointList.getLon(index - 1),
                     pointList.getLat(index), pointList.getLon(index), REDUCE_TO_SEGMENT);

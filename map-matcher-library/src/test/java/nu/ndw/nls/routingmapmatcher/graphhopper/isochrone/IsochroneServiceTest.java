@@ -2,6 +2,7 @@
 package nu.ndw.nls.routingmapmatcher.graphhopper.isochrone;
 
 import static nu.ndw.nls.routingmapmatcher.graphhopper.LinkWayIdEncodedValuesFactory.ID_NAME;
+import static nu.ndw.nls.routingmapmatcher.constants.GlobalConstants.VEHICLE_CAR;
 import static nu.ndw.nls.routingmapmatcher.graphhopper.isochrone.IsochroneTestHelper.createIsoLabel;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -106,8 +107,7 @@ class IsochroneServiceTest {
                 .build();
         IsoLabel isoLabel = createIsoLabel(100, 0);
         setupFixture(isoLabel);
-
-        when(encodingManager.getBooleanEncodedValue(VehicleAccess.key("car"))).thenReturn(booleanEncodedValue);
+        when(encodingManager.getBooleanEncodedValue(VehicleAccess.key(VEHICLE_CAR))).thenReturn(booleanEncodedValue);
         when(startEdge.get(booleanEncodedValue)).thenReturn(true);
         when(startEdge.getReverse(booleanEncodedValue)).thenReturn(false);
         when(location.getUpstreamIsochrone()).thenReturn(ISOCHRONE_VALUE_METERS);
@@ -147,7 +147,7 @@ class IsochroneServiceTest {
         IsoLabel endLabel = createIsoLabel(200, 10800, 1, 2, 10800);
         setupFixture(endLabel);
 
-        when(encodingManager.getBooleanEncodedValue(VehicleAccess.key("car"))).thenReturn(booleanEncodedValue);
+        when(encodingManager.getBooleanEncodedValue(VehicleAccess.key(VEHICLE_CAR))).thenReturn(booleanEncodedValue);
         when(startEdge.get(booleanEncodedValue)).thenReturn(true);
         when(startEdge.getReverse(booleanEncodedValue)).thenReturn(false);
         when(location.getUpstreamIsochrone()).thenReturn(ISOCHRONE_VALUE_SECONDS);
@@ -155,7 +155,7 @@ class IsochroneServiceTest {
         when(queryGraph.getEdgeIteratorState(anyInt(), anyInt()))
                 .thenReturn(currentEdge);
         // Segment with average speed of 100 km ph 27.77 meters/second
-        when(encodingManager.getDecimalEncodedValue(VehicleSpeed.key("car"))).thenReturn(decimalEncodedValue);
+        when(encodingManager.getDecimalEncodedValue(VehicleSpeed.key(VEHICLE_CAR))).thenReturn(decimalEncodedValue);
         when(currentEdge.get(decimalEncodedValue)).thenReturn(SPEED);
         wrapWithStaticMock(() -> isochroneService.getUpstreamIsochroneMatches(matchedPoint, location));
         verify(isochroneMatchMapper).mapToIsochroneMatch(eq(endLabel),
@@ -184,7 +184,7 @@ class IsochroneServiceTest {
                 .build();
         IsoLabel isoLabel = createIsoLabel(100, 0);
         setupFixture(isoLabel);
-        when(encodingManager.getBooleanEncodedValue(VehicleAccess.key("car"))).thenReturn(booleanEncodedValue);
+        when(encodingManager.getBooleanEncodedValue(VehicleAccess.key(VEHICLE_CAR))).thenReturn(booleanEncodedValue);
         when(startEdge.get(booleanEncodedValue)).thenReturn(true);
         when(startEdge.getReverse(booleanEncodedValue)).thenReturn(false);
         when(location.getDownstreamIsochrone()).thenReturn(ISOCHRONE_VALUE_METERS);
@@ -241,7 +241,7 @@ class IsochroneServiceTest {
     }
 
     private void setupFixtureForFilter(IsoLabel isoLabel) {
-        when(encodingManager.getBooleanEncodedValue(VehicleAccess.key("car"))).thenReturn(booleanEncodedValue);
+        when(encodingManager.getBooleanEncodedValue(VehicleAccess.key(VEHICLE_CAR))).thenReturn(booleanEncodedValue);
         when(startEdge.get(booleanEncodedValue)).thenReturn(true);
         when(startEdge.getReverse(booleanEncodedValue)).thenReturn(true);
         when(isochroneMatchMapper.isStartSegment(0, startSegment)).thenReturn(true);

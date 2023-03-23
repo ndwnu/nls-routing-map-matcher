@@ -13,7 +13,6 @@ import com.graphhopper.routing.ev.IntEncodedValue;
 import com.graphhopper.routing.util.EncodingManager;
 import com.graphhopper.routing.util.parsers.TagParser;
 import com.graphhopper.storage.BaseGraph;
-import com.graphhopper.storage.IntsRef;
 import com.graphhopper.util.EdgeIteratorState;
 import com.graphhopper.util.PointList;
 import java.util.Collections;
@@ -60,9 +59,6 @@ class NetworkReaderTest {
 
     @Mock
     private EncodingManager encodingManager;
-
-    @Mock
-    private IntsRef intsRef;
 
     @Mock
     private LineString lineString;

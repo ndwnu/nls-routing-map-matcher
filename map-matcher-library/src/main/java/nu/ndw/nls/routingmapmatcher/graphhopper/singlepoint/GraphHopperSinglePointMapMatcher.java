@@ -2,6 +2,7 @@ package nu.ndw.nls.routingmapmatcher.graphhopper.singlepoint;
 
 import static java.util.Comparator.comparing;
 import static java.util.Comparator.comparingDouble;
+import static nu.ndw.nls.routingmapmatcher.constants.GlobalConstants.VEHICLE_CAR;
 import static nu.ndw.nls.routingmapmatcher.graphhopper.LinkWayIdEncodedValuesFactory.ID_NAME;
 import static nu.ndw.nls.routingmapmatcher.graphhopper.util.MatchUtil.getQueryResults;
 import static nu.ndw.nls.routingmapmatcher.graphhopper.util.PathUtil.determineEdgeDirection;
@@ -92,8 +93,8 @@ public class GraphHopperSinglePointMapMatcher implements SinglePointMapMatcher {
         this.edgeFilter = EdgeFilter.ALL_EDGES;
         baseGraph = network.getBaseGraph();
         EncodingManager encodingManager = network.getEncodingManager();
-        BooleanEncodedValue accessEnc = encodingManager.getBooleanEncodedValue(VehicleAccess.key("car"));
-        DecimalEncodedValue speedEnc = encodingManager.getDecimalEncodedValue(VehicleSpeed.key("car"));
+        BooleanEncodedValue accessEnc = encodingManager.getBooleanEncodedValue(VehicleAccess.key(VEHICLE_CAR));
+        DecimalEncodedValue speedEnc = encodingManager.getDecimalEncodedValue(VehicleSpeed.key(VEHICLE_CAR));
         Weighting weighting = new ShortestWeighting(accessEnc, speedEnc);
         GeodeticCalculator geodeticCalculator = new GeodeticCalculator();
         FractionAndDistanceCalculator fractionAndDistanceCalculator = new FractionAndDistanceCalculator(

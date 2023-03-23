@@ -1,5 +1,6 @@
 package nu.ndw.nls.routingmapmatcher.graphhopper.viterbi;
 
+import static nu.ndw.nls.routingmapmatcher.constants.GlobalConstants.CAR_SHORTEST;
 import static nu.ndw.nls.routingmapmatcher.graphhopper.util.MatchUtil.getQueryResults;
 
 import com.google.common.base.Preconditions;
@@ -63,6 +64,7 @@ public class ViterbiLineStringMapMatcher implements LineStringMapMatcher {
 
 
     private static final int COORDINATES_LENGTH_START_END = 2;
+    public static final String PROFILE_KEY = "profile";
 
     private final MapMatching mapMatching;
     private final LocationIndexTree locationIndexTree;
@@ -77,7 +79,7 @@ public class ViterbiLineStringMapMatcher implements LineStringMapMatcher {
         Preconditions.checkNotNull(networkGraphHopper);
         this.networkGraphHopper = networkGraphHopper;
         PMap hints = new PMap();
-        hints.putObject("profile", "car_shortest");
+        hints.putObject(PROFILE_KEY, CAR_SHORTEST);
         hints.putObject(Parameters.CH.DISABLE, true);
         this.mapMatching = MapMatching.fromGraphHopper(networkGraphHopper, hints);
         mapMatching.setMeasurementErrorSigma(MEASUREMENT_ERROR_SIGMA_IN_METERS);
@@ -92,11 +94,7 @@ public class ViterbiLineStringMapMatcher implements LineStringMapMatcher {
     @Override
     public LineStringMatch match(LineStringLocation lineStringLocation) {
         Preconditions.checkNotNull(lineStringLocation);
-        PMap hints = new PMap();
-        hints.putObject("profile", "car_shortest");
-        hints.putObject(Parameters.CH.DISABLE, true);
         List<Observation> observations = convertToObservations(lineStringLocation.getGeometry());
-
         LineStringMatch lineStringMatch;
         if (observations.size() >= COORDINATES_LENGTH_START_END) {
             try {

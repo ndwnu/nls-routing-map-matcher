@@ -2,6 +2,7 @@ package nu.ndw.nls.routingmapmatcher.graphhopper.isochrone;
 
 
 import static java.util.Comparator.comparing;
+import static nu.ndw.nls.routingmapmatcher.constants.GlobalConstants.VEHICLE_CAR;
 import static nu.ndw.nls.routingmapmatcher.graphhopper.LinkWayIdEncodedValuesFactory.ID_NAME;
 import static nu.ndw.nls.routingmapmatcher.graphhopper.util.PathUtil.determineEdgeDirection;
 
@@ -142,7 +143,7 @@ public class IsochroneService {
             IsoLabel isoLabel) {
         EdgeIteratorState currentEdge = queryGraph.getEdgeIteratorState(isoLabel.edge,
                 isoLabel.node);
-        double averageSpeed = currentEdge.get(encodingManager.getDecimalEncodedValue(VehicleSpeed.key("car")));
+        double averageSpeed = currentEdge.get(encodingManager.getDecimalEncodedValue(VehicleSpeed.key(VEHICLE_CAR)));
         double totalTime = (double) isoLabel.time / MILLISECONDS;
         double maxDistance;
         if (totalTime <= maximumTimeInSeconds) {

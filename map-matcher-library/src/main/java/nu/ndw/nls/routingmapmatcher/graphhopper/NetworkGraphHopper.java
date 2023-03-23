@@ -18,6 +18,7 @@ import nu.ndw.nls.routingmapmatcher.domain.model.Link;
 public class NetworkGraphHopper extends GraphHopper implements Network {
 
     private static final int MAX_LEAF_ENTRIES = 200;
+    private static final String DATAREADER_IMPORT_DATE = "datareader.import.date";
 
     private final Supplier<Iterator<Link>> linkSupplier;
 
@@ -29,6 +30,11 @@ public class NetworkGraphHopper extends GraphHopper implements Network {
 
     }
 
+    /**
+     * GraphHopper uses this method importOSM for loading a network from file on r 862,
+     * this is a hardcoded method name we need to override in order to load a network from a linkSupplier.
+     * Via a linkSupplier we can load any map type into graphhopper.
+     */
     @Override
     protected void importOSM() {
         log.info("Start creating graph from db ");
@@ -38,7 +44,7 @@ public class NetworkGraphHopper extends GraphHopper implements Network {
                 nodeIdToInternalNodeIdMap);
         networkReader.readGraph();
         DateFormat f = Helper.createFormatter();
-        getProperties().put("datareader.import.date", f.format(new Date()));
+        getProperties().put(DATAREADER_IMPORT_DATE, f.format(new Date()));
         this.writeEncodingManagerToProperties();
     }
 

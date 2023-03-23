@@ -18,7 +18,6 @@ import nu.ndw.nls.routingmapmatcher.domain.model.singlepoint.SinglePointMatch;
 import nu.ndw.nls.routingmapmatcher.domain.model.singlepoint.SinglePointMatch.CandidateMatch;
 import nu.ndw.nls.routingmapmatcher.graphhopper.NetworkGraphHopperFactory;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.GeometryFactory;
@@ -51,15 +50,8 @@ class SinglePointMapMatcherFractionTest {
 
     /**
      * Test scenario contains one vertical line and two horizontal lines. With and without pilar nodes.
-     *
-     * (0,2)    2
-     *          |
-     * (0,1) 0  ~
-     *          |
-     *          0-----2-----~-----6
-     *             1        2
-     * (0,0)       (2,0)  (4,0)  (6,0)
-     * ~ pillar node
+     * <p>
+     * (0,2)    2 | (0,1) 0  ~ | 0-----2-----~-----6 1        2 (0,0)       (2,0)  (4,0)  (6,0) ~ pillar node
      *
      * @return
      */
@@ -157,7 +149,7 @@ class SinglePointMapMatcherFractionTest {
     void matchSinglePoint_fraction_towerBaseNode_returns_two_candidates_with_different_bearings() {
         SinglePointLocation singlePoint = this.createSinglePoint(123, 0, 0);
         SinglePointMatch match = this.singlePointMapMatcher.match(singlePoint);
-        assertThat( match.getCandidateMatches()).hasSize(2);
+        assertThat(match.getCandidateMatches()).hasSize(2);
         CandidateMatch candidateMatch1 = match.getCandidateMatches().get(0);
         assertEquals(0, candidateMatch1.getMatchedLinkId());
         assertEquals(0, candidateMatch1.getBearing());

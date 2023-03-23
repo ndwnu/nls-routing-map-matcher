@@ -1,5 +1,6 @@
 package nu.ndw.nls.routingmapmatcher.graphhopper.util;
 
+import static nu.ndw.nls.routingmapmatcher.constants.GlobalConstants.VEHICLE_CAR;
 import static nu.ndw.nls.routingmapmatcher.graphhopper.LinkWayIdEncodedValuesFactory.ID_NAME;
 
 import com.graphhopper.routing.ev.VehicleAccess;
@@ -90,9 +91,9 @@ public class PathUtil {
             EncodingManager encodingManager) {
         EdgeIteratorState edge = queryResult.getClosestEdge();
         boolean edgeCanBeTraveledFromBaseToAdjacent = edge.get(
-                encodingManager.getBooleanEncodedValue(VehicleAccess.key("car")));
+                encodingManager.getBooleanEncodedValue(VehicleAccess.key(VEHICLE_CAR)));
         boolean edgeCanBeTraveledFromAdjacentToBase = edge.getReverse(
-                encodingManager.getBooleanEncodedValue(VehicleAccess.key("car")));
+                encodingManager.getBooleanEncodedValue(VehicleAccess.key(VEHICLE_CAR)));
         if (edgeCanBeTraveledFromAdjacentToBase && edgeCanBeTraveledFromBaseToAdjacent) {
             return EdgeIteratorTravelDirection.BOTH_DIRECTIONS;
         } else if (edgeCanBeTraveledFromAdjacentToBase) {
