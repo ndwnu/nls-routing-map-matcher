@@ -9,7 +9,6 @@ import static nu.ndw.nls.routingmapmatcher.constants.GlobalConstants.WEIGHTING_S
 
 import com.graphhopper.config.Profile;
 import java.nio.file.Path;
-import nu.ndw.nls.routingmapmatcher.constants.GlobalConstants;
 import nu.ndw.nls.routingmapmatcher.domain.model.RoutingNetwork;
 import nu.ndw.nls.routingmapmatcher.util.GraphHopperNetworkPathUtils;
 
