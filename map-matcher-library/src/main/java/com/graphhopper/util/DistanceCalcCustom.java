@@ -1,5 +1,10 @@
 package com.graphhopper.util;
 
+/**
+ * This class  has a calcNormalizedEdgeDistanceNew method which was removed in the current version,
+ * but is necessary to calculate the EdgeDistance correctly in LineStringScoreUtil.
+ * Using the regular calcNormalizedEdgeDistance without the reduceToSegment logic produces incorrect reliability results in It test.
+ */
 public class DistanceCalcCustom extends  DistancePlaneProjection{
     public double calcNormalizedEdgeDistanceNew(double r_lat_deg, double r_lon_deg, double a_lat_deg, double a_lon_deg, double b_lat_deg, double b_lon_deg, boolean reduceToSegment) {
         double shrinkFactor = this.calcShrinkFactor(a_lat_deg, b_lat_deg);
