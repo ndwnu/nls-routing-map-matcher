@@ -15,7 +15,7 @@ import nu.ndw.nls.routingmapmatcher.domain.model.Link;
 
 
 public class LinkCarAverageSpeedParser extends AbstractAverageSpeedParser implements TagParser {
-    public static final double CAR_MAX_SPEED = 140;
+    public static final double CAR_MAX_SPEED = 130;
 
     public LinkCarAverageSpeedParser(EncodedValueLookup lookup, PMap properties) {
         this(
