@@ -14,6 +14,8 @@ import org.locationtech.jts.geom.Point;
 
 public final class MatchUtil {
 
+    private static final int KEY_FACTOR = 2;
+
     private MatchUtil() {
 
     }
@@ -28,7 +30,7 @@ public final class MatchUtil {
 
         locationIndexTree.query(circle.getBounds(), edgeId -> {
             EdgeIteratorState edge = network.getBaseGraph()
-                    .getEdgeIteratorStateForKey(edgeId * 2);
+                    .getEdgeIteratorStateForKey(edgeId * KEY_FACTOR);
             var geometry = edge.fetchWayGeometry(FetchMode.ALL).makeImmutable();
             if (circle.intersects(geometry)) {
                 var snap = new Snap(latitude, longitude);

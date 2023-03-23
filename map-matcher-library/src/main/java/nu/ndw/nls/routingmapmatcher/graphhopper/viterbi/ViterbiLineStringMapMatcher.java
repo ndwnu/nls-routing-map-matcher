@@ -124,7 +124,8 @@ public class ViterbiLineStringMapMatcher implements LineStringMapMatcher {
         for (int index = 0; index < coordinateSequence.size(); index++) {
             Observation observation = new Observation(
                     new GHPoint(coordinateSequence.getY(index), coordinateSequence.getX(index)));
-            // Only add observation entry when coordinate is nearby the NDW base network. This way, when an empty observation list is
+            // Only add observation entry when coordinate is nearby the NDW base network.
+            // This way, when an empty observation list is
             // returned, we can be pretty confident that there is no matching possible on the NDW base network.
             if (isNearbyNdwNetwork(observation)) {
                 observations.add(observation);
