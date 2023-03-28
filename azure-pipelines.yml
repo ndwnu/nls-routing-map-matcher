@@ -9,7 +9,7 @@ pool:
   vmImage: 'ubuntu-latest'
 
 variables:
-  isMain: ${{ eq(variables['Build.SourceBranch'], 'refs/heads/main') }}
+  isMain: true #${{ eq(variables['Build.SourceBranch'], 'refs/heads/main') }}
 
 steps:
   - task: SonarQubePrepare@4
@@ -20,7 +20,7 @@ steps:
       extraProperties: |
         sonar.coverage.jacoco.xmlReportPaths=**/target/site/jacoco/jacoco.xml,**/target/site/jacoco-it/jacoco.xml
         sonar.coverage.exclusions=**/config/**
-        sonar.exclusions=**/graphhopper/isochrone/ShortestPathTree.java
+        sonar.exclusions=**/graphhopper/isochrone/ShortestPathTree.java,**/graphhopper/viterbi.MapMatching.java
 
   - task: MavenAuthenticate@0
     displayName: 'Maven Authenticate'

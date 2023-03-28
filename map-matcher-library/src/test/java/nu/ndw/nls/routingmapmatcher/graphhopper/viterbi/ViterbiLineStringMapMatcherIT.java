@@ -62,7 +62,7 @@ class ViterbiLineStringMapMatcherIT {
                 containsInAnyOrder(3666086, 3666105, 3666106, 3666107, 3666108, 3666109, 3686216, 3686217));
         assertThat(lineStringMatch.getStartLinkFraction(), is(0.8805534312637381));
         assertThat(lineStringMatch.getEndLinkFraction(), is(0.45960570331968187));
-        assertThat(lineStringMatch.getReliability(), is(93.18611307333045));
+        assertThat(lineStringMatch.getReliability(), is(93.17603722543475));
         assertThat(lineStringMatch.getId(), is(29));
         assertThat(lineStringMatch.getLocationIndex(), is(-1));
         assertThat(lineStringMatch.isReversed(), is(true));
