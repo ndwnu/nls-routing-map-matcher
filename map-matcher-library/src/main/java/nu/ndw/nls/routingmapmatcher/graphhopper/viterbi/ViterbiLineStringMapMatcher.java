@@ -1,10 +1,11 @@
 package nu.ndw.nls.routingmapmatcher.graphhopper.viterbi;
 
+import static nu.ndw.nls.routingmapmatcher.constants.GlobalConstants.CAR_FASTEST;
 import static nu.ndw.nls.routingmapmatcher.constants.GlobalConstants.CAR_SHORTEST;
 import static nu.ndw.nls.routingmapmatcher.graphhopper.util.MatchUtil.getQueryResults;
 
 import com.google.common.base.Preconditions;
-
+import com.graphhopper.matching.MapMatching;
 import com.graphhopper.matching.MatchResult;
 import com.graphhopper.matching.Observation;
 import com.graphhopper.routing.Path;
@@ -13,7 +14,6 @@ import com.graphhopper.routing.querygraph.QueryGraph;
 import com.graphhopper.routing.util.EdgeFilter;
 import com.graphhopper.storage.index.LocationIndexTree;
 import com.graphhopper.storage.index.Snap;
-import com.graphhopper.util.DistanceCalcCustom;
 import com.graphhopper.util.PMap;
 import com.graphhopper.util.Parameters;
 import com.graphhopper.util.shapes.GHPoint;
@@ -76,18 +76,14 @@ public class ViterbiLineStringMapMatcher implements LineStringMapMatcher {
     private final LineStringMatchUtil lineStringMatchUtil;
     private final LineStringScoreUtil lineStringScoreUtil;
 
-    private final DistanceCalcCustom distanceCalc;
-
 
     public ViterbiLineStringMapMatcher(NetworkGraphHopper networkGraphHopper) {
         Preconditions.checkNotNull(networkGraphHopper);
         this.networkGraphHopper = networkGraphHopper;
-        this.distanceCalc = new DistanceCalcCustom();
         PMap hints = new PMap();
         hints.putObject(PROFILE_KEY, CAR_SHORTEST);
         hints.putObject(Parameters.CH.DISABLE, true);
         this.mapMatching = MapMatching.fromGraphHopper(networkGraphHopper, hints);
-        this.mapMatching.setDistanceCalc(distanceCalc);
         mapMatching.setMeasurementErrorSigma(MEASUREMENT_ERROR_SIGMA_IN_METERS);
         mapMatching.setTransitionProbabilityBeta(TRANSITION_PROBABILITY_BETA);
         this.locationIndexTree = networkGraphHopper.getLocationIndex();
@@ -104,7 +100,6 @@ public class ViterbiLineStringMapMatcher implements LineStringMapMatcher {
         LineStringMatch lineStringMatch;
         if (observations.size() >= COORDINATES_LENGTH_START_END) {
             try {
-                preventFilteringWhileMapMatching(observations);
                 MatchResult matchResult = mapMatching.match(observations);
                 if (matchResult.getMergedPath().getEdgeCount() > 0) {
                     lineStringMatch = createMatch(matchResult, lineStringLocation);
@@ -121,11 +116,6 @@ public class ViterbiLineStringMapMatcher implements LineStringMapMatcher {
         return lineStringMatch;
     }
 
-    private void preventFilteringWhileMapMatching(List<Observation> observations) {
-        // When filtering there is no distance calculation for the first and last GPS coordinates
-        int numberOfCalls = Math.max(observations.size() - COORDINATES_LENGTH_START_END, 0);
-        distanceCalc.returnCustomDistanceForNextCalls(DISTANCE_CALCULATOR_CUSTOM_DISTANCE, numberOfCalls);
-    }
     private List<Observation> convertToObservations(LineString lineString) {
         CoordinateSequence coordinateSequence = lineString.getCoordinateSequence();
         List<Observation> observations = new ArrayList<>();
