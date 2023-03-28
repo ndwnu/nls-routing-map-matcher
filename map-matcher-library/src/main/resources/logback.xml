@@ -9,7 +9,7 @@
     </appender>
 
     <!-- Special treatment -->
-    <logger name="nu.ndw.nls.routingmapmatcher.graphhopper.viterbi.MapMatching" level="info"/>
+    <logger name="com.graphhopper.matching.MapMatching" level="info"/>
     <root level="info">
         <appender-ref ref="STDOUT"/>
     </root>
