@@ -1,14 +1,23 @@
 package nu.ndw.nls.routingmapmatcher.graphhopper;
 
+import com.graphhopper.GHRequest;
 import com.graphhopper.GraphHopper;
 import com.graphhopper.coll.GHLongIntBTree;
 import com.graphhopper.coll.LongIntMap;
+import com.graphhopper.config.Profile;
+import com.graphhopper.routing.Path;
+import com.graphhopper.routing.PathRouter;
 import com.graphhopper.storage.index.LocationIndexTree;
 import com.graphhopper.util.Helper;
 import java.text.DateFormat;
 import java.util.Date;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.function.Function;
 import java.util.function.Supplier;
+import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import nu.ndw.nls.routingmapmatcher.domain.Network;
 import nu.ndw.nls.routingmapmatcher.domain.model.Link;
@@ -31,9 +40,9 @@ public class NetworkGraphHopper extends GraphHopper implements Network {
     }
 
     /**
-     * GraphHopper uses this method importOSM for loading a network from file on r 862,
-     * this is a hardcoded method name we need to override in order to load a network from a linkSupplier.
-     * Via a linkSupplier we can load any map type into graphhopper.
+     * GraphHopper uses this method importOSM for loading a network from file on r 862, this is a hardcoded method name
+     * we need to override in order to load a network from a linkSupplier. Via a linkSupplier we can load any map type
+     * into graphhopper.
      */
     @Override
     protected void importOSM() {
@@ -53,5 +62,23 @@ public class NetworkGraphHopper extends GraphHopper implements Network {
         return (LocationIndexTree) super.getLocationIndex();
     }
 
+    public List<Path> calcPaths(GHRequest request) {
+        Map<String, Profile> profilesByName = getProfiles()
+                .stream().collect(Collectors
+                        .toMap(Profile::getName,
+                                Function.identity(),
+                                (e1, e2) -> e1,
+                                LinkedHashMap::new
+                        ));
 
+        return new PathRouter(getBaseGraph(),
+                getEncodingManager(),
+                getLocationIndex(), profilesByName,
+                getPathDetailsBuilderFactory(),
+                getTranslationMap(),
+                getRouterConfig(),
+                createWeightingFactory(),
+                getCHGraphs(), getLandmarks())
+                .calcPaths(request);
+    }
 }
