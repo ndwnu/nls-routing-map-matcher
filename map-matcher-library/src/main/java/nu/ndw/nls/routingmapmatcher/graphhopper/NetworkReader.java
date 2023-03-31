@@ -68,9 +68,14 @@ class NetworkReader {
         int count = 0;
         while (links.hasNext()) {
             Link link = links.next();
-            addLink(link);
-            count++;
-            logCount(count);
+            try {
+                addLink(link);
+                count++;
+                logCount(count);
+            } catch (Exception exception) {
+                log.error("Error adding link {} {}", exception, link);
+                throw new IllegalStateException(exception);
+            }
         }
     }
 
@@ -84,7 +89,7 @@ class NetworkReader {
                 coordinates[coordinates.length - 1].x);
 
         IntsRef wayFlags = determineWayFlags(link);
-        idEncoder.setInt(false, wayFlags, Math.toIntExact(link.getId()));
+
         EdgeIteratorState edge = baseGraph.edge(internalFromNodeId, internalToNodeId)
                 .setDistance(link.getDistanceInMeters())
                 .setFlags(wayFlags);
@@ -112,7 +117,7 @@ class NetworkReader {
         vehicleTagParsers
                 .forEach(tagParser -> tagParser.handleWayTags(wayFlags,
                         link, IntsRef.EMPTY));
-
+        idEncoder.setInt(false, wayFlags, Math.toIntExact(link.getId()));
         return wayFlags;
     }
 
