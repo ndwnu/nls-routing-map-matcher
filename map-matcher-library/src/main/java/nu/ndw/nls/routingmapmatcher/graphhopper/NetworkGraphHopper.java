@@ -62,6 +62,17 @@ public class NetworkGraphHopper extends GraphHopper implements Network {
         return (LocationIndexTree) super.getLocationIndex();
     }
 
+    /**
+     * calcPaths method in order to get access to the edges and id's via the paths This is used to get the link ids and
+     * determine the start and end fractions. In the previous version (0.12) of graphhopper this was part of the GH
+     * routing api.
+     *
+     * @param request the gh routing request
+     * @return a list of path objects
+     * @see <a
+     * href="https://github.com/graphhopper/graphhopper/blob/0.12/core/src/main/java/com/graphhopper/GraphHopper.java#L929">original
+     * routing api</a>
+     */
     public List<Path> calcPaths(GHRequest request) {
         Map<String, Profile> profilesByName = getProfiles()
                 .stream().collect(Collectors
