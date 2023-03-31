@@ -1,12 +1,9 @@
 package com.graphhopper.util;
 
-import com.google.common.base.Preconditions;
-
 /**
  * This class  has a calcNormalizedEdgeDistanceNew method which was removed in the current version, but is necessary to
  * calculate the EdgeDistance correctly in LineStringScoreUtil. Using the regular calcNormalizedEdgeDistance without the
  * reduceToSegment logic produces incorrect reliability results in It test.
- *
  */
 public class DistanceCalcCustom extends DistancePlaneProjection {
 
