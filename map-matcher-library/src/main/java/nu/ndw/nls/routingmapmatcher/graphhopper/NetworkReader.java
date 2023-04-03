@@ -73,7 +73,7 @@ class NetworkReader {
                 count++;
                 logCount(count);
             } catch (Exception exception) {
-                log.error("Error adding link {} {}", exception, link);
+                log.error("Error adding link {}", link);
                 throw new IllegalStateException(exception);
             }
         }
@@ -89,7 +89,6 @@ class NetworkReader {
                 coordinates[coordinates.length - 1].x);
 
         IntsRef wayFlags = determineWayFlags(link);
-
         EdgeIteratorState edge = baseGraph.edge(internalFromNodeId, internalToNodeId)
                 .setDistance(link.getDistanceInMeters())
                 .setFlags(wayFlags);
@@ -111,6 +110,7 @@ class NetworkReader {
 
     private IntsRef determineWayFlags(Link link) {
         if (getAccess(link).canSkip()) {
+            log.warn("link {} is inaccessible and will be ignored in the network",link);
             return IntsRef.EMPTY;
         }
         IntsRef wayFlags = encodingManager.createEdgeFlags();
