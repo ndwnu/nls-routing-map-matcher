@@ -20,7 +20,7 @@ steps:
       extraProperties: |
         sonar.coverage.jacoco.xmlReportPaths=**/target/site/jacoco/jacoco.xml,**/target/site/jacoco-it/jacoco.xml
         sonar.coverage.exclusions=**/config/**
-        sonar.exclusions=**/graphhopper/isochrone/Isochrone.java
+        sonar.exclusions=**/graphhopper/isochrone/ShortestPathTree.java,**/graphhopper/routing/PathRouter.java
 
   - task: MavenAuthenticate@0
     displayName: 'Maven Authenticate'

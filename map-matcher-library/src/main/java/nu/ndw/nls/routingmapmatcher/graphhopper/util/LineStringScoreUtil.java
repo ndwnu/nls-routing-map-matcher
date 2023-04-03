@@ -1,7 +1,7 @@
 package nu.ndw.nls.routingmapmatcher.graphhopper.util;
 
 import com.graphhopper.routing.Path;
-import com.graphhopper.util.DistancePlaneProjection;
+import com.graphhopper.util.DistanceCalcCustom;
 import com.graphhopper.util.PointList;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -19,7 +19,7 @@ public class LineStringScoreUtil {
     private static final double DISTANCE_PENALTY_FACTOR = 1.5;
     private static final double PATH_LENGTH_DIFFERENCE_PENALTY_FACTOR = 0.1;
 
-    private final DistancePlaneProjection distanceCalc = new DistancePlaneProjection();
+    private final DistanceCalcCustom distanceCalc = new DistanceCalcCustom();
 
     public double calculateCandidatePathScore(Path path, LineStringLocation lineStringLocation) {
         if (ReliabilityCalculationType.POINT_OBSERVATIONS == lineStringLocation.getReliabilityCalculationType()) {
@@ -66,8 +66,8 @@ public class LineStringScoreUtil {
         CoordinateSequence geometryCoordinates = geometry.getCoordinateSequence();
         double maximumDistanceInMeters = 0.0;
         for (int index = 0; index < pathPointList.size(); index++) {
-            double latitude = pathPointList.getLatitude(index);
-            double longitude = pathPointList.getLongitude(index);
+            double latitude = pathPointList.getLat(index);
+            double longitude = pathPointList.getLon(index);
             double smallestDistanceToLtcLink = calculateSmallestDistanceToCoordinateSequence(latitude, longitude,
                     geometryCoordinates);
             maximumDistanceInMeters = Math.max(maximumDistanceInMeters, smallestDistanceToLtcLink);
@@ -98,8 +98,8 @@ public class LineStringScoreUtil {
         double smallestDistanceToLtcLink = Double.MAX_VALUE;
         for (int index = 1; index < pointList.size(); index++) {
             double normalizedDistance = distanceCalc.calcNormalizedEdgeDistanceNew(latitude, longitude,
-                    pointList.getLatitude(index - 1), pointList.getLongitude(index - 1),
-                    pointList.getLatitude(index), pointList.getLongitude(index), REDUCE_TO_SEGMENT);
+                    pointList.getLat(index - 1), pointList.getLon(index - 1),
+                    pointList.getLat(index), pointList.getLon(index), REDUCE_TO_SEGMENT);
             double distanceInMeters = distanceCalc.calcDenormalizedDist(normalizedDistance);
             smallestDistanceToLtcLink = Math.min(smallestDistanceToLtcLink, distanceInMeters);
         }

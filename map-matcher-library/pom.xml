@@ -4,7 +4,7 @@
     <parent>
         <groupId>nu.ndw.nls</groupId>
         <artifactId>routing-map-matcher-parent</artifactId>
-        <version>3.1.1</version>
+        <version>4.0.0</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <artifactId>routing-map-matcher-library</artifactId>
@@ -18,13 +18,7 @@
         </dependency>
         <dependency>
             <groupId>com.graphhopper</groupId>
-            <artifactId>graphhopper-map-matching-core</artifactId>
-            <exclusions>
-                <exclusion>
-                    <groupId>com.graphhopper</groupId>
-                    <artifactId>graphhopper-reader-osm</artifactId>
-                </exclusion>
-            </exclusions>
+            <artifactId>graphhopper-map-matching</artifactId>
         </dependency>
         <dependency>
             <groupId>org.projectlombok</groupId>

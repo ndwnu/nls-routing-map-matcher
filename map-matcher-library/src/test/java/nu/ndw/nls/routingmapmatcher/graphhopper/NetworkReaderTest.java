@@ -9,8 +9,10 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.graphhopper.coll.LongIntMap;
+import com.graphhopper.routing.ev.IntEncodedValue;
 import com.graphhopper.routing.util.EncodingManager;
-import com.graphhopper.storage.GraphHopperStorage;
+import com.graphhopper.routing.util.parsers.TagParser;
+import com.graphhopper.storage.BaseGraph;
 import com.graphhopper.util.EdgeIteratorState;
 import com.graphhopper.util.PointList;
 import java.util.Collections;
@@ -48,12 +50,15 @@ class NetworkReaderTest {
     private ArgumentCaptor<PointList> pointListArgumentCaptor;
 
     @Mock
-    private EncodingManager encodingManager;
+    private IntEncodedValue intEncodedValue;
     @Mock
-    private GraphHopperStorage ghStorage;
+    private BaseGraph baseGraph;
 
     @Mock
-    private EdgeIteratorState edgeIteratorState;
+    private TagParser tagParser;
+
+    @Mock
+    private EncodingManager encodingManager;
 
     @Mock
     private LineString lineString;
@@ -70,15 +75,18 @@ class NetworkReaderTest {
 
     @BeforeEach
     void setup() {
-        when(ghStorage.getEncodingManager()).thenReturn(encodingManager);
         List<Link> links = Collections.singletonList(link);
         Supplier<Iterator<Link>> networkSupplier = links::iterator;
-        networkReader = new NetworkReader(ghStorage, networkSupplier, nodeIdToInternalNodeIdMap);
+        List<TagParser> tagParsers = Collections.singletonList(tagParser);
+        when(encodingManager.getIntEncodedValue(LinkWayIdEncodedValuesFactory.ID_NAME))
+                .thenReturn(intEncodedValue);
+        networkReader = new NetworkReader(baseGraph, encodingManager, networkSupplier, tagParsers,
+                nodeIdToInternalNodeIdMap);
     }
 
     @Test
     void testReadGraph() {
-        when(ghStorage.edge(anyInt(), anyInt())).thenReturn(edge);
+        when(baseGraph.edge(anyInt(), anyInt())).thenReturn(edge);
         when(edge.setDistance(anyDouble())).thenReturn(edge);
         when(edge.setFlags(any())).thenReturn(edge);
         when(edge.setWayGeometry(any())).thenReturn(edge);
@@ -90,7 +98,7 @@ class NetworkReaderTest {
         networkReader.readGraph();
         verify(edge).setWayGeometry(pointListArgumentCaptor.capture());
         PointList pointList = pointListArgumentCaptor.getValue();
-        assertThat(pointList.getSize(), is(1));
+        assertThat(pointList.size(), is(1));
         assertThat(pointList.getLon(0), is(LONG_2));
         assertThat(pointList.getLat(0), is(LAT_2));
     }
