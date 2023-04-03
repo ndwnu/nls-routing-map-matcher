@@ -39,7 +39,6 @@ class NetworkGraphHopperFactoryTest {
     @Mock
     private RoutingNetwork routingNetwork;
 
-    @Mock
     private Link link;
 
     @Mock
@@ -49,26 +48,27 @@ class NetworkGraphHopperFactoryTest {
 
     @BeforeEach
     void setup() {
-        when(link.getFromNodeId()).thenReturn(FROM_NODE_ID);
-        when(link.getToNodeId()).thenReturn(TO_NODE_ID);
         Coordinate[] coordinates = {coordinateA1, coordinateA2, coordinateA3};
         when(lineString.getCoordinates()).thenReturn(coordinates);
-        when(link.getGeometry()).thenReturn(lineString);
+        link =  Link.builder()
+                .id(20L)
+                .fromNodeId(FROM_NODE_ID)
+                .toNodeId(TO_NODE_ID)
+                .distanceInMeters(100)
+                .geometry(lineString)
+                .reverseSpeedInKilometersPerHour(0)
+                .speedInKilometersPerHour(100)
+                .build();
         when(routingNetwork.getNetworkNameAndVersion()).thenReturn(TEST_NETWORK);
         when(routingNetwork.getLinkSupplier()).thenReturn(() -> Collections.singletonList(link).iterator());
-
         networkGraphHopperFactory = new NetworkGraphHopperFactory();
     }
 
     @Test
     void testCreateNetworkGraphHopper() {
         NetworkGraphHopper graphHopper = networkGraphHopperFactory.createNetwork(routingNetwork);
-
-        assertThat(graphHopper.getDataReaderFile(),
-                is(Path.of(DEFAULT_GRAPHHOPPER_ROOT_DIRECTORY, TEST_NETWORK).toString()));
         assertThat(graphHopper.getGraphHopperLocation(),
                 is(Path.of(DEFAULT_GRAPHHOPPER_ROOT_DIRECTORY, TEST_NETWORK).toString()));
-        assertFalse(graphHopper.isCHEnabled());
         assertFalse(graphHopper.isAllowWrites());
         assertFalse(graphHopper.hasElevation());
     }
@@ -77,12 +77,8 @@ class NetworkGraphHopperFactoryTest {
     void testCreateNetworkGraphHopper_with_Network() {
         NetworkGraphHopper graphHopper = networkGraphHopperFactory.createNetwork(routingNetwork, false,
                 CUSTOM_GRAPHHOPPER_DIRECTORY);
-
-        assertThat(graphHopper.getDataReaderFile(), is(CUSTOM_GRAPHHOPPER_DIRECTORY.resolve(TEST_NETWORK).toString()));
         assertThat(graphHopper.getGraphHopperLocation(),
                 is(CUSTOM_GRAPHHOPPER_DIRECTORY.resolve(TEST_NETWORK).toString()));
-
-        assertFalse(graphHopper.isCHEnabled());
         assertFalse(graphHopper.isAllowWrites());
         assertFalse(graphHopper.hasElevation());
     }

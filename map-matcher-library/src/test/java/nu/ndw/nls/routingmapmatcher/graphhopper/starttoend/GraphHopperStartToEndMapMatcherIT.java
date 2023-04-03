@@ -74,9 +74,9 @@ class GraphHopperStartToEndMapMatcherIT {
         assertThat(lineStringMatch, is(notNullValue()));
         assertThat(lineStringMatch.getStatus(), is(MatchStatus.MATCH));
         assertThat(lineStringMatch.getMatchedLinkIds(), hasSize(16));
-        assertThat(lineStringMatch.getStartLinkFraction(), is(0.6486691616943794));
-        assertThat(lineStringMatch.getEndLinkFraction(), is(0.9814440510788827));
-        assertThat(lineStringMatch.getReliability(), is(73.89369696136275));
+        assertThat(lineStringMatch.getStartLinkFraction(), is(0.6488926754519858));
+        assertThat(lineStringMatch.getEndLinkFraction(), is(0.9813577658271124));
+        assertThat(lineStringMatch.getReliability(), is(73.88564657201005));
     }
 
     @SneakyThrows
@@ -93,9 +93,10 @@ class GraphHopperStartToEndMapMatcherIT {
                 containsInAnyOrder(3666097, 3666096, 3666095, 3666094, 7223062, 7223061));
         assertThat(lineStringMatch.getDownstreamLinkIds(),
                 containsInAnyOrder(3666086, 3666105, 3666106, 3666107, 3666108, 3666109, 3686216, 3686217));
-        assertThat(lineStringMatch.getStartLinkFraction(), is(0.8802584207113416));
-        assertThat(lineStringMatch.getEndLinkFraction(), is(0.45984987610479167));
-        assertThat(lineStringMatch.getReliability(), is(93.31281800491443));
+
+        assertThat(lineStringMatch.getStartLinkFraction(), is(0.8805534312637381));
+        assertThat(lineStringMatch.getEndLinkFraction(), is(0.45960570331968187));
+        assertThat(lineStringMatch.getReliability(), is(93.29643981088304));
         assertThat(lineStringMatch.getId(), is(29));
         assertThat(lineStringMatch.getLocationIndex(), is(-1));
         assertThat(lineStringMatch.isReversed(), is(true));

@@ -1,10 +1,20 @@
 package nu.ndw.nls.routingmapmatcher.graphhopper.util;
 
+import static nu.ndw.nls.routingmapmatcher.constants.GlobalConstants.VEHICLE_CAR;
+
 import com.google.common.collect.Lists;
 import com.graphhopper.routing.Path;
-import com.graphhopper.routing.QueryGraph;
+import com.graphhopper.routing.ev.BooleanEncodedValue;
+import com.graphhopper.routing.ev.DecimalEncodedValue;
+import com.graphhopper.routing.ev.VehicleAccess;
+import com.graphhopper.routing.ev.VehicleSpeed;
+import com.graphhopper.routing.querygraph.QueryGraph;
+import com.graphhopper.routing.util.EncodingManager;
+import com.graphhopper.routing.weighting.ShortestWeighting;
 import com.graphhopper.routing.weighting.Weighting;
+import com.graphhopper.storage.BaseGraph;
 import com.graphhopper.storage.EdgeIteratorStateReverseExtractor;
+import com.graphhopper.storage.index.LocationIndexTree;
 import com.graphhopper.util.EdgeIteratorState;
 import java.util.List;
 import java.util.Set;
@@ -13,9 +23,9 @@ import nu.ndw.nls.routingmapmatcher.domain.exception.RoutingMapMatcherException;
 import nu.ndw.nls.routingmapmatcher.domain.model.MatchStatus;
 import nu.ndw.nls.routingmapmatcher.domain.model.linestring.LineStringLocation;
 import nu.ndw.nls.routingmapmatcher.domain.model.linestring.LineStringMatch;
-import nu.ndw.nls.routingmapmatcher.graphhopper.LinkFlagEncoder;
-import nu.ndw.nls.routingmapmatcher.graphhopper.isochrone.IsochroneFactory;
+import nu.ndw.nls.routingmapmatcher.graphhopper.NetworkGraphHopper;
 import nu.ndw.nls.routingmapmatcher.graphhopper.isochrone.IsochroneService;
+import nu.ndw.nls.routingmapmatcher.graphhopper.isochrone.ShortestPathTreeFactory;
 import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.LineString;
 import org.locationtech.jts.geom.PrecisionModel;
@@ -23,15 +33,26 @@ import org.locationtech.jts.geom.PrecisionModel;
 public class LineStringMatchUtil {
 
     private final PathUtil pathUtil;
-    private final LinkFlagEncoder flagEncoder;
+    private final EncodingManager encodingManager;
     private final IsochroneService isochroneService;
 
-    public LineStringMatchUtil(LinkFlagEncoder flagEncoder, Weighting weighting) {
+
+    private LineStringMatchUtil(LocationIndexTree locationIndexTree, BaseGraph baseGraph,
+            EncodingManager encodingManager) {
         GeometryFactory geometryFactory = new GeometryFactory(new PrecisionModel(), GlobalConstants.WGS84_SRID);
         this.pathUtil = new PathUtil(geometryFactory);
-        this.flagEncoder = flagEncoder;
-        this.isochroneService = new IsochroneService(flagEncoder,new EdgeIteratorStateReverseExtractor(),
-                null,new IsochroneFactory(weighting));
+        this.encodingManager = encodingManager;
+        BooleanEncodedValue accessEnc = encodingManager.getBooleanEncodedValue(VehicleAccess.key(VEHICLE_CAR));
+        DecimalEncodedValue speedEnc = encodingManager.getDecimalEncodedValue(VehicleSpeed.key(VEHICLE_CAR));
+        Weighting weighting = new ShortestWeighting(accessEnc, speedEnc);
+        this.isochroneService = new IsochroneService(encodingManager, baseGraph,
+                new EdgeIteratorStateReverseExtractor(),
+                null, new ShortestPathTreeFactory(weighting), locationIndexTree);
+    }
+
+    public LineStringMatchUtil(NetworkGraphHopper networkGraphHopper) {
+        this(networkGraphHopper.getLocationIndex(), networkGraphHopper.getBaseGraph(),
+                networkGraphHopper.getEncodingManager());
     }
 
     public LineStringMatch createMatch(LineStringLocation lineStringLocation, Path path, QueryGraph queryGraph,
@@ -40,7 +61,7 @@ public class LineStringMatchUtil {
         if (edges.isEmpty()) {
             throw new RoutingMapMatcherException("Unexpected: path has no edges");
         }
-        List<Integer> matchedLinkIds = pathUtil.determineMatchedLinkIds(flagEncoder, edges);
+        List<Integer> matchedLinkIds = pathUtil.determineMatchedLinkIds(encodingManager, edges);
 
         int startNode = edges.get(0).getBaseNode();
         Set<Integer> upstreamLinkIds = lineStringLocation.getUpstreamIsochroneUnit() != null ?

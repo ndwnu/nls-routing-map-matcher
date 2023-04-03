@@ -2,7 +2,7 @@ package nu.ndw.nls.routingmapmatcher.graphhopper.isochrone;
 
 import java.lang.reflect.Constructor;
 import lombok.SneakyThrows;
-import nu.ndw.nls.routingmapmatcher.graphhopper.isochrone.Isochrone.IsoLabel;
+import nu.ndw.nls.routingmapmatcher.graphhopper.isochrone.ShortestPathTree.IsoLabel;
 
 public final class IsochroneTestHelper {
 
@@ -21,10 +21,10 @@ public final class IsochroneTestHelper {
                 int.class,
                 double.class,
                 long.class,
-                double.class);
+                double.class,IsoLabel.class);
         constructor.setAccessible(true);
-        var isoLabel = constructor.newInstance(edgeId, adjNode, weight, time, distance);
-        isoLabel.parent = constructor.newInstance(ROOT_ID, ROOT_ID, weight, 0, 0);
+        IsoLabel parent = constructor.newInstance(ROOT_ID, ROOT_ID, weight, 0, 0,null);
+        IsoLabel isoLabel = constructor.newInstance(edgeId, adjNode, weight, time, distance,parent);
         return isoLabel;
     }
 
@@ -35,9 +35,9 @@ public final class IsochroneTestHelper {
                 int.class,
                 double.class,
                 long.class,
-                double.class);
+                double.class,IsoLabel.class);
         constructor.setAccessible(true);
-        return constructor.newInstance(edgeId, adjNode, weight, time, distance);
+        return constructor.newInstance(edgeId, adjNode, weight, time, distance,null);
     }
 
 }

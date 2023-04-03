@@ -3,9 +3,11 @@ package nu.ndw.nls.routingmapmatcher.domain.model;
 import com.graphhopper.reader.ReaderWay;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.ToString;
 import org.locationtech.jts.geom.LineString;
 
 @Getter
+@ToString(exclude = "geometry")
 public class Link extends ReaderWay {
 
     private final long fromNodeId;

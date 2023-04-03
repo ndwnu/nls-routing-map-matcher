@@ -2,15 +2,20 @@ package nu.ndw.nls.routingmapmatcher.graphhopper.isochrone;
 
 
 import static java.util.Comparator.comparing;
+import static nu.ndw.nls.routingmapmatcher.constants.GlobalConstants.VEHICLE_CAR;
+import static nu.ndw.nls.routingmapmatcher.graphhopper.LinkWayIdEncodedValuesFactory.ID_NAME;
 import static nu.ndw.nls.routingmapmatcher.graphhopper.util.PathUtil.determineEdgeDirection;
 
-import com.graphhopper.routing.QueryGraph;
+import com.graphhopper.routing.ev.VehicleSpeed;
+import com.graphhopper.routing.querygraph.QueryGraph;
 import com.graphhopper.routing.util.EdgeFilter;
+import com.graphhopper.routing.util.EncodingManager;
+import com.graphhopper.storage.BaseGraph;
 import com.graphhopper.storage.EdgeIteratorStateReverseExtractor;
-import com.graphhopper.storage.SPTEntry;
 import com.graphhopper.storage.index.LocationIndexTree;
-import com.graphhopper.storage.index.QueryResult;
+import com.graphhopper.storage.index.Snap;
 import com.graphhopper.util.EdgeIteratorState;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -18,8 +23,7 @@ import lombok.RequiredArgsConstructor;
 import nu.ndw.nls.routingmapmatcher.domain.model.IsochroneMatch;
 import nu.ndw.nls.routingmapmatcher.domain.model.IsochroneUnit;
 import nu.ndw.nls.routingmapmatcher.domain.model.base.BaseLocation;
-import nu.ndw.nls.routingmapmatcher.graphhopper.LinkFlagEncoder;
-import nu.ndw.nls.routingmapmatcher.graphhopper.isochrone.Isochrone.IsoLabel;
+import nu.ndw.nls.routingmapmatcher.graphhopper.isochrone.ShortestPathTree.IsoLabel;
 import nu.ndw.nls.routingmapmatcher.graphhopper.isochrone.mappers.IsochroneMatchMapper;
 import nu.ndw.nls.routingmapmatcher.graphhopper.model.EdgeIteratorTravelDirection;
 import nu.ndw.nls.routingmapmatcher.graphhopper.model.MatchedPoint;
@@ -31,28 +35,26 @@ public class IsochroneService {
     private static final int METERS = 1000;
     private static final int SECONDS_PER_HOUR = 3600;
     private static final int MILLISECONDS = 1000;
-    private final LinkFlagEncoder flagEncoder;
+    private final EncodingManager encodingManager;
+    private final BaseGraph baseGraph;
     private final EdgeIteratorStateReverseExtractor edgeIteratorStateReverseExtractor;
     private final IsochroneMatchMapper isochroneMatchMapper;
-    private final IsochroneFactory isochroneFactory;
+    private final ShortestPathTreeFactory shortestPathTreeFactory;
+    private final LocationIndexTree locationIndexTree;
 
     /**
      * Performs an up-stream isochrone search and returns a list of isochrone matches containing exact cropped
      * geometries with start and end fractions.
      *
      * @param matchedPoint      The nearest point found by the nearest match from which to start the isochrone search
-     * @param queryGraph        The query graph to use in the isochrone search
      * @param location          Base location containing isochrone specifications
-     * @param locationIndexTree The spatial index to retrieve the start segment from
      * @return A list of isochrone matches with the geometries cropped to the max distance. The geometry is aligned in
      * the direction of travelling. Start and en fraction are with respect to this alignment (positive negative)
      */
     public List<IsochroneMatch> getUpstreamIsochroneMatches(MatchedPoint matchedPoint,
-            QueryGraph queryGraph,
-            BaseLocation location,
-            LocationIndexTree locationIndexTree) {
-        return getIsochroneMatches(matchedPoint, queryGraph, location.getUpstreamIsochrone(),
-                location.getUpstreamIsochroneUnit(), locationIndexTree, true);
+            BaseLocation location) {
+        return getIsochroneMatches(matchedPoint, location.getUpstreamIsochrone(),
+                location.getUpstreamIsochroneUnit(), true);
     }
 
     /**
@@ -60,18 +62,14 @@ public class IsochroneService {
      * geometries with start and end fractions.
      *
      * @param matchedPoint      The nearest point found by the nearest match from which to start the isochrone search
-     * @param queryGraph        The query graph to use in the isochrone search
      * @param location          Base location containing isochrone specifications
-     * @param locationIndexTree The spatial index to retrieve the start segment from
      * @return A list of isochrone matches with the geometries cropped to the max distance. The geometry is aligned in
      * the direction of travelling. Start and en fraction are with respect to this alignment (positive negative)
      */
     public List<IsochroneMatch> getDownstreamIsochroneMatches(MatchedPoint matchedPoint,
-            QueryGraph queryGraph,
-            BaseLocation location,
-            LocationIndexTree locationIndexTree) {
-        return getIsochroneMatches(matchedPoint, queryGraph, location.getDownstreamIsochrone(),
-                location.getDownstreamIsochroneUnit(), locationIndexTree, false);
+            BaseLocation location) {
+        return getIsochroneMatches(matchedPoint, location.getDownstreamIsochrone(),
+                location.getDownstreamIsochroneUnit(), false);
     }
 
     public Set<Integer> getUpstreamLinkIds(QueryGraph queryGraph, BaseLocation location, int nodeId) {
@@ -85,15 +83,14 @@ public class IsochroneService {
     }
 
     private List<IsochroneMatch> getIsochroneMatches(MatchedPoint matchedPoint,
-            QueryGraph queryGraph,
             double isochroneValue,
             IsochroneUnit isochroneUnit,
-            LocationIndexTree locationIndexTree,
+
             boolean reverseFlow) {
         double latitude = matchedPoint.getSnappedPoint().getY();
         double longitude = matchedPoint.getSnappedPoint().getX();
         // Get the  start segment for the isochrone calculation
-        QueryResult startSegment
+        Snap startSegment
                 = locationIndexTree
                 .findClosest(latitude, longitude, EdgeFilter.ALL_EDGES);
 
@@ -103,12 +100,15 @@ public class IsochroneService {
             start point for isochrone calculation based on the snapped point coordinates.
         */
 
-        queryGraph.lookup(List.of(startSegment));
-        Isochrone isochrone = isochroneFactory.createIsochrone(queryGraph, isochroneValue, isochroneUnit, reverseFlow);
+        QueryGraph queryGraph = QueryGraph.create(baseGraph, startSegment);
+        ShortestPathTree isochrone = shortestPathTreeFactory.createShortestPathtree(queryGraph, isochroneValue,
+                isochroneUnit, reverseFlow);
         // Here the ClosestNode is the virtual node id created by the queryGraph.lookup.
-        List<IsoLabel> labels = isochrone.search(startSegment.getClosestNode());
+        List<IsoLabel> isoLabels = new ArrayList<>();
+        isochrone.search(startSegment.getClosestNode(), isoLabels::add);
         boolean searchDirectionReversed = matchedPoint.isReversed() != reverseFlow;
-        return labels.stream()
+        return isoLabels.stream()
+                .filter(isoLabel-> isoLabel.edge!=ROOT_PARENT)
                 /*
                     With bidirectional start segments the search goes two ways for both down and upstream isochrones.
                     The  branches that are starting in the wrong direction of travelling
@@ -142,8 +142,8 @@ public class IsochroneService {
     private double calculateMaxDistance(QueryGraph queryGraph, double maximumTimeInSeconds,
             IsoLabel isoLabel) {
         EdgeIteratorState currentEdge = queryGraph.getEdgeIteratorState(isoLabel.edge,
-                isoLabel.adjNode);
-        double averageSpeed = currentEdge.get(flagEncoder.getAverageSpeedEnc());
+                isoLabel.node);
+        double averageSpeed = currentEdge.get(encodingManager.getDecimalEncodedValue(VehicleSpeed.key(VEHICLE_CAR)));
         double totalTime = (double) isoLabel.time / MILLISECONDS;
         double maxDistance;
         if (totalTime <= maximumTimeInSeconds) {
@@ -162,12 +162,15 @@ public class IsochroneService {
 
     private Set<Integer> getIsochroneLinkIds(QueryGraph queryGraph, boolean reverse, double isochroneValue,
             IsochroneUnit isochroneUnit, int nodeId) {
-        Isochrone isochrone = isochroneFactory.createIsochrone(queryGraph, isochroneValue, isochroneUnit, reverse);
-        List<Isochrone.IsoLabel> labels = isochrone.search(nodeId);
+        ShortestPathTree isochrone = shortestPathTreeFactory.createShortestPathtree(queryGraph, isochroneValue,
+                isochroneUnit,
+                reverse);
+        List<ShortestPathTree.IsoLabel> labels = new ArrayList<>();
+        isochrone.search(nodeId, labels::add);
         return labels.stream()
-                .map(l -> queryGraph.getEdgeIteratorState(l.edge, l.adjNode))
-                .map(EdgeIteratorState::getFlags)
-                .map(flagEncoder::getId)
+                .filter(l-> l.edge!=ROOT_PARENT)
+                .map(l -> queryGraph.getEdgeIteratorState(l.edge, l.node))
+                .map(edge -> edge.get(encodingManager.getIntEncodedValue(ID_NAME)))
                 .collect(Collectors.toSet());
     }
 
@@ -182,16 +185,16 @@ public class IsochroneService {
      * @param queryGraph   the context from which to get the currentEdge
      * @return boolean indicating the correct direction
      */
-    private boolean isSegmentFromStartSegmentInCorrectDirection(boolean reverse, SPTEntry isoLabel,
-            QueryResult startSegment, QueryGraph queryGraph) {
+    private boolean isSegmentFromStartSegmentInCorrectDirection(boolean reverse, IsoLabel isoLabel,
+            Snap startSegment, QueryGraph queryGraph) {
         // If the start segment not bidirectional the search returns the right results
-        EdgeIteratorTravelDirection edgeIteratorTravelDirection = determineEdgeDirection(startSegment, flagEncoder);
+        EdgeIteratorTravelDirection edgeIteratorTravelDirection = determineEdgeDirection(startSegment, encodingManager);
         if (EdgeIteratorTravelDirection.BOTH_DIRECTIONS != edgeIteratorTravelDirection) {
             return true;
         } else {
             boolean isCorrect = true;
-            EdgeIteratorState currentEdge = queryGraph.getEdgeIteratorState(isoLabel.edge, isoLabel.adjNode);
-            int roadSectionId = flagEncoder.getId(currentEdge.getFlags());
+            EdgeIteratorState currentEdge = queryGraph.getEdgeIteratorState(isoLabel.edge, isoLabel.node);
+            int roadSectionId = currentEdge.get(encodingManager.getIntEncodedValue(ID_NAME));
             if (isochroneMatchMapper.isStartSegment(roadSectionId, startSegment)) {
                 isCorrect = edgeIteratorStateReverseExtractor.hasReversed(currentEdge) == reverse;
             }

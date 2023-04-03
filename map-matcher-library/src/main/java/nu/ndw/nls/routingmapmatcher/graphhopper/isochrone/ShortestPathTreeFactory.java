@@ -1,20 +1,26 @@
 package nu.ndw.nls.routingmapmatcher.graphhopper.isochrone;
 
-import com.graphhopper.routing.QueryGraph;
+import com.graphhopper.routing.querygraph.QueryGraph;
+import com.graphhopper.routing.util.TraversalMode;
 import com.graphhopper.routing.weighting.Weighting;
 import lombok.RequiredArgsConstructor;
 import nu.ndw.nls.routingmapmatcher.domain.model.IsochroneUnit;
 
 @RequiredArgsConstructor
-public class IsochroneFactory {
+public class ShortestPathTreeFactory {
+
+    private static final int MILLISECONDS = 1000;
     private final Weighting weighting;
-    public Isochrone createIsochrone(QueryGraph queryGraph, double isochroneValue, IsochroneUnit isochroneUnit,
+
+    public ShortestPathTree createShortestPathtree(QueryGraph queryGraph, double isochroneValue,
+            IsochroneUnit isochroneUnit,
             boolean reverseFlow) {
-        Isochrone isochrone = new Isochrone(queryGraph, this.weighting, reverseFlow);
+        ShortestPathTree isochrone = new ShortestPathTree(queryGraph, this.weighting, reverseFlow,
+                TraversalMode.NODE_BASED);
         if (isochroneUnit == IsochroneUnit.METERS) {
             isochrone.setDistanceLimit(isochroneValue);
         } else if (isochroneUnit == IsochroneUnit.SECONDS) {
-            isochrone.setTimeLimit(isochroneValue);
+            isochrone.setTimeLimit(isochroneValue * MILLISECONDS);
         } else {
             throw new IllegalArgumentException("Unexpected isochrone unit");
         }
