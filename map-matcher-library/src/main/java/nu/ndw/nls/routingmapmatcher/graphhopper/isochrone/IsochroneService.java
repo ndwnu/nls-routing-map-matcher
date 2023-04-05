@@ -26,7 +26,7 @@ import nu.ndw.nls.routingmapmatcher.domain.model.base.BaseLocation;
 import nu.ndw.nls.routingmapmatcher.graphhopper.isochrone.ShortestPathTree.IsoLabel;
 import nu.ndw.nls.routingmapmatcher.graphhopper.isochrone.mappers.IsochroneMatchMapper;
 import nu.ndw.nls.routingmapmatcher.graphhopper.model.EdgeIteratorTravelDirection;
-import nu.ndw.nls.routingmapmatcher.graphhopper.model.MatchedPoint;
+import nu.ndw.nls.routingmapmatcher.domain.model.singlepoint.MatchedPoint;
 
 @RequiredArgsConstructor
 public class IsochroneService {

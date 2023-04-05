@@ -34,7 +34,7 @@ class SinglePointMapMatcherFractionTest {
 
     @SneakyThrows
     @BeforeEach
-    private void setup() {
+    void setup() {
         this.geometryFactory = new GeometryFactory(new PrecisionModel(), GlobalConstants.WGS84_SRID);
 
         RoutingNetwork routingNetwork = RoutingNetwork.builder()

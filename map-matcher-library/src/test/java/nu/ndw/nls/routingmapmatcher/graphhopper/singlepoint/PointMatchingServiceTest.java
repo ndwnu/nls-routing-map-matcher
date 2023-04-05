@@ -6,7 +6,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import nu.ndw.nls.routingmapmatcher.constants.GlobalConstants;
 import nu.ndw.nls.routingmapmatcher.domain.model.singlepoint.BearingFilter;
 import nu.ndw.nls.routingmapmatcher.graphhopper.model.EdgeIteratorTravelDirection;
-import nu.ndw.nls.routingmapmatcher.graphhopper.model.MatchedPoint;
+import nu.ndw.nls.routingmapmatcher.domain.model.singlepoint.MatchedPoint;
 import nu.ndw.nls.routingmapmatcher.graphhopper.model.MatchedQueryResult;
 import nu.ndw.nls.routingmapmatcher.graphhopper.util.BearingCalculator;
 import nu.ndw.nls.routingmapmatcher.graphhopper.util.FractionAndDistanceCalculator;
