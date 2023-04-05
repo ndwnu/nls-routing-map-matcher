@@ -18,9 +18,11 @@ import nu.ndw.nls.routingmapmatcher.domain.model.IsochroneUnit;
 import nu.ndw.nls.routingmapmatcher.domain.model.Link;
 import nu.ndw.nls.routingmapmatcher.domain.model.RoutingNetwork;
 import nu.ndw.nls.routingmapmatcher.domain.model.singlepoint.BearingFilter;
+import nu.ndw.nls.routingmapmatcher.domain.model.singlepoint.MatchFilter;
+import nu.ndw.nls.routingmapmatcher.domain.model.singlepoint.MatchSort;
 import nu.ndw.nls.routingmapmatcher.domain.model.singlepoint.SinglePointLocation;
-import nu.ndw.nls.routingmapmatcher.domain.model.singlepoint.SinglePointMatchWithIsochrone;
-import nu.ndw.nls.routingmapmatcher.domain.model.singlepoint.SinglePointMatchWithIsochrone.CandidateMatchWithIsochrone;
+import nu.ndw.nls.routingmapmatcher.domain.model.singlepoint.SinglePointMatch;
+import nu.ndw.nls.routingmapmatcher.domain.model.singlepoint.SinglePointMatch.CandidateMatch;
 import nu.ndw.nls.routingmapmatcher.graphhopper.NetworkGraphHopperFactory;
 import nu.ndw.nls.routingmapmatcher.graphhopper.viterbi.LinkDeserializer;
 import org.apache.commons.io.IOUtils;
@@ -71,14 +73,16 @@ public class SinglePointMapMatcherWithIsochroneIT {
                 .builder()
                 .id(ID)
                 .point(point)
+                .matchSort(MatchSort.SHORTEST_DISTANCE)
+                .matchFilter(MatchFilter.FIRST)
                 .downstreamIsochrone(UPSTREAM_ISOCHRONE_METERS)
                 .bearingFilter(BEARING_FILTER)
                 .downstreamIsochroneUnit(IsochroneUnit.METERS)
                 .cutoffDistance(CUTOFF_DISTANCE)
                 .build();
-        SinglePointMatchWithIsochrone result = singlePointMapMatcher.matchWithIsochrone(request);
+        SinglePointMatch result = singlePointMapMatcher.match(request);
         assertThat(result.getCandidateMatches(), hasSize(ID));
-        CandidateMatchWithIsochrone match = result.getCandidateMatches().get(0);
+        CandidateMatch match = result.getCandidateMatches().get(0);
         assertThat(match.getDownstream(), hasSize(5));
         var startPoint = match.getDownstream().get(0);
         assertThat(startPoint.getStartFraction(), is(0.672874050063));
@@ -95,14 +99,16 @@ public class SinglePointMapMatcherWithIsochroneIT {
                 .builder()
                 .id(ID)
                 .point(point)
+                .matchSort(MatchSort.SHORTEST_DISTANCE)
+                .matchFilter(MatchFilter.FIRST)
                 .downstreamIsochrone(20)
                 .bearingFilter(BEARING_FILTER)
                 .downstreamIsochroneUnit(IsochroneUnit.SECONDS)
                 .cutoffDistance(CUTOFF_DISTANCE)
                 .build();
-        SinglePointMatchWithIsochrone result = singlePointMapMatcher.matchWithIsochrone(request);
+        SinglePointMatch result = singlePointMapMatcher.match(request);
         assertThat(result.getCandidateMatches(), hasSize(ID));
-        CandidateMatchWithIsochrone match = result.getCandidateMatches().get(0);
+        CandidateMatch match = result.getCandidateMatches().get(0);
         assertThat(match.getDownstream(), hasSize(14));
         var startPoint = match.getDownstream().get(0);
         assertThat(startPoint.getStartFraction(), is(0.672874050063));
@@ -120,14 +126,16 @@ public class SinglePointMapMatcherWithIsochroneIT {
                 .builder()
                 .id(ID)
                 .point(point)
+                .matchSort(MatchSort.SHORTEST_DISTANCE)
+                .matchFilter(MatchFilter.FIRST)
                 .upstreamIsochrone(UPSTREAM_ISOCHRONE_METERS)
                 .bearingFilter(BEARING_FILTER)
                 .upstreamIsochroneUnit(IsochroneUnit.METERS)
                 .cutoffDistance(CUTOFF_DISTANCE)
                 .build();
-        SinglePointMatchWithIsochrone result = singlePointMapMatcher.matchWithIsochrone(request);
+        SinglePointMatch result = singlePointMapMatcher.match(request);
         assertThat(result.getCandidateMatches(), hasSize(ID));
-        CandidateMatchWithIsochrone match = result.getCandidateMatches().get(0);
+        CandidateMatch match = result.getCandidateMatches().get(0);
         assertThat(match.getUpstream(), hasSize(5));
         var startPoint = match.getUpstream().get(0);
         assertThat(startPoint.getStartFraction(), is(0.327127525272));
@@ -144,14 +152,16 @@ public class SinglePointMapMatcherWithIsochroneIT {
                 .builder()
                 .id(ID)
                 .point(point)
+                .matchSort(MatchSort.SHORTEST_DISTANCE)
+                .matchFilter(MatchFilter.FIRST)
                 .upstreamIsochrone(20)
                 .bearingFilter(BEARING_FILTER)
                 .upstreamIsochroneUnit(IsochroneUnit.SECONDS)
                 .cutoffDistance(CUTOFF_DISTANCE)
                 .build();
-        SinglePointMatchWithIsochrone result = singlePointMapMatcher.matchWithIsochrone(request);
+        SinglePointMatch result = singlePointMapMatcher.match(request);
         assertThat(result.getCandidateMatches(), hasSize(ID));
-        CandidateMatchWithIsochrone match = result.getCandidateMatches().get(0);
+        CandidateMatch match = result.getCandidateMatches().get(0);
         assertThat(match.getUpstream(), hasSize(11));
         var startPoint = match.getUpstream().get(0);
         assertThat(startPoint.getStartFraction(), is(0.327127525272));

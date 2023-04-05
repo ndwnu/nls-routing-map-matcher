@@ -1,12 +1,12 @@
 package nu.ndw.nls.routingmapmatcher.domain.model.singlepoint;
 
 import java.util.List;
-import java.util.Set;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
 import lombok.experimental.SuperBuilder;
+import nu.ndw.nls.routingmapmatcher.domain.model.IsochroneMatch;
 import nu.ndw.nls.routingmapmatcher.domain.model.base.MapMatch;
 import org.locationtech.jts.geom.Point;
 
@@ -16,6 +16,7 @@ import org.locationtech.jts.geom.Point;
 @ToString(callSuper = true)
 public class SinglePointMatch extends MapMatch {
 
+
     @Builder
     @Getter
     @EqualsAndHashCode
@@ -23,9 +24,9 @@ public class SinglePointMatch extends MapMatch {
     public static class CandidateMatch {
 
         private final int matchedLinkId;
-        private final boolean reversed;
-        private final Set<Integer> upstreamLinkIds;
-        private final Set<Integer> downstreamLinkIds;
+        private boolean reversed;
+        private final List<IsochroneMatch> upstream;
+        private final List<IsochroneMatch> downstream;
         private final Point snappedPoint;
         // Fraction of snapped point on link based on length in meters
         private final double fraction;
@@ -38,4 +39,5 @@ public class SinglePointMatch extends MapMatch {
     }
 
     private final List<CandidateMatch> candidateMatches;
+
 }
