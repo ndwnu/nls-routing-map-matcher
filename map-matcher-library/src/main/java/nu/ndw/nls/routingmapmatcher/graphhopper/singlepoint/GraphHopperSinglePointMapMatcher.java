@@ -117,7 +117,7 @@ public class GraphHopperSinglePointMapMatcher implements SinglePointMapMatcher {
         List<MatchedPoint> matches = singlePointLocation
                 .getMatchFilter()
                 .getFilter()
-                .filter(getMatchedPoints(singlePointLocation, queryResults, circle));
+                .apply(getMatchedPoints(singlePointLocation, queryResults, circle));
         if (matches.isEmpty()) {
             return createFailedMatchWithIsochrone(singlePointLocation);
         }
