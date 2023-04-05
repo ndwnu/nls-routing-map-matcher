@@ -119,7 +119,7 @@ public class GraphHopperSinglePointMapMatcher implements SinglePointMapMatcher {
                 .getFilter()
                 .apply(getMatchedPoints(singlePointLocation, queryResults, circle));
         if (matches.isEmpty()) {
-            return createFailedMatchWithIsochrone(singlePointLocation);
+            return createFailedMatch(singlePointLocation);
         }
         List<CandidateMatch> candidateMatches = matches.stream()
                 .map(matchedPoint -> {
@@ -220,7 +220,7 @@ public class GraphHopperSinglePointMapMatcher implements SinglePointMapMatcher {
 
     }
 
-    private SinglePointMatch createFailedMatchWithIsochrone(SinglePointLocation singlePointLocation) {
+    private SinglePointMatch createFailedMatch(SinglePointLocation singlePointLocation) {
         return SinglePointMatch.builder()
                 .id(singlePointLocation.getId())
                 .candidateMatches(Lists.newArrayList())
