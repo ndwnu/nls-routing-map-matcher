@@ -11,7 +11,7 @@ import lombok.RequiredArgsConstructor;
 @Getter
 public enum MatchFilter {
     ALL(matches -> matches),
-    FIRST(matches -> matches.isEmpty() ? emptyList() : List.of(matches.stream().findFirst().get()));
+    FIRST(matches -> matches.isEmpty() ? emptyList() : matches.subList(0, 1));
 
     private final UnaryOperator<List<MatchedPoint>> filter;
 }
