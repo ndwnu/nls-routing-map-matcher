@@ -6,8 +6,8 @@ import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import nu.ndw.nls.routingmapmatcher.domain.model.singlepoint.BearingFilter;
-import nu.ndw.nls.routingmapmatcher.graphhopper.model.EdgeIteratorTravelDirection;
 import nu.ndw.nls.routingmapmatcher.domain.model.singlepoint.MatchedPoint;
+import nu.ndw.nls.routingmapmatcher.graphhopper.model.EdgeIteratorTravelDirection;
 import nu.ndw.nls.routingmapmatcher.graphhopper.model.MatchedQueryResult;
 import nu.ndw.nls.routingmapmatcher.graphhopper.util.BearingCalculator;
 import nu.ndw.nls.routingmapmatcher.graphhopper.util.FractionAndDistanceCalculator;
@@ -22,6 +22,7 @@ import org.locationtech.jts.linearref.LocationIndexedLine;
 @RequiredArgsConstructor
 @Slf4j
 public class PointMatchingService {
+
     private static final int MIN_RELIABILITY_SCORE = 0;
     private static final int MAX_RELIABILITY_SCORE = 100;
     private final GeometryFactory geometryFactory;
@@ -50,7 +51,7 @@ public class PointMatchingService {
                                                         lineString,
                                                         bearingFilter,
                                                         cutoffDistance
-                                                        );
+                                                );
                                                 matchedPoints.add(matchedPoint);
                                             }
                                     );
@@ -96,7 +97,7 @@ public class PointMatchingService {
                 .snappedPoint(snappedPoint)
                 .fraction(fraction)
                 .distance(distance)
-                .reliability(calculateReliability(distance,bearing,bearingFilter,cutoffDistance))
+                .reliability(calculateReliability(distance, bearing, bearingFilter, cutoffDistance))
                 .bearing(bearing)
                 .build();
     }
@@ -131,7 +132,8 @@ public class PointMatchingService {
         return subGeometries;
     }
 
-    private double calculateReliability(double distance,double bearing,BearingFilter bearingFilter,double cutoffDistance) {
+    private double calculateReliability(double distance, double bearing, BearingFilter bearingFilter,
+            double cutoffDistance) {
         double distancePenalty = distance / cutoffDistance;
         double bearingPenalty = Optional.ofNullable(bearingFilter)
                 .map(bf -> bearingCalculator.bearingDelta(
