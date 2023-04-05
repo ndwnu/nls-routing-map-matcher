@@ -26,7 +26,6 @@ import com.graphhopper.util.FetchMode;
 import com.graphhopper.util.PointList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Stream;
 import nu.ndw.nls.routingmapmatcher.constants.GlobalConstants;
@@ -43,7 +42,7 @@ import nu.ndw.nls.routingmapmatcher.graphhopper.isochrone.IsochroneService;
 import nu.ndw.nls.routingmapmatcher.graphhopper.isochrone.ShortestPathTreeFactory;
 import nu.ndw.nls.routingmapmatcher.graphhopper.isochrone.mappers.IsochroneMatchMapper;
 import nu.ndw.nls.routingmapmatcher.graphhopper.model.EdgeIteratorTravelDirection;
-import nu.ndw.nls.routingmapmatcher.graphhopper.model.MatchedPoint;
+import nu.ndw.nls.routingmapmatcher.domain.model.singlepoint.MatchedPoint;
 import nu.ndw.nls.routingmapmatcher.graphhopper.model.MatchedQueryResult;
 import nu.ndw.nls.routingmapmatcher.graphhopper.util.BearingCalculator;
 import nu.ndw.nls.routingmapmatcher.graphhopper.util.CrsTransformer;
@@ -64,8 +63,6 @@ public class GraphHopperSinglePointMapMatcher implements SinglePointMapMatcher {
 
     private static final boolean INCLUDE_ELEVATION = false;
     private static final int NUM_POINTS = 100;
-    private static final int MIN_RELIABILITY_SCORE = 0;
-    private static final int MAX_RELIABILITY_SCORE = 100;
 
     private static final GeometryFactory WGS84_GEOMETRY_FACTORY = new GeometryFactory(new PrecisionModel(),
             GlobalConstants.WGS84_SRID);
@@ -77,7 +74,6 @@ public class GraphHopperSinglePointMapMatcher implements SinglePointMapMatcher {
 
 
     private final IsochroneService isochroneService;
-    private final BearingCalculator bearingCalculator;
     private final PointMatchingService pointMatchingService;
     private final CrsTransformer crsTransformer;
 
@@ -108,9 +104,9 @@ public class GraphHopperSinglePointMapMatcher implements SinglePointMapMatcher {
                 new ShortestPathTreeFactory(weighting),
                 this.locationIndexTree
         );
-        this.bearingCalculator = new BearingCalculator(geodeticCalculator);
+        BearingCalculator bearingCalculator = new BearingCalculator(geodeticCalculator);
         this.pointMatchingService = new PointMatchingService(WGS84_GEOMETRY_FACTORY,
-                this.bearingCalculator,
+                bearingCalculator,
                 fractionAndDistanceCalculator);
         this.crsTransformer = new CrsTransformer();
     }
@@ -154,7 +150,7 @@ public class GraphHopperSinglePointMapMatcher implements SinglePointMapMatcher {
                 .snappedPoint(closestMatchedPoint.getSnappedPoint())
                 .fraction(closestMatchedPoint.getFraction())
                 .distance(closestMatchedPoint.getDistance())
-                .reliability(calculateReliability(closestMatchedPoint, singlePointLocation))
+                .reliability(closestMatchedPoint.getReliability())
                 .build();
         return SinglePointMatchWithIsochrone
                 .builder()
@@ -234,7 +230,7 @@ public class GraphHopperSinglePointMapMatcher implements SinglePointMapMatcher {
                         .fraction(matchedPoint.getFraction())
                         .distance(matchedPoint.getDistance())
                         .bearing(matchedPoint.getBearing())
-                        .reliability(calculateReliability(matchedPoint, singlePointLocation))
+                        .reliability(matchedPoint.getReliability())
                         .build());
     }
 
@@ -259,6 +255,7 @@ public class GraphHopperSinglePointMapMatcher implements SinglePointMapMatcher {
         var matchedQueryResult = MatchedQueryResult.builder()
                 .matchedLinkId(matchedLinkId)
                 .inputPoint(singlePointLocation.getPoint())
+                .cutoffDistance(singlePointLocation.getCutoffDistance())
                 .bearingFilter(singlePointLocation.getBearingFilter())
                 .travelDirection(travelDirection)
                 .originalGeometry(originalGeometry)
@@ -269,13 +266,6 @@ public class GraphHopperSinglePointMapMatcher implements SinglePointMapMatcher {
 
     }
 
-    private double calculateReliability(MatchedPoint matchedPoint, SinglePointLocation singlePointLocation) {
-        double distancePenalty = matchedPoint.getDistance() / singlePointLocation.getCutoffDistance();
-        double bearingPenalty = Optional.ofNullable(singlePointLocation.getBearingFilter())
-                .map(bf -> bearingCalculator.bearingDelta(matchedPoint.getBearing(), bf.target()) / bf.cutoffMargin())
-                .orElse(0.0);
-        return Math.max(MIN_RELIABILITY_SCORE, (1 - distancePenalty - bearingPenalty) * MAX_RELIABILITY_SCORE);
-    }
 
     private SinglePointMatch createFailedMatch(SinglePointLocation singlePointLocation) {
         return SinglePointMatch.builder()

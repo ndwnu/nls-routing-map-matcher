@@ -1,4 +1,4 @@
-package nu.ndw.nls.routingmapmatcher.graphhopper.model;
+package nu.ndw.nls.routingmapmatcher.domain.model.singlepoint;
 
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
@@ -18,4 +18,5 @@ public class MatchedPoint {
     private final double fraction;
     private final double distance;
     private final double bearing;
+    private final double reliability;
 }
