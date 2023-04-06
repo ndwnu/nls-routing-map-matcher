@@ -94,7 +94,7 @@ public class PointMatchingService {
                 .matchedLinkId(matchedLinkId)
                 .reversed(reversed)
                 .snappedPoint(snappedPoint)
-                .fraction(reversed ? 1 - fraction : fraction)
+                .fraction(reversed ? (1 - fraction) : fraction)
                 .distance(distance)
                 .reliability(calculateReliability(distance, bearing, bearingFilter, cutoffDistance))
                 .bearing(bearing)
