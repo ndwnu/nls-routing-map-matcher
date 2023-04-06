@@ -1,6 +1,8 @@
 package nu.ndw.nls.routingmapmatcher.domain.model.singlepoint;
 
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -36,6 +38,24 @@ public class SinglePointMatch extends MapMatch {
         private final double bearing;
         // Reliability of this candidate based on distance and bearing
         private final double reliability;
+
+        public Set<Integer> getDownstreamLinkIds() {
+            if (downstream == null) {
+                return null;
+            }
+            return downstream.stream().map(IsochroneMatch::getMatchedLinkId)
+                    .collect(Collectors.toSet());
+        }
+
+        public Set<Integer> getUpstreamLinkIds() {
+            if (upstream == null) {
+                return null;
+            }
+            return upstream.stream().map(IsochroneMatch::getMatchedLinkId)
+                    .collect(Collectors.toSet());
+        }
+
+
     }
 
     private final List<CandidateMatch> candidateMatches;
