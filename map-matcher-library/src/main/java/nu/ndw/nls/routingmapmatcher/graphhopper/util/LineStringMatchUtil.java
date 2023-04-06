@@ -36,7 +36,7 @@ import org.locationtech.jts.geom.PrecisionModel;
 
 public class LineStringMatchUtil {
 
-    public static final boolean INCLUDE_ELEVATION = false;
+    private static final boolean INCLUDE_ELEVATION = false;
     private final PathUtil pathUtil;
     private final EncodingManager encodingManager;
     private final IsochroneService isochroneService;
