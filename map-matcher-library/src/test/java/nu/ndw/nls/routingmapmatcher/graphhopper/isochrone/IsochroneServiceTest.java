@@ -2,7 +2,6 @@
 package nu.ndw.nls.routingmapmatcher.graphhopper.isochrone;
 
 import static nu.ndw.nls.routingmapmatcher.constants.GlobalConstants.VEHICLE_CAR;
-import static nu.ndw.nls.routingmapmatcher.graphhopper.LinkWayIdEncodedValuesFactory.ID_NAME;
 import static nu.ndw.nls.routingmapmatcher.graphhopper.isochrone.IsochroneTestHelper.createIsoLabel;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -28,9 +27,7 @@ import com.graphhopper.storage.EdgeIteratorStateReverseExtractor;
 import com.graphhopper.storage.index.LocationIndexTree;
 import com.graphhopper.storage.index.Snap;
 import com.graphhopper.util.EdgeIteratorState;
-import java.util.Set;
 import java.util.function.Consumer;
-import nu.ndw.nls.routingmapmatcher.domain.model.Direction;
 import nu.ndw.nls.routingmapmatcher.domain.model.IsochroneMatch;
 import nu.ndw.nls.routingmapmatcher.domain.model.IsochroneUnit;
 import nu.ndw.nls.routingmapmatcher.domain.model.base.BaseLocation;
@@ -57,6 +54,7 @@ class IsochroneServiceTest {
     private static final int START_NODE_ID = 1;
     private static final double ISOCHRONE_VALUE_SECONDS = 8D;
     private static final double SPEED = 100D;
+    public static final boolean REVERSED = false;
     @Mock
     private EncodingManager encodingManager;
     @Mock
@@ -111,7 +109,7 @@ class IsochroneServiceTest {
                 startSegment))
                 .thenReturn(IsochroneMatch.builder().build());
         wrapWithStaticMock(() -> isochroneService.getUpstreamIsochroneMatches(point,
-                Direction.FORWARD,
+                REVERSED,
                 location));
         verify(shortestPathTreeFactory).createShortestPathtree(queryGraph, ISOCHRONE_VALUE_METERS,
                 IsochroneUnit.METERS, true);
@@ -127,7 +125,7 @@ class IsochroneServiceTest {
         when(location.getUpstreamIsochrone()).thenReturn(ISOCHRONE_VALUE_METERS);
         when(location.getUpstreamIsochroneUnit()).thenReturn(IsochroneUnit.METERS);
         wrapWithStaticMock(() -> isochroneService.getUpstreamIsochroneMatches(point,
-                Direction.FORWARD, location));
+                REVERSED, location));
         verifyNoMoreInteractions(isochroneMatchMapper);
     }
 
@@ -146,7 +144,7 @@ class IsochroneServiceTest {
         // Segment with average speed of 100 km ph 27.77 meters/second
         when(encodingManager.getDecimalEncodedValue(VehicleSpeed.key(VEHICLE_CAR))).thenReturn(decimalEncodedValue);
         when(currentEdge.get(decimalEncodedValue)).thenReturn(SPEED);
-        wrapWithStaticMock(() -> isochroneService.getUpstreamIsochroneMatches(point, Direction.FORWARD, location));
+        wrapWithStaticMock(() -> isochroneService.getUpstreamIsochroneMatches(point, REVERSED, location));
         verify(isochroneMatchMapper).mapToIsochroneMatch(eq(endLabel),
                 maxDistanceArgumentCaptor.capture(), eq(queryGraph),
                 eq(startSegment));
@@ -178,12 +176,11 @@ class IsochroneServiceTest {
         when(isochroneMatchMapper.mapToIsochroneMatch(isoLabel, ISOCHRONE_VALUE_METERS, queryGraph,
                 startSegment)).thenReturn(
                 IsochroneMatch.builder().build());
-        wrapWithStaticMock(() -> isochroneService.getDownstreamIsochroneMatches(point, Direction.FORWARD, location));
+        wrapWithStaticMock(() -> isochroneService.getDownstreamIsochroneMatches(point, REVERSED, location));
         verify(shortestPathTreeFactory).createShortestPathtree(queryGraph, ISOCHRONE_VALUE_METERS,
                 IsochroneUnit.METERS, false);
 
     }
-
 
 
     private void setupFixtureForFilter(IsoLabel isoLabel) {

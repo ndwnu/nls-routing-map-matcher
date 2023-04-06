@@ -19,7 +19,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
-import nu.ndw.nls.routingmapmatcher.domain.model.Direction;
 import nu.ndw.nls.routingmapmatcher.domain.model.IsochroneMatch;
 import nu.ndw.nls.routingmapmatcher.domain.model.IsochroneUnit;
 import nu.ndw.nls.routingmapmatcher.domain.model.base.BaseLocation;
@@ -47,14 +46,14 @@ public class IsochroneService {
      * geometries with start and end fractions.
      *
      * @param startPoint The start point from which to start the isochrone search
-     * @param direction  Direction of travelling with respect to the original geometry
+     * @param reversed   Boolean indicating reversed direction of travelling with respect to the original geometry
      * @param location   Base location containing isochrone specifications
      * @return A list of isochrone matches with the geometries cropped to the max distance. The geometry is aligned in
      * the direction of travelling. Start and en fraction are with respect to this alignment (positive negative)
      */
-    public List<IsochroneMatch> getUpstreamIsochroneMatches(Point startPoint, Direction direction,
+    public List<IsochroneMatch> getUpstreamIsochroneMatches(Point startPoint, boolean reversed,
             BaseLocation location) {
-        return getIsochroneMatches(startPoint, direction, location.getUpstreamIsochrone(),
+        return getIsochroneMatches(startPoint, reversed, location.getUpstreamIsochrone(),
                 location.getUpstreamIsochroneUnit(), true);
     }
 
@@ -63,20 +62,20 @@ public class IsochroneService {
      * geometries with start and end fractions.
      *
      * @param startPoint The start point from which to start the isochrone search
-     * @param direction  Direction of travelling with respect to the original geometry
+     * @param reversed   Boolean indicating reversed direction of travelling with respect to the original geometry
      * @param location   Base location containing isochrone specifications
      * @return A list of isochrone matches with the geometries cropped to the max distance. The geometry is aligned in
      * the direction of travelling. Start and en fraction are with respect to this alignment (positive negative)
      */
-    public List<IsochroneMatch> getDownstreamIsochroneMatches(Point startPoint, Direction direction,
+    public List<IsochroneMatch> getDownstreamIsochroneMatches(Point startPoint, boolean reversed,
             BaseLocation location) {
-        return getIsochroneMatches(startPoint, direction, location.getDownstreamIsochrone(),
+        return getIsochroneMatches(startPoint, reversed, location.getDownstreamIsochrone(),
                 location.getDownstreamIsochroneUnit(), false);
     }
 
 
     private List<IsochroneMatch> getIsochroneMatches(Point startPoint,
-            Direction direction,
+            boolean reversed,
             double isochroneValue,
             IsochroneUnit isochroneUnit,
 
@@ -100,8 +99,7 @@ public class IsochroneService {
         // Here the ClosestNode is the virtual node id created by the queryGraph.lookup.
         List<IsoLabel> isoLabels = new ArrayList<>();
         isochrone.search(startSegment.getClosestNode(), isoLabels::add);
-        boolean reversedTravellingDirection = Direction.BACKWARD == direction;
-        boolean searchDirectionReversed = reversedTravellingDirection != reverseFlow;
+        boolean searchDirectionReversed = reversed != reverseFlow;
         return isoLabels.stream()
                 .filter(isoLabel -> isoLabel.edge != ROOT_PARENT)
                 /*
