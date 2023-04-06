@@ -17,11 +17,10 @@ import com.graphhopper.storage.index.Snap;
 import com.graphhopper.util.EdgeIteratorState;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
-import nu.ndw.nls.routingmapmatcher.domain.model.IsochroneMatch;
 import nu.ndw.nls.routingmapmatcher.domain.model.Direction;
+import nu.ndw.nls.routingmapmatcher.domain.model.IsochroneMatch;
 import nu.ndw.nls.routingmapmatcher.domain.model.IsochroneUnit;
 import nu.ndw.nls.routingmapmatcher.domain.model.base.BaseLocation;
 import nu.ndw.nls.routingmapmatcher.graphhopper.isochrone.ShortestPathTree.IsoLabel;
@@ -47,14 +46,15 @@ public class IsochroneService {
      * Performs an up-stream isochrone search and returns a list of isochrone matches containing exact cropped
      * geometries with start and end fractions.
      *
-     * @param matchedPoint      The nearest point found by the nearest match from which to start the isochrone search
-     * @param location          Base location containing isochrone specifications
+     * @param startPoint The start point from which to start the isochrone search
+     * @param direction  Direction of travelling with respect to the original geometry
+     * @param location   Base location containing isochrone specifications
      * @return A list of isochrone matches with the geometries cropped to the max distance. The geometry is aligned in
      * the direction of travelling. Start and en fraction are with respect to this alignment (positive negative)
      */
-    public List<IsochroneMatch> getUpstreamIsochroneMatches(Point startPoint,Direction direction,
+    public List<IsochroneMatch> getUpstreamIsochroneMatches(Point startPoint, Direction direction,
             BaseLocation location) {
-        return getIsochroneMatches(startPoint, direction,location.getUpstreamIsochrone(),
+        return getIsochroneMatches(startPoint, direction, location.getUpstreamIsochrone(),
                 location.getUpstreamIsochroneUnit(), true);
     }
 
@@ -62,26 +62,18 @@ public class IsochroneService {
      * Performs a down-stream isochrone search and returns a list of isochrone matches containing exact cropped
      * geometries with start and end fractions.
      *
-     * @param matchedPoint      The nearest point found by the nearest match from which to start the isochrone search
-     * @param location          Base location containing isochrone specifications
+     * @param startPoint The start point from which to start the isochrone search
+     * @param direction  Direction of travelling with respect to the original geometry
+     * @param location   Base location containing isochrone specifications
      * @return A list of isochrone matches with the geometries cropped to the max distance. The geometry is aligned in
      * the direction of travelling. Start and en fraction are with respect to this alignment (positive negative)
      */
-    public List<IsochroneMatch> getDownstreamIsochroneMatches(Point startPoint,Direction direction,
+    public List<IsochroneMatch> getDownstreamIsochroneMatches(Point startPoint, Direction direction,
             BaseLocation location) {
-        return getIsochroneMatches(startPoint, direction,location.getDownstreamIsochrone(),
+        return getIsochroneMatches(startPoint, direction, location.getDownstreamIsochrone(),
                 location.getDownstreamIsochroneUnit(), false);
     }
 
-    public Set<Integer> getUpstreamLinkIds(QueryGraph queryGraph, BaseLocation location, int nodeId) {
-        return getIsochroneLinkIds(queryGraph, true, location.getUpstreamIsochrone(),
-                location.getUpstreamIsochroneUnit(), nodeId);
-    }
-
-    public Set<Integer> getDownstreamLinkIds(QueryGraph queryGraph, BaseLocation location, int nodeId) {
-        return getIsochroneLinkIds(queryGraph, false, location.getDownstreamIsochrone(),
-                location.getDownstreamIsochroneUnit(), nodeId);
-    }
 
     private List<IsochroneMatch> getIsochroneMatches(Point startPoint,
             Direction direction,
@@ -89,8 +81,8 @@ public class IsochroneService {
             IsochroneUnit isochroneUnit,
 
             boolean reverseFlow) {
-        double latitude =startPoint.getY();
-        double longitude =startPoint.getX();
+        double latitude = startPoint.getY();
+        double longitude = startPoint.getX();
         // Get the  start segment for the isochrone calculation
         Snap startSegment
                 = locationIndexTree
@@ -108,10 +100,10 @@ public class IsochroneService {
         // Here the ClosestNode is the virtual node id created by the queryGraph.lookup.
         List<IsoLabel> isoLabels = new ArrayList<>();
         isochrone.search(startSegment.getClosestNode(), isoLabels::add);
-        boolean reversedTravellingDirection = Direction.BACKWARD==direction;
+        boolean reversedTravellingDirection = Direction.BACKWARD == direction;
         boolean searchDirectionReversed = reversedTravellingDirection != reverseFlow;
         return isoLabels.stream()
-                .filter(isoLabel-> isoLabel.edge!=ROOT_PARENT)
+                .filter(isoLabel -> isoLabel.edge != ROOT_PARENT)
                 /*
                     With bidirectional start segments the search goes two ways for both down and upstream isochrones.
                     The  branches that are starting in the wrong direction of travelling
@@ -160,21 +152,6 @@ public class IsochroneService {
             maxDistance = isoLabel.distance - ((totalTime - maximumTimeInSeconds) * metersPerSecond);
         }
         return maxDistance;
-    }
-
-
-    private Set<Integer> getIsochroneLinkIds(QueryGraph queryGraph, boolean reverse, double isochroneValue,
-            IsochroneUnit isochroneUnit, int nodeId) {
-        ShortestPathTree isochrone = shortestPathTreeFactory.createShortestPathtree(queryGraph, isochroneValue,
-                isochroneUnit,
-                reverse);
-        List<ShortestPathTree.IsoLabel> labels = new ArrayList<>();
-        isochrone.search(nodeId, labels::add);
-        return labels.stream()
-                .filter(l-> l.edge!=ROOT_PARENT)
-                .map(l -> queryGraph.getEdgeIteratorState(l.edge, l.node))
-                .map(edge -> edge.get(encodingManager.getIntEncodedValue(ID_NAME)))
-                .collect(Collectors.toSet());
     }
 
 
