@@ -62,8 +62,9 @@ public class LineStringMatchUtil {
             throw new RoutingMapMatcherException("Unexpected: path has no edges");
         }
         List<Integer> matchedLinkIds = pathUtil.determineMatchedLinkIds(encodingManager, edges);
-
         int startNode = edges.get(0).getBaseNode();
+        //edges.get(0).fetchWayGeometry(FetchMode.ALL).toLineString(false).getStartPoint()
+        // boolean reverse = false;
         Set<Integer> upstreamLinkIds = lineStringLocation.getUpstreamIsochroneUnit() != null ?
                 isochroneService.getUpstreamLinkIds(queryGraph, lineStringLocation, startNode) : null;
         int endNode = edges.get(edges.size() - 1).getAdjNode();

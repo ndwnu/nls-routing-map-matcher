@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import nu.ndw.nls.routingmapmatcher.domain.model.Direction;
 import nu.ndw.nls.routingmapmatcher.domain.model.singlepoint.BearingFilter;
 import nu.ndw.nls.routingmapmatcher.domain.model.singlepoint.MatchedPoint;
 import nu.ndw.nls.routingmapmatcher.graphhopper.model.EdgeIteratorTravelDirection;
@@ -83,7 +84,6 @@ public class PointMatchingService {
         LinearLocation snappedPointLinearLocation = lineIndex.project(inputCoordinate);
         LineSegment snappedPointSegment = snappedPointLinearLocation.getSegment(aggregatedGeometry);
         Coordinate snappedCoordinate = snappedPointSegment.closestPoint(inputCoordinate);
-
         Point snappedPoint = geometryFactory.createPoint(snappedCoordinate);
         double fraction = fractionAndDistanceCalculator
                 .calculateFractionAndDistance(originalGeometry, snappedCoordinate).getFraction();
@@ -93,9 +93,9 @@ public class PointMatchingService {
         return MatchedPoint
                 .builder()
                 .matchedLinkId(matchedLinkId)
-                .reversed(reversed)
+                .direction(reversed ? Direction.BACKWARD : Direction.FORWARD)
                 .snappedPoint(snappedPoint)
-                .fraction(fraction)
+                .fraction(reversed ? 1 - fraction : fraction)
                 .distance(distance)
                 .reliability(calculateReliability(distance, bearing, bearingFilter, cutoffDistance))
                 .bearing(bearing)

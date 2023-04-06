@@ -21,12 +21,13 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import nu.ndw.nls.routingmapmatcher.domain.model.IsochroneMatch;
+import nu.ndw.nls.routingmapmatcher.domain.model.Direction;
 import nu.ndw.nls.routingmapmatcher.domain.model.IsochroneUnit;
 import nu.ndw.nls.routingmapmatcher.domain.model.base.BaseLocation;
 import nu.ndw.nls.routingmapmatcher.graphhopper.isochrone.ShortestPathTree.IsoLabel;
 import nu.ndw.nls.routingmapmatcher.graphhopper.isochrone.mappers.IsochroneMatchMapper;
 import nu.ndw.nls.routingmapmatcher.graphhopper.model.EdgeIteratorTravelDirection;
-import nu.ndw.nls.routingmapmatcher.domain.model.singlepoint.MatchedPoint;
+import org.locationtech.jts.geom.Point;
 
 @RequiredArgsConstructor
 public class IsochroneService {
@@ -51,9 +52,9 @@ public class IsochroneService {
      * @return A list of isochrone matches with the geometries cropped to the max distance. The geometry is aligned in
      * the direction of travelling. Start and en fraction are with respect to this alignment (positive negative)
      */
-    public List<IsochroneMatch> getUpstreamIsochroneMatches(MatchedPoint matchedPoint,
+    public List<IsochroneMatch> getUpstreamIsochroneMatches(Point startPoint,Direction direction,
             BaseLocation location) {
-        return getIsochroneMatches(matchedPoint, location.getUpstreamIsochrone(),
+        return getIsochroneMatches(startPoint, direction,location.getUpstreamIsochrone(),
                 location.getUpstreamIsochroneUnit(), true);
     }
 
@@ -66,9 +67,9 @@ public class IsochroneService {
      * @return A list of isochrone matches with the geometries cropped to the max distance. The geometry is aligned in
      * the direction of travelling. Start and en fraction are with respect to this alignment (positive negative)
      */
-    public List<IsochroneMatch> getDownstreamIsochroneMatches(MatchedPoint matchedPoint,
+    public List<IsochroneMatch> getDownstreamIsochroneMatches(Point startPoint,Direction direction,
             BaseLocation location) {
-        return getIsochroneMatches(matchedPoint, location.getDownstreamIsochrone(),
+        return getIsochroneMatches(startPoint, direction,location.getDownstreamIsochrone(),
                 location.getDownstreamIsochroneUnit(), false);
     }
 
@@ -82,13 +83,14 @@ public class IsochroneService {
                 location.getDownstreamIsochroneUnit(), nodeId);
     }
 
-    private List<IsochroneMatch> getIsochroneMatches(MatchedPoint matchedPoint,
+    private List<IsochroneMatch> getIsochroneMatches(Point startPoint,
+            Direction direction,
             double isochroneValue,
             IsochroneUnit isochroneUnit,
 
             boolean reverseFlow) {
-        double latitude = matchedPoint.getSnappedPoint().getY();
-        double longitude = matchedPoint.getSnappedPoint().getX();
+        double latitude =startPoint.getY();
+        double longitude =startPoint.getX();
         // Get the  start segment for the isochrone calculation
         Snap startSegment
                 = locationIndexTree
@@ -106,7 +108,8 @@ public class IsochroneService {
         // Here the ClosestNode is the virtual node id created by the queryGraph.lookup.
         List<IsoLabel> isoLabels = new ArrayList<>();
         isochrone.search(startSegment.getClosestNode(), isoLabels::add);
-        boolean searchDirectionReversed = matchedPoint.isReversed() != reverseFlow;
+        boolean reversedTravellingDirection = Direction.BACKWARD==direction;
+        boolean searchDirectionReversed = reversedTravellingDirection != reverseFlow;
         return isoLabels.stream()
                 .filter(isoLabel-> isoLabel.edge!=ROOT_PARENT)
                 /*
