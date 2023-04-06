@@ -13,8 +13,6 @@ import org.locationtech.jts.geom.LineString;
 @ToString
 public class IsochroneMatch {
 
-    public enum Direction {FORWARD, BACKWARD}
-
     private final int matchedLinkId;
     @ToString.Exclude
     private final LineString geometry;

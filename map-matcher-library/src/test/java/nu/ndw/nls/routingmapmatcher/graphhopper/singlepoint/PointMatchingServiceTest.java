@@ -4,6 +4,7 @@ import static java.util.Comparator.comparing;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import nu.ndw.nls.routingmapmatcher.constants.GlobalConstants;
+import nu.ndw.nls.routingmapmatcher.domain.model.Direction;
 import nu.ndw.nls.routingmapmatcher.domain.model.singlepoint.BearingFilter;
 import nu.ndw.nls.routingmapmatcher.graphhopper.model.EdgeIteratorTravelDirection;
 import nu.ndw.nls.routingmapmatcher.domain.model.singlepoint.MatchedPoint;
@@ -96,7 +97,7 @@ class PointMatchingServiceTest {
         assertThat(match.getMatchedLinkId()).isEqualTo(ID);
         assertThat(match.getSnappedPoint().getX()).isEqualTo(SNAPPED_POINT_X);
         assertThat(match.getSnappedPoint().getY()).isEqualTo(SNAPPED_POINT_Y);
-        assertThat(match.isReversed()).isEqualTo(false);
+        assertThat(match.getDirection()).isEqualTo(Direction.FORWARD);
         assertThat(match.getDistance()).isEqualTo(DISTANCE);
         assertThat(match.getFraction()).isEqualTo(FRACTION);
         assertThat(match.getBearing()).isEqualTo(BEARING);
@@ -122,7 +123,7 @@ class PointMatchingServiceTest {
         assertThat(matchOne.getMatchedLinkId()).isEqualTo(ID);
         assertThat(matchOne.getSnappedPoint().getX()).isEqualTo(SNAPPED_POINT_X);
         assertThat(matchOne.getSnappedPoint().getY()).isEqualTo(SNAPPED_POINT_Y);
-        assertThat(matchOne.isReversed()).isEqualTo(false);
+        assertThat(matchOne.getDirection()).isEqualTo(Direction.FORWARD);
         assertThat(matchOne.getDistance()).isEqualTo(DISTANCE);
         assertThat(matchOne.getFraction()).isEqualTo(FRACTION);
         assertThat(matchOne.getBearing()).isEqualTo(BEARING);
@@ -130,9 +131,9 @@ class PointMatchingServiceTest {
         assertThat(matchTwo.getMatchedLinkId()).isEqualTo(ID);
         assertThat(matchTwo.getSnappedPoint().getX()).isEqualTo(SNAPPED_POINT_X);
         assertThat(matchTwo.getSnappedPoint().getY()).isEqualTo(SNAPPED_POINT_Y);
-        assertThat(matchTwo.isReversed()).isEqualTo(true);
+        assertThat(matchTwo.getDirection()).isEqualTo(Direction.BACKWARD);
         assertThat(matchTwo.getDistance()).isEqualTo(DISTANCE);
-        assertThat(matchTwo.getFraction()).isEqualTo(FRACTION);
+        assertThat(matchTwo.getFraction()).isEqualTo(1-FRACTION);
         assertThat(matchTwo.getBearing()).isEqualTo(BEARING_REVERSED);
     }
 
@@ -157,7 +158,7 @@ class PointMatchingServiceTest {
         assertThat(matchOne.getMatchedLinkId()).isEqualTo(ID);
         assertThat(matchOne.getSnappedPoint().getX()).isEqualTo(SNAPPED_POINT_X);
         assertThat(matchOne.getSnappedPoint().getY()).isEqualTo(SNAPPED_POINT_Y);
-        assertThat(matchOne.isReversed()).isEqualTo(false);
+        assertThat(matchOne.getDirection()).isEqualTo(Direction.FORWARD);
         assertThat(matchOne.getDistance()).isEqualTo(DISTANCE);
         assertThat(matchOne.getFraction()).isEqualTo(FRACTION);
         assertThat(matchOne.getBearing()).isEqualTo(BEARING);
@@ -203,7 +204,7 @@ class PointMatchingServiceTest {
         assertThat(closestMatch.getMatchedLinkId()).isEqualTo(ID);
         assertThat(closestMatch.getSnappedPoint().getX()).isEqualTo(SNAPPED_POINT_X_ZIG_ZAG);
         assertThat(closestMatch.getSnappedPoint().getY()).isEqualTo(SNAPPED_POINT_Y_ZIG_ZAG);
-        assertThat(closestMatch.isReversed()).isEqualTo(false);
+        assertThat(closestMatch.getDirection()).isEqualTo(Direction.FORWARD);
         assertThat(closestMatch.getDistance()).isEqualTo(DISTANCE_ZIG_ZAG);
         assertThat(closestMatch.getFraction()).isEqualTo(FRACTION_ZIG_ZAG);
         assertThat(closestMatch.getBearing()).isEqualTo(BEARING_ZIG_ZAG);

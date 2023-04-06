@@ -15,7 +15,7 @@ import com.graphhopper.util.FetchMode;
 import com.graphhopper.util.PointList;
 import nu.ndw.nls.routingmapmatcher.constants.GlobalConstants;
 import nu.ndw.nls.routingmapmatcher.domain.model.IsochroneMatch;
-import nu.ndw.nls.routingmapmatcher.domain.model.IsochroneMatch.Direction;
+import nu.ndw.nls.routingmapmatcher.domain.model.Direction;
 import nu.ndw.nls.routingmapmatcher.graphhopper.isochrone.ShortestPathTree.IsoLabel;
 import nu.ndw.nls.routingmapmatcher.graphhopper.model.FractionAndDistance;
 import nu.ndw.nls.routingmapmatcher.graphhopper.util.CrsTransformer;
