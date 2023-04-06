@@ -20,7 +20,6 @@ import com.graphhopper.util.FetchMode;
 import java.util.List;
 import nu.ndw.nls.routingmapmatcher.constants.GlobalConstants;
 import nu.ndw.nls.routingmapmatcher.domain.exception.RoutingMapMatcherException;
-import nu.ndw.nls.routingmapmatcher.domain.model.Direction;
 import nu.ndw.nls.routingmapmatcher.domain.model.IsochroneMatch;
 import nu.ndw.nls.routingmapmatcher.domain.model.MatchStatus;
 import nu.ndw.nls.routingmapmatcher.domain.model.linestring.LineStringLocation;
@@ -76,14 +75,15 @@ public class LineStringMatchUtil {
                 .fetchWayGeometry(FetchMode.ALL)
                 .toLineString(INCLUDE_ELEVATION)
                 .getStartPoint();
-        Direction direction = lineStringLocation.isReversed() ? Direction.BACKWARD : Direction.FORWARD;
         List<IsochroneMatch> upstream = lineStringLocation.getUpstreamIsochroneUnit() != null ?
-                isochroneService.getUpstreamIsochroneMatches(startPoint, direction, lineStringLocation) : null;
+                isochroneService.getUpstreamIsochroneMatches(startPoint, lineStringLocation.isReversed(),
+                        lineStringLocation) : null;
         Point endPoint = edges.get(edges.size() - 1).fetchWayGeometry(FetchMode.ALL)
                 .toLineString(INCLUDE_ELEVATION)
                 .getEndPoint();
         List<IsochroneMatch> downstream = lineStringLocation.getDownstreamIsochroneUnit() != null ?
-                isochroneService.getDownstreamIsochroneMatches(endPoint, direction, lineStringLocation) : null;
+                isochroneService.getDownstreamIsochroneMatches(endPoint, lineStringLocation.isReversed(),
+                        lineStringLocation) : null;
 
         double startLinkFraction = pathUtil.determineStartLinkFraction(edges.get(0), queryGraph);
         double endLinkFraction = pathUtil.determineEndLinkFraction(edges.get(edges.size() - 1), queryGraph);

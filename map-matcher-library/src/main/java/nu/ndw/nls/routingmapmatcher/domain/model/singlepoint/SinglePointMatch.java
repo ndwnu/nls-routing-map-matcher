@@ -8,7 +8,6 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
 import lombok.experimental.SuperBuilder;
-import nu.ndw.nls.routingmapmatcher.domain.model.Direction;
 import nu.ndw.nls.routingmapmatcher.domain.model.IsochroneMatch;
 import nu.ndw.nls.routingmapmatcher.domain.model.base.MapMatch;
 import org.locationtech.jts.geom.Point;
@@ -27,7 +26,7 @@ public class SinglePointMatch extends MapMatch {
     public static class CandidateMatch {
 
         private final int matchedLinkId;
-        private Direction direction;
+        private boolean reversed;
         private final List<IsochroneMatch> upstream;
         private final List<IsochroneMatch> downstream;
         private final Point snappedPoint;

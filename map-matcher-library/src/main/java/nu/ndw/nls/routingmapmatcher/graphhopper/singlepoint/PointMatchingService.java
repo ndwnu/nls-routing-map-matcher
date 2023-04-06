@@ -5,7 +5,6 @@ import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import nu.ndw.nls.routingmapmatcher.domain.model.Direction;
 import nu.ndw.nls.routingmapmatcher.domain.model.singlepoint.BearingFilter;
 import nu.ndw.nls.routingmapmatcher.domain.model.singlepoint.MatchedPoint;
 import nu.ndw.nls.routingmapmatcher.graphhopper.model.EdgeIteratorTravelDirection;
@@ -93,7 +92,7 @@ public class PointMatchingService {
         return MatchedPoint
                 .builder()
                 .matchedLinkId(matchedLinkId)
-                .direction(reversed ? Direction.BACKWARD : Direction.FORWARD)
+                .reversed(reversed)
                 .snappedPoint(snappedPoint)
                 .fraction(reversed ? 1 - fraction : fraction)
                 .distance(distance)

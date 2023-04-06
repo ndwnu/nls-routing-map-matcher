@@ -18,5 +18,5 @@ public class IsochroneMatch {
     private final LineString geometry;
     private final double startFraction;
     private final double endFraction;
-    private final Direction direction;
+    private final boolean reversed;
 }

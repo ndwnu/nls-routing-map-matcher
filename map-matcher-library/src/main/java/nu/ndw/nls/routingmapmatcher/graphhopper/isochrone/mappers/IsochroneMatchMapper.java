@@ -14,7 +14,6 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import lombok.RequiredArgsConstructor;
 import nu.ndw.nls.routingmapmatcher.domain.model.IsochroneMatch;
-import nu.ndw.nls.routingmapmatcher.domain.model.Direction;
 import nu.ndw.nls.routingmapmatcher.graphhopper.isochrone.ShortestPathTree.IsoLabel;
 import nu.ndw.nls.routingmapmatcher.graphhopper.util.CrsTransformer;
 import nu.ndw.nls.routingmapmatcher.graphhopper.util.FractionAndDistanceCalculator;
@@ -48,8 +47,7 @@ public class IsochroneMatchMapper {
          *  with respect to the original alignment of the geometry
          * (can be backward for bidirectional edges or for upstream isochrone searches).
          */
-        Direction edgeDirection = edgeIteratorStateReverseExtractor
-                .hasReversed(currentEdge) ? Direction.BACKWARD : Direction.FORWARD;
+        boolean reversed = edgeIteratorStateReverseExtractor.hasReversed(currentEdge);
         IntEncodedValue idEnc = encodingManager.getIntEncodedValue(ID_NAME);
         int roadSectionId = currentEdge.get(idEnc);
         double totalDistanceTravelled = isoLabel.distance;
@@ -78,7 +76,7 @@ public class IsochroneMatchMapper {
                         maxDistance);
             }
             LineString startSegmentWayGeometryInTravelDirection = getStartSegmentWayGeometryInTravelDirection(
-                    edgeDirection, startSegment);
+                    reversed, startSegment);
 
             startFraction = fractionAndDistanceCalculator.calculateFractionAndDistance(
                             startSegmentWayGeometryInTravelDirection,
@@ -113,7 +111,7 @@ public class IsochroneMatchMapper {
                 .endFraction(BigDecimal.valueOf(endFraction)
                         .setScale(ROUNDING_DECIMAL_PLACES, RoundingMode.HALF_UP)
                         .doubleValue())
-                .direction(edgeDirection)
+                .reversed(reversed)
                 .geometry(isoLabelWayGeometry)
                 .build();
 
@@ -125,7 +123,7 @@ public class IsochroneMatchMapper {
         return roadSectionId == startSegmentId;
     }
 
-    private LineString getStartSegmentWayGeometryInTravelDirection(Direction edgeDirection, Snap startSegment) {
+    private LineString getStartSegmentWayGeometryInTravelDirection(boolean reversed, Snap startSegment) {
         LineString startSegmentWayGeometry = startSegment
                 .getClosestEdge().fetchWayGeometry(FetchMode.ALL)
                 .toLineString(INCLUDE_ELEVATION);
@@ -133,9 +131,8 @@ public class IsochroneMatchMapper {
                 edgeIteratorStateReverseExtractor.hasReversed(startSegment.getClosestEdge())
                         ? startSegmentWayGeometry.reverse()
                         : startSegmentWayGeometry;
-        return edgeDirection == Direction.FORWARD ?
-                startSegmentWayGeometryInForwardDirection :
-                startSegmentWayGeometryInForwardDirection.reverse();
+        return reversed ? startSegmentWayGeometryInForwardDirection.reverse() :
+                startSegmentWayGeometryInForwardDirection;
     }
 
     private LineString calculatePartialGeometry(LineString edgeGeometry, double isoLabelEdgeGeometryDistance,

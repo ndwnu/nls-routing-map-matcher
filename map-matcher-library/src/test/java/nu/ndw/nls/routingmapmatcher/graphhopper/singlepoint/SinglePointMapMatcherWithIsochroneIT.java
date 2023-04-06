@@ -3,6 +3,8 @@ package nu.ndw.nls.routingmapmatcher.graphhopper.singlepoint;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -13,7 +15,6 @@ import java.util.Objects;
 import lombok.SneakyThrows;
 import nu.ndw.nls.routingmapmatcher.constants.GlobalConstants;
 import nu.ndw.nls.routingmapmatcher.domain.SinglePointMapMatcher;
-import nu.ndw.nls.routingmapmatcher.domain.model.Direction;
 import nu.ndw.nls.routingmapmatcher.domain.model.IsochroneUnit;
 import nu.ndw.nls.routingmapmatcher.domain.model.Link;
 import nu.ndw.nls.routingmapmatcher.domain.model.RoutingNetwork;
@@ -87,7 +88,7 @@ public class SinglePointMapMatcherWithIsochroneIT {
         var startPoint = match.getDownstream().get(0);
         assertThat(startPoint.getStartFraction(), is(0.672874050063));
         assertThat(startPoint.getEndFraction(), is(1.0));
-        assertThat(startPoint.getDirection(), is(Direction.FORWARD));
+        assertFalse(startPoint.isReversed());
     }
 
     @SneakyThrows
@@ -113,7 +114,7 @@ public class SinglePointMapMatcherWithIsochroneIT {
         var startPoint = match.getDownstream().get(0);
         assertThat(startPoint.getStartFraction(), is(0.672874050063));
         assertThat(startPoint.getEndFraction(), is(1.0));
-        assertThat(startPoint.getDirection(), is(Direction.FORWARD));
+        assertFalse(startPoint.isReversed());
     }
 
 
@@ -140,7 +141,7 @@ public class SinglePointMapMatcherWithIsochroneIT {
         var startPoint = match.getUpstream().get(0);
         assertThat(startPoint.getStartFraction(), is(0.327127525272));
         assertThat(startPoint.getEndFraction(), is(1.0));
-        assertThat(startPoint.getDirection(), is(Direction.BACKWARD));
+        assertTrue(startPoint.isReversed());
     }
 
     @SneakyThrows
@@ -166,7 +167,7 @@ public class SinglePointMapMatcherWithIsochroneIT {
         var startPoint = match.getUpstream().get(0);
         assertThat(startPoint.getStartFraction(), is(0.327127525272));
         assertThat(startPoint.getEndFraction(), is(1.0));
-        assertThat(startPoint.getDirection(), is(Direction.BACKWARD));
+        assertTrue(startPoint.isReversed());
     }
 
 }

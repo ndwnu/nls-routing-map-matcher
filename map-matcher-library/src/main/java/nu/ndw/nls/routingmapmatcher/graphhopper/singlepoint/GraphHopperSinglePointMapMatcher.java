@@ -120,18 +120,18 @@ public class GraphHopperSinglePointMapMatcher implements SinglePointMapMatcher {
                             singlePointLocation.getUpstreamIsochroneUnit() == null ? null
                                     : isochroneService
                                             .getUpstreamIsochroneMatches(matchedPoint.getSnappedPoint(),
-                                                    matchedPoint.getDirection()
+                                                    matchedPoint.isReversed()
                                                     , singlePointLocation);
                     List<IsochroneMatch> downstream =
                             singlePointLocation.getDownstreamIsochroneUnit() == null ? null
                                     : isochroneService
                                             .getDownstreamIsochroneMatches(matchedPoint.getSnappedPoint(),
-                                                    matchedPoint.getDirection(),
+                                                    matchedPoint.isReversed(),
                                                     singlePointLocation);
                     return CandidateMatch
                             .builder()
                             .matchedLinkId(matchedPoint.getMatchedLinkId())
-                            .direction(matchedPoint.getDirection())
+                            .reversed(matchedPoint.isReversed())
                             .upstream(upstream)
                             .downstream(downstream)
                             .snappedPoint(matchedPoint.getSnappedPoint())
