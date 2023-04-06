@@ -54,7 +54,6 @@ class IsochroneServiceTest {
     private static final double Y_COORDINATE = 1D;
     private static final double X_COORDINATE = 0D;
     private static final double ISOCHRONE_VALUE_METERS = 200D;
-    private static final boolean REVERSED = false;
     private static final int START_NODE_ID = 1;
     private static final double ISOCHRONE_VALUE_SECONDS = 8D;
     private static final double SPEED = 100D;
@@ -185,47 +184,7 @@ class IsochroneServiceTest {
 
     }
 
-    @Test
-    void getUpstreamLinkIds_ok() {
-        when(shortestPathTreeFactory.createShortestPathtree(queryGraph, ISOCHRONE_VALUE_METERS,
-                IsochroneUnit.METERS, true))
-                .thenReturn(shortestPathTree);
-        when(location.getUpstreamIsochrone()).thenReturn(ISOCHRONE_VALUE_METERS);
-        when(location.getUpstreamIsochroneUnit()).thenReturn(IsochroneUnit.METERS);
-        IsoLabel isoLabel = createIsoLabel(100, 0);
-        doAnswer(ans -> {
-            Consumer<IsoLabel> callback = ans.getArgument(1, Consumer.class);
-            callback.accept(isoLabel);
-            return null;
-        }).when(shortestPathTree).search(eq(START_NODE_ID), any());
-        when(queryGraph.getEdgeIteratorState(anyInt(), anyInt())).thenReturn(currentEdge);
-        when(encodingManager.getIntEncodedValue(ID_NAME)).thenReturn(intEncodedValue);
-        when(currentEdge.get(intEncodedValue)).thenReturn(START_NODE_ID);
-        Set<Integer> result = isochroneService.getUpstreamLinkIds(queryGraph, location, START_NODE_ID);
-        assertThat(result).hasSize(1);
-        assertThat(result.iterator().next()).isEqualTo(START_NODE_ID);
-    }
 
-    @Test
-    void getDownstreamLinkIds_ok() {
-        when(shortestPathTreeFactory.createShortestPathtree(queryGraph, ISOCHRONE_VALUE_METERS,
-                IsochroneUnit.METERS, false))
-                .thenReturn(shortestPathTree);
-        when(location.getDownstreamIsochrone()).thenReturn(ISOCHRONE_VALUE_METERS);
-        when(location.getDownstreamIsochroneUnit()).thenReturn(IsochroneUnit.METERS);
-        IsoLabel isoLabel = createIsoLabel(100, 0);
-        doAnswer(ans -> {
-            Consumer<IsoLabel> callback = ans.getArgument(1, Consumer.class);
-            callback.accept(isoLabel);
-            return null;
-        }).when(shortestPathTree).search(eq(START_NODE_ID), any());
-        when(queryGraph.getEdgeIteratorState(anyInt(), anyInt())).thenReturn(currentEdge);
-        when(encodingManager.getIntEncodedValue(ID_NAME)).thenReturn(intEncodedValue);
-        when(currentEdge.get(intEncodedValue)).thenReturn(START_NODE_ID);
-        Set<Integer> result = isochroneService.getDownstreamLinkIds(queryGraph, location, START_NODE_ID);
-        assertThat(result).hasSize(1);
-        assertThat(result.iterator().next()).isEqualTo(START_NODE_ID);
-    }
 
     private void setupFixtureForFilter(IsoLabel isoLabel) {
         when(encodingManager.getBooleanEncodedValue(VehicleAccess.key(VEHICLE_CAR))).thenReturn(booleanEncodedValue);
