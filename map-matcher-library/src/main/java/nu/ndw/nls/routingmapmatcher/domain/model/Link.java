@@ -7,7 +7,7 @@ import lombok.ToString;
 import org.locationtech.jts.geom.LineString;
 
 @Getter
-@ToString(exclude = "geometry")
+@ToString(exclude = "geometry", callSuper = true)
 public class Link extends ReaderWay {
 
     private final long fromNodeId;
