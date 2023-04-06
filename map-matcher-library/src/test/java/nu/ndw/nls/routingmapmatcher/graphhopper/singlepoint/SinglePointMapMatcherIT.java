@@ -1,12 +1,7 @@
 package nu.ndw.nls.routingmapmatcher.graphhopper.singlepoint;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.closeTo;
-import static org.hamcrest.Matchers.containsInAnyOrder;
-import static org.hamcrest.Matchers.emptyIterable;
-import static org.hamcrest.Matchers.hasSize;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.notNullValue;
+import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -261,8 +256,7 @@ public class SinglePointMapMatcherIT {
 
         // TODO upstream and downstream shouldn't contain matched segment itself?
         assertThat(
-                candidateMatch.getUpstream().stream().map(IsochroneMatch::getMatchedLinkId)
-                        .collect(Collectors.toSet()), containsInAnyOrder(3666958,
+                candidateMatch.getUpstreamLinkIds(), containsInAnyOrder(3666958,
                         3666957, 3666956, 3666955, 3667003, 3667002, 3667001, 3667000, 3666999, 3666998, 3666997,
                         3666996,
                         3666256, 3666973, 3666972, 3666971, 3666970, 3666969, 3666968, 3666967, 3666966, 3666974,
@@ -270,10 +264,7 @@ public class SinglePointMapMatcherIT {
                         3667136, 3667135, 3667134, 3666244, 3666243, 3666242, 3666241, 3666240, 3666223, 3667125,
                         3667124,
                         3667123, 3667122, 3667121, 3667120));
-        assertThat(candidateMatch.getDownstream()
-                .stream()
-                .map(IsochroneMatch::getMatchedLinkId)
-                .collect(Collectors.toSet()), containsInAnyOrder(3666958,
+        assertThat(candidateMatch.getDownstreamLinkIds(), containsInAnyOrder(3666958,
                 3666098, 3666099, 3666100, 3666101, 3666102, 3666103, 3666104, 3666105, 3666106, 3666107, 3666108,
                 3666109, 3686216, 3686217, 3666945, 3666946, 3666947, 3666948, 3666949, 3666950, 3666951, 3666952,
                 3666943, 3666944, 3666953, 3666954, 3666123, 3666110, 3666111, 3666112, 3666113, 3666114, 3666130,
@@ -287,8 +278,8 @@ public class SinglePointMapMatcherIT {
 
     private void assertThatUpstreamAndDownstreamAreNull(List<CandidateMatch> candidateMatches) {
         for (SinglePointMatch.CandidateMatch candidateMatch : candidateMatches) {
-            assertThat(candidateMatch.getUpstream(), is(emptyIterable()));
-            assertThat(candidateMatch.getDownstream(), is(emptyIterable()));
+            assertThat(candidateMatch.getUpstream(), is(nullValue()));
+            assertThat(candidateMatch.getDownstream(), is(nullValue()));
         }
     }
 

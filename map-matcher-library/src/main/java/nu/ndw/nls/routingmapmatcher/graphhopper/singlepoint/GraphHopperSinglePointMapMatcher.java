@@ -21,7 +21,6 @@ import com.graphhopper.storage.index.LocationIndexTree;
 import com.graphhopper.storage.index.Snap;
 import com.graphhopper.util.FetchMode;
 import com.graphhopper.util.PointList;
-import java.util.Collections;
 import java.util.List;
 import nu.ndw.nls.routingmapmatcher.constants.GlobalConstants;
 import nu.ndw.nls.routingmapmatcher.domain.SinglePointMapMatcher;
@@ -118,12 +117,12 @@ public class GraphHopperSinglePointMapMatcher implements SinglePointMapMatcher {
         List<CandidateMatch> candidateMatches = matches.stream()
                 .map(matchedPoint -> {
                     List<IsochroneMatch> upstream =
-                            singlePointLocation.getUpstreamIsochroneUnit() == null ? Collections.emptyList()
+                            singlePointLocation.getUpstreamIsochroneUnit() == null ? null
                                     : isochroneService
                                             .getUpstreamIsochroneMatches(matchedPoint
                                                     , singlePointLocation);
                     List<IsochroneMatch> downstream =
-                            singlePointLocation.getDownstreamIsochroneUnit() == null ? Collections.emptyList()
+                            singlePointLocation.getDownstreamIsochroneUnit() == null ? null
                                     : isochroneService
                                             .getDownstreamIsochroneMatches(matchedPoint,
                                                     singlePointLocation);
