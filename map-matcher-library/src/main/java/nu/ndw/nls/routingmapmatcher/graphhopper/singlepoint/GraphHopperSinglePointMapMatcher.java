@@ -107,10 +107,7 @@ public class GraphHopperSinglePointMapMatcher implements SinglePointMapMatcher {
         double inputRadius = singlePointLocation.getCutoffDistance();
         List<Snap> queryResults = findCandidates(inputPoint, inputRadius);
         Polygon circle = createCircle(inputPoint, RADIUS_TO_DIAMETER * inputRadius);
-        List<MatchedPoint> matches = singlePointLocation
-                .getMatchFilter()
-                .getFilter()
-                .apply(getMatchedPoints(singlePointLocation, queryResults, circle));
+        List<MatchedPoint> matches = getMatchedPoints(singlePointLocation, queryResults, circle);
         if (matches.isEmpty()) {
             return createFailedMatch(singlePointLocation);
         }
@@ -153,12 +150,31 @@ public class GraphHopperSinglePointMapMatcher implements SinglePointMapMatcher {
 
     private List<MatchedPoint> getMatchedPoints(SinglePointLocation singlePointLocation, List<Snap> queryResults,
             Polygon circle) {
-        return queryResults.stream()
+        List<MatchedPoint> sorted = queryResults.stream()
                 .filter(qr -> intersects(circle, qr))
                 .flatMap(qr -> calculateMatches(qr, circle, singlePointLocation)
                         .stream())
                 .sorted(singlePointLocation.getMatchSort().getSort())
                 .toList();
+        return switch (singlePointLocation.getMatchFilter()) {
+            case ALL -> sorted;
+            case FIRST -> switch (singlePointLocation.getMatchSort()) {
+                case HIGHEST_RELIABILITY -> {
+                    double cutoffValue = sorted.get(0).getReliability() - 0.5;
+                    yield sorted
+                            .stream()
+                            .filter(matchedPoint -> matchedPoint.getReliability() > cutoffValue)
+                            .toList();
+                }
+                case SHORTEST_DISTANCE -> {
+                    double cutoffValue = sorted.get(0).getDistance() + 0.1;
+                    yield sorted
+                            .stream()
+                            .filter(matchedPoint -> matchedPoint.getDistance() < cutoffValue)
+                            .toList();
+                }
+            };
+        };
     }
 
 
