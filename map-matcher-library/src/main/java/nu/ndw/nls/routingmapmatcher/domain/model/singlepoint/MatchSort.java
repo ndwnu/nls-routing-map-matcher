@@ -1,6 +1,5 @@
 package nu.ndw.nls.routingmapmatcher.domain.model.singlepoint;
 
-import static java.util.Comparator.comparing;
 import static java.util.Comparator.comparingDouble;
 
 import java.util.Comparator;
