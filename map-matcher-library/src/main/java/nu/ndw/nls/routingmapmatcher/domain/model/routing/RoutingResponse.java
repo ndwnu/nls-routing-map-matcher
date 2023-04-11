@@ -11,6 +11,8 @@ import lombok.ToString;
 @EqualsAndHashCode
 @ToString
 public class RoutingResponse {
-   private final List<Route> routes;
-   private final List<Waypoint> waypoints;
+
+    private final Route route;
+    private final List<Waypoint> waypoints;
+
 }

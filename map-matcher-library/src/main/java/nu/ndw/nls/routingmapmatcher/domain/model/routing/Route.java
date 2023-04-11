@@ -2,6 +2,7 @@ package nu.ndw.nls.routingmapmatcher.domain.model.routing;
 
 import java.util.List;
 import lombok.Builder;
+import lombok.Builder.Default;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
@@ -13,7 +14,10 @@ import org.locationtech.jts.geom.LineString;
 @ToString
 public class Route {
 
-    private final List<RouteLink> routeLinks;
+    private final double startFraction;
+    private final double endFraction;
+
+    private List<Integer> matchedLinkIds;
 
     private final LineString geometry;
     private final double weight;
