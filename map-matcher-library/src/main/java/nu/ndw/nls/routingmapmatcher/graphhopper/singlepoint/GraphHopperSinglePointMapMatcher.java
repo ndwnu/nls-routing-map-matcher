@@ -156,6 +156,9 @@ public class GraphHopperSinglePointMapMatcher implements SinglePointMapMatcher {
                         .stream())
                 .sorted(singlePointLocation.getMatchSort().getSort())
                 .toList();
+        if (sorted.isEmpty()) {
+            return sorted;
+        }
         return switch (singlePointLocation.getMatchFilter()) {
             case ALL -> sorted;
             case FIRST -> switch (singlePointLocation.getMatchSort()) {
