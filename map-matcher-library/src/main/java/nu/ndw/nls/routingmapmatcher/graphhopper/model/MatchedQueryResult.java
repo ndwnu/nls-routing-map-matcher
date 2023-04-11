@@ -26,6 +26,7 @@ public class MatchedQueryResult {
     private final BearingFilter bearingFilter;
     private final LineString originalGeometry;
     private final EdgeIteratorTravelDirection travelDirection;
+    private final double cutoffDistance;
     @Getter(AccessLevel.NONE)
     private final Geometry cutoffGeometry;
     private final boolean reversed;

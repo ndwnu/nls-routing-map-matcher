@@ -15,7 +15,6 @@ import com.graphhopper.util.FetchMode;
 import com.graphhopper.util.PointList;
 import nu.ndw.nls.routingmapmatcher.constants.GlobalConstants;
 import nu.ndw.nls.routingmapmatcher.domain.model.IsochroneMatch;
-import nu.ndw.nls.routingmapmatcher.domain.model.IsochroneMatch.Direction;
 import nu.ndw.nls.routingmapmatcher.graphhopper.isochrone.ShortestPathTree.IsoLabel;
 import nu.ndw.nls.routingmapmatcher.graphhopper.model.FractionAndDistance;
 import nu.ndw.nls.routingmapmatcher.graphhopper.util.CrsTransformer;
@@ -102,7 +101,7 @@ class IsochroneMatchMapperTest {
         assertThat(result.getMatchedLinkId()).isEqualTo(MATCHED_LINK_ID_ONE);
         assertThat(result.getStartFraction()).isEqualTo(0);
         assertThat(result.getEndFraction()).isEqualTo(0.633761059681);
-        assertThat(result.getDirection()).isEqualTo(Direction.FORWARD);
+        assertThat(result.isReversed()).isFalse();
         assertThat(result.getGeometry()).isEqualTo(isoLabelWayGeometry);
     }
 
@@ -115,7 +114,7 @@ class IsochroneMatchMapperTest {
         assertThat(result.getMatchedLinkId()).isEqualTo(MATCHED_LINK_ID_ONE);
         assertThat(result.getStartFraction()).isEqualTo(0.366238940319);
         assertThat(result.getEndFraction()).isEqualTo(1);
-        assertThat(result.getDirection()).isEqualTo(Direction.BACKWARD);
+        assertThat(result.isReversed()).isTrue();
         assertThat(result.getGeometry()).isEqualTo(isoLabelWayGeometry.reverse());
     }
 
@@ -130,7 +129,7 @@ class IsochroneMatchMapperTest {
         assertThat(result.getMatchedLinkId()).isEqualTo(MATCHED_LINK_ID_ONE);
         assertThat(result.getStartFraction()).isEqualTo(2.285606E-5);
         assertThat(result.getEndFraction()).isEqualTo(0.506377235259);
-        assertThat(result.getDirection()).isEqualTo(Direction.FORWARD);
+        assertThat(result.isReversed()).isFalse();
         assertThat(result.getGeometry().getLength()).isLessThan(originalGeometry.getLength());
         FractionAndDistance fractionAndDistance = fractionAndDistanceCalculator.calculateFractionAndDistance(
                 result.getGeometry(),
@@ -153,7 +152,7 @@ class IsochroneMatchMapperTest {
         assertThat(result.getMatchedLinkId()).isEqualTo(MATCHED_LINK_ID_ONE);
         assertThat(result.getStartFraction()).isEqualTo(0.0);
         assertThat(result.getEndFraction()).isEqualTo(0.799003390195);
-        assertThat(result.getDirection()).isEqualTo(Direction.FORWARD);
+        assertThat(result.isReversed()).isFalse();
         assertThat(result.getGeometry().getLength()).isLessThan(originalGeometry.getLength());
         FractionAndDistance fractionAndDistance = fractionAndDistanceCalculator.calculateFractionAndDistance(
                 result.getGeometry(),
