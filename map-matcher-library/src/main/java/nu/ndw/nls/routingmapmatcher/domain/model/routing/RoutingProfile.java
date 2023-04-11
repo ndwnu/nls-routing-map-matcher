@@ -1,11 +1,14 @@
 package nu.ndw.nls.routingmapmatcher.domain.model.routing;
 
-import lombok.Builder;
-import lombok.EqualsAndHashCode;
 import lombok.Getter;
-import lombok.ToString;
+import nu.ndw.nls.routingmapmatcher.constants.GlobalConstants;
 
-
+@Getter
 public enum RoutingProfile {
-        CAR_FASTEST,CAR_SHORTEST
+    CAR_FASTEST(GlobalConstants.CAR_FASTEST), CAR_SHORTEST(GlobalConstants.CAR_SHORTEST);
+    private final String label;
+
+    RoutingProfile(String label) {
+        this.label = label;
+    }
 }
