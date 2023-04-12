@@ -93,15 +93,14 @@ public class GraphHopperRouter implements Router {
         for (Path path : paths) {
             List<EdgeIteratorState> edges = path.calcEdges();
             for (int i = 0; i < edges.size(); i++) {
-                EdgeIteratorState edge = edges.get(i);
                 if (isStartOfRoute(pathIndex, i)) {
-                    routeBuilder.startLinkFraction(pathUtil.determineStartLinkFraction(edge,
+                    routeBuilder.startLinkFraction(pathUtil.determineStartLinkFraction(edges.get(i),
                             queryGraphExtractor.extractQueryGraph(path)));
                 } else if (isEndOfRoute(paths, pathIndex, edges, i)) {
-                    routeBuilder.endLinkFraction(pathUtil.determineEndLinkFraction(edge,
+                    routeBuilder.endLinkFraction(pathUtil.determineEndLinkFraction(edges.get(i),
                             queryGraphExtractor.extractQueryGraph(path)));
                 }
-                matchedLinkIds.add(determineLinkId(edge, networkGraphHopper));
+                matchedLinkIds.add(determineLinkId(edges.get(i), networkGraphHopper));
             }
             pathIndex++;
         }
