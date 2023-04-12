@@ -77,17 +77,11 @@ public class GraphHopperRouter implements Router {
     }
 
     private RoutingResponse.RoutingResponseBuilder createRoute(ResponsePath path) {
-
-        LineString lineString = path.getPoints().toLineString(false);
-        double weight = Helper.round(path.getRouteWeight(), 1);
-        long duration = TimeUnit.MILLISECONDS.toSeconds(path.getTime());
-        double distance = Helper.round(path.getDistance(), 1);
-        RoutingResponse.RoutingResponseBuilder routeBuilder = RoutingResponse.builder();
-        return routeBuilder
-                .geometry(lineString)
-                .weight(weight)
-                .distance(duration)
-                .distance(distance);
+        return  RoutingResponse.builder()
+                .geometry(path.getPoints().toLineString(false))
+                .weight(Helper.round(path.getRouteWeight(), 1))
+                .distance(TimeUnit.MILLISECONDS.toSeconds(path.getTime()))
+                .distance( Helper.round(path.getDistance(), 1));
 
 
     }
