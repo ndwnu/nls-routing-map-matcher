@@ -3,7 +3,6 @@ package nu.ndw.nls.routingmapmatcher.config;
 import nu.ndw.nls.routingmapmatcher.domain.LineStringMapMatcher;
 import nu.ndw.nls.routingmapmatcher.domain.MapMatcherFactory;
 import nu.ndw.nls.routingmapmatcher.domain.Router;
-import nu.ndw.nls.routingmapmatcher.domain.RouterFactory;
 import nu.ndw.nls.routingmapmatcher.domain.RoutingMapMatcher;
 import nu.ndw.nls.routingmapmatcher.domain.SinglePointMapMatcher;
 import nu.ndw.nls.routingmapmatcher.domain.StartToEndMapMatcher;

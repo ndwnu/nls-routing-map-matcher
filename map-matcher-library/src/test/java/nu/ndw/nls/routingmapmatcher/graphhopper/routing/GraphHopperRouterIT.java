@@ -9,6 +9,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Objects;
 import lombok.SneakyThrows;
+import nu.ndw.nls.routingmapmatcher.constants.GlobalConstants;
 import nu.ndw.nls.routingmapmatcher.domain.Router;
 import nu.ndw.nls.routingmapmatcher.domain.model.Link;
 import nu.ndw.nls.routingmapmatcher.domain.model.RoutingNetwork;
@@ -18,11 +19,16 @@ import nu.ndw.nls.routingmapmatcher.graphhopper.NetworkGraphHopperFactory;
 import nu.ndw.nls.routingmapmatcher.graphhopper.viterbi.LinkDeserializer;
 import org.apache.commons.io.IOUtils;
 import org.junit.jupiter.api.Test;
+import org.locationtech.jts.geom.Coordinate;
+import org.locationtech.jts.geom.GeometryFactory;
+import org.locationtech.jts.geom.Point;
+import org.locationtech.jts.geom.PrecisionModel;
 
 class GraphHopperRouterIT {
 
     private static final String LINKS_RESOURCE = "/test-data/links.json";
     private Router router;
+    private GeometryFactory geometryFactory;
 
     @SneakyThrows
     private void setupNetwork() {
@@ -40,21 +46,23 @@ class GraphHopperRouterIT {
         GraphHopperRouterFactory graphHopperSinglePointMapMatcherFactory =
                 new GraphHopperRouterFactory(new NetworkGraphHopperFactory());
         router = graphHopperSinglePointMapMatcherFactory.createMapMatcher(routingNetwork);
+        geometryFactory = new GeometryFactory(new PrecisionModel(), GlobalConstants.WGS84_SRID);
     }
 
     @Test
     void route_ok() {
         setupNetwork();
-        List<Double> start = List.of(5.430496,52.177687);
-        List<Double> end = List.of(5.428436,52.175901);
-        List<List<Double>> wayPoints = List.of(start, end);
+        Point start = geometryFactory.createPoint(new Coordinate(5.430496, 52.177687));
+        Point end = geometryFactory.createPoint(new Coordinate(5.428436, 52.175901));
+        List<Point> wayPoints = List.of(start, end);
         var result = router.route(RoutingRequest.builder()
                 .routingProfile(RoutingProfile.CAR_FASTEST)
                 .wayPoints(wayPoints).build()
         );
-        assertThat(result.getRoute().getStartFraction()).isEqualTo(0.8236516616727612);
-        assertThat(result.getRoute().getEndFraction()).isEqualTo(0.5228504089301351);
-        assertThat(result.getRoute().getDistance()).isEqualTo(243.6);
-        assertThat(result.getRoute().getMatchedLinkIds()).isEqualTo(List.of(7223072,7223073,3667130,3667131,3667132,3667133,3666204));
+        assertThat(result.getStartLinkFraction()).isEqualTo(0.8236516616727612);
+        assertThat(result.getEndLinkFraction()).isEqualTo(0.5228504089301351);
+        assertThat(result.getDistance()).isEqualTo(243.6);
+        assertThat(result.getMatchedLinkIds()).isEqualTo(
+                List.of(7223072, 7223073, 3667130, 3667131, 3667132, 3667133, 3666204));
     }
 }
