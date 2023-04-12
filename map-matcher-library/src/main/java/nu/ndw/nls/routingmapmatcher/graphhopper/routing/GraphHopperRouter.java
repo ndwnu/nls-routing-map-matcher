@@ -20,13 +20,12 @@ import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import nu.ndw.nls.routingmapmatcher.domain.Router;
-import nu.ndw.nls.routingmapmatcher.domain.model.routing.Route;
 import nu.ndw.nls.routingmapmatcher.domain.model.routing.RoutingRequest;
 import nu.ndw.nls.routingmapmatcher.domain.model.routing.RoutingResponse;
-import nu.ndw.nls.routingmapmatcher.domain.model.routing.Waypoint;
 import nu.ndw.nls.routingmapmatcher.graphhopper.NetworkGraphHopper;
 import nu.ndw.nls.routingmapmatcher.graphhopper.util.PathUtil;
 import org.locationtech.jts.geom.LineString;
+import org.locationtech.jts.geom.Point;
 
 @RequiredArgsConstructor
 public class GraphHopperRouter implements Router {
@@ -43,15 +42,7 @@ public class GraphHopperRouter implements Router {
         ResponsePath responsePath = routingResponse.getBest();
         ensureResponseHasNoErrors(routingResponse);
         ensurePathsAreNotEmpty(responsePath);
-        return RoutingResponse.builder()
-                .route(createMatchedLinkIds(ghRequest, createRoute(responsePath)))
-                .waypoints(ghPoints.stream()
-                        .map(ghPoint -> Waypoint
-                                .builder()
-                                .latitude(ghPoint.getLat())
-                                .longitude(ghPoint.getLon())
-                                .build()).toList())
-                .build();
+        return createMatchedLinkIds(ghRequest, createRoute(responsePath));
     }
 
     private static GHRequest createGHRequest(List<GHPoint> points, String profile) {
@@ -66,8 +57,8 @@ public class GraphHopperRouter implements Router {
     }
 
 
-    private static List<GHPoint> getGHPointsFromPoints(List<List<Double>> points) {
-        return points.stream().map(coordinates -> new GHPoint(coordinates.get(1), coordinates.get(0)))
+    private static List<GHPoint> getGHPointsFromPoints(List<Point> points) {
+        return points.stream().map(point -> new GHPoint(point.getY(), point.getX()))
                 .collect(Collectors.toList());
     }
 
@@ -85,13 +76,13 @@ public class GraphHopperRouter implements Router {
         }
     }
 
-    private Route.RouteBuilder createRoute(ResponsePath path) {
+    private RoutingResponse.RoutingResponseBuilder createRoute(ResponsePath path) {
 
         LineString lineString = path.getPoints().toLineString(false);
         double weight = Helper.round(path.getRouteWeight(), 1);
         long duration = TimeUnit.MILLISECONDS.toSeconds(path.getTime());
         double distance = Helper.round(path.getDistance(), 1);
-        Route.RouteBuilder routeBuilder = Route.builder();
+        RoutingResponse.RoutingResponseBuilder routeBuilder = RoutingResponse.builder();
         return routeBuilder
                 .geometry(lineString)
                 .weight(weight)
@@ -101,7 +92,8 @@ public class GraphHopperRouter implements Router {
 
     }
 
-    private Route createMatchedLinkIds(GHRequest ghRequest, Route.RouteBuilder routeBuilder) {
+    private RoutingResponse createMatchedLinkIds(GHRequest ghRequest,
+            RoutingResponse.RoutingResponseBuilder routeBuilder) {
         List<Path> paths = networkGraphHopper.calcPaths(ghRequest);
         int pathIndex = 0;
         List<Integer> matchedLinkIds = new ArrayList<>();
@@ -111,10 +103,10 @@ public class GraphHopperRouter implements Router {
             for (int i = 0; i < edges.size(); i++) {
                 EdgeIteratorState edge = edges.get(i);
                 if (pathIndex == 0 && i == 0) {
-                    routeBuilder.startFraction(pathUtil.determineStartLinkFraction(edges.get(i),
+                    routeBuilder.startLinkFraction(pathUtil.determineStartLinkFraction(edge,
                             queryGraph));
                 } else if (pathIndex == paths.size() - 1 && i == edges.size() - 1) {
-                    routeBuilder.endFraction(pathUtil.determineEndLinkFraction(edges.get(i),
+                    routeBuilder.endLinkFraction(pathUtil.determineEndLinkFraction(edge,
                             queryGraph));
                 }
                 matchedLinkIds.add(determineLinkId(edge, networkGraphHopper));
