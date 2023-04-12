@@ -7,7 +7,6 @@ import com.graphhopper.GHResponse;
 import com.graphhopper.ResponsePath;
 import com.graphhopper.routing.Path;
 import com.graphhopper.routing.QueryGraphExtractor;
-import com.graphhopper.routing.querygraph.QueryGraph;
 import com.graphhopper.util.EdgeIteratorState;
 import com.graphhopper.util.Helper;
 import com.graphhopper.util.PMap;
@@ -24,12 +23,12 @@ import nu.ndw.nls.routingmapmatcher.domain.model.routing.RoutingRequest;
 import nu.ndw.nls.routingmapmatcher.domain.model.routing.RoutingResponse;
 import nu.ndw.nls.routingmapmatcher.graphhopper.NetworkGraphHopper;
 import nu.ndw.nls.routingmapmatcher.graphhopper.util.PathUtil;
-import org.locationtech.jts.geom.LineString;
 import org.locationtech.jts.geom.Point;
 
 @RequiredArgsConstructor
 public class GraphHopperRouter implements Router {
 
+    private static final boolean INCLUDE_ELEVATION = false;
     private final NetworkGraphHopper networkGraphHopper;
     private final QueryGraphExtractor queryGraphExtractor;
     private final PathUtil pathUtil;
@@ -77,31 +76,30 @@ public class GraphHopperRouter implements Router {
     }
 
     private RoutingResponse.RoutingResponseBuilder createRoute(ResponsePath path) {
-        return  RoutingResponse.builder()
-                .geometry(path.getPoints().toLineString(false))
+        return RoutingResponse.builder()
+                .geometry(path.getPoints().toLineString(INCLUDE_ELEVATION))
                 .weight(Helper.round(path.getRouteWeight(), 1))
                 .distance(TimeUnit.MILLISECONDS.toSeconds(path.getTime()))
-                .distance( Helper.round(path.getDistance(), 1));
+                .distance(Helper.round(path.getDistance(), 1));
 
 
     }
 
     private RoutingResponse createMatchedLinkIds(GHRequest ghRequest,
             RoutingResponse.RoutingResponseBuilder routeBuilder) {
-        List<Path> paths = networkGraphHopper.calcPaths(ghRequest);
         int pathIndex = 0;
         List<Integer> matchedLinkIds = new ArrayList<>();
+        List<Path> paths = networkGraphHopper.calcPaths(ghRequest);
         for (Path path : paths) {
-            QueryGraph queryGraph = queryGraphExtractor.extractQueryGraph(path);
             List<EdgeIteratorState> edges = path.calcEdges();
             for (int i = 0; i < edges.size(); i++) {
                 EdgeIteratorState edge = edges.get(i);
-                if (pathIndex == 0 && i == 0) {
+                if (isStartOfRoute(pathIndex, i)) {
                     routeBuilder.startLinkFraction(pathUtil.determineStartLinkFraction(edge,
-                            queryGraph));
-                } else if (pathIndex == paths.size() - 1 && i == edges.size() - 1) {
+                            queryGraphExtractor.extractQueryGraph(path)));
+                } else if (isEndOfRoute(paths, pathIndex, edges, i)) {
                     routeBuilder.endLinkFraction(pathUtil.determineEndLinkFraction(edge,
-                            queryGraph));
+                            queryGraphExtractor.extractQueryGraph(path)));
                 }
                 matchedLinkIds.add(determineLinkId(edge, networkGraphHopper));
             }
@@ -110,6 +108,14 @@ public class GraphHopperRouter implements Router {
         return routeBuilder
                 .matchedLinkIds(matchedLinkIds)
                 .build();
+    }
+
+    private static boolean isEndOfRoute(List<Path> paths, int pathIndex, List<EdgeIteratorState> edges, int i) {
+        return pathIndex == paths.size() - 1 && i == edges.size() - 1;
+    }
+
+    private static boolean isStartOfRoute(int pathIndex, int i) {
+        return pathIndex == 0 && i == 0;
     }
 
     private int determineLinkId(EdgeIteratorState edge, NetworkGraphHopper graphHopper) {
