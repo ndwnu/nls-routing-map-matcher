@@ -2,10 +2,12 @@ package nu.ndw.nls.routingmapmatcher.config;
 
 import nu.ndw.nls.routingmapmatcher.domain.LineStringMapMatcher;
 import nu.ndw.nls.routingmapmatcher.domain.MapMatcherFactory;
+import nu.ndw.nls.routingmapmatcher.domain.Router;
 import nu.ndw.nls.routingmapmatcher.domain.RoutingMapMatcher;
 import nu.ndw.nls.routingmapmatcher.domain.SinglePointMapMatcher;
 import nu.ndw.nls.routingmapmatcher.domain.StartToEndMapMatcher;
 import nu.ndw.nls.routingmapmatcher.graphhopper.NetworkGraphHopperFactory;
+import nu.ndw.nls.routingmapmatcher.graphhopper.routing.GraphHopperRouterFactory;
 import nu.ndw.nls.routingmapmatcher.graphhopper.singlepoint.GraphHopperSinglePointMapMatcherFactory;
 import nu.ndw.nls.routingmapmatcher.graphhopper.starttoend.GraphHopperStartToEndMapMatcherFactory;
 import nu.ndw.nls.routingmapmatcher.graphhopper.viterbi.ViterbiLinestringMapMatcherFactory;
@@ -53,5 +55,12 @@ public class MapMatcherAutoConfiguration {
     public MapMatcherFactory<StartToEndMapMatcher> startToEndMapMatcherFactory(
             NetworkGraphHopperFactory networkGraphHopperFactory) {
         return new GraphHopperStartToEndMapMatcherFactory(networkGraphHopperFactory);
+    }
+
+    @Bean
+    @ConditionalOnMissingBean(value = Router.class, parameterizedContainer = MapMatcherFactory.class)
+    public MapMatcherFactory<Router> routerFactory(
+            NetworkGraphHopperFactory networkGraphHopperFactory) {
+        return new GraphHopperRouterFactory(networkGraphHopperFactory);
     }
 }
