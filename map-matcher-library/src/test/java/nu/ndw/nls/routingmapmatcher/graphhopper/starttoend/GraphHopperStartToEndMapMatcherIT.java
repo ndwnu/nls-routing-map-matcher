@@ -39,7 +39,7 @@ class GraphHopperStartToEndMapMatcherIT {
 
     @SneakyThrows
     @BeforeEach
-    private void setup() {
+    void setup() {
         String linksJson = IOUtils.toString(getClass().getResourceAsStream("/test-data/links.json"));
         mapper = new ObjectMapper();
         SimpleModule module = new SimpleModule();
