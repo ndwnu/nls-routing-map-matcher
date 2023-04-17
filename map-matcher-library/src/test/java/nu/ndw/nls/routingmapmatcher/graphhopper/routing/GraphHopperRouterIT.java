@@ -49,6 +49,7 @@ class GraphHopperRouterIT {
         geometryFactory = new GeometryFactory(new PrecisionModel(), GlobalConstants.WGS84_SRID);
     }
 
+    @SneakyThrows
     @Test
     void route_ok() {
         setupNetwork();
