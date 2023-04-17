@@ -16,22 +16,27 @@ import com.graphhopper.storage.BaseGraph;
 import com.graphhopper.storage.EdgeIteratorStateReverseExtractor;
 import com.graphhopper.storage.index.LocationIndexTree;
 import com.graphhopper.util.EdgeIteratorState;
+import com.graphhopper.util.FetchMode;
 import java.util.List;
-import java.util.Set;
 import nu.ndw.nls.routingmapmatcher.constants.GlobalConstants;
 import nu.ndw.nls.routingmapmatcher.domain.exception.RoutingMapMatcherException;
+import nu.ndw.nls.routingmapmatcher.domain.model.IsochroneMatch;
 import nu.ndw.nls.routingmapmatcher.domain.model.MatchStatus;
 import nu.ndw.nls.routingmapmatcher.domain.model.linestring.LineStringLocation;
 import nu.ndw.nls.routingmapmatcher.domain.model.linestring.LineStringMatch;
 import nu.ndw.nls.routingmapmatcher.graphhopper.NetworkGraphHopper;
 import nu.ndw.nls.routingmapmatcher.graphhopper.isochrone.IsochroneService;
 import nu.ndw.nls.routingmapmatcher.graphhopper.isochrone.ShortestPathTreeFactory;
+import nu.ndw.nls.routingmapmatcher.graphhopper.isochrone.mappers.IsochroneMatchMapper;
+import org.geotools.referencing.GeodeticCalculator;
 import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.LineString;
+import org.locationtech.jts.geom.Point;
 import org.locationtech.jts.geom.PrecisionModel;
 
 public class LineStringMatchUtil {
 
+    private static final boolean INCLUDE_ELEVATION = false;
     private final PathUtil pathUtil;
     private final EncodingManager encodingManager;
     private final IsochroneService isochroneService;
@@ -45,9 +50,13 @@ public class LineStringMatchUtil {
         BooleanEncodedValue accessEnc = encodingManager.getBooleanEncodedValue(VehicleAccess.key(VEHICLE_CAR));
         DecimalEncodedValue speedEnc = encodingManager.getDecimalEncodedValue(VehicleSpeed.key(VEHICLE_CAR));
         Weighting weighting = new ShortestWeighting(accessEnc, speedEnc);
+        EdgeIteratorStateReverseExtractor edgeIteratorStateReverseExtractor = new EdgeIteratorStateReverseExtractor();
+        IsochroneMatchMapper isochroneMatchMapper = new IsochroneMatchMapper(new CrsTransformer(), encodingManager,
+                new FractionAndDistanceCalculator(new GeodeticCalculator()),
+                edgeIteratorStateReverseExtractor);
         this.isochroneService = new IsochroneService(encodingManager, baseGraph,
-                new EdgeIteratorStateReverseExtractor(),
-                null, new ShortestPathTreeFactory(weighting), locationIndexTree);
+                edgeIteratorStateReverseExtractor,
+                isochroneMatchMapper, new ShortestPathTreeFactory(weighting), locationIndexTree);
     }
 
     public LineStringMatchUtil(NetworkGraphHopper networkGraphHopper) {
@@ -62,13 +71,19 @@ public class LineStringMatchUtil {
             throw new RoutingMapMatcherException("Unexpected: path has no edges");
         }
         List<Integer> matchedLinkIds = pathUtil.determineMatchedLinkIds(encodingManager, edges);
-
-        int startNode = edges.get(0).getBaseNode();
-        Set<Integer> upstreamLinkIds = lineStringLocation.getUpstreamIsochroneUnit() != null ?
-                isochroneService.getUpstreamLinkIds(queryGraph, lineStringLocation, startNode) : null;
-        int endNode = edges.get(edges.size() - 1).getAdjNode();
-        Set<Integer> downstreamLinkIds = lineStringLocation.getDownstreamIsochroneUnit() != null ?
-                isochroneService.getDownstreamLinkIds(queryGraph, lineStringLocation, endNode) : null;
+        Point startPoint = edges.get(0)
+                .fetchWayGeometry(FetchMode.ALL)
+                .toLineString(INCLUDE_ELEVATION)
+                .getStartPoint();
+        List<IsochroneMatch> upstream = lineStringLocation.getUpstreamIsochroneUnit() != null ?
+                isochroneService.getUpstreamIsochroneMatches(startPoint, lineStringLocation.isReversed(),
+                        lineStringLocation) : null;
+        Point endPoint = edges.get(edges.size() - 1).fetchWayGeometry(FetchMode.ALL)
+                .toLineString(INCLUDE_ELEVATION)
+                .getEndPoint();
+        List<IsochroneMatch> downstream = lineStringLocation.getDownstreamIsochroneUnit() != null ?
+                isochroneService.getDownstreamIsochroneMatches(endPoint, lineStringLocation.isReversed(),
+                        lineStringLocation) : null;
 
         double startLinkFraction = pathUtil.determineStartLinkFraction(edges.get(0), queryGraph);
         double endLinkFraction = pathUtil.determineEndLinkFraction(edges.get(edges.size() - 1), queryGraph);
@@ -78,8 +93,8 @@ public class LineStringMatchUtil {
                 .locationIndex(lineStringLocation.getLocationIndex())
                 .reversed(lineStringLocation.isReversed())
                 .matchedLinkIds(matchedLinkIds)
-                .upstreamLinkIds(upstreamLinkIds)
-                .downstreamLinkIds(downstreamLinkIds)
+                .upstream(upstream)
+                .downstream(downstream)
                 .startLinkFraction(startLinkFraction)
                 .endLinkFraction(endLinkFraction)
                 .reliability(reliability)
@@ -94,8 +109,8 @@ public class LineStringMatchUtil {
                 .locationIndex(lineStringLocation.getLocationIndex())
                 .reversed(lineStringLocation.isReversed())
                 .matchedLinkIds(Lists.newArrayList())
-                .upstreamLinkIds(null)
-                .downstreamLinkIds(null)
+                .downstream(null)
+                .upstream(null)
                 .startLinkFraction(0.0)
                 .endLinkFraction(0.0)
                 .reliability(0.0)
