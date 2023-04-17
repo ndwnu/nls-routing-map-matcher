@@ -6,6 +6,7 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
 import org.locationtech.jts.geom.LineString;
+import org.locationtech.jts.geom.Point;
 
 @Builder
 @Getter
@@ -14,7 +15,9 @@ import org.locationtech.jts.geom.LineString;
 public class RoutingResponse {
 
     private final double startLinkFraction;
-    private final double endLinkFraction;
+    @Builder.Default
+    private final double endLinkFraction = 1;
+    private final List<Point> snappedWaypoints;
     private List<Integer> matchedLinkIds;
     private final LineString geometry;
     private final double weight;

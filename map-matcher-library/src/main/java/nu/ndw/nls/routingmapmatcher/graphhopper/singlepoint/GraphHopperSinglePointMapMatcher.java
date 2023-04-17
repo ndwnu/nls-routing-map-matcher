@@ -42,11 +42,9 @@ import nu.ndw.nls.routingmapmatcher.graphhopper.util.FractionAndDistanceCalculat
 import org.geotools.referencing.GeodeticCalculator;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Geometry;
-import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.LineString;
 import org.locationtech.jts.geom.Point;
 import org.locationtech.jts.geom.Polygon;
-import org.locationtech.jts.geom.PrecisionModel;
 import org.locationtech.jts.util.GeometricShapeFactory;
 
 public class GraphHopperSinglePointMapMatcher implements SinglePointMapMatcher {
@@ -55,11 +53,6 @@ public class GraphHopperSinglePointMapMatcher implements SinglePointMapMatcher {
 
     private static final boolean INCLUDE_ELEVATION = false;
     private static final int NUM_POINTS = 100;
-
-    private static final GeometryFactory WGS84_GEOMETRY_FACTORY = new GeometryFactory(new PrecisionModel(),
-            GlobalConstants.WGS84_SRID);
-    private static final GeometryFactory RD_NEW_GEOMETRY_FACTORY = new GeometryFactory(new PrecisionModel(),
-            GlobalConstants.RD_NEW_SRID);
 
     private final LocationIndexTree locationIndexTree;
     private final EdgeFilter edgeFilter;
@@ -95,7 +88,7 @@ public class GraphHopperSinglePointMapMatcher implements SinglePointMapMatcher {
                 this.locationIndexTree
         );
         BearingCalculator bearingCalculator = new BearingCalculator(geodeticCalculator);
-        this.pointMatchingService = new PointMatchingService(WGS84_GEOMETRY_FACTORY,
+        this.pointMatchingService = new PointMatchingService(GlobalConstants.WGS84_GEOMETRY_FACTORY,
                 bearingCalculator,
                 fractionAndDistanceCalculator);
         this.crsTransformer = new CrsTransformer();
@@ -187,7 +180,7 @@ public class GraphHopperSinglePointMapMatcher implements SinglePointMapMatcher {
     }
 
     private Polygon createCircle(Point pointWgs84, double diameterInMeters) {
-        var shapeFactory = new GeometricShapeFactory(RD_NEW_GEOMETRY_FACTORY);
+        var shapeFactory = new GeometricShapeFactory(GlobalConstants.RD_NEW_GEOMETRY_FACTORY);
         Point pointRd = (Point) crsTransformer.transformFromWgs84ToRdNew(pointWgs84);
         shapeFactory.setCentre(new Coordinate(pointRd.getX(), pointRd.getY()));
         shapeFactory.setNumPoints(NUM_POINTS);
