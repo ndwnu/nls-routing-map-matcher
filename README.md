@@ -16,19 +16,11 @@ The project is a multi-module maven project.
 ### Modules
 
 - map-matcher-library:
-
   The core library
 
 
 - map-matcher-spring-boot-autoconfigure:
-
   The spring based autoconfiguration of the library for use within a spring project.
-
-
-- map-matcher-spring-boot-starter:
-
-  A spring boot starter maven pom which automatically adds the library and autoconfig jars to the client application's
-  classpath.
 
 ## General usage
 
@@ -108,16 +100,22 @@ MapMatchingRequest mapMatchingRequest = MapMatchingRequest.builder()
 
 ### spring boot
 
-When using spring boot in your project, you can use the spring boot starter dependency to use the routing map matcher
+When using spring boot in your project, you can use the spring boot dependency to use the routing map matcher
 library:
 
 ```xml
 <dependency>
   <groupId>nu.ndw.nls</groupId>
-  <artifactId>routing-map-matcher-spring-boot-starter</artifactId>
+  <artifactId>routing-map-matcher-spring-boot</artifactId>
   <version>${routing-map-matcher.version}</version>
 </dependency>
 ```
+
+```java
+@Import(MapMatcherConfiguration.java)
+```
+
+
 
 This will give you a pre-configured bean called "*RoutingMapMatcher*" to use in your application.
 
