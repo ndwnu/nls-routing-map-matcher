@@ -1,9 +1,16 @@
 package nu.ndw.nls.routingmapmatcher.constants;
 
+import org.locationtech.jts.geom.GeometryFactory;
+import org.locationtech.jts.geom.PrecisionModel;
+
 public final class GlobalConstants {
 
     public static final int WGS84_SRID = 4326;
+    public static final GeometryFactory WGS84_GEOMETRY_FACTORY = new GeometryFactory(new PrecisionModel(),
+            WGS84_SRID);
     public static final int RD_NEW_SRID = 28992;
+    public static final GeometryFactory RD_NEW_GEOMETRY_FACTORY = new GeometryFactory(new PrecisionModel(),
+            RD_NEW_SRID);
     public static final String CAR_FASTEST = "car_fastest";
     public static final String CAR_SHORTEST = "car_shortest";
 
