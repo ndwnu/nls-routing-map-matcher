@@ -19,7 +19,7 @@ The project is a multi-module maven project.
   The core library
 
 
-- map-matcher-spring-boot-autoconfigure:
+- map-matcher-spring-boot:
   The spring based autoconfiguration of the library for use within a spring project.
 
 ## General usage
