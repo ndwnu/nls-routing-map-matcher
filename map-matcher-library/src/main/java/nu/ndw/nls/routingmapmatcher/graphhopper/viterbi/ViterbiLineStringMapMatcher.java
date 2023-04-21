@@ -1,6 +1,5 @@
 package nu.ndw.nls.routingmapmatcher.graphhopper.viterbi;
 
-import static nu.ndw.nls.routingmapmatcher.constants.GlobalConstants.CAR_FASTEST;
 import static nu.ndw.nls.routingmapmatcher.constants.GlobalConstants.CAR_SHORTEST;
 import static nu.ndw.nls.routingmapmatcher.graphhopper.util.MatchUtil.getQueryResults;
 
