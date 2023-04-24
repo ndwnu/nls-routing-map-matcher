@@ -2,7 +2,6 @@ package nu.ndw.nls.routingmapmatcher.graphhopper.util;
 
 import static nu.ndw.nls.routingmapmatcher.constants.GlobalConstants.VEHICLE_CAR;
 
-import com.google.common.collect.Lists;
 import com.graphhopper.routing.Path;
 import com.graphhopper.routing.ev.BooleanEncodedValue;
 import com.graphhopper.routing.ev.DecimalEncodedValue;
@@ -17,6 +16,7 @@ import com.graphhopper.storage.EdgeIteratorStateReverseExtractor;
 import com.graphhopper.storage.index.LocationIndexTree;
 import com.graphhopper.util.EdgeIteratorState;
 import com.graphhopper.util.FetchMode;
+import java.util.Collections;
 import java.util.List;
 import nu.ndw.nls.routingmapmatcher.constants.GlobalConstants;
 import nu.ndw.nls.routingmapmatcher.domain.exception.RoutingMapMatcherException;
@@ -24,6 +24,7 @@ import nu.ndw.nls.routingmapmatcher.domain.model.IsochroneMatch;
 import nu.ndw.nls.routingmapmatcher.domain.model.MatchStatus;
 import nu.ndw.nls.routingmapmatcher.domain.model.linestring.LineStringLocation;
 import nu.ndw.nls.routingmapmatcher.domain.model.linestring.LineStringMatch;
+import nu.ndw.nls.routingmapmatcher.domain.model.linestring.MatchedLink;
 import nu.ndw.nls.routingmapmatcher.graphhopper.NetworkGraphHopper;
 import nu.ndw.nls.routingmapmatcher.graphhopper.isochrone.IsochroneService;
 import nu.ndw.nls.routingmapmatcher.graphhopper.isochrone.ShortestPathTreeFactory;
@@ -70,7 +71,8 @@ public class LineStringMatchUtil {
         if (edges.isEmpty()) {
             throw new RoutingMapMatcherException("Unexpected: path has no edges");
         }
-        List<Integer> matchedLinkIds = pathUtil.determineMatchedLinkIds(encodingManager, edges);
+        List<MatchedLink> matchedLinks = pathUtil.determineMatchedLinks(encodingManager, edges);
+
         Point startPoint = edges.get(0)
                 .fetchWayGeometry(FetchMode.ALL)
                 .toLineString(INCLUDE_ELEVATION)
@@ -92,7 +94,7 @@ public class LineStringMatchUtil {
                 .id(lineStringLocation.getId())
                 .locationIndex(lineStringLocation.getLocationIndex())
                 .reversed(lineStringLocation.isReversed())
-                .matchedLinkIds(matchedLinkIds)
+                .matchedLinks(matchedLinks)
                 .upstream(upstream)
                 .downstream(downstream)
                 .startLinkFraction(startLinkFraction)
@@ -108,7 +110,7 @@ public class LineStringMatchUtil {
                 .id(lineStringLocation.getId())
                 .locationIndex(lineStringLocation.getLocationIndex())
                 .reversed(lineStringLocation.isReversed())
-                .matchedLinkIds(Lists.newArrayList())
+                .matchedLinks(Collections.emptyList())
                 .downstream(null)
                 .upstream(null)
                 .startLinkFraction(0.0)

@@ -19,8 +19,7 @@ public class LineStringMatch extends MapMatch {
 
     private final int locationIndex;
     private final boolean reversed;
-    private final List<Integer> matchedLinkIds;
-
+    private final List<MatchedLink> matchedLinks;
     private final List<IsochroneMatch> upstream;
     private final List<IsochroneMatch> downstream;
 
@@ -43,5 +42,14 @@ public class LineStringMatch extends MapMatch {
         }
         return upstream.stream().map(IsochroneMatch::getMatchedLinkId)
                 .collect(Collectors.toSet());
+    }
+
+    /**
+     * @deprecated (MatchedLinkIds have been replaced with MatchedLink Objects.)
+     */
+    @Deprecated(since = "5.2.0", forRemoval = true)
+    public List<Integer> getMatchedLinkIds() {
+        return matchedLinks
+                .stream().map(MatchedLink::getLinkId).toList();
     }
 }

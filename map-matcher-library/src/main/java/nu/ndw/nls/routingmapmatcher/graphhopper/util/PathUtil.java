@@ -7,6 +7,7 @@ import com.graphhopper.routing.ev.VehicleAccess;
 import com.graphhopper.routing.querygraph.QueryGraph;
 import com.graphhopper.routing.querygraph.VirtualEdgeIteratorState;
 import com.graphhopper.routing.util.EncodingManager;
+import com.graphhopper.storage.EdgeIteratorStateReverseExtractor;
 import com.graphhopper.storage.index.Snap;
 import com.graphhopper.util.EdgeExplorer;
 import com.graphhopper.util.EdgeIterator;
@@ -17,6 +18,7 @@ import java.util.Collection;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import nu.ndw.nls.routingmapmatcher.domain.exception.RoutingMapMatcherException;
+import nu.ndw.nls.routingmapmatcher.domain.model.linestring.MatchedLink;
 import nu.ndw.nls.routingmapmatcher.graphhopper.model.EdgeIteratorTravelDirection;
 import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.LineString;
@@ -31,6 +33,9 @@ public class PathUtil {
     private static final int KEY_FACTOR = 2;
 
     private final GeometryFactory geometryFactory;
+
+    private final EdgeIteratorStateReverseExtractor edgeIteratorStateReverseExtractor =
+            new EdgeIteratorStateReverseExtractor();
 
     public PathUtil(GeometryFactory geometryFactory) {
         this.geometryFactory = geometryFactory;
@@ -60,18 +65,22 @@ public class PathUtil {
         return lineString;
     }
 
-    public List<Integer> determineMatchedLinkIds(EncodingManager encodingManager, Collection<EdgeIteratorState> edges) {
-        List<Integer> matchedLinkIds = new ArrayList<>(edges.size());
+    public List<MatchedLink> determineMatchedLinks(EncodingManager encodingManager,
+            Collection<EdgeIteratorState> edges) {
+        List<MatchedLink> matchedLinks = new ArrayList<>(edges.size());
         Integer previousMatchedLinkId = null;
         for (EdgeIteratorState edge : edges) {
-
             Integer matchedLinkId = edge.get(encodingManager.getIntEncodedValue(ID_NAME));
             if (previousMatchedLinkId == null || !previousMatchedLinkId.equals(matchedLinkId)) {
-                matchedLinkIds.add(matchedLinkId);
+                MatchedLink matchedLink = MatchedLink.builder()
+                        .linkId(matchedLinkId)
+                        .reversed(edgeIteratorStateReverseExtractor.hasReversed(edge))
+                        .build();
+                matchedLinks.add(matchedLink);
             }
             previousMatchedLinkId = matchedLinkId;
         }
-        return matchedLinkIds;
+        return matchedLinks;
     }
 
     /**

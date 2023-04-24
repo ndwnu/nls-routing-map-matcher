@@ -61,12 +61,10 @@ public class ViterbiLineStringMapMatcher implements LineStringMapMatcher {
 
     private static final GeometryFactory WGS84_GEOMETRY_FACTORY = new GeometryFactory(new PrecisionModel(),
             GlobalConstants.WGS84_SRID);
-    private static final double DISTANCE_CALCULATOR_CUSTOM_DISTANCE = 3 * MEASUREMENT_ERROR_SIGMA_IN_METERS;
 
     private static final int COORDINATES_LENGTH_START_END = 2;
     public static final String PROFILE_KEY = "profile";
 
-    private final MapMatching mapMatching;
     private final LocationIndexTree locationIndexTree;
     private final EdgeFilter edgeFilter;
 
@@ -79,12 +77,6 @@ public class ViterbiLineStringMapMatcher implements LineStringMapMatcher {
     public ViterbiLineStringMapMatcher(NetworkGraphHopper networkGraphHopper) {
         Preconditions.checkNotNull(networkGraphHopper);
         this.networkGraphHopper = networkGraphHopper;
-        PMap hints = new PMap();
-        hints.putObject(PROFILE_KEY, CAR_SHORTEST);
-        hints.putObject(Parameters.CH.DISABLE, true);
-        this.mapMatching = MapMatching.fromGraphHopper(networkGraphHopper, hints);
-        mapMatching.setMeasurementErrorSigma(MEASUREMENT_ERROR_SIGMA_IN_METERS);
-        mapMatching.setTransitionProbabilityBeta(TRANSITION_PROBABILITY_BETA);
         this.locationIndexTree = networkGraphHopper.getLocationIndex();
         this.edgeFilter = EdgeFilter.ALL_EDGES;
         this.queryGraphExtractor = new QueryGraphExtractor();
@@ -95,6 +87,8 @@ public class ViterbiLineStringMapMatcher implements LineStringMapMatcher {
     @Override
     public LineStringMatch match(LineStringLocation lineStringLocation) {
         Preconditions.checkNotNull(lineStringLocation);
+        PMap hints = createHints();
+        MapMatching mapMatching = createMapMatching(lineStringLocation, hints);
         List<Observation> observations = convertToObservations(lineStringLocation.getGeometry());
         LineStringMatch lineStringMatch;
         if (observations.size() >= COORDINATES_LENGTH_START_END) {
@@ -113,6 +107,21 @@ public class ViterbiLineStringMapMatcher implements LineStringMapMatcher {
             lineStringMatch = lineStringMatchUtil.createFailedMatch(lineStringLocation, MatchStatus.NO_MATCH);
         }
         return lineStringMatch;
+    }
+
+    private MapMatching createMapMatching(LineStringLocation lineStringLocation, PMap hints) {
+        MapMatching mapMatching = MapMatching.fromGraphHopper(networkGraphHopper, hints);
+        mapMatching.setMeasurementErrorSigma(lineStringLocation.getRadius() == null ? MEASUREMENT_ERROR_SIGMA_IN_METERS
+                : lineStringLocation.getRadius());
+        mapMatching.setTransitionProbabilityBeta(TRANSITION_PROBABILITY_BETA);
+        return mapMatching;
+    }
+
+    private static PMap createHints() {
+        PMap hints = new PMap();
+        hints.putObject(PROFILE_KEY, CAR_SHORTEST);
+        hints.putObject(Parameters.CH.DISABLE, true);
+        return hints;
     }
 
     private List<Observation> convertToObservations(LineString lineString) {
