@@ -10,8 +10,8 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 @ExtendWith(SpringExtension.class)
-@ContextConfiguration(classes = MapMatcherAutoConfiguration.class)
-class MapMatcherAutoConfigurationIT {
+@ContextConfiguration(classes = MapMatcherConfiguration.class)
+class MapMatcherConfigurationIT {
 
     @Autowired
     private RoutingMapMatcher routingMapMatcher;
