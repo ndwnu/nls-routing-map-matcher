@@ -19,4 +19,5 @@ public class LineStringLocation extends BaseLocation {
     @ToString.Exclude
     private final LineString geometry;
     private final ReliabilityCalculationType reliabilityCalculationType;
+    private final Double radius;
 }
