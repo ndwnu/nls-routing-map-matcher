@@ -18,7 +18,7 @@ import org.springframework.context.annotation.Configuration;
 
 @Configuration
 @ConditionalOnClass(RoutingMapMatcher.class)
-public class MapMatcherAutoConfiguration {
+public class MapMatcherConfiguration {
 
     @Bean
     @ConditionalOnMissingBean

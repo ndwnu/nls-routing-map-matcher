@@ -6,11 +6,11 @@
     <parent>
         <groupId>nu.ndw.nls</groupId>
         <artifactId>routing-map-matcher-parent</artifactId>
-        <version>5.3.0</version>
+        <version>6.0.0</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
-    <artifactId>routing-map-matcher-spring-boot-autoconfigure</artifactId>
-    <name>routing-map-matcher-spring-boot-autoconfigure</name>
+    <artifactId>routing-map-matcher-spring-boot</artifactId>
+    <name>routing-map-matcher-spring-boot</name>
     <packaging>jar</packaging>
     <dependencies>
         <dependency>
@@ -26,7 +26,6 @@
             <groupId>nu.ndw.nls</groupId>
             <artifactId>routing-map-matcher-library</artifactId>
             <version>${project.version}</version>
-            <optional>true</optional>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
