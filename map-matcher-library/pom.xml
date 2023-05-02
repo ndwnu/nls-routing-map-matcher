@@ -4,7 +4,7 @@
     <parent>
         <groupId>nu.ndw.nls</groupId>
         <artifactId>routing-map-matcher-parent</artifactId>
-        <version>6.0.0</version>
+        <version>6.0.1</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <artifactId>routing-map-matcher-library</artifactId>
@@ -24,34 +24,26 @@
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
         </dependency>
-
         <dependency>
             <groupId>org.geotools</groupId>
             <artifactId>gt-epsg-hsql</artifactId>
         </dependency>
-
         <dependency>
             <groupId>org.geotools</groupId>
             <artifactId>gt-referencing</artifactId>
         </dependency>
-
         <dependency>
             <groupId>org.geotools</groupId>
             <artifactId>gt-epsg-extension</artifactId>
         </dependency>
-
         <dependency>
             <groupId>org.geotools</groupId>
             <artifactId>gt-geojson-core</artifactId>
         </dependency>
-
-        <!-- https://mvnrepository.com/artifact/org.wololo/jts2geojson -->
         <dependency>
             <groupId>org.wololo</groupId>
             <artifactId>jts2geojson</artifactId>
-            <version>0.18.1</version>
         </dependency>
-
         <!-- JTS -->
         <dependency>
             <groupId>org.locationtech.jts</groupId>
