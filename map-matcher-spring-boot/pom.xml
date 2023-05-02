@@ -2,11 +2,10 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-
     <parent>
         <groupId>nu.ndw.nls</groupId>
         <artifactId>routing-map-matcher-parent</artifactId>
-        <version>6.0.0</version>
+        <version>6.0.1</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <artifactId>routing-map-matcher-spring-boot</artifactId>
@@ -21,7 +20,6 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-autoconfigure</artifactId>
         </dependency>
-
         <dependency>
             <groupId>nu.ndw.nls</groupId>
             <artifactId>routing-map-matcher-library</artifactId>
