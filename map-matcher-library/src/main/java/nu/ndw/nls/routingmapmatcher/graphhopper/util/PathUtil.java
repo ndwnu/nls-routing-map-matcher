@@ -170,10 +170,8 @@ public class PathUtil {
             // This could be the case when an edge has exactly one virtual node and that edge has the same node as
             // start node and end node; in this situation the value of distanceInOtherDirection should be 0
             if (!distanceInOtherDirectionIsPositive) {
-                int originalEdgeKey = ((VirtualEdgeIteratorState) queryGraph.getEdgeIteratorStateForKey(
-                        virtualNode * KEY_FACTOR))
-                        .getOriginalEdgeKey();
-                distanceInOtherDirection = queryGraph.getEdgeIteratorStateForKey(originalEdgeKey).getDistance() -
+                EdgeIteratorState originalEdge = findOriginalEdge(pathEdge, queryGraph);
+                distanceInOtherDirection = originalEdge.getDistance() -
                         pathEdge.getDistance();
             } else {
                 throw new RoutingMapMatcherException("Unexpected: distance not correctly calculated");
