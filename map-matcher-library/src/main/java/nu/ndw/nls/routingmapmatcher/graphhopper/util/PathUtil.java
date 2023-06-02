@@ -30,7 +30,6 @@ public class PathUtil {
     private static final int MINIMUM_LENGTH = 2;
     private static final int DIMENSIONS = 2;
     private static final int MEASURES = 0;
-    private static final int KEY_FACTOR = 2;
 
     private final GeometryFactory geometryFactory;
 
