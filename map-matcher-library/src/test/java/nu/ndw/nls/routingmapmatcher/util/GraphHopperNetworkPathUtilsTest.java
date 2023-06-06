@@ -41,9 +41,4 @@ class GraphHopperNetworkPathUtilsTest {
                 GraphHopperNetworkPathUtils.formatNormalizedPath(GRAPHHOPPER_UNNORMALIZED_ROOT_PATH,
                         "networkAndVersion"));
     }
-
-    @Test
-    void edgeHasOneVirtualNode() {
-
-    }
 }
