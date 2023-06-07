@@ -10,7 +10,6 @@ import com.graphhopper.matching.Observation;
 import com.graphhopper.routing.Path;
 import com.graphhopper.routing.QueryGraphExtractor;
 import com.graphhopper.routing.querygraph.QueryGraph;
-import com.graphhopper.routing.util.EdgeFilter;
 import com.graphhopper.storage.index.LocationIndexTree;
 import com.graphhopper.storage.index.Snap;
 import com.graphhopper.util.PMap;
@@ -66,8 +65,6 @@ public class ViterbiLineStringMapMatcher implements LineStringMapMatcher {
     public static final String PROFILE_KEY = "profile";
 
     private final LocationIndexTree locationIndexTree;
-    private final EdgeFilter edgeFilter;
-
     private final NetworkGraphHopper networkGraphHopper;
     private final QueryGraphExtractor queryGraphExtractor;
     private final LineStringMatchUtil lineStringMatchUtil;
@@ -78,7 +75,6 @@ public class ViterbiLineStringMapMatcher implements LineStringMapMatcher {
         Preconditions.checkNotNull(networkGraphHopper);
         this.networkGraphHopper = networkGraphHopper;
         this.locationIndexTree = networkGraphHopper.getLocationIndex();
-        this.edgeFilter = EdgeFilter.ALL_EDGES;
         this.queryGraphExtractor = new QueryGraphExtractor();
         this.lineStringMatchUtil = new LineStringMatchUtil(networkGraphHopper);
         this.lineStringScoreUtil = new LineStringScoreUtil();
@@ -146,7 +142,7 @@ public class ViterbiLineStringMapMatcher implements LineStringMapMatcher {
         Point point = WGS84_GEOMETRY_FACTORY.createPoint(
                 new Coordinate(observation.getPoint().getLon(), observation.getPoint().getLat()));
         List<Snap> queryResults = getQueryResults(networkGraphHopper, point, MEASUREMENT_ERROR_SIGMA_IN_METERS,
-                locationIndexTree, edgeFilter);
+                locationIndexTree);
         for (Snap queryResult : queryResults) {
             if (queryResult.getQueryDistance() <= NEARBY_NDW_NETWORK_DISTANCE_IN_METERS) {
                 return true;

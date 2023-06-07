@@ -11,7 +11,6 @@ import com.graphhopper.routing.ev.BooleanEncodedValue;
 import com.graphhopper.routing.ev.DecimalEncodedValue;
 import com.graphhopper.routing.ev.VehicleAccess;
 import com.graphhopper.routing.ev.VehicleSpeed;
-import com.graphhopper.routing.util.EdgeFilter;
 import com.graphhopper.routing.util.EncodingManager;
 import com.graphhopper.routing.weighting.ShortestWeighting;
 import com.graphhopper.routing.weighting.Weighting;
@@ -55,9 +54,6 @@ public class GraphHopperSinglePointMapMatcher implements SinglePointMapMatcher {
     private static final int NUM_POINTS = 100;
 
     private final LocationIndexTree locationIndexTree;
-    private final EdgeFilter edgeFilter;
-
-
     private final IsochroneService isochroneService;
     private final PointMatchingService pointMatchingService;
     private final CrsTransformer crsTransformer;
@@ -69,7 +65,6 @@ public class GraphHopperSinglePointMapMatcher implements SinglePointMapMatcher {
         Preconditions.checkNotNull(network);
         this.network = network;
         this.locationIndexTree = network.getLocationIndex();
-        this.edgeFilter = EdgeFilter.ALL_EDGES;
         BaseGraph baseGraph = network.getBaseGraph();
         EncodingManager encodingManager = network.getEncodingManager();
         BooleanEncodedValue accessEnc = encodingManager.getBooleanEncodedValue(VehicleAccess.key(VEHICLE_CAR));
@@ -98,8 +93,8 @@ public class GraphHopperSinglePointMapMatcher implements SinglePointMapMatcher {
         Preconditions.checkNotNull(singlePointLocation);
         Point inputPoint = singlePointLocation.getPoint();
         double inputRadius = singlePointLocation.getCutoffDistance();
-        List<Snap> queryResults = findCandidates(inputPoint, inputRadius);
-        Polygon circle = createCircle(inputPoint, RADIUS_TO_DIAMETER * inputRadius);
+        List<Snap> queryResults = getQueryResults(network, inputPoint, inputRadius, locationIndexTree);
+        Polygon circle = createCircle(inputPoint, RADIUS_TO_DIAMETER * inputRadius); // IS THIS VALID?
         List<MatchedPoint> matches = getMatchedPoints(singlePointLocation, queryResults, circle);
         if (matches.isEmpty()) {
             return createFailedMatch(singlePointLocation);
@@ -190,13 +185,7 @@ public class GraphHopperSinglePointMapMatcher implements SinglePointMapMatcher {
         return (Polygon) crsTransformer.transformFromRdNewToWgs84(ellipseRd);
     }
 
-    private List<Snap> findCandidates(Point point, double radius) {
-        return getQueryResults(network, point, radius, locationIndexTree, edgeFilter);
-    }
-
-
-    private List<MatchedPoint> calculateMatches(Snap queryResult, Polygon circle,
-            SinglePointLocation singlePointLocation) {
+    private List<MatchedPoint> calculateMatches(Snap queryResult, Polygon circle, SinglePointLocation singlePointLocation) {
         LineString wayGeometry = queryResult.getClosestEdge()
                 .fetchWayGeometry(FetchMode.ALL)
                 .toLineString(false);
