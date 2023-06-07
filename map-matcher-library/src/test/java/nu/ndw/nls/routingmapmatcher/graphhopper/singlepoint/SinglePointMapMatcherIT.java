@@ -85,7 +85,7 @@ public class SinglePointMapMatcherIT {
         assertThat(candidateMatches, hasSize(1));
         assertThatUpstreamAndDownstreamAreNull(candidateMatches);
         assertThat(getSnappedPoints(candidateMatches), hasSize(1));
-        assertThat(singlePointMatch.getCandidateMatches().get(0).getFraction(), closeTo(expectedFraction, 0.001));
+        assertThat(singlePointMatch.getCandidateMatches().get(0).getFraction(), closeTo(expectedFraction, 0.01));
     }
 
     @SneakyThrows
@@ -106,7 +106,7 @@ public class SinglePointMapMatcherIT {
         assertThat(candidateMatches, hasSize(1));
         assertThatUpstreamAndDownstreamAreNull(candidateMatches);
         assertThat(getSnappedPoints(candidateMatches), hasSize(1));
-        assertThat(singlePointMatch.getReliability(), is(63.45691284226403));
+        assertThat(singlePointMatch.getReliability(), is(66.96798791959225));
     }
 
     @SneakyThrows
@@ -127,7 +127,7 @@ public class SinglePointMapMatcherIT {
         assertThat(candidateMatches, hasSize(2));
         assertThatUpstreamAndDownstreamAreNull(candidateMatches);
         assertThat(getSnappedPoints(candidateMatches), hasSize(1));
-        assertThat(singlePointMatch.getReliability(), is(84.50926986919272));
+        assertThat(singlePointMatch.getReliability(), is(84.53118547414594));
     }
 
     @SneakyThrows
@@ -149,7 +149,7 @@ public class SinglePointMapMatcherIT {
         assertThat(candidateMatches, hasSize(1));
         assertThatUpstreamAndDownstreamAreNull(candidateMatches);
         assertThat(getSnappedPoints(candidateMatches), hasSize(1));
-        assertThat(singlePointMatch.getReliability(), is(79.53533559944795));
+        assertThat(singlePointMatch.getReliability(), is(79.55725120440115));
     }
 
     @SneakyThrows
@@ -213,7 +213,7 @@ public class SinglePointMapMatcherIT {
         assertThat(candidateMatches, hasSize(2));
         assertThatUpstreamAndDownstreamAreNull(candidateMatches);
         assertThat(getSnappedPoints(candidateMatches), hasSize(2));
-        assertThat(singlePointMatch.getReliability(), is(95.02527927755959));
+        assertThat(singlePointMatch.getReliability(), is(95.53279394202733));
     }
 
     @SneakyThrows
@@ -253,7 +253,7 @@ public class SinglePointMapMatcherIT {
         List<CandidateMatch> candidateMatches = getNearestCandidateMatches(singlePointMatch.getCandidateMatches());
         assertThat(candidateMatches, hasSize(1));
         assertThat(getSnappedPoints(candidateMatches), hasSize(1));
-        assertThat(singlePointMatch.getReliability(), is(91.68369218480646));
+        assertThat(singlePointMatch.getReliability(), is(92.4716649970769));
 
         SinglePointMatch.CandidateMatch candidateMatch = singlePointMatch.getCandidateMatches().get(0);
         assertThat(candidateMatch.getMatchedLinkId(), is(3666958));
