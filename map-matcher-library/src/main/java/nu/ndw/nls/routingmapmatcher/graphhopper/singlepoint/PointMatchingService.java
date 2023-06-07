@@ -157,11 +157,12 @@ public class PointMatchingService {
             Coordinate current = lineString.get(i);
 
             var projectionResult = project(previous, current, point);
-            if (closestProjectionResult == null) {
-                closestProjectionResult = projectionResult;
-            } else if (projectionResult.distance < closestProjectionResult.distance) {
+            if (closestProjectionResult == null || projectionResult.distance < closestProjectionResult.distance) {
                 closestProjectionResult = projectionResult;
             }
+        }
+        if (closestProjectionResult == null) {
+            throw new IllegalStateException("failed to project " + point + " on " + lineString);
         }
         return closestProjectionResult;
     }
