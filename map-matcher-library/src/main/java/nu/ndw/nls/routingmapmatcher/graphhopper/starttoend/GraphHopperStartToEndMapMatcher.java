@@ -13,7 +13,6 @@ import com.graphhopper.routing.RoutingAlgorithmFactorySimple;
 import com.graphhopper.routing.ev.VehicleAccess;
 import com.graphhopper.routing.ev.VehicleSpeed;
 import com.graphhopper.routing.querygraph.QueryGraph;
-import com.graphhopper.routing.util.EdgeFilter;
 import com.graphhopper.routing.util.EncodingManager;
 import com.graphhopper.routing.util.TraversalMode;
 import com.graphhopper.routing.weighting.ShortestWeighting;
@@ -46,8 +45,6 @@ public class GraphHopperStartToEndMapMatcher implements StartToEndMapMatcher {
 
     private final NetworkGraphHopper networkGraphHopper;
     private final LocationIndexTree locationIndexTree;
-    private final EdgeFilter edgeFilter;
-
     private final RoutingAlgorithmFactory algorithmFactory;
     private final AlgorithmOptions algorithmOptions;
 
@@ -64,7 +61,6 @@ public class GraphHopperStartToEndMapMatcher implements StartToEndMapMatcher {
                 .setTraversalMode(TraversalMode.NODE_BASED);
         this.algorithmFactory = new RoutingAlgorithmFactorySimple();
         this.locationIndexTree = networkGraphHopper.getLocationIndex();
-        this.edgeFilter = EdgeFilter.ALL_EDGES;
         EncodingManager encodingManager = networkGraphHopper.getEncodingManager();
         this.networkGraphHopper = networkGraphHopper;
         this.lineStringMatchUtil = new LineStringMatchUtil(networkGraphHopper);
@@ -96,8 +92,7 @@ public class GraphHopperStartToEndMapMatcher implements StartToEndMapMatcher {
     }
 
     private List<Snap> findCandidates(Point point) {
-        return getQueryResults(networkGraphHopper, point, MAXIMUM_CANDIDATE_DISTANCE_IN_METERS, locationIndexTree,
-                edgeFilter);
+        return getQueryResults(networkGraphHopper, point, MAXIMUM_CANDIDATE_DISTANCE_IN_METERS, locationIndexTree);
     }
 
     private QueryGraph createQueryGraphAndAssignClosestNodePerCandidate(List<Snap> startCandidates,
