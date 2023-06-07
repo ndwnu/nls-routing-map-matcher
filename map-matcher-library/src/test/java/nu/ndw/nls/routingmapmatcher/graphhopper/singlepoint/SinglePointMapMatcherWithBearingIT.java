@@ -32,9 +32,9 @@ import org.locationtech.jts.geom.Point;
 public class SinglePointMapMatcherWithBearingIT {
 
     private static final String LINKS_RESOURCE = "/test-data/links.json";
-    public static final double SNAPPED_RELIABILITY = 58.44035622040511;
+    public static final double SNAPPED_RELIABILITY = 58.5059250048517;
     public static final Point SNAPPED_REQUEST_POINT = createPoint(5.424289, 52.177873);
-    public static final double BEARING_RELIABILITY = 7.885090534660866;
+    public static final double BEARING_RELIABILITY = 7.956622176353855;
     private SinglePointMapMatcher singlePointMapMatcher;
 
     @SneakyThrows
@@ -77,7 +77,7 @@ public class SinglePointMapMatcherWithBearingIT {
                         .matchedLinkId(3667044)
                         .snappedPoint(createPoint(5.4267844367147156, 52.176683703033994))
                         .fraction(0.7955196672137371)
-                        .distance(3.4445906167239992)
+                        .distance(3.4374374525547)
                         .bearing(137.88345016490496)
                         .reliability(BEARING_RELIABILITY)
                         .build()))
@@ -102,7 +102,7 @@ public class SinglePointMapMatcherWithBearingIT {
                                 .matchedLinkId(3667015)
                                 .snappedPoint(createPoint(5.424366071968406, 52.177889266140795))
                                 .fraction(0.4479580165855611)
-                                .distance(5.574173229931168)
+                                .distance(5.557781033819523)
                                 .bearing(160.9631475429935)
                                 .reliability(SNAPPED_RELIABILITY)
                                 .build(),
@@ -110,7 +110,7 @@ public class SinglePointMapMatcherWithBearingIT {
                                 .matchedLinkId(3667014)
                                 .snappedPoint(createPoint(5.424268, 52.178064))
                                 .fraction(1)
-                                .distance(21.301202848581156)
+                                .distance(21.286446542354614)
                                 .bearing(161.06168302121978)
                                 .reliability(0)
                                 .build()))
