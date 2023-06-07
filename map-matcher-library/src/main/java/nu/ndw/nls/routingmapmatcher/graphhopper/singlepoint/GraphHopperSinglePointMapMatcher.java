@@ -185,7 +185,8 @@ public class GraphHopperSinglePointMapMatcher implements SinglePointMapMatcher {
         return (Polygon) crsTransformer.transformFromRdNewToWgs84(ellipseRd);
     }
 
-    private List<MatchedPoint> calculateMatches(Snap queryResult, Polygon circle, SinglePointLocation singlePointLocation) {
+    private List<MatchedPoint> calculateMatches(Snap queryResult, Polygon circle,
+            SinglePointLocation singlePointLocation) {
         LineString wayGeometry = queryResult.getClosestEdge()
                 .fetchWayGeometry(FetchMode.ALL)
                 .toLineString(false);
