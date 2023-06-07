@@ -146,7 +146,7 @@ public class PointMatchingService {
         return Math.max(MIN_RELIABILITY_SCORE, (1 - distancePenalty - bearingPenalty) * MAX_RELIABILITY_SCORE);
     }
 
-    public static ProjectionResult closestPoint(List<Coordinate> lineString, Coordinate point) {
+    private ProjectionResult closestPoint(List<Coordinate> lineString, Coordinate point) {
         ProjectionResult closestProjectionResult = null;
         for (int i = 0; i < lineString.size(); i++) {
             if (i == 0) {
@@ -166,9 +166,7 @@ public class PointMatchingService {
         return closestProjectionResult;
     }
 
-    record ProjectionResult(double distance, Coordinate point) {}
-
-    public static ProjectionResult project(Coordinate a, Coordinate b, Coordinate r)  {
+    private ProjectionResult project(Coordinate a, Coordinate b, Coordinate r)  {
         double distanceToA = DIST_PLANE.calcDist(r.y, r.x, a.y, a.x);
         double distanceToB = DIST_PLANE.calcDist(r.y, r.x, b.y, b.x);
 
@@ -187,4 +185,5 @@ public class PointMatchingService {
         );
     }
 
+    record ProjectionResult(double distance, Coordinate point) {}
 }
