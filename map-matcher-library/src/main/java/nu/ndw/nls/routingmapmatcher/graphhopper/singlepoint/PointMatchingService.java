@@ -148,11 +148,7 @@ public class PointMatchingService {
 
     private ProjectionResult closestPoint(List<Coordinate> lineString, Coordinate point) {
         ProjectionResult closestProjectionResult = null;
-        for (int i = 0; i < lineString.size(); i++) {
-            if (i == 0) {
-                continue;
-            }
-
+        for (int i = 1; i < lineString.size(); i++) {
             Coordinate previous = lineString.get(i - 1);
             Coordinate current = lineString.get(i);
 

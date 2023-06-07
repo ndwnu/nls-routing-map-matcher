@@ -94,7 +94,7 @@ public class GraphHopperSinglePointMapMatcher implements SinglePointMapMatcher {
         Point inputPoint = singlePointLocation.getPoint();
         double inputRadius = singlePointLocation.getCutoffDistance();
         List<Snap> queryResults = getQueryResults(network, inputPoint, inputRadius, locationIndexTree);
-        Polygon circle = createCircle(inputPoint, RADIUS_TO_DIAMETER * inputRadius); // IS THIS VALID?
+        Polygon circle = createCircle(inputPoint, RADIUS_TO_DIAMETER * inputRadius);
         List<MatchedPoint> matches = getMatchedPoints(singlePointLocation, queryResults, circle);
         if (matches.isEmpty()) {
             return createFailedMatch(singlePointLocation);
