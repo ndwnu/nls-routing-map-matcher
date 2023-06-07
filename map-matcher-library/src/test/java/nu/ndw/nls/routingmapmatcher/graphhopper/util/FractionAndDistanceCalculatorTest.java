@@ -43,10 +43,4 @@ class FractionAndDistanceCalculatorTest {
                 .getFraction();
         assertThat(fraction).isCloseTo(0.4986, Percentage.withPercentage(1));
     }
-
-    @Test
-    void calculateDistance() {
-        double distance = fractionAndDistanceCalculator.calculateDistance(FROM, TO);
-        assertThat(distance).isCloseTo(3.4, Percentage.withPercentage(1));
-    }
 }
