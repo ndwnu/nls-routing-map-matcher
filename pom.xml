@@ -28,7 +28,7 @@
         <maven.javadoc.failOnError>false</maven.javadoc.failOnError>
         <graphhopper.version>7.0</graphhopper.version>
         <jts-core.version>1.19.0</jts-core.version>
-        <guava.version>31.1-jre</guava.version>
+        <guava.version>32.0.1-jre</guava.version>
         <hamcrest.version>2.2</hamcrest.version>
         <jacoco.version>0.8.10</jacoco.version>
         <geotools.version>28.2</geotools.version>
