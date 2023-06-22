@@ -29,13 +29,20 @@ public class NetworkGraphHopper extends GraphHopper implements Network {
     private static final int MAX_LEAF_ENTRIES = 200;
     private static final String DATAREADER_IMPORT_DATE = "datareader.import.date";
 
-    private final Supplier<Iterator<Link>> linkSupplier;
+    private Supplier<Iterator<Link>> linkSupplier;
 
-    private final LongIntMap nodeIdToInternalNodeIdMap;
+    private LongIntMap nodeIdToInternalNodeIdMap;
 
     public NetworkGraphHopper(Supplier<Iterator<Link>> linkSupplier) {
         this.linkSupplier = linkSupplier;
         this.nodeIdToInternalNodeIdMap = new GHLongIntBTree(MAX_LEAF_ENTRIES);
+
+    }
+
+    /**
+     * Loading an existing network from disk does not require a link supplier and nodeIdToInternalNodeIdMap
+     **/
+    public NetworkGraphHopper() {
 
     }
 

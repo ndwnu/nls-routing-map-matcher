@@ -1,6 +1,7 @@
 package nu.ndw.nls.routingmapmatcher.constants;
 
 import com.graphhopper.util.DistancePlaneProjection;
+import java.nio.file.Path;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.PrecisionModel;
@@ -20,6 +21,7 @@ public final class GlobalConstants {
     public static final String VEHICLE_CAR = "car";
     public static final String WEIGHTING_FASTEST = "fastest";
     public static final String WEIGHTING_SHORTEST = "shortest";
+    public static final Path DEFAULT_FOLDER_PREFIX = Path.of("graphhopper_");
 
     private GlobalConstants() {
     }
