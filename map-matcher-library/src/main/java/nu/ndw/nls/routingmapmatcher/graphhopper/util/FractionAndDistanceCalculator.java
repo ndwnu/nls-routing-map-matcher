@@ -47,7 +47,7 @@ public class FractionAndDistanceCalculator {
                 .build();
     }
 
-    public double calculateDistance(Coordinate from, Coordinate to) {
+    private double calculateDistance(Coordinate from, Coordinate to) {
         geodeticCalculator.setStartingGeographicPoint(to.getX(), to.getY());
         geodeticCalculator.setDestinationGeographicPoint(from.getX(), from.getY());
         return geodeticCalculator.getOrthodromicDistance();

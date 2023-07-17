@@ -25,17 +25,17 @@ import org.mockito.junit.jupiter.MockitoExtension;
 class PointMatchingServiceTest {
 
     private static final int ID = 1;
-    private static final double SNAPPED_POINT_X = 5.426768463894968;
-    private static final double SNAPPED_POINT_Y = 52.176694564551426;
-    private static final double DISTANCE = 3.8067685587693947;
-    private static final double FRACTION = 0.23728485714724185;
+    private static final double SNAPPED_POINT_X = 5.426784436725146;
+    private static final double SNAPPED_POINT_Y = 52.1766837030269;
+    private static final double DISTANCE = 3.437437452681715;
+    private static final double FRACTION = 0.20448031137004394;
     private static final double BEARING = 317.8835356767284;
     private static final double BEARING_REVERSED = 137.88347510955532;
-    private static final double SNAPPED_POINT_X_ZIG_ZAG = 5.42678346;
-    private static final double SNAPPED_POINT_Y_ZIG_ZAG = 52.17667896;
-    private static final double DISTANCE_ZIG_ZAG = 3.061770997311956;
-    private static final double FRACTION_ZIG_ZAG = 0.3158437228827713;
-    private static final double BEARING_ZIG_ZAG = 329.90304946644443;
+    private static final double SNAPPED_POINT_X_ZIG_ZAG = 5.42679104;
+    private static final double SNAPPED_POINT_Y_ZIG_ZAG = 52.17667092;
+    private static final double DISTANCE_ZIG_ZAG = 3.129465813922507;
+    private static final double FRACTION_ZIG_ZAG = 0.29396506116769844;
+    private static final double BEARING_ZIG_ZAG = 309.1094082854381;
     private static final Coordinate INPUT_POINT_COORDINATE = new Coordinate(5.426747, 52.176663);
     private static final Coordinate CUTOFF_COORDINATE_1 = new Coordinate(5.4268356764862355, 52.17664885998936);
     private static final Coordinate CUTOFF_COORDINATE_2 = new Coordinate(5.426759, 52.176701);

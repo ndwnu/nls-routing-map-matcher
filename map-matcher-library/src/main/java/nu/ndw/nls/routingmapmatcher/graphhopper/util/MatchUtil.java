@@ -1,9 +1,9 @@
 package nu.ndw.nls.routingmapmatcher.graphhopper.util;
 
-import com.graphhopper.routing.util.EdgeFilter;
+import static nu.ndw.nls.routingmapmatcher.constants.GlobalConstants.DIST_PLANE;
+
 import com.graphhopper.storage.index.LocationIndexTree;
 import com.graphhopper.storage.index.Snap;
-import com.graphhopper.util.DistancePlaneProjection;
 import com.graphhopper.util.EdgeIteratorState;
 import com.graphhopper.util.FetchMode;
 import com.graphhopper.util.shapes.Circle;
@@ -17,12 +17,10 @@ public final class MatchUtil {
     private static final int KEY_FACTOR = 2;
 
     private MatchUtil() {
-
     }
 
     public static List<Snap> getQueryResults(NetworkGraphHopper network, Point point, double radius,
-            LocationIndexTree locationIndexTree,
-            EdgeFilter edgeFilter) {
+            LocationIndexTree locationIndexTree) {
         double latitude = point.getY();
         double longitude = point.getX();
         Circle circle = new Circle(latitude, longitude, radius);
@@ -46,9 +44,8 @@ public final class MatchUtil {
                                     }
                                 });
                 if (snap.isValid()) {
-                    snap.setQueryDistance(
-                            DistancePlaneProjection.DIST_PLANE.calcDenormalizedDist(snap.getQueryDistance()));
-                    snap.calcSnappedPoint(DistancePlaneProjection.DIST_PLANE);
+                    snap.setQueryDistance(DIST_PLANE.calcDenormalizedDist(snap.getQueryDistance()));
+                    snap.calcSnappedPoint(DIST_PLANE);
                     queryResults.add(snap);
                 }
             }
