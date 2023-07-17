@@ -13,7 +13,7 @@
 
     <groupId>nu.ndw.nls</groupId>
     <artifactId>routing-map-matcher-parent</artifactId>
-    <version>6.0.4</version>
+    <version>6.2.1</version>
     <name>routing map matcher parent</name>
     <description>Routing Map Matcher modules containing the core library and spring boot starter modules</description>
     <packaging>pom</packaging>
@@ -28,10 +28,10 @@
         <maven.javadoc.failOnError>false</maven.javadoc.failOnError>
         <graphhopper.version>7.0</graphhopper.version>
         <jts-core.version>1.19.0</jts-core.version>
-        <guava.version>31.1-jre</guava.version>
+        <guava.version>32.0.1-jre</guava.version>
         <hamcrest.version>2.2</hamcrest.version>
         <jacoco.version>0.8.10</jacoco.version>
-        <geotools.version>28.2</geotools.version>
+        <geotools.version>29.1</geotools.version>
         <jts2geojson.version>0.18.1</jts2geojson.version>
         <commons-io.version>2.11.0</commons-io.version>
         <maven-failsafe-plugin.version>3.0.0</maven-failsafe-plugin.version>
