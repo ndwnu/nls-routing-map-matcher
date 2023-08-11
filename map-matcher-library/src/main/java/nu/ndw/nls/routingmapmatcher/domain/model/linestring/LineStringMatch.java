@@ -27,21 +27,22 @@ public class LineStringMatch extends MapMatch {
     private final double endLinkFraction;
     @ToString.Exclude
     private final LineString lineString;
+    private final double weight;
+    private final double duration;
+    private final double distance;
 
     public Set<Integer> getDownstreamLinkIds() {
         if (downstream == null) {
             return null;
         }
-        return downstream.stream().map(IsochroneMatch::getMatchedLinkId)
-                .collect(Collectors.toSet());
+        return downstream.stream().map(IsochroneMatch::getMatchedLinkId).collect(Collectors.toSet());
     }
 
     public Set<Integer> getUpstreamLinkIds() {
         if (upstream == null) {
             return null;
         }
-        return upstream.stream().map(IsochroneMatch::getMatchedLinkId)
-                .collect(Collectors.toSet());
+        return upstream.stream().map(IsochroneMatch::getMatchedLinkId).collect(Collectors.toSet());
     }
 
     /**
@@ -49,7 +50,6 @@ public class LineStringMatch extends MapMatch {
      */
     @Deprecated(since = "5.2.0", forRemoval = true)
     public List<Integer> getMatchedLinkIds() {
-        return matchedLinks
-                .stream().map(MatchedLink::getLinkId).toList();
+        return matchedLinks.stream().map(MatchedLink::getLinkId).toList();
     }
 }
