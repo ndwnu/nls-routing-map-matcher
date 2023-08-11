@@ -13,6 +13,7 @@ import nu.ndw.nls.routingmapmatcher.constants.GlobalConstants;
 import nu.ndw.nls.routingmapmatcher.domain.Router;
 import nu.ndw.nls.routingmapmatcher.domain.model.Link;
 import nu.ndw.nls.routingmapmatcher.domain.model.RoutingNetwork;
+import nu.ndw.nls.routingmapmatcher.domain.model.linestring.MatchedLink;
 import nu.ndw.nls.routingmapmatcher.domain.model.routing.RoutingProfile;
 import nu.ndw.nls.routingmapmatcher.domain.model.routing.RoutingRequest;
 import nu.ndw.nls.routingmapmatcher.graphhopper.NetworkGraphHopperFactory;
@@ -26,14 +27,13 @@ import org.locationtech.jts.geom.PrecisionModel;
 
 class GraphHopperRouterIT {
 
-    private static final String LINKS_RESOURCE = "/test-data/links.json";
     private Router router;
     private GeometryFactory geometryFactory;
 
     @SneakyThrows
     private void setupNetwork() {
-        String linksJson = IOUtils.toString(Objects.requireNonNull(getClass().getResourceAsStream(
-                        LINKS_RESOURCE)),
+        String linksJson = IOUtils.toString(
+                Objects.requireNonNull(getClass().getResourceAsStream("/test-data/links.json")),
                 StandardCharsets.UTF_8);
         ObjectMapper mapper = new ObjectMapper();
         SimpleModule module = new SimpleModule();
@@ -62,8 +62,11 @@ class GraphHopperRouterIT {
         );
         assertThat(result.getStartLinkFraction()).isEqualTo(0.8236516616727612);
         assertThat(result.getEndLinkFraction()).isEqualTo(0.5228504089301351);
-        assertThat(result.getDistance()).isEqualTo(243.6);
-        assertThat(result.getMatchedLinkIds()).isEqualTo(
-                List.of(7223072, 7223073, 3667130, 3667131, 3667132, 3667133, 3666204));
+        assertThat(result.getMatchedLinkIds())
+                .containsExactly(7223072, 7223073, 3667130, 3667131, 3667132, 3667133, 3666204);
+        assertThat(result.getMatchedLinks()).noneMatch(MatchedLink::isReversed);
+        assertThat(result.getWeight()).isEqualTo(8.769);
+        assertThat(result.getDuration()).isEqualTo(8.768);
+        assertThat(result.getDistance()).isEqualTo(243.592);
     }
 }

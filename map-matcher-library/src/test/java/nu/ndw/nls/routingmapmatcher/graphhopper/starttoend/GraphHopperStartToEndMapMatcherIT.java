@@ -1,16 +1,13 @@
 package nu.ndw.nls.routingmapmatcher.graphhopper.starttoend;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.contains;
-import static org.hamcrest.Matchers.containsInAnyOrder;
-import static org.hamcrest.Matchers.hasSize;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.notNullValue;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
+import java.util.Objects;
 import lombok.SneakyThrows;
 import nu.ndw.nls.routingmapmatcher.constants.GlobalConstants;
 import nu.ndw.nls.routingmapmatcher.domain.StartToEndMapMatcher;
@@ -19,6 +16,7 @@ import nu.ndw.nls.routingmapmatcher.domain.model.MatchStatus;
 import nu.ndw.nls.routingmapmatcher.domain.model.RoutingNetwork;
 import nu.ndw.nls.routingmapmatcher.domain.model.linestring.LineStringLocation;
 import nu.ndw.nls.routingmapmatcher.domain.model.linestring.LineStringMatch;
+import nu.ndw.nls.routingmapmatcher.domain.model.linestring.MatchedLink;
 import nu.ndw.nls.routingmapmatcher.domain.model.linestring.ReliabilityCalculationType;
 import nu.ndw.nls.routingmapmatcher.graphhopper.NetworkGraphHopperFactory;
 import nu.ndw.nls.routingmapmatcher.graphhopper.viterbi.LineStringLocationDeserializer;
@@ -40,7 +38,9 @@ class GraphHopperStartToEndMapMatcherIT {
     @SneakyThrows
     @BeforeEach
     void setup() {
-        String linksJson = IOUtils.toString(getClass().getResourceAsStream("/test-data/links.json"));
+        String linksJson = IOUtils.toString(
+                Objects.requireNonNull(getClass().getResourceAsStream("/test-data/links.json")),
+                StandardCharsets.UTF_8);
         mapper = new ObjectMapper();
         SimpleModule module = new SimpleModule();
         module.addDeserializer(Link.class, new LinkDeserializer());
@@ -71,35 +71,48 @@ class GraphHopperStartToEndMapMatcherIT {
                 .reliabilityCalculationType(ReliabilityCalculationType.POINT_OBSERVATIONS)
                 .build();
         LineStringMatch lineStringMatch = startToEndMapMatcher.match(lineStringLocation);
-        assertThat(lineStringMatch, is(notNullValue()));
-        assertThat(lineStringMatch.getStatus(), is(MatchStatus.MATCH));
-        assertThat(lineStringMatch.getMatchedLinkIds(), hasSize(16));
-        assertThat(lineStringMatch.getStartLinkFraction(), is(0.6488926754519858));
-        assertThat(lineStringMatch.getEndLinkFraction(), is(0.9813577658271124));
-        assertThat(lineStringMatch.getReliability(), is(73.88564657201005));
+        assertThat(lineStringMatch.getId()).isEqualTo(1);
+        assertThat(lineStringMatch.getStatus()).isEqualTo(MatchStatus.MATCH);
+        assertThat(lineStringMatch.getReliability()).isEqualTo(73.88564657201005);
+        assertThat(lineStringMatch.getLocationIndex()).isEqualTo(1);
+        assertThat(lineStringMatch.isReversed()).isFalse();
+        assertThat(lineStringMatch.getMatchedLinkIds()).containsExactly(6405237, 6405238, 6405239, 6405226, 6405227,
+                6405228, 6405229, 6405230, 6405231, 6405232, 6405233, 6369284, 6369285, 6369286, 6369287, 6369288);
+        assertThat(lineStringMatch.getMatchedLinks()).noneMatch(MatchedLink::isReversed);
+        assertThat(lineStringMatch.getUpstreamLinkIds()).isNull();
+        assertThat(lineStringMatch.getDownstreamLinkIds()).isNull();
+        assertThat(lineStringMatch.getStartLinkFraction()).isEqualTo(0.6488926754519858);
+        assertThat(lineStringMatch.getEndLinkFraction()).isEqualTo(0.9813577658271124);
+        assertThat(lineStringMatch.getWeight()).isEqualTo(727.039);
+        assertThat(lineStringMatch.getDuration()).isEqualTo(75.91);
+        assertThat(lineStringMatch.getDistance()).isEqualTo(727.039);
     }
 
     @SneakyThrows
     @Test
     void match_ok_lineStringWithIsochrones() {
         String locationJson = IOUtils.toString(
-                getClass().getResourceAsStream("/test-data/matched_linestring_location.json"));
+                Objects.requireNonNull(getClass().getResourceAsStream("/test-data/matched_linestring_location.json")),
+                StandardCharsets.UTF_8);
         LineStringLocation lineStringLocation = mapper.readValue(locationJson, LineStringLocation.class);
         LineStringMatch lineStringMatch = startToEndMapMatcher.match(lineStringLocation);
-        assertThat(lineStringMatch.getStatus(), is(MatchStatus.MATCH));
-        assertThat(lineStringMatch.getMatchedLinkIds(), contains(3666097, 3666076, 3666077, 3666078, 3666079, 3666080,
-                3666081, 3666082, 3666083, 3666084, 3666085, 3666086));
-        assertThat(lineStringMatch.getUpstreamLinkIds(),
-                containsInAnyOrder(3666097, 3666096, 3666095, 3666094, 7223062, 7223061));
-        assertThat(lineStringMatch.getDownstreamLinkIds(),
-                containsInAnyOrder(3666086, 3666105, 3666106, 3666107, 3666108, 3666109, 3686216, 3686217));
-
-        assertThat(lineStringMatch.getStartLinkFraction(), is(0.8805534312637381));
-        assertThat(lineStringMatch.getEndLinkFraction(), is(0.45960570331968187));
-        assertThat(lineStringMatch.getReliability(), is(93.29643981088304));
-        assertThat(lineStringMatch.getId(), is(29));
-        assertThat(lineStringMatch.getLocationIndex(), is(-1));
-        assertThat(lineStringMatch.isReversed(), is(true));
+        assertThat(lineStringMatch.getId()).isEqualTo(29);
+        assertThat(lineStringMatch.getStatus()).isEqualTo(MatchStatus.MATCH);
+        assertThat(lineStringMatch.getReliability()).isEqualTo(93.29643981088304);
+        assertThat(lineStringMatch.getLocationIndex()).isEqualTo(-1);
+        assertThat(lineStringMatch.isReversed()).isTrue();
+        assertThat(lineStringMatch.getMatchedLinkIds()).containsExactly(3666097, 3666076, 3666077, 3666078, 3666079,
+                3666080, 3666081, 3666082, 3666083, 3666084, 3666085, 3666086);
+        assertThat(lineStringMatch.getMatchedLinks()).noneMatch(MatchedLink::isReversed);
+        assertThat(lineStringMatch.getUpstreamLinkIds())
+                .containsExactlyInAnyOrder(3666097, 3666096, 3666095, 3666094, 7223062, 7223061);
+        assertThat(lineStringMatch.getDownstreamLinkIds())
+                .containsExactlyInAnyOrder(3666086, 3666105, 3666106, 3666107, 3666108, 3666109, 3686216, 3686217);
+        assertThat(lineStringMatch.getStartLinkFraction()).isEqualTo(0.8805534312637381);
+        assertThat(lineStringMatch.getEndLinkFraction()).isEqualTo(0.45960570331968187);
+        assertThat(lineStringMatch.getWeight()).isEqualTo(520.87);
+        assertThat(lineStringMatch.getDuration()).isEqualTo(18.748);
+        assertThat(lineStringMatch.getDistance()).isEqualTo(520.87);
     }
 
     @SneakyThrows
@@ -116,11 +129,18 @@ class GraphHopperStartToEndMapMatcherIT {
                 .reliabilityCalculationType(ReliabilityCalculationType.POINT_OBSERVATIONS)
                 .build();
         LineStringMatch lineStringMatch = startToEndMapMatcher.match(lineStringLocation);
-        assertThat(lineStringMatch, is(notNullValue()));
-        assertThat(lineStringMatch.getStatus(), is(MatchStatus.NO_MATCH));
-        assertThat(lineStringMatch.getMatchedLinkIds(), hasSize(0));
-        assertThat(lineStringMatch.getStartLinkFraction(), is(0.0));
-        assertThat(lineStringMatch.getEndLinkFraction(), is(0.0));
-        assertThat(lineStringMatch.getReliability(), is(0.0));
+        assertThat(lineStringMatch.getId()).isEqualTo(1);
+        assertThat(lineStringMatch.getStatus()).isEqualTo(MatchStatus.NO_MATCH);
+        assertThat(lineStringMatch.getReliability()).isEqualTo(0.0);
+        assertThat(lineStringMatch.getLocationIndex()).isEqualTo(1);
+        assertThat(lineStringMatch.isReversed()).isFalse();
+        assertThat(lineStringMatch.getMatchedLinks()).isEmpty();
+        assertThat(lineStringMatch.getUpstreamLinkIds()).isNull();
+        assertThat(lineStringMatch.getDownstreamLinkIds()).isNull();
+        assertThat(lineStringMatch.getStartLinkFraction()).isEqualTo(0.0);
+        assertThat(lineStringMatch.getEndLinkFraction()).isEqualTo(0.0);
+        assertThat(lineStringMatch.getWeight()).isEqualTo(0.0);
+        assertThat(lineStringMatch.getDuration()).isEqualTo(0.0);
+        assertThat(lineStringMatch.getDistance()).isEqualTo(0.0);
     }
 }

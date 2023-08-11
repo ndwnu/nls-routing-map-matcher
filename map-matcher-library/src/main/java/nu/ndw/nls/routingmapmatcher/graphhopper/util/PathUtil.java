@@ -66,18 +66,15 @@ public class PathUtil {
 
     public List<MatchedLink> determineMatchedLinks(EncodingManager encodingManager,
             Collection<EdgeIteratorState> edges) {
-        List<MatchedLink> matchedLinks = new ArrayList<>(edges.size());
-        Integer previousMatchedLinkId = null;
+        List<MatchedLink> matchedLinks = new ArrayList<>();
         for (EdgeIteratorState edge : edges) {
-            Integer matchedLinkId = edge.get(encodingManager.getIntEncodedValue(ID_NAME));
-            if (previousMatchedLinkId == null || !previousMatchedLinkId.equals(matchedLinkId)) {
-                MatchedLink matchedLink = MatchedLink.builder()
+            int matchedLinkId = edge.get(encodingManager.getIntEncodedValue(ID_NAME));
+            if (matchedLinks.isEmpty() || matchedLinks.get(matchedLinks.size() - 1).getLinkId() != matchedLinkId) {
+                matchedLinks.add(MatchedLink.builder()
                         .linkId(matchedLinkId)
                         .reversed(edgeIteratorStateReverseExtractor.hasReversed(edge))
-                        .build();
-                matchedLinks.add(matchedLink);
+                        .build());
             }
-            previousMatchedLinkId = matchedLinkId;
         }
         return matchedLinks;
     }
