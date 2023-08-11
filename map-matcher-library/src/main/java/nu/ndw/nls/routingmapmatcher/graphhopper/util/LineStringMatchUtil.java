@@ -16,6 +16,7 @@ import com.graphhopper.storage.EdgeIteratorStateReverseExtractor;
 import com.graphhopper.storage.index.LocationIndexTree;
 import com.graphhopper.util.EdgeIteratorState;
 import com.graphhopper.util.FetchMode;
+import com.graphhopper.util.Helper;
 import java.util.Collections;
 import java.util.List;
 import nu.ndw.nls.routingmapmatcher.constants.GlobalConstants;
@@ -38,10 +39,12 @@ import org.locationtech.jts.geom.PrecisionModel;
 public class LineStringMatchUtil {
 
     private static final boolean INCLUDE_ELEVATION = false;
+    private static final int DECIMAL_PLACES = 3;
+    private static final double MILLISECONDS_PER_SECOND = 1000.0;
+
     private final PathUtil pathUtil;
     private final EncodingManager encodingManager;
     private final IsochroneService isochroneService;
-
 
     private LineStringMatchUtil(LocationIndexTree locationIndexTree, BaseGraph baseGraph,
             EncodingManager encodingManager) {
@@ -90,6 +93,7 @@ public class LineStringMatchUtil {
         double startLinkFraction = pathUtil.determineStartLinkFraction(edges.get(0), queryGraph);
         double endLinkFraction = pathUtil.determineEndLinkFraction(edges.get(edges.size() - 1), queryGraph);
         LineString lineString = pathUtil.createLineString(path.calcPoints());
+        double distance = Helper.round(path.getDistance(), DECIMAL_PLACES);
         return LineStringMatch.builder()
                 .id(lineStringLocation.getId())
                 .locationIndex(lineStringLocation.getLocationIndex())
@@ -102,6 +106,11 @@ public class LineStringMatchUtil {
                 .reliability(reliability)
                 .status(MatchStatus.MATCH)
                 .lineString(lineString)
+                // Viterbi does not provide a usable weight. StartToEnd uses distance as weight, so always using
+                // distance changes nothing for StartToEnd and gives a usable (and comparable) value for Viterbi.
+                .weight(distance)
+                .duration(path.getTime() / MILLISECONDS_PER_SECOND)
+                .distance(distance)
                 .build();
     }
 
