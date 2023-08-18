@@ -37,8 +37,6 @@ public class GraphHopperRouter implements Router {
     private static final double MILLISECONDS_PER_SECOND = 1000.0;
 
     private final NetworkGraphHopper networkGraphHopper;
-    private final QueryGraphExtractor queryGraphExtractor;
-    private final PathUtil pathUtil;
 
     @Override
     public RoutingResponse route(RoutingRequest routingRequest) throws RoutingRequestException, RoutingException {
@@ -57,11 +55,11 @@ public class GraphHopperRouter implements Router {
         if (!paths.isEmpty()) {
             List<EdgeIteratorState> edges = paths.stream().map(Path::calcEdges).flatMap(Collection::stream).toList();
             routeBuilder
-                    .startLinkFraction(pathUtil.determineStartLinkFraction(edges.get(0),
-                            queryGraphExtractor.extractQueryGraph(paths.get(0))))
-                    .endLinkFraction(pathUtil.determineEndLinkFraction(edges.get(edges.size() - 1),
-                            queryGraphExtractor.extractQueryGraph(paths.get(paths.size() - 1))))
-                    .matchedLinks(pathUtil.determineMatchedLinks(networkGraphHopper.getEncodingManager(), edges));
+                    .startLinkFraction(PathUtil.determineStartLinkFraction(edges.get(0),
+                            QueryGraphExtractor.extractQueryGraph(paths.get(0))))
+                    .endLinkFraction(PathUtil.determineEndLinkFraction(edges.get(edges.size() - 1),
+                            QueryGraphExtractor.extractQueryGraph(paths.get(paths.size() - 1))))
+                    .matchedLinks(PathUtil.determineMatchedLinks(networkGraphHopper.getEncodingManager(), edges));
         }
         return routeBuilder.build();
     }

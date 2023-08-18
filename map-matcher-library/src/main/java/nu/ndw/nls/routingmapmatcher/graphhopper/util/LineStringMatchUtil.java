@@ -19,7 +19,6 @@ import com.graphhopper.util.FetchMode;
 import com.graphhopper.util.Helper;
 import java.util.Collections;
 import java.util.List;
-import nu.ndw.nls.routingmapmatcher.constants.GlobalConstants;
 import nu.ndw.nls.routingmapmatcher.domain.exception.RoutingMapMatcherException;
 import nu.ndw.nls.routingmapmatcher.domain.model.IsochroneMatch;
 import nu.ndw.nls.routingmapmatcher.domain.model.MatchStatus;
@@ -31,10 +30,8 @@ import nu.ndw.nls.routingmapmatcher.graphhopper.isochrone.IsochroneService;
 import nu.ndw.nls.routingmapmatcher.graphhopper.isochrone.ShortestPathTreeFactory;
 import nu.ndw.nls.routingmapmatcher.graphhopper.isochrone.mappers.IsochroneMatchMapper;
 import org.geotools.referencing.GeodeticCalculator;
-import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.LineString;
 import org.locationtech.jts.geom.Point;
-import org.locationtech.jts.geom.PrecisionModel;
 
 public class LineStringMatchUtil {
 
@@ -42,24 +39,19 @@ public class LineStringMatchUtil {
     private static final int DECIMAL_PLACES = 3;
     private static final double MILLISECONDS_PER_SECOND = 1000.0;
 
-    private final PathUtil pathUtil;
     private final EncodingManager encodingManager;
     private final IsochroneService isochroneService;
 
     private LineStringMatchUtil(LocationIndexTree locationIndexTree, BaseGraph baseGraph,
             EncodingManager encodingManager) {
-        GeometryFactory geometryFactory = new GeometryFactory(new PrecisionModel(), GlobalConstants.WGS84_SRID);
-        this.pathUtil = new PathUtil(geometryFactory);
         this.encodingManager = encodingManager;
         BooleanEncodedValue accessEnc = encodingManager.getBooleanEncodedValue(VehicleAccess.key(VEHICLE_CAR));
         DecimalEncodedValue speedEnc = encodingManager.getDecimalEncodedValue(VehicleSpeed.key(VEHICLE_CAR));
         Weighting weighting = new ShortestWeighting(accessEnc, speedEnc);
         EdgeIteratorStateReverseExtractor edgeIteratorStateReverseExtractor = new EdgeIteratorStateReverseExtractor();
         IsochroneMatchMapper isochroneMatchMapper = new IsochroneMatchMapper(new CrsTransformer(), encodingManager,
-                new FractionAndDistanceCalculator(new GeodeticCalculator()),
-                edgeIteratorStateReverseExtractor);
-        this.isochroneService = new IsochroneService(encodingManager, baseGraph,
-                edgeIteratorStateReverseExtractor,
+                new FractionAndDistanceCalculator(new GeodeticCalculator()), edgeIteratorStateReverseExtractor);
+        this.isochroneService = new IsochroneService(encodingManager, baseGraph, edgeIteratorStateReverseExtractor,
                 isochroneMatchMapper, new ShortestPathTreeFactory(weighting), locationIndexTree);
     }
 
@@ -74,7 +66,7 @@ public class LineStringMatchUtil {
         if (edges.isEmpty()) {
             throw new RoutingMapMatcherException("Unexpected: path has no edges");
         }
-        List<MatchedLink> matchedLinks = pathUtil.determineMatchedLinks(encodingManager, edges);
+        List<MatchedLink> matchedLinks = PathUtil.determineMatchedLinks(encodingManager, edges);
 
         Point startPoint = edges.get(0)
                 .fetchWayGeometry(FetchMode.ALL)
@@ -90,9 +82,9 @@ public class LineStringMatchUtil {
                 isochroneService.getDownstreamIsochroneMatches(endPoint, lineStringLocation.isReversed(),
                         lineStringLocation) : null;
 
-        double startLinkFraction = pathUtil.determineStartLinkFraction(edges.get(0), queryGraph);
-        double endLinkFraction = pathUtil.determineEndLinkFraction(edges.get(edges.size() - 1), queryGraph);
-        LineString lineString = pathUtil.createLineString(path.calcPoints());
+        double startLinkFraction = PathUtil.determineStartLinkFraction(edges.get(0), queryGraph);
+        double endLinkFraction = PathUtil.determineEndLinkFraction(edges.get(edges.size() - 1), queryGraph);
+        LineString lineString = path.calcPoints().toLineString(INCLUDE_ELEVATION);
         double distance = Helper.round(path.getDistance(), DECIMAL_PLACES);
         return LineStringMatch.builder()
                 .id(lineStringLocation.getId())
