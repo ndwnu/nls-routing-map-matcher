@@ -1,6 +1,5 @@
 package nu.ndw.nls.routingmapmatcher.domain.model.linestring;
 
-import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
@@ -21,6 +20,5 @@ public class LineStringLocation extends BaseLocation {
     private final LineString geometry;
     private final ReliabilityCalculationType reliabilityCalculationType;
     private final Double radius;
-    @Builder.Default
-    private final boolean simplifyResponseGeometry = false;
+    private final boolean simplifyResponseGeometry;
 }
