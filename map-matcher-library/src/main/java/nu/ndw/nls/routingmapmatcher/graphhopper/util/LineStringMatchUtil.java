@@ -17,6 +17,9 @@ import com.graphhopper.storage.index.LocationIndexTree;
 import com.graphhopper.util.EdgeIteratorState;
 import com.graphhopper.util.FetchMode;
 import com.graphhopper.util.Helper;
+import com.graphhopper.util.PathSimplification;
+import com.graphhopper.util.PointList;
+import com.graphhopper.util.RamerDouglasPeucker;
 import java.util.Collections;
 import java.util.List;
 import nu.ndw.nls.routingmapmatcher.domain.exception.RoutingMapMatcherException;
@@ -84,7 +87,11 @@ public class LineStringMatchUtil {
 
         double startLinkFraction = PathUtil.determineStartLinkFraction(edges.get(0), queryGraph);
         double endLinkFraction = PathUtil.determineEndLinkFraction(edges.get(edges.size() - 1), queryGraph);
-        LineString lineString = path.calcPoints().toLineString(INCLUDE_ELEVATION);
+        PointList points = path.calcPoints();
+        if (lineStringLocation.isSimplifyResponseGeometry()) {
+            PathSimplification.simplify(points, List.of(), new RamerDouglasPeucker());
+        }
+        LineString lineString = points.toLineString(INCLUDE_ELEVATION);
         double distance = Helper.round(path.getDistance(), DECIMAL_PLACES);
         return LineStringMatch.builder()
                 .id(lineStringLocation.getId())

@@ -14,4 +14,6 @@ import org.locationtech.jts.geom.Point;
 public class RoutingRequest {
     private final RoutingProfile routingProfile;
     private final List<Point> wayPoints;
+    @Builder.Default
+    private final boolean simplifyResponseGeometry = true;
 }

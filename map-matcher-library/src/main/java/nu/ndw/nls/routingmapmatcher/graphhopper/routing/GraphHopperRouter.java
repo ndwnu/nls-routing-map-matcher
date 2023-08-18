@@ -42,6 +42,7 @@ public class GraphHopperRouter implements Router {
     public RoutingResponse route(RoutingRequest routingRequest) throws RoutingRequestException, RoutingException {
         List<GHPoint> ghPoints = getGHPointsFromPoints(routingRequest.getWayPoints());
         GHRequest ghRequest = createGHRequest(ghPoints, routingRequest.getRoutingProfile().getLabel());
+        networkGraphHopper.getRouterConfig().setSimplifyResponse(routingRequest.isSimplifyResponseGeometry());
         GHResponse routingResponse = networkGraphHopper.route(ghRequest);
         ensureResponseHasNoErrors(routingResponse);
         ResponsePath responsePath = routingResponse.getBest();
