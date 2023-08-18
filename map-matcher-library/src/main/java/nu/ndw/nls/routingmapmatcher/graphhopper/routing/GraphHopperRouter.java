@@ -12,24 +12,25 @@ import com.graphhopper.util.Helper;
 import com.graphhopper.util.PMap;
 import com.graphhopper.util.Parameters.CH;
 import com.graphhopper.util.Parameters.Routing;
+import com.graphhopper.util.PathSimplification;
 import com.graphhopper.util.PointList;
+import com.graphhopper.util.RamerDouglasPeucker;
 import com.graphhopper.util.shapes.GHPoint;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
-import lombok.RequiredArgsConstructor;
 import nu.ndw.nls.routingmapmatcher.domain.Router;
 import nu.ndw.nls.routingmapmatcher.domain.exception.RoutingException;
 import nu.ndw.nls.routingmapmatcher.domain.exception.RoutingRequestException;
 import nu.ndw.nls.routingmapmatcher.domain.model.routing.RoutingRequest;
 import nu.ndw.nls.routingmapmatcher.domain.model.routing.RoutingResponse;
+import nu.ndw.nls.routingmapmatcher.domain.model.routing.RoutingResponse.RoutingResponseBuilder;
 import nu.ndw.nls.routingmapmatcher.graphhopper.NetworkGraphHopper;
 import nu.ndw.nls.routingmapmatcher.graphhopper.util.PathUtil;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Point;
 
-@RequiredArgsConstructor
 public class GraphHopperRouter implements Router {
 
     private static final boolean INCLUDE_ELEVATION = false;
@@ -38,36 +39,48 @@ public class GraphHopperRouter implements Router {
 
     private final NetworkGraphHopper networkGraphHopper;
 
+    public GraphHopperRouter(NetworkGraphHopper networkGraphHopper) {
+        this.networkGraphHopper = networkGraphHopper;
+        // This configuration is global for the routing network and is probably not thread safe.
+        // To be able to configure simplification per request, it's safer to disable GraphHopper-internal simplification
+        // and perform it in our own response mapping code below.
+        this.networkGraphHopper.getRouterConfig().setSimplifyResponse(false);
+    }
+
     @Override
     public RoutingResponse route(RoutingRequest routingRequest) throws RoutingRequestException, RoutingException {
         List<GHPoint> ghPoints = getGHPointsFromPoints(routingRequest.getWayPoints());
         GHRequest ghRequest = createGHRequest(ghPoints, routingRequest.getRoutingProfile().getLabel());
-        networkGraphHopper.getRouterConfig().setSimplifyResponse(routingRequest.isSimplifyResponseGeometry());
-        GHResponse routingResponse = networkGraphHopper.route(ghRequest);
-        ensureResponseHasNoErrors(routingResponse);
-        ResponsePath responsePath = routingResponse.getBest();
+        GHResponse ghResponse = networkGraphHopper.route(ghRequest);
+        ensureResponseHasNoErrors(ghResponse);
+        ResponsePath responsePath = ghResponse.getBest();
         ensurePathsAreNotEmpty(responsePath);
-        return createMatchedLinkIds(ghRequest, createRoute(responsePath));
+
+        boolean simplify = routingRequest.isSimplifyResponseGeometry();
+        RoutingResponseBuilder routingResponseBuilder = createRoutingResponse(responsePath, simplify);
+        return setFractionsAndMatchedLinks(routingResponseBuilder, ghRequest);
     }
 
-    private RoutingResponse createMatchedLinkIds(GHRequest ghRequest,
-            RoutingResponse.RoutingResponseBuilder routeBuilder) {
+    private RoutingResponse setFractionsAndMatchedLinks(RoutingResponseBuilder routingResponseBuilder,
+            GHRequest ghRequest) {
         List<Path> paths = networkGraphHopper.calcPaths(ghRequest);
         if (!paths.isEmpty()) {
             List<EdgeIteratorState> edges = paths.stream().map(Path::calcEdges).flatMap(Collection::stream).toList();
-            routeBuilder
+            routingResponseBuilder
                     .startLinkFraction(PathUtil.determineStartLinkFraction(edges.get(0),
                             QueryGraphExtractor.extractQueryGraph(paths.get(0))))
                     .endLinkFraction(PathUtil.determineEndLinkFraction(edges.get(edges.size() - 1),
                             QueryGraphExtractor.extractQueryGraph(paths.get(paths.size() - 1))))
                     .matchedLinks(PathUtil.determineMatchedLinks(networkGraphHopper.getEncodingManager(), edges));
         }
-        return routeBuilder.build();
+        return routingResponseBuilder.build();
     }
 
-    private RoutingResponse.RoutingResponseBuilder createRoute(ResponsePath path) {
+    private RoutingResponseBuilder createRoutingResponse(ResponsePath path, boolean simplify) {
+        PointList points = simplify ? PathSimplification.simplify(path, new RamerDouglasPeucker(), false)
+                : path.getPoints();
         return RoutingResponse.builder()
-                .geometry(path.getPoints().toLineString(INCLUDE_ELEVATION))
+                .geometry(points.toLineString(INCLUDE_ELEVATION))
                 .snappedWaypoints(mapToSnappedWaypoints(path.getWaypoints()))
                 .weight(Helper.round(path.getRouteWeight(), DECIMAL_PLACES))
                 .duration(path.getTime() / MILLISECONDS_PER_SECOND)
