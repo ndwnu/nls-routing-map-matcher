@@ -96,6 +96,56 @@ class GraphHopperStartToEndMapMatcherIT {
                 StandardCharsets.UTF_8);
         LineStringLocation lineStringLocation = mapper.readValue(locationJson, LineStringLocation.class);
         LineStringMatch lineStringMatch = startToEndMapMatcher.match(lineStringLocation);
+        assertSuccess(lineStringMatch, new Coordinate[]{new Coordinate(5.431641, 52.17898),
+                new Coordinate(5.431601, 52.178947), new Coordinate(5.43111, 52.178622),
+                new Coordinate(5.431077, 52.1786), new Coordinate(5.430663, 52.178413),
+                new Coordinate(5.430526, 52.178363), new Coordinate(5.430206, 52.178246),
+                new Coordinate(5.429884, 52.178165), new Coordinate(5.429882, 52.178165),
+                new Coordinate(5.429507, 52.178104), new Coordinate(5.42918, 52.178064),
+                new Coordinate(5.429103, 52.178055), new Coordinate(5.428641, 52.178005),
+                new Coordinate(5.428467, 52.177998), new Coordinate(5.427836, 52.177971),
+                new Coordinate(5.427747, 52.17797), new Coordinate(5.427079, 52.177963),
+                new Coordinate(5.427025, 52.177964), new Coordinate(5.426695, 52.177971),
+                new Coordinate(5.426323, 52.178013), new Coordinate(5.42631, 52.178015),
+                new Coordinate(5.42593, 52.178082), new Coordinate(5.425628, 52.178159),
+                new Coordinate(5.425557, 52.178177), new Coordinate(5.425227, 52.178303),
+                new Coordinate(5.425037, 52.178409), new Coordinate(5.424792, 52.178546)});
+    }
+
+    @SneakyThrows
+    @Test
+    void match_ok_lineStringWithIsochrones_simplify() {
+        String locationJson = IOUtils.toString(
+                Objects.requireNonNull(getClass().getResourceAsStream("/test-data/matched_linestring_location.json")),
+                StandardCharsets.UTF_8);
+        LineStringLocation l = mapper.readValue(locationJson, LineStringLocation.class);
+        LineStringLocation lineStringLocation = LineStringLocation.builder()
+                .id(l.getId())
+                .upstreamIsochrone(l.getUpstreamIsochrone())
+                .upstreamIsochroneUnit(l.getUpstreamIsochroneUnit())
+                .downstreamIsochrone(l.getDownstreamIsochrone())
+                .downstreamIsochroneUnit(l.getDownstreamIsochroneUnit())
+                .locationIndex(l.getLocationIndex())
+                .reversed(l.isReversed())
+                .lengthInMeters(l.getLengthInMeters())
+                .geometry(l.getGeometry())
+                .reliabilityCalculationType(l.getReliabilityCalculationType())
+                .radius(l.getRadius())
+                .simplifyResponseGeometry(true)
+                .build();
+
+        LineStringMatch lineStringMatch = startToEndMapMatcher.match(lineStringLocation);
+        assertSuccess(lineStringMatch, new Coordinate[]{new Coordinate(5.431641, 52.17898),
+                new Coordinate(5.431077, 52.1786), new Coordinate(5.430663, 52.178413),
+                new Coordinate(5.430206, 52.178246), new Coordinate(5.429884, 52.178165),
+                new Coordinate(5.429507, 52.178104), new Coordinate(5.428641, 52.178005),
+                new Coordinate(5.427836, 52.177971), new Coordinate(5.427079, 52.177963),
+                new Coordinate(5.426695, 52.177971), new Coordinate(5.426323, 52.178013),
+                new Coordinate(5.42593, 52.178082), new Coordinate(5.425557, 52.178177),
+                new Coordinate(5.425227, 52.178303), new Coordinate(5.424792, 52.178546)});
+    }
+
+    private void assertSuccess(LineStringMatch lineStringMatch, Coordinate[] coordinates) {
         assertThat(lineStringMatch.getId()).isEqualTo(29);
         assertThat(lineStringMatch.getStatus()).isEqualTo(MatchStatus.MATCH);
         assertThat(lineStringMatch.getReliability()).isEqualTo(93.29643981088304);
@@ -110,6 +160,7 @@ class GraphHopperStartToEndMapMatcherIT {
                 .containsExactlyInAnyOrder(3666086, 3666105, 3666106, 3666107, 3666108, 3666109, 3686216, 3686217);
         assertThat(lineStringMatch.getStartLinkFraction()).isEqualTo(0.8805534312637381);
         assertThat(lineStringMatch.getEndLinkFraction()).isEqualTo(0.45960570331968187);
+        assertThat(lineStringMatch.getLineString()).isEqualTo(geometryFactory.createLineString(coordinates));
         assertThat(lineStringMatch.getWeight()).isEqualTo(520.87);
         assertThat(lineStringMatch.getDuration()).isEqualTo(18.748);
         assertThat(lineStringMatch.getDistance()).isEqualTo(520.87);
