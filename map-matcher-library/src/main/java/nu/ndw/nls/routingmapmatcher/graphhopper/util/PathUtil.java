@@ -12,59 +12,23 @@ import com.graphhopper.storage.index.Snap;
 import com.graphhopper.util.EdgeExplorer;
 import com.graphhopper.util.EdgeIterator;
 import com.graphhopper.util.EdgeIteratorState;
-import com.graphhopper.util.PointList;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import lombok.extern.slf4j.Slf4j;
 import nu.ndw.nls.routingmapmatcher.domain.exception.RoutingMapMatcherException;
 import nu.ndw.nls.routingmapmatcher.domain.model.linestring.MatchedLink;
 import nu.ndw.nls.routingmapmatcher.graphhopper.model.EdgeIteratorTravelDirection;
-import org.locationtech.jts.geom.GeometryFactory;
-import org.locationtech.jts.geom.LineString;
-import org.locationtech.jts.geom.impl.PackedCoordinateSequence;
 
-@Slf4j
-public class PathUtil {
+public final class PathUtil {
 
-    private static final int MINIMUM_LENGTH = 2;
-    private static final int DIMENSIONS = 2;
-    private static final int MEASURES = 0;
-
-    private final GeometryFactory geometryFactory;
-
-    private final EdgeIteratorStateReverseExtractor edgeIteratorStateReverseExtractor =
+    private static final EdgeIteratorStateReverseExtractor EDGE_ITERATOR_STATE_REVERSE_EXTRACTOR =
             new EdgeIteratorStateReverseExtractor();
 
-    public PathUtil(GeometryFactory geometryFactory) {
-        this.geometryFactory = geometryFactory;
+    private PathUtil() {
+        // Util class
     }
 
-    public LineString createLineString(PointList points) {
-        LineString lineString;
-        if (points.size() > 1) {
-            PackedCoordinateSequence.Double coordinateSequence =
-                    new PackedCoordinateSequence.Double(points.size(), DIMENSIONS, MEASURES);
-            for (int index = 0; index < points.size(); index++) {
-                coordinateSequence.setOrdinate(index, 0, points.getLon(index));
-                coordinateSequence.setOrdinate(index, 1, points.getLat(index));
-            }
-            lineString = geometryFactory.createLineString(coordinateSequence);
-        } else if (points.size() == 1) {
-            PackedCoordinateSequence.Double coordinateSequence =
-                    new PackedCoordinateSequence.Double(MINIMUM_LENGTH, DIMENSIONS, MEASURES);
-            coordinateSequence.setOrdinate(0, 0, points.getLon(0));
-            coordinateSequence.setOrdinate(0, 1, points.getLat(0));
-            coordinateSequence.setOrdinate(1, 0, points.getLon(0));
-            coordinateSequence.setOrdinate(1, 1, points.getLat(0));
-            lineString = geometryFactory.createLineString(coordinateSequence);
-        } else {
-            throw new RoutingMapMatcherException("Unexpected: no points");
-        }
-        return lineString;
-    }
-
-    public List<MatchedLink> determineMatchedLinks(EncodingManager encodingManager,
+    public static List<MatchedLink> determineMatchedLinks(EncodingManager encodingManager,
             Collection<EdgeIteratorState> edges) {
         List<MatchedLink> matchedLinks = new ArrayList<>();
         for (EdgeIteratorState edge : edges) {
@@ -72,7 +36,7 @@ public class PathUtil {
             if (matchedLinks.isEmpty() || matchedLinks.get(matchedLinks.size() - 1).getLinkId() != matchedLinkId) {
                 matchedLinks.add(MatchedLink.builder()
                         .linkId(matchedLinkId)
-                        .reversed(edgeIteratorStateReverseExtractor.hasReversed(edge))
+                        .reversed(EDGE_ITERATOR_STATE_REVERSE_EXTRACTOR.hasReversed(edge))
                         .build());
             }
         }
@@ -110,7 +74,7 @@ public class PathUtil {
         }
     }
 
-    public double determineStartLinkFraction(EdgeIteratorState firstEdge, QueryGraph queryGraph) {
+    public static double determineStartLinkFraction(EdgeIteratorState firstEdge, QueryGraph queryGraph) {
         if (queryGraph.isVirtualNode(firstEdge.getBaseNode())) {
             EdgeIteratorState originalEdge = findOriginalEdge(firstEdge, queryGraph);
 
@@ -122,7 +86,7 @@ public class PathUtil {
         return 0D;
     }
 
-    private EdgeIteratorState findOriginalEdge(EdgeIteratorState edge, QueryGraph queryGraph) {
+    private static EdgeIteratorState findOriginalEdge(EdgeIteratorState edge, QueryGraph queryGraph) {
         EdgeIteratorState originalEdge;
         if (edge instanceof VirtualEdgeIteratorState) {
             originalEdge = queryGraph.getEdgeIteratorStateForKey(
@@ -133,7 +97,7 @@ public class PathUtil {
         return originalEdge;
     }
 
-    private double calculateDistanceFromVirtualNodeToNonVirtualNode(QueryGraph queryGraph, int virtualNode,
+    private static double calculateDistanceFromVirtualNodeToNonVirtualNode(QueryGraph queryGraph, int virtualNode,
             int nodeToAvoid, EdgeIteratorState pathEdge) {
         EdgeExplorer edgeExplorer = queryGraph.createEdgeExplorer();
 
@@ -176,7 +140,7 @@ public class PathUtil {
         return distanceInOtherDirection;
     }
 
-    public double determineEndLinkFraction(EdgeIteratorState lastEdge, QueryGraph queryGraph) {
+    public static double determineEndLinkFraction(EdgeIteratorState lastEdge, QueryGraph queryGraph) {
         if (queryGraph.isVirtualNode(lastEdge.getAdjNode())) {
             EdgeIteratorState originalEdge = findOriginalEdge(lastEdge, queryGraph);
 

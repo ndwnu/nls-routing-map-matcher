@@ -62,20 +62,17 @@ public class ViterbiLineStringMapMatcher implements LineStringMapMatcher {
             GlobalConstants.WGS84_SRID);
 
     private static final int COORDINATES_LENGTH_START_END = 2;
-    public static final String PROFILE_KEY = "profile";
+    private static final String PROFILE_KEY = "profile";
 
     private final LocationIndexTree locationIndexTree;
     private final NetworkGraphHopper networkGraphHopper;
-    private final QueryGraphExtractor queryGraphExtractor;
     private final LineStringMatchUtil lineStringMatchUtil;
     private final LineStringScoreUtil lineStringScoreUtil;
-
 
     public ViterbiLineStringMapMatcher(NetworkGraphHopper networkGraphHopper) {
         Preconditions.checkNotNull(networkGraphHopper);
         this.networkGraphHopper = networkGraphHopper;
         this.locationIndexTree = networkGraphHopper.getLocationIndex();
-        this.queryGraphExtractor = new QueryGraphExtractor();
         this.lineStringMatchUtil = new LineStringMatchUtil(networkGraphHopper);
         this.lineStringScoreUtil = new LineStringScoreUtil();
     }
@@ -153,7 +150,7 @@ public class ViterbiLineStringMapMatcher implements LineStringMapMatcher {
 
     private LineStringMatch createMatch(MatchResult matchResult, LineStringLocation lineStringLocation) {
         Path path = matchResult.getMergedPath();
-        QueryGraph queryGraph = queryGraphExtractor.extractQueryGraph(path);
+        QueryGraph queryGraph = QueryGraphExtractor.extractQueryGraph(path);
         double reliability = lineStringScoreUtil.calculateCandidatePathScore(path, lineStringLocation);
         return lineStringMatchUtil.createMatch(lineStringLocation, path, queryGraph, reliability);
     }
