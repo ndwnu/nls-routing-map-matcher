@@ -20,4 +20,5 @@ public class LineStringLocation extends BaseLocation {
     private final LineString geometry;
     private final ReliabilityCalculationType reliabilityCalculationType;
     private final Double radius;
+    private final boolean simplifyResponseGeometry;
 }
