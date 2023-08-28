@@ -86,9 +86,14 @@ class GraphHopperRouterIT {
     private void assertSuccess(RoutingResponse result, Coordinate[] coordinates) {
         assertThat(result.getStartLinkFraction()).isEqualTo(0.8236516616727612);
         assertThat(result.getEndLinkFraction()).isEqualTo(0.5228504089301351);
-        assertThat(result.getMatchedLinkIds())
-                .containsExactly(7223072, 7223073, 3667130, 3667131, 3667132, 3667133, 3666204);
-        assertThat(result.getMatchedLinks()).noneMatch(MatchedLink::isReversed);
+        assertThat(result.getMatchedLinks()).containsExactly(
+                MatchedLink.builder().linkId(7223072).reversed(false).build(),
+                MatchedLink.builder().linkId(7223073).reversed(false).build(),
+                MatchedLink.builder().linkId(3667130).reversed(false).build(),
+                MatchedLink.builder().linkId(3667131).reversed(false).build(),
+                MatchedLink.builder().linkId(3667132).reversed(false).build(),
+                MatchedLink.builder().linkId(3667133).reversed(false).build(),
+                MatchedLink.builder().linkId(3666204).reversed(false).build());
         assertThat(result.getGeometry()).isEqualTo(geometryFactory.createLineString(coordinates));
         assertThat(result.getWeight()).isEqualTo(8.769);
         assertThat(result.getDuration()).isEqualTo(8.768);

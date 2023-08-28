@@ -20,7 +20,6 @@ import com.graphhopper.util.Helper;
 import com.graphhopper.util.PathSimplification;
 import com.graphhopper.util.PointList;
 import com.graphhopper.util.RamerDouglasPeucker;
-import java.util.Collections;
 import java.util.List;
 import nu.ndw.nls.routingmapmatcher.domain.exception.RoutingMapMatcherException;
 import nu.ndw.nls.routingmapmatcher.domain.model.IsochroneMatch;
@@ -118,7 +117,7 @@ public class LineStringMatchUtil {
                 .id(lineStringLocation.getId())
                 .locationIndex(lineStringLocation.getLocationIndex())
                 .reversed(lineStringLocation.isReversed())
-                .matchedLinks(Collections.emptyList())
+                .matchedLinks(List.of())
                 .downstream(null)
                 .upstream(null)
                 .startLinkFraction(0.0)
