@@ -66,12 +66,14 @@ public class GraphHopperRouter implements Router {
         List<Path> paths = networkGraphHopper.calcPaths(ghRequest);
         if (!paths.isEmpty()) {
             List<EdgeIteratorState> edges = paths.stream().map(Path::calcEdges).flatMap(Collection::stream).toList();
-            routingResponseBuilder
-                    .startLinkFraction(PathUtil.determineStartLinkFraction(edges.get(0),
-                            QueryGraphExtractor.extractQueryGraph(paths.get(0))))
-                    .endLinkFraction(PathUtil.determineEndLinkFraction(edges.get(edges.size() - 1),
-                            QueryGraphExtractor.extractQueryGraph(paths.get(paths.size() - 1))))
-                    .matchedLinks(PathUtil.determineMatchedLinks(networkGraphHopper.getEncodingManager(), edges));
+            if (!edges.isEmpty()) {
+                routingResponseBuilder
+                        .startLinkFraction(PathUtil.determineStartLinkFraction(edges.get(0),
+                                QueryGraphExtractor.extractQueryGraph(paths.get(0))))
+                        .endLinkFraction(PathUtil.determineEndLinkFraction(edges.get(edges.size() - 1),
+                                QueryGraphExtractor.extractQueryGraph(paths.get(paths.size() - 1))))
+                        .matchedLinks(PathUtil.determineMatchedLinks(networkGraphHopper.getEncodingManager(), edges));
+            }
         }
         return routingResponseBuilder.build();
     }
