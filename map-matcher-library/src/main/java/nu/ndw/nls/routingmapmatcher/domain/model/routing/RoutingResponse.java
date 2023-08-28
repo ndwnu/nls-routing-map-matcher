@@ -19,7 +19,8 @@ public class RoutingResponse {
     @Builder.Default
     private final double endLinkFraction = 1;
     private final List<Point> snappedWaypoints;
-    private List<MatchedLink> matchedLinks;
+    @Builder.Default
+    private final List<MatchedLink> matchedLinks = List.of();
     private final LineString geometry;
     private final double weight;
     private final double duration;

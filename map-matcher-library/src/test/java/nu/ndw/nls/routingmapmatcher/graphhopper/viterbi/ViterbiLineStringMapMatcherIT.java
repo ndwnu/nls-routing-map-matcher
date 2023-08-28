@@ -120,9 +120,19 @@ class ViterbiLineStringMapMatcherIT {
         assertThat(lineStringMatch.getReliability()).isEqualTo(93.18611307333045);
         assertThat(lineStringMatch.getLocationIndex()).isEqualTo(-1);
         assertThat(lineStringMatch.isReversed()).isTrue();
-        assertThat(lineStringMatch.getMatchedLinkIds()).containsExactly(3666097, 3666076, 3666077, 3666078, 3666079,
-                3666080, 3666081, 3666082, 3666083, 3666084, 3666085, 3666086);
-        assertThat(lineStringMatch.getMatchedLinks()).noneMatch(MatchedLink::isReversed);
+        assertThat(lineStringMatch.getMatchedLinks()).containsExactly(
+                MatchedLink.builder().linkId(3666097).reversed(false).build(),
+                MatchedLink.builder().linkId(3666076).reversed(false).build(),
+                MatchedLink.builder().linkId(3666077).reversed(false).build(),
+                MatchedLink.builder().linkId(3666078).reversed(false).build(),
+                MatchedLink.builder().linkId(3666079).reversed(false).build(),
+                MatchedLink.builder().linkId(3666080).reversed(false).build(),
+                MatchedLink.builder().linkId(3666081).reversed(false).build(),
+                MatchedLink.builder().linkId(3666082).reversed(false).build(),
+                MatchedLink.builder().linkId(3666083).reversed(false).build(),
+                MatchedLink.builder().linkId(3666084).reversed(false).build(),
+                MatchedLink.builder().linkId(3666085).reversed(false).build(),
+                MatchedLink.builder().linkId(3666086).reversed(false).build());
         assertThat(lineStringMatch.getUpstreamLinkIds())
                 .containsExactlyInAnyOrder(3666097, 3666096, 3666095, 3666094, 7223062, 7223061);
         assertThat(lineStringMatch.getDownstreamLinkIds())
