@@ -1,6 +1,6 @@
 package nu.ndw.nls.routingmapmatcher.graphhopper.util;
 
-import lombok.RequiredArgsConstructor;
+import java.util.stream.IntStream;
 import lombok.extern.slf4j.Slf4j;
 import nu.ndw.nls.routingmapmatcher.graphhopper.model.FractionAndDistance;
 import org.geotools.referencing.GeodeticCalculator;
@@ -9,14 +9,13 @@ import org.locationtech.jts.geom.LineString;
 import org.locationtech.jts.linearref.LinearLocation;
 import org.locationtech.jts.linearref.LocationIndexedLine;
 
-@RequiredArgsConstructor
 @Slf4j
 public class FractionAndDistanceCalculator {
 
     private static final double NEAR_ZERO = 0.00000000000001;
-    private final GeodeticCalculator geodeticCalculator;
+    private static final GeodeticCalculator GEODETIC_CALCULATOR = new GeodeticCalculator();
 
-    public FractionAndDistance calculateFractionAndDistance(LineString line, Coordinate snappedPointCoordinate) {
+    public static FractionAndDistance calculateFractionAndDistance(LineString line, Coordinate snappedPointCoordinate) {
         LocationIndexedLine locationIndexedLine = new LocationIndexedLine(line);
         LinearLocation snappedPointLocation = locationIndexedLine.indexOf(snappedPointCoordinate);
         Coordinate[] coordinates = line.getCoordinates();
@@ -47,9 +46,16 @@ public class FractionAndDistanceCalculator {
                 .build();
     }
 
-    private double calculateDistance(Coordinate from, Coordinate to) {
-        geodeticCalculator.setStartingGeographicPoint(to.getX(), to.getY());
-        geodeticCalculator.setDestinationGeographicPoint(from.getX(), from.getY());
-        return geodeticCalculator.getOrthodromicDistance();
+    public static double calculateLengthInMeters(LineString lineString) {
+        Coordinate[] coordinates = lineString.getCoordinates();
+        return IntStream.range(1, coordinates.length)
+                .mapToDouble(index -> calculateDistance(coordinates[index - 1], coordinates[index]))
+                .sum();
+    }
+
+    private static double calculateDistance(Coordinate from, Coordinate to) {
+        GEODETIC_CALCULATOR.setStartingGeographicPoint(to.getX(), to.getY());
+        GEODETIC_CALCULATOR.setDestinationGeographicPoint(from.getX(), from.getY());
+        return GEODETIC_CALCULATOR.getOrthodromicDistance();
     }
 }
