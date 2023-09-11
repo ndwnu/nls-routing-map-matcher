@@ -31,7 +31,6 @@ import nu.ndw.nls.routingmapmatcher.graphhopper.NetworkGraphHopper;
 import nu.ndw.nls.routingmapmatcher.graphhopper.isochrone.IsochroneService;
 import nu.ndw.nls.routingmapmatcher.graphhopper.isochrone.ShortestPathTreeFactory;
 import nu.ndw.nls.routingmapmatcher.graphhopper.isochrone.mappers.IsochroneMatchMapper;
-import org.geotools.referencing.GeodeticCalculator;
 import org.locationtech.jts.geom.LineString;
 import org.locationtech.jts.geom.Point;
 
@@ -52,7 +51,7 @@ public class LineStringMatchUtil {
         Weighting weighting = new ShortestWeighting(accessEnc, speedEnc);
         EdgeIteratorStateReverseExtractor edgeIteratorStateReverseExtractor = new EdgeIteratorStateReverseExtractor();
         IsochroneMatchMapper isochroneMatchMapper = new IsochroneMatchMapper(new CrsTransformer(), encodingManager,
-                new FractionAndDistanceCalculator(new GeodeticCalculator()), edgeIteratorStateReverseExtractor);
+                edgeIteratorStateReverseExtractor);
         this.isochroneService = new IsochroneService(encodingManager, baseGraph, edgeIteratorStateReverseExtractor,
                 isochroneMatchMapper, new ShortestPathTreeFactory(weighting), locationIndexTree);
     }

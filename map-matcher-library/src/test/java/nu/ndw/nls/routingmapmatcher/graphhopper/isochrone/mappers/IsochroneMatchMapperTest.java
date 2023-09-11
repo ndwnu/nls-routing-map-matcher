@@ -20,7 +20,6 @@ import nu.ndw.nls.routingmapmatcher.graphhopper.model.FractionAndDistance;
 import nu.ndw.nls.routingmapmatcher.graphhopper.util.CrsTransformer;
 import nu.ndw.nls.routingmapmatcher.graphhopper.util.FractionAndDistanceCalculator;
 import org.assertj.core.data.Percentage;
-import org.geotools.referencing.GeodeticCalculator;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -59,10 +58,8 @@ class IsochroneMatchMapperTest {
     @Mock
     private PointList pointList;
 
-
     @Mock
-    IntEncodedValue intEncodedValue;
-
+    private IntEncodedValue intEncodedValue;
 
     private LineString startSegmentWayGeometry;
 
@@ -71,7 +68,6 @@ class IsochroneMatchMapperTest {
     private IsochroneMatchMapper isochroneMatchMapper;
 
     private IsoLabel isoLabel;
-    private FractionAndDistanceCalculator fractionAndDistanceCalculator;
 
     @BeforeEach
     void setup() {
@@ -86,17 +82,14 @@ class IsochroneMatchMapperTest {
                 COORDINATE_1,
                 COORDINATE_2});
 
-        fractionAndDistanceCalculator = new FractionAndDistanceCalculator(new GeodeticCalculator());
         isochroneMatchMapper = new IsochroneMatchMapper(new CrsTransformer(), encodingManager,
-                fractionAndDistanceCalculator, edgeIteratorStateReverseExtractor);
-
+                edgeIteratorStateReverseExtractor);
     }
 
     @Test
     void mapToIsochroneMatch_ok_startSegment() {
         setupFixtureStartSegment(false, 0);
-        IsochroneMatch result = isochroneMatchMapper.mapToIsochroneMatch(isoLabel, MAX_DISTANCE,
-                queryGraph,
+        IsochroneMatch result = isochroneMatchMapper.mapToIsochroneMatch(isoLabel, MAX_DISTANCE, queryGraph,
                 startSegment);
         assertThat(result.getMatchedLinkId()).isEqualTo(MATCHED_LINK_ID_ONE);
         assertThat(result.getStartFraction()).isEqualTo(0);
@@ -108,8 +101,7 @@ class IsochroneMatchMapperTest {
     @Test
     void mapToIsochroneMatch_ok_startSegment_reversed() {
         setupFixtureStartSegment(true, 0);
-        IsochroneMatch result = isochroneMatchMapper.mapToIsochroneMatch(isoLabel, MAX_DISTANCE,
-                queryGraph,
+        IsochroneMatch result = isochroneMatchMapper.mapToIsochroneMatch(isoLabel, MAX_DISTANCE, queryGraph,
                 startSegment);
         assertThat(result.getMatchedLinkId()).isEqualTo(MATCHED_LINK_ID_ONE);
         assertThat(result.getStartFraction()).isEqualTo(0.366238940319);
@@ -118,77 +110,55 @@ class IsochroneMatchMapperTest {
         assertThat(result.getGeometry()).isEqualTo(isoLabelWayGeometry.reverse());
     }
 
-
     @Test
     void mapToIsochroneMatch_ok_startSegment_cropped_geometry() {
         Geometry originalGeometry = isoLabelWayGeometry.copy();
         setupFixtureStartSegment(false, 250.30366999283603);
-        IsochroneMatch result = isochroneMatchMapper.mapToIsochroneMatch(isoLabel, MAX_DISTANCE,
-                queryGraph,
+        IsochroneMatch result = isochroneMatchMapper.mapToIsochroneMatch(isoLabel, MAX_DISTANCE, queryGraph,
                 startSegment);
         assertThat(result.getMatchedLinkId()).isEqualTo(MATCHED_LINK_ID_ONE);
         assertThat(result.getStartFraction()).isEqualTo(2.285606E-5);
         assertThat(result.getEndFraction()).isEqualTo(0.506377235259);
         assertThat(result.isReversed()).isFalse();
         assertThat(result.getGeometry().getLength()).isLessThan(originalGeometry.getLength());
-        FractionAndDistance fractionAndDistance = fractionAndDistanceCalculator.calculateFractionAndDistance(
-                result.getGeometry(),
-                result.getGeometry().getStartPoint().getCoordinate());
-        assertThat(fractionAndDistance.getTotalDistance()).isCloseTo(MAX_DISTANCE, Percentage
-                .withPercentage(0.0001));
-
+        FractionAndDistance fractionAndDistance = FractionAndDistanceCalculator.calculateFractionAndDistance(
+                result.getGeometry(), result.getGeometry().getStartPoint().getCoordinate());
+        assertThat(fractionAndDistance.getTotalDistance()).isCloseTo(MAX_DISTANCE, Percentage.withPercentage(0.0001));
     }
-
 
     @Test
     void mapToIsochroneMatch_ok_cropped_geometry() {
         Geometry originalGeometry = isoLabelWayGeometry.copy();
         setupFixture(false, 250.30366999283603, 2);
-        when(pointList.toLineString(INCLUDE_ELEVATION))
-                .thenReturn(isoLabelWayGeometry);
-        IsochroneMatch result = isochroneMatchMapper.mapToIsochroneMatch(isoLabel, MAX_DISTANCE,
-                queryGraph,
+        when(pointList.toLineString(INCLUDE_ELEVATION)).thenReturn(isoLabelWayGeometry);
+        IsochroneMatch result = isochroneMatchMapper.mapToIsochroneMatch(isoLabel, MAX_DISTANCE, queryGraph,
                 startSegment);
         assertThat(result.getMatchedLinkId()).isEqualTo(MATCHED_LINK_ID_ONE);
         assertThat(result.getStartFraction()).isEqualTo(0.0);
         assertThat(result.getEndFraction()).isEqualTo(0.799003390195);
         assertThat(result.isReversed()).isFalse();
         assertThat(result.getGeometry().getLength()).isLessThan(originalGeometry.getLength());
-        FractionAndDistance fractionAndDistance = fractionAndDistanceCalculator.calculateFractionAndDistance(
-                result.getGeometry(),
-                result.getGeometry().getStartPoint().getCoordinate());
-        assertThat(fractionAndDistance.getTotalDistance()).isCloseTo(MAX_DISTANCE, Percentage
-                .withPercentage(0.0001));
-
+        FractionAndDistance fractionAndDistance = FractionAndDistanceCalculator.calculateFractionAndDistance(
+                result.getGeometry(), result.getGeometry().getStartPoint().getCoordinate());
+        assertThat(fractionAndDistance.getTotalDistance()).isCloseTo(MAX_DISTANCE, Percentage.withPercentage(0.0001));
     }
-
 
     private void setupFixtureStartSegment(boolean reversed, double distance) {
         // If reversed EdgeIterator returns reversed geometry
         LineString wayGeometry = reversed ? isoLabelWayGeometry.reverse() : isoLabelWayGeometry;
         setupFixture(reversed, distance, MATCHED_LINK_ID_ONE);
-        when(edgeIteratorStateStartSegment
-                .fetchWayGeometry(FetchMode.ALL))
-                .thenReturn(pointList);
-        when(pointList.toLineString(false))
-                .thenReturn(wayGeometry, startSegmentWayGeometry);
+        when(edgeIteratorStateStartSegment.fetchWayGeometry(FetchMode.ALL)).thenReturn(pointList);
+        when(pointList.toLineString(false)).thenReturn(wayGeometry, startSegmentWayGeometry);
     }
 
     private void setupFixture(boolean reversed, double distance, int startSegmentId) {
         isoLabel = createIsoLabel(distance, 0);
         when(queryGraph.getEdgeIteratorState(isoLabel.edge, isoLabel.node)).thenReturn(edgeIteratorState);
-        when(edgeIteratorStateReverseExtractor
-                .hasReversed(edgeIteratorState)).thenReturn(reversed, false);
+        when(edgeIteratorStateReverseExtractor.hasReversed(edgeIteratorState)).thenReturn(reversed, false);
         when(encodingManager.getIntEncodedValue(ID_NAME)).thenReturn(intEncodedValue);
         when(edgeIteratorState.get(intEncodedValue)).thenReturn(MATCHED_LINK_ID_ONE);
         when(startSegment.getClosestEdge()).thenReturn(edgeIteratorStateStartSegment);
         when(edgeIteratorStateStartSegment.get(intEncodedValue)).thenReturn(startSegmentId);
-        when(edgeIteratorState
-                .fetchWayGeometry(FetchMode.ALL))
-                .thenReturn(pointList);
-
-
+        when(edgeIteratorState.fetchWayGeometry(FetchMode.ALL)).thenReturn(pointList);
     }
-
-
 }

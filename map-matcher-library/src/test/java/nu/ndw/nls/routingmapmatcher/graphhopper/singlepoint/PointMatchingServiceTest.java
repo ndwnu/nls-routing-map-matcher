@@ -9,7 +9,6 @@ import nu.ndw.nls.routingmapmatcher.domain.model.singlepoint.MatchedPoint;
 import nu.ndw.nls.routingmapmatcher.graphhopper.model.EdgeIteratorTravelDirection;
 import nu.ndw.nls.routingmapmatcher.graphhopper.model.MatchedQueryResult;
 import nu.ndw.nls.routingmapmatcher.graphhopper.util.BearingCalculator;
-import nu.ndw.nls.routingmapmatcher.graphhopper.util.FractionAndDistanceCalculator;
 import org.geotools.referencing.GeodeticCalculator;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -71,9 +70,7 @@ class PointMatchingServiceTest {
     @BeforeEach
     void setup() {
         GeodeticCalculator geodeticCalculator = new GeodeticCalculator();
-        pointMatchingService = new PointMatchingService(geometryFactory,
-                new BearingCalculator(geodeticCalculator),
-                new FractionAndDistanceCalculator(geodeticCalculator));
+        pointMatchingService = new PointMatchingService(geometryFactory, new BearingCalculator(geodeticCalculator));
     }
 
     @Test

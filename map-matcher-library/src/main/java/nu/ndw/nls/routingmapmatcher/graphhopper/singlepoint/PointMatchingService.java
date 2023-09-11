@@ -31,7 +31,6 @@ public class PointMatchingService {
     private final GeometryFactory geometryFactory;
 
     private final BearingCalculator bearingCalculator;
-    private final FractionAndDistanceCalculator fractionAndDistanceCalculator;
 
     public List<MatchedPoint> calculateMatches(MatchedQueryResult matchedQueryResult) {
         List<MatchedPoint> matchedPoints = new ArrayList<>();
@@ -88,7 +87,7 @@ public class PointMatchingService {
         LineSegment snappedPointSegment = snappedPointLinearLocation.getSegment(aggregatedGeometry);
         Coordinate snappedCoordinate = snappedPointSegment.closestPoint(projectionResult.point);
 
-        double fraction = fractionAndDistanceCalculator
+        double fraction = FractionAndDistanceCalculator
                 .calculateFractionAndDistance(originalGeometry, snappedCoordinate).getFraction();
         double bearing = bearingCalculator.calculateBearing(snappedPointSegment.p0, snappedPointSegment.p1);
 
