@@ -16,7 +16,6 @@ import com.graphhopper.util.PointList;
 import nu.ndw.nls.routingmapmatcher.constants.GlobalConstants;
 import nu.ndw.nls.routingmapmatcher.domain.model.IsochroneMatch;
 import nu.ndw.nls.routingmapmatcher.graphhopper.isochrone.ShortestPathTree.IsoLabel;
-import nu.ndw.nls.routingmapmatcher.graphhopper.model.FractionAndDistance;
 import nu.ndw.nls.routingmapmatcher.graphhopper.util.CrsTransformer;
 import nu.ndw.nls.routingmapmatcher.graphhopper.util.FractionAndDistanceCalculator;
 import org.assertj.core.data.Percentage;
@@ -121,9 +120,8 @@ class IsochroneMatchMapperTest {
         assertThat(result.getEndFraction()).isEqualTo(0.506377235259);
         assertThat(result.isReversed()).isFalse();
         assertThat(result.getGeometry().getLength()).isLessThan(originalGeometry.getLength());
-        FractionAndDistance fractionAndDistance = FractionAndDistanceCalculator.calculateFractionAndDistance(
-                result.getGeometry(), result.getGeometry().getStartPoint().getCoordinate());
-        assertThat(fractionAndDistance.getTotalDistance()).isCloseTo(MAX_DISTANCE, Percentage.withPercentage(0.0001));
+        double lengthInMeters = FractionAndDistanceCalculator.calculateLengthInMeters(result.getGeometry());
+        assertThat(lengthInMeters).isCloseTo(MAX_DISTANCE, Percentage.withPercentage(0.0001));
     }
 
     @Test
@@ -138,9 +136,8 @@ class IsochroneMatchMapperTest {
         assertThat(result.getEndFraction()).isEqualTo(0.799003390195);
         assertThat(result.isReversed()).isFalse();
         assertThat(result.getGeometry().getLength()).isLessThan(originalGeometry.getLength());
-        FractionAndDistance fractionAndDistance = FractionAndDistanceCalculator.calculateFractionAndDistance(
-                result.getGeometry(), result.getGeometry().getStartPoint().getCoordinate());
-        assertThat(fractionAndDistance.getTotalDistance()).isCloseTo(MAX_DISTANCE, Percentage.withPercentage(0.0001));
+        double lengthInMeters = FractionAndDistanceCalculator.calculateLengthInMeters(result.getGeometry());
+        assertThat(lengthInMeters).isCloseTo(MAX_DISTANCE, Percentage.withPercentage(0.0001));
     }
 
     private void setupFixtureStartSegment(boolean reversed, double distance) {

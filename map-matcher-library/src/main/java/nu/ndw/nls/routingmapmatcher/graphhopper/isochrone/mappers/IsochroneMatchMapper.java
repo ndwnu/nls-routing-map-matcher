@@ -54,9 +54,8 @@ public class IsochroneMatchMapper {
         LineString isoLabelWayGeometry = currentEdge
                 .fetchWayGeometry(FetchMode.ALL)
                 .toLineString(INCLUDE_ELEVATION);
-        double isoLabelEdgeGeometryDistance = FractionAndDistanceCalculator.calculateFractionAndDistance(
-                        isoLabelWayGeometry, isoLabelWayGeometry.getStartPoint().getCoordinate())
-                .getTotalDistance();
+        double isoLabelEdgeGeometryDistance = FractionAndDistanceCalculator.calculateLengthInMeters(
+                isoLabelWayGeometry);
 
         /*
          *   The start segment in the iso-label is split into 2 sections, in case of bidirectional roads
