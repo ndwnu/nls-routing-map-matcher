@@ -23,14 +23,18 @@ public class LineStringScoreUtil {
 
     public double calculateCandidatePathScore(Path path, LineStringLocation lineStringLocation) {
         if (ReliabilityCalculationType.POINT_OBSERVATIONS == lineStringLocation.getReliabilityCalculationType()) {
-            return calculateCandidatePathScoreOnlyPoints(path, lineStringLocation);
+            return calculateCandidatePathScoreOnlyPoints(path.calcPoints(), path.getDistance(),
+                    lineStringLocation.getGeometry(), lineStringLocation.getLengthInMeters());
         }
-        return calculateCandidatePathScoreLineString(path, lineStringLocation);
+        return calculateCandidatePathScoreLineString(path.calcPoints(), path.getDistance(),
+                lineStringLocation.getGeometry(), lineStringLocation.getLengthInMeters());
     }
 
-    private double calculateCandidatePathScoreOnlyPoints(Path path, LineStringLocation lineStringLocation) {
-        PointList pathPointList = path.calcPoints();
-        CoordinateSequence geometryCoordinates = lineStringLocation.getGeometry().getCoordinateSequence();
+    // This method is public to allow applications that implement other mapmatching algorithms than GraphHopper to
+    // calculate reliability scores using the same algorithm.
+    public double calculateCandidatePathScoreOnlyPoints(PointList pathPointList, double pathDistance,
+            LineString originalGeometry, Double originalDistance) {
+        CoordinateSequence geometryCoordinates = originalGeometry.getCoordinateSequence();
         List<Double> pointDistancesToMatch = new ArrayList<>();
         for (int index = 0; index < geometryCoordinates.size(); index++) {
             double latitude = geometryCoordinates.getY(index);
@@ -41,28 +45,31 @@ public class LineStringScoreUtil {
         double score = MAX_RELIABILITY_SCORE - Collections.min(pointDistancesToMatch)
                 - Collections.max(pointDistancesToMatch);
 
-        Double lengthInMeters = lineStringLocation.getLengthInMeters();
-        if (lengthInMeters != null) {
-            double pathDistanceLengthDifferenceInMeters = Math.abs(path.getDistance() - lengthInMeters);
+        if (originalDistance != null) {
+            double pathDistanceLengthDifferenceInMeters = Math.abs(pathDistance - originalDistance);
             score -= PATH_LENGTH_DIFFERENCE_PENALTY_FACTOR * pathDistanceLengthDifferenceInMeters;
         }
 
         return Math.max(MIN_RELIABILITY_SCORE, score);
     }
 
-    private double calculateCandidatePathScoreLineString(Path path, LineStringLocation lineStringLocation) {
-        double maximumDistanceInMeters = calculateMaximumDistanceInMeters(path, lineStringLocation.getGeometry());
+    // This method is public to allow applications that implement other mapmatching algorithms than GraphHopper to
+    // calculate reliability scores using the same algorithm.
+    public double calculateCandidatePathScoreLineString(PointList pathPointList, double pathDistance,
+            LineString originalGeometry, Double originalDistance) {
+        double maximumDistanceInMeters = calculateMaximumDistanceInMeters(pathPointList,
+                originalGeometry);
 
-        double lengthInMeters = lineStringLocation.getLengthInMeters();
-        double pathDistanceLengthDifferenceInMeters = Math.abs(path.getDistance() - lengthInMeters);
+        double lengthInMeters = originalDistance != null ? originalDistance
+                : FractionAndDistanceCalculator.calculateLengthInMeters(originalGeometry);
+        double pathDistanceLengthDifferenceInMeters = Math.abs(pathDistance - lengthInMeters);
 
         return Math.max(MIN_RELIABILITY_SCORE, MAX_RELIABILITY_SCORE
                 - (DISTANCE_PENALTY_FACTOR * maximumDistanceInMeters)
                 - (PATH_LENGTH_DIFFERENCE_PENALTY_FACTOR * pathDistanceLengthDifferenceInMeters));
     }
 
-    private double calculateMaximumDistanceInMeters(Path path, LineString geometry) {
-        PointList pathPointList = path.calcPoints();
+    private double calculateMaximumDistanceInMeters(PointList pathPointList, LineString geometry) {
         CoordinateSequence geometryCoordinates = geometry.getCoordinateSequence();
         double maximumDistanceInMeters = 0.0;
         for (int index = 0; index < pathPointList.size(); index++) {

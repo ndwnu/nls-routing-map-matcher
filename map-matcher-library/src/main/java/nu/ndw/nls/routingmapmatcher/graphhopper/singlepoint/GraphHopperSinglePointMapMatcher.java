@@ -37,7 +37,6 @@ import nu.ndw.nls.routingmapmatcher.graphhopper.model.EdgeIteratorTravelDirectio
 import nu.ndw.nls.routingmapmatcher.graphhopper.model.MatchedQueryResult;
 import nu.ndw.nls.routingmapmatcher.graphhopper.util.BearingCalculator;
 import nu.ndw.nls.routingmapmatcher.graphhopper.util.CrsTransformer;
-import nu.ndw.nls.routingmapmatcher.graphhopper.util.FractionAndDistanceCalculator;
 import org.geotools.referencing.GeodeticCalculator;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Geometry;
@@ -71,21 +70,12 @@ public class GraphHopperSinglePointMapMatcher implements SinglePointMapMatcher {
         DecimalEncodedValue speedEnc = encodingManager.getDecimalEncodedValue(VehicleSpeed.key(VEHICLE_CAR));
         Weighting weighting = new ShortestWeighting(accessEnc, speedEnc);
         GeodeticCalculator geodeticCalculator = new GeodeticCalculator();
-        FractionAndDistanceCalculator fractionAndDistanceCalculator = new FractionAndDistanceCalculator(
-                geodeticCalculator);
         this.edgeIteratorStateReverseExtractor = new EdgeIteratorStateReverseExtractor();
-        this.isochroneService = new IsochroneService(encodingManager, baseGraph,
-                edgeIteratorStateReverseExtractor,
-                new IsochroneMatchMapper(new CrsTransformer(), encodingManager,
-                        fractionAndDistanceCalculator,
-                        edgeIteratorStateReverseExtractor),
-                new ShortestPathTreeFactory(weighting),
-                this.locationIndexTree
-        );
+        this.isochroneService = new IsochroneService(encodingManager, baseGraph, edgeIteratorStateReverseExtractor,
+                new IsochroneMatchMapper(new CrsTransformer(), encodingManager, edgeIteratorStateReverseExtractor),
+                new ShortestPathTreeFactory(weighting), this.locationIndexTree);
         BearingCalculator bearingCalculator = new BearingCalculator(geodeticCalculator);
-        this.pointMatchingService = new PointMatchingService(GlobalConstants.WGS84_GEOMETRY_FACTORY,
-                bearingCalculator,
-                fractionAndDistanceCalculator);
+        this.pointMatchingService = new PointMatchingService(GlobalConstants.WGS84_GEOMETRY_FACTORY, bearingCalculator);
         this.crsTransformer = new CrsTransformer();
     }
 
