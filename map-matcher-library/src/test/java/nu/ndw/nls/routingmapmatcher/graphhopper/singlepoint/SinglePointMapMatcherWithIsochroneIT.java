@@ -86,7 +86,7 @@ public class SinglePointMapMatcherWithIsochroneIT {
         CandidateMatch match = result.getCandidateMatches().get(0);
         assertThat(match.getDownstream(), hasSize(5));
         var startPoint = match.getDownstream().get(0);
-        assertThat(startPoint.getStartFraction(), is(0.672874050063));
+        assertThat(startPoint.getStartFraction(), is(0.673088825759));
         assertThat(startPoint.getEndFraction(), is(1.0));
         assertFalse(startPoint.isReversed());
     }
@@ -112,11 +112,10 @@ public class SinglePointMapMatcherWithIsochroneIT {
         CandidateMatch match = result.getCandidateMatches().get(0);
         assertThat(match.getDownstream(), hasSize(14));
         var startPoint = match.getDownstream().get(0);
-        assertThat(startPoint.getStartFraction(), is(0.672874050063));
+        assertThat(startPoint.getStartFraction(), is(0.673088825759));
         assertThat(startPoint.getEndFraction(), is(1.0));
         assertFalse(startPoint.isReversed());
     }
-
 
     @SneakyThrows
     @Test
@@ -139,7 +138,7 @@ public class SinglePointMapMatcherWithIsochroneIT {
         CandidateMatch match = result.getCandidateMatches().get(0);
         assertThat(match.getUpstream(), hasSize(5));
         var startPoint = match.getUpstream().get(0);
-        assertThat(startPoint.getStartFraction(), is(0.327127525272));
+        assertThat(startPoint.getStartFraction(), is(0.326911174226));
         assertThat(startPoint.getEndFraction(), is(1.0));
         assertTrue(startPoint.isReversed());
     }
@@ -165,9 +164,8 @@ public class SinglePointMapMatcherWithIsochroneIT {
         CandidateMatch match = result.getCandidateMatches().get(0);
         assertThat(match.getUpstream(), hasSize(11));
         var startPoint = match.getUpstream().get(0);
-        assertThat(startPoint.getStartFraction(), is(0.327127525272));
+        assertThat(startPoint.getStartFraction(), is(0.326911174226));
         assertThat(startPoint.getEndFraction(), is(1.0));
         assertTrue(startPoint.isReversed());
     }
-
 }

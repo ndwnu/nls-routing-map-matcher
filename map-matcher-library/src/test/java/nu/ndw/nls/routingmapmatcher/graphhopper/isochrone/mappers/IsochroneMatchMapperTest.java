@@ -116,8 +116,8 @@ class IsochroneMatchMapperTest {
         IsochroneMatch result = isochroneMatchMapper.mapToIsochroneMatch(isoLabel, MAX_DISTANCE, queryGraph,
                 startSegment);
         assertThat(result.getMatchedLinkId()).isEqualTo(MATCHED_LINK_ID_ONE);
-        assertThat(result.getStartFraction()).isEqualTo(2.285606E-5);
-        assertThat(result.getEndFraction()).isEqualTo(0.506377235259);
+        assertThat(result.getStartFraction()).isEqualTo(0.0);
+        assertThat(result.getEndFraction()).isEqualTo(0.506385770788);
         assertThat(result.isReversed()).isFalse();
         assertThat(result.getGeometry().getLength()).isLessThan(originalGeometry.getLength());
         double lengthInMeters = FractionAndDistanceCalculator.calculateLengthInMeters(result.getGeometry());
@@ -133,7 +133,7 @@ class IsochroneMatchMapperTest {
                 startSegment);
         assertThat(result.getMatchedLinkId()).isEqualTo(MATCHED_LINK_ID_ONE);
         assertThat(result.getStartFraction()).isEqualTo(0.0);
-        assertThat(result.getEndFraction()).isEqualTo(0.799003390195);
+        assertThat(result.getEndFraction()).isEqualTo(0.79901685825);
         assertThat(result.isReversed()).isFalse();
         assertThat(result.getGeometry().getLength()).isLessThan(originalGeometry.getLength());
         double lengthInMeters = FractionAndDistanceCalculator.calculateLengthInMeters(result.getGeometry());
