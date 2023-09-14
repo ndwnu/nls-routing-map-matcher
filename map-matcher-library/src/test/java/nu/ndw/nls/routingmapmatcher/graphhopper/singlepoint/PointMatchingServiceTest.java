@@ -27,7 +27,7 @@ class PointMatchingServiceTest {
     private static final double SNAPPED_POINT_X = 5.426784436725146;
     private static final double SNAPPED_POINT_Y = 52.1766837030269;
     private static final double DISTANCE = 3.437437452681715;
-    private static final double FRACTION = 0.20448031137004394;
+    private static final double FRACTION = 0.20448031137004336;
     private static final double BEARING = 317.8835356767284;
     private static final double BEARING_REVERSED = 137.88347510955532;
     private static final double SNAPPED_POINT_X_ZIG_ZAG = 5.42679104;

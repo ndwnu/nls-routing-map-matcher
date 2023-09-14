@@ -15,9 +15,10 @@ public class FractionAndDistanceCalculator {
     private static final double NEAR_ZERO = 0.00000000000001;
     private static final GeodeticCalculator GEODETIC_CALCULATOR = new GeodeticCalculator();
 
-    public static FractionAndDistance calculateFractionAndDistance(LineString line, Coordinate snappedPointCoordinate) {
+    public static FractionAndDistance calculateFractionAndDistance(LineString line, Coordinate inputCoordinate) {
         LocationIndexedLine locationIndexedLine = new LocationIndexedLine(line);
-        LinearLocation snappedPointLocation = locationIndexedLine.indexOf(snappedPointCoordinate);
+        LinearLocation snappedPointLocation = locationIndexedLine.project(inputCoordinate);
+        Coordinate snappedPointCoordinate = snappedPointLocation.getCoordinate(line);
         Coordinate[] coordinates = line.getCoordinates();
         double sumOfPathLengths = NEAR_ZERO;
         Double pathDistanceToSnappedPoint = null;

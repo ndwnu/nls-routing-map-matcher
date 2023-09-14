@@ -85,7 +85,7 @@ public class PointMatchingService {
         LocationIndexedLine lineIndex = new LocationIndexedLine(aggregatedGeometry);
         LinearLocation snappedPointLinearLocation = lineIndex.project(projectionResult.point);
         LineSegment snappedPointSegment = snappedPointLinearLocation.getSegment(aggregatedGeometry);
-        Coordinate snappedCoordinate = snappedPointSegment.closestPoint(projectionResult.point);
+        Coordinate snappedCoordinate = snappedPointLinearLocation.getCoordinate(aggregatedGeometry);
 
         double fraction = FractionAndDistanceCalculator
                 .calculateFractionAndDistance(originalGeometry, snappedCoordinate).getFraction();
