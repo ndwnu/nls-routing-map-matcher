@@ -1,42 +1,18 @@
-trigger:
-  batch: true
-  branches:
-    include:
-      - main
-
 pool:
-  vmImage: 'ubuntu-latest'
+  vmImage: ubuntu-latest
 
-variables:
-  isMain: ${{ eq(variables['Build.SourceBranch'], 'refs/heads/main') }}
+resources:
+  repositories:
+    - repository: nls-pipeline-templates
+      type: git
+      name: NLS/nls-pipeline-templates
+      ref: main
 
-steps:
-  - task: SonarQubePrepare@4
-    displayName: Prepare Sonar analysis
-    inputs:
-      SonarQube: Sonar
-      scannerMode: Other
-      extraProperties: |
-        sonar.coverage.jacoco.xmlReportPaths=**/target/site/jacoco/jacoco.xml,**/target/site/jacoco-it/jacoco.xml
-        sonar.coverage.exclusions=**/config/**
-        sonar.exclusions=**/graphhopper/isochrone/ShortestPathTree.java,**/graphhopper/routing/PathRouter.java
+extends:
+  template: azure-pipelines-java.yml@nls-pipeline-templates
+  parameters:
+    isVersionedProject: true
+    mavenReleaseGoal: deploy
+    sonarOptionalCoverageExclusions: '**/config/**'
+    sonarOptionalExclusions: '**/graphhopper/isochrone/ShortestPathTree.java,**/graphhopper/routing/PathRouter.java'
 
-  - task: MavenAuthenticate@0
-    displayName: 'Maven Authenticate'
-    inputs:
-      artifactsFeeds: NLS
-
-  - task: Maven@3
-    displayName: Maven build
-    inputs:
-      options: -B
-      publishJUnitResults: false
-      sonarQubeRunAnalysis: true
-      jdkVersionOption: 1.17
-      ${{ if eq(variables.isMain, true) }}:
-        goals: clean deploy
-      ${{ if ne(variables.isMain, true) }}:
-        goals: clean verify
-
-  - task: SonarQubePublish@4
-    displayName: Publish Sonar analysis results
