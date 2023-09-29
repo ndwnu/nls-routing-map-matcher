@@ -7,7 +7,7 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>3.0.6</version>
+        <version>3.1.4</version>
         <relativePath/>
     </parent>
 
@@ -28,14 +28,14 @@
         <maven.javadoc.failOnError>false</maven.javadoc.failOnError>
         <graphhopper.version>7.0</graphhopper.version>
         <jts-core.version>1.19.0</jts-core.version>
-        <guava.version>32.0.1-jre</guava.version>
+        <guava.version>32.1.2-jre</guava.version>
         <hamcrest.version>2.2</hamcrest.version>
         <jacoco.version>0.8.10</jacoco.version>
-        <geotools.version>29.1</geotools.version>
+        <geotools.version>29.2</geotools.version>
         <jts2geojson.version>0.18.1</jts2geojson.version>
-        <commons-io.version>2.11.0</commons-io.version>
-        <maven-failsafe-plugin.version>3.0.0</maven-failsafe-plugin.version>
-        <maven-surefire-plugin.version>3.0.0</maven-surefire-plugin.version>
+        <commons-io.version>2.13.0</commons-io.version>
+        <maven-failsafe-plugin.version>3.1.2</maven-failsafe-plugin.version>
+        <maven-surefire-plugin.version>3.1.2</maven-surefire-plugin.version>
         <sonar-maven-plugin.version>3.9.1.2184</sonar-maven-plugin.version>
         <sonar.projectName>nls-routing-map-matcher</sonar.projectName>
     </properties>
