@@ -1,6 +1,6 @@
 package nu.ndw.nls.routingmapmatcher.graphhopper.isochrone.mappers;
 
-import static nu.ndw.nls.routingmapmatcher.graphhopper.LinkWayIdEncodedValuesFactory.ID_NAME;
+import static nu.ndw.nls.routingmapmatcher.graphhopper.ev.WayId.KEY;
 import static nu.ndw.nls.routingmapmatcher.graphhopper.isochrone.IsochroneTestHelper.createIsoLabel;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
@@ -152,7 +152,7 @@ class IsochroneMatchMapperTest {
         isoLabel = createIsoLabel(distance, 0);
         when(queryGraph.getEdgeIteratorState(isoLabel.edge, isoLabel.node)).thenReturn(edgeIteratorState);
         when(edgeIteratorStateReverseExtractor.hasReversed(edgeIteratorState)).thenReturn(reversed, false);
-        when(encodingManager.getIntEncodedValue(ID_NAME)).thenReturn(intEncodedValue);
+        when(encodingManager.getIntEncodedValue(KEY)).thenReturn(intEncodedValue);
         when(edgeIteratorState.get(intEncodedValue)).thenReturn(MATCHED_LINK_ID_ONE);
         when(startSegment.getClosestEdge()).thenReturn(edgeIteratorStateStartSegment);
         when(edgeIteratorStateStartSegment.get(intEncodedValue)).thenReturn(startSegmentId);

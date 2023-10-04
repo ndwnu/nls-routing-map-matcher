@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+        xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
     <modelVersion>4.0.0</modelVersion>
 
@@ -13,7 +13,7 @@
 
     <groupId>nu.ndw.nls</groupId>
     <artifactId>routing-map-matcher-parent</artifactId>
-    <version>7.2.3-SNAPSHOT</version>
+    <version>7.3.0-SNAPSHOT</version>
     <name>routing map matcher parent</name>
     <description>Routing Map Matcher modules containing the core library and spring boot starter modules</description>
     <packaging>pom</packaging>
@@ -27,6 +27,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.javadoc.failOnError>false</maven.javadoc.failOnError>
         <graphhopper.version>7.0</graphhopper.version>
+        <janino.version>3.1.2</janino.version>
         <jts-core.version>1.19.0</jts-core.version>
         <guava.version>32.1.2-jre</guava.version>
         <hamcrest.version>2.2</hamcrest.version>
@@ -113,6 +114,12 @@
                 <artifactId>graphhopper-core</artifactId>
                 <version>${graphhopper.version}</version>
             </dependency>
+            <!-- Fixes weird error see https://discuss.graphhopper.com/t/custommodelparser-error-when-parsing-priority-statement/7386/5-->
+            <dependency>
+                <groupId>org.codehaus.janino</groupId>
+                <artifactId>janino</artifactId>
+                <version>${janino.version}</version>
+            </dependency>
             <dependency>
                 <groupId>com.graphhopper</groupId>
                 <artifactId>graphhopper-map-matching</artifactId>
@@ -167,6 +174,14 @@
                     <groupId>org.jacoco</groupId>
                     <artifactId>jacoco-maven-plugin</artifactId>
                     <version>${jacoco.version}</version>
+                    <configuration>
+                        <!--
+                        fixes java.lang.instrument.IllegalClassFormatException error on
+                        com.graphhopper.routing.weighting.custom-->
+                        <excludes>
+                            <exclude>com.graphhopper.routing.weighting.custom.*</exclude>
+                        </excludes>
+                    </configuration>
                     <executions>
                         <execution>
                             <id>prepare-agent</id>

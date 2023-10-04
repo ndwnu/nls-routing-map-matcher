@@ -1,14 +1,8 @@
 package nu.ndw.nls.routingmapmatcher.graphhopper;
 
 
-import static nu.ndw.nls.routingmapmatcher.constants.GlobalConstants.CAR_FASTEST;
-import static nu.ndw.nls.routingmapmatcher.constants.GlobalConstants.CAR_SHORTEST;
-import static nu.ndw.nls.routingmapmatcher.constants.GlobalConstants.VEHICLE_CAR;
-import static nu.ndw.nls.routingmapmatcher.constants.GlobalConstants.WEIGHTING_FASTEST;
-import static nu.ndw.nls.routingmapmatcher.constants.GlobalConstants.WEIGHTING_SHORTEST;
 import static nu.ndw.nls.routingmapmatcher.graphhopper.GraphHopperConfigurator.configureGraphHopper;
 
-import com.graphhopper.config.Profile;
 import java.nio.file.Path;
 import nu.ndw.nls.routingmapmatcher.constants.GlobalConstants;
 import nu.ndw.nls.routingmapmatcher.domain.model.RoutingNetwork;
@@ -33,4 +27,5 @@ public class NetworkGraphHopperFactory {
         graphHopper.setAllowWrites(false);
         return graphHopper;
     }
+
 }

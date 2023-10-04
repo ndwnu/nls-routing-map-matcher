@@ -8,7 +8,7 @@ import org.locationtech.jts.geom.LineString;
 
 @Getter
 @ToString(exclude = "geometry", callSuper = true)
-public class Link extends ReaderWay {
+public final class Link extends ReaderWay {
 
     private final long fromNodeId;
     private final long toNodeId;
@@ -27,5 +27,13 @@ public class Link extends ReaderWay {
         this.reverseSpeedInKilometersPerHour = reverseSpeedInKilometersPerHour;
         this.distanceInMeters = distanceInMeters;
         this.geometry = geometry;
+    }
+
+    public void setTag(LinkTag tag, Object value) {
+        if(!tag.getClazz().isInstance(value)) {
+            throw new IllegalArgumentException("Value for tag \"%s\" should be of class %s, is %s instead"
+                    .formatted(tag.getLabel(), tag.getClazz(), value.getClass()));
+        }
+        this.setTag(tag.getLabel(), value);
     }
 }

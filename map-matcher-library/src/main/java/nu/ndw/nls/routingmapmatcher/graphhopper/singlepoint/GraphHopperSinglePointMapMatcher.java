@@ -1,7 +1,7 @@
 package nu.ndw.nls.routingmapmatcher.graphhopper.singlepoint;
 
 import static nu.ndw.nls.routingmapmatcher.constants.GlobalConstants.VEHICLE_CAR;
-import static nu.ndw.nls.routingmapmatcher.graphhopper.LinkWayIdEncodedValuesFactory.ID_NAME;
+import static nu.ndw.nls.routingmapmatcher.graphhopper.ev.WayId.KEY;
 import static nu.ndw.nls.routingmapmatcher.graphhopper.util.MatchUtil.getQueryResults;
 import static nu.ndw.nls.routingmapmatcher.graphhopper.util.PathUtil.determineEdgeDirection;
 
@@ -192,7 +192,7 @@ public class GraphHopperSinglePointMapMatcher implements SinglePointMapMatcher {
         Geometry cutoffGeometry = circle.intersection(originalGeometry);
         EdgeIteratorTravelDirection travelDirection = determineEdgeDirection(queryResult, network.getEncodingManager());
         int matchedLinkId = queryResult.getClosestEdge().get(network.getEncodingManager()
-                .getIntEncodedValue(ID_NAME));
+                .getIntEncodedValue(KEY));
         var matchedQueryResult = MatchedQueryResult.builder()
                 .matchedLinkId(matchedLinkId)
                 .inputPoint(singlePointLocation.getPoint())
