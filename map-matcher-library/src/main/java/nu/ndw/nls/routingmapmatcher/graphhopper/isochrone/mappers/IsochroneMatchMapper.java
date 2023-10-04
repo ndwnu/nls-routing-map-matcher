@@ -1,7 +1,7 @@
 package nu.ndw.nls.routingmapmatcher.graphhopper.isochrone.mappers;
 
 
-import static nu.ndw.nls.routingmapmatcher.graphhopper.LinkWayIdEncodedValuesFactory.ID_NAME;
+import static nu.ndw.nls.routingmapmatcher.graphhopper.ev.WayId.KEY;
 
 import com.graphhopper.routing.ev.IntEncodedValue;
 import com.graphhopper.routing.querygraph.QueryGraph;
@@ -45,7 +45,7 @@ public class IsochroneMatchMapper {
          * (can be backward for bidirectional edges or for upstream isochrone searches).
          */
         boolean reversed = edgeIteratorStateReverseExtractor.hasReversed(currentEdge);
-        IntEncodedValue idEnc = encodingManager.getIntEncodedValue(ID_NAME);
+        IntEncodedValue idEnc = encodingManager.getIntEncodedValue(KEY);
         int roadSectionId = currentEdge.get(idEnc);
         double totalDistanceTravelled = isoLabel.distance;
         double startFraction = 0D;
@@ -106,7 +106,7 @@ public class IsochroneMatchMapper {
     }
 
     public boolean isStartSegment(int roadSectionId, Snap startSegment) {
-        IntEncodedValue idEnc = encodingManager.getIntEncodedValue(ID_NAME);
+        IntEncodedValue idEnc = encodingManager.getIntEncodedValue(KEY);
         int startSegmentId = startSegment.getClosestEdge().get(idEnc);
         return roadSectionId == startSegmentId;
     }

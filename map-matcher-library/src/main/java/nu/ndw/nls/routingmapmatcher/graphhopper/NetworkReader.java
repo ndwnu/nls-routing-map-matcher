@@ -17,10 +17,11 @@ import java.util.List;
 import java.util.function.Supplier;
 import lombok.extern.slf4j.Slf4j;
 import nu.ndw.nls.routingmapmatcher.domain.model.Link;
+import nu.ndw.nls.routingmapmatcher.graphhopper.ev.WayId;
 import org.locationtech.jts.geom.Coordinate;
 
 @Slf4j
-class NetworkReader {
+public class NetworkReader {
 
     private static final int COORDINATES_LENGTH_START_END = 2;
 
@@ -40,7 +41,7 @@ class NetworkReader {
         this.encodingManager = Preconditions.checkNotNull(encodingManager);
         this.vehicleTagParsers = Preconditions.checkNotNull(vehicleTagParsers);
         this.baseGraph = Preconditions.checkNotNull(baseGraph);
-        this.idEncoder = encodingManager.getIntEncodedValue(LinkWayIdEncodedValuesFactory.ID_NAME);
+        this.idEncoder = encodingManager.getIntEncodedValue(WayId.KEY);
     }
 
     public void readGraph() {

@@ -20,6 +20,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.function.Supplier;
 import nu.ndw.nls.routingmapmatcher.domain.model.Link;
+import nu.ndw.nls.routingmapmatcher.graphhopper.ev.WayId;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -78,7 +79,7 @@ class NetworkReaderTest {
         List<Link> links = Collections.singletonList(link);
         Supplier<Iterator<Link>> networkSupplier = links::iterator;
         List<TagParser> tagParsers = Collections.singletonList(tagParser);
-        when(encodingManager.getIntEncodedValue(LinkWayIdEncodedValuesFactory.ID_NAME))
+        when(encodingManager.getIntEncodedValue(WayId.KEY))
                 .thenReturn(intEncodedValue);
         networkReader = new NetworkReader(baseGraph, encodingManager, networkSupplier, tagParsers,
                 nodeIdToInternalNodeIdMap);

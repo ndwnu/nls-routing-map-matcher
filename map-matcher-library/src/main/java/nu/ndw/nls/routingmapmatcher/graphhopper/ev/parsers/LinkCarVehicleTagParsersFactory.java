@@ -1,4 +1,4 @@
-package nu.ndw.nls.routingmapmatcher.graphhopper;
+package nu.ndw.nls.routingmapmatcher.graphhopper.ev.parsers;
 
 import com.graphhopper.routing.ev.EncodedValueLookup;
 import com.graphhopper.routing.util.VehicleTagParserFactory;

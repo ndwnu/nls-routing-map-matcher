@@ -8,6 +8,11 @@ import static nu.ndw.nls.routingmapmatcher.constants.GlobalConstants.WEIGHTING_S
 
 import com.graphhopper.config.Profile;
 import java.nio.file.Path;
+import nu.ndw.nls.routingmapmatcher.graphhopper.ev.LinkCarVehicleEncodedValuesFactory;
+import nu.ndw.nls.routingmapmatcher.graphhopper.ev.LinkEncodedValuesFactory;
+import nu.ndw.nls.routingmapmatcher.graphhopper.ev.WayId;
+import nu.ndw.nls.routingmapmatcher.graphhopper.ev.parsers.LinkCarVehicleTagParsersFactory;
+import nu.ndw.nls.routingmapmatcher.graphhopper.ev.parsers.LinkTagParserFactory;
 
 public final class GraphHopperConfigurator {
 
@@ -18,14 +23,15 @@ public final class GraphHopperConfigurator {
         networkGraphHopper.setElevation(false);
         networkGraphHopper.setVehicleEncodedValuesFactory(new LinkCarVehicleEncodedValuesFactory());
         networkGraphHopper.setVehicleTagParserFactory(new LinkCarVehicleTagParsersFactory());
-        networkGraphHopper.setEncodedValueFactory(new LinkWayIdEncodedValuesFactory());
+        networkGraphHopper.setEncodedValueFactory(new LinkEncodedValuesFactory());
+        networkGraphHopper.setTagParserFactory(new LinkTagParserFactory());
         networkGraphHopper.setProfiles(new Profile(CAR_FASTEST)
                         .setVehicle(VEHICLE_CAR)
                         .setWeighting(WEIGHTING_FASTEST),
                 new Profile(CAR_SHORTEST)
                         .setVehicle(VEHICLE_CAR)
                         .setWeighting(WEIGHTING_SHORTEST));
-        networkGraphHopper.setEncodedValuesString(LinkWayIdEncodedValuesFactory.ID_NAME);
+        networkGraphHopper.setEncodedValuesString(WayId.KEY);
         networkGraphHopper.setMinNetworkSize(0);
         networkGraphHopper.setGraphHopperLocation(path.toString());
     }
