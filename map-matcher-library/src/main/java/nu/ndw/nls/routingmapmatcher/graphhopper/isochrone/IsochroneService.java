@@ -6,6 +6,7 @@ import static nu.ndw.nls.routingmapmatcher.constants.GlobalConstants.VEHICLE_CAR
 import static nu.ndw.nls.routingmapmatcher.graphhopper.ev.WayId.KEY;
 import static nu.ndw.nls.routingmapmatcher.graphhopper.util.PathUtil.determineEdgeDirection;
 
+import com.graphhopper.routing.ev.DecimalEncodedValue;
 import com.graphhopper.routing.ev.VehicleSpeed;
 import com.graphhopper.routing.querygraph.QueryGraph;
 import com.graphhopper.routing.util.EdgeFilter;
@@ -118,7 +119,7 @@ public class IsochroneService {
                             or accumulate dynamically based on the average speed of the iso-label in case of seconds.
                        */
                     double maxDistance = IsochroneUnit.METERS == isochroneUnit ? isochroneValue
-                            : calculateMaxDistance(queryGraph, isochroneValue, isoLabel);
+                            : calculateMaxDistance(queryGraph, isochroneValue, isoLabel, searchDirectionReversed);
                     return isochroneMatchMapper.mapToIsochroneMatch(isoLabel, maxDistance, queryGraph, startSegment);
                 })
                 .collect(Collectors.toList());
@@ -133,10 +134,10 @@ public class IsochroneService {
      * @param isoLabel             the isoLabel
      */
     private double calculateMaxDistance(QueryGraph queryGraph, double maximumTimeInSeconds,
-            IsoLabel isoLabel) {
+            IsoLabel isoLabel, boolean useSpeedFromReversedDirection) {
         EdgeIteratorState currentEdge = queryGraph.getEdgeIteratorState(isoLabel.edge,
                 isoLabel.node);
-        double averageSpeed = currentEdge.get(encodingManager.getDecimalEncodedValue(VehicleSpeed.key(VEHICLE_CAR)));
+        double averageSpeed = getAverageSpeedFromEdge(currentEdge, useSpeedFromReversedDirection);
         double totalTime = (double) isoLabel.time / MILLISECONDS;
         double maxDistance;
         if (totalTime <= maximumTimeInSeconds) {
@@ -150,6 +151,15 @@ public class IsochroneService {
             maxDistance = isoLabel.distance - ((totalTime - maximumTimeInSeconds) * metersPerSecond);
         }
         return maxDistance;
+    }
+
+    private double getAverageSpeedFromEdge(EdgeIteratorState currentEdge, boolean useSpeedFromReversedDirection) {
+        DecimalEncodedValue vehicleSpeedDecimalEncodedValue = encodingManager.getDecimalEncodedValue(
+                VehicleSpeed.key(VEHICLE_CAR));
+        if (useSpeedFromReversedDirection) {
+            return currentEdge.getReverse(vehicleSpeedDecimalEncodedValue);
+        }
+        return currentEdge.get(vehicleSpeedDecimalEncodedValue);
     }
 
 

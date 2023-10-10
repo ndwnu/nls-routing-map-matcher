@@ -54,6 +54,7 @@ class IsochroneServiceTest {
     private static final int START_NODE_ID = 1;
     private static final double ISOCHRONE_VALUE_SECONDS = 8D;
     private static final double SPEED = 100D;
+    private static final double REVERSE_SPEED = 50D;
     public static final boolean REVERSED = false;
     @Mock
     private EncodingManager encodingManager;
@@ -141,9 +142,9 @@ class IsochroneServiceTest {
         when(location.getUpstreamIsochroneUnit()).thenReturn(IsochroneUnit.SECONDS);
         when(queryGraph.getEdgeIteratorState(anyInt(), anyInt()))
                 .thenReturn(currentEdge);
-        // Segment with average speed of 100 km ph 27.77 meters/second
+        // Segment with average speed of 50 km ph 13.89 meters/second
         when(encodingManager.getDecimalEncodedValue(VehicleSpeed.key(VEHICLE_CAR))).thenReturn(decimalEncodedValue);
-        when(currentEdge.get(decimalEncodedValue)).thenReturn(SPEED);
+        when(currentEdge.getReverse(decimalEncodedValue)).thenReturn(REVERSE_SPEED);
         wrapWithStaticMock(() -> isochroneService.getUpstreamIsochroneMatches(point, REVERSED, location));
         verify(isochroneMatchMapper).mapToIsochroneMatch(eq(endLabel),
                 maxDistanceArgumentCaptor.capture(), eq(queryGraph),
@@ -151,9 +152,36 @@ class IsochroneServiceTest {
         verify(shortestPathTreeFactory).createShortestPathtree(queryGraph, ISOCHRONE_VALUE_SECONDS,
                 IsochroneUnit.SECONDS, true);
         Double maxDistance = maxDistanceArgumentCaptor.getValue();
+        // The max distance based on 8 seconds will be around 200 - ((10.8-8) * 13.89 meters/second) ~ 161.1 meters
+        assertThat(maxDistance).isCloseTo(161.1, Percentage.withPercentage(0.1));
+    }
+
+    @Test
+    void getDownstreamIsochroneMatches_ok_seconds() {
+
+        IsoLabel endLabel = createIsoLabel(200, 10800, 1, 2, 10800);
+        setupFixture(endLabel);
+        when(encodingManager.getBooleanEncodedValue(VehicleAccess.key(VEHICLE_CAR))).thenReturn(booleanEncodedValue);
+        when(startEdge.get(booleanEncodedValue)).thenReturn(true);
+        when(startEdge.getReverse(booleanEncodedValue)).thenReturn(false);
+        when(location.getDownstreamIsochrone()).thenReturn(ISOCHRONE_VALUE_SECONDS);
+        when(location.getDownstreamIsochroneUnit()).thenReturn(IsochroneUnit.SECONDS);
+        when(queryGraph.getEdgeIteratorState(anyInt(), anyInt()))
+                .thenReturn(currentEdge);
+        // Segment with average speed of 100 km ph 27.77 meters/second
+        when(encodingManager.getDecimalEncodedValue(VehicleSpeed.key(VEHICLE_CAR))).thenReturn(decimalEncodedValue);
+        when(currentEdge.get(decimalEncodedValue)).thenReturn(SPEED);
+        wrapWithStaticMock(() -> isochroneService.getDownstreamIsochroneMatches(point, REVERSED, location));
+        verify(isochroneMatchMapper).mapToIsochroneMatch(eq(endLabel),
+                maxDistanceArgumentCaptor.capture(), eq(queryGraph),
+                eq(startSegment));
+        verify(shortestPathTreeFactory).createShortestPathtree(queryGraph, ISOCHRONE_VALUE_SECONDS,
+                IsochroneUnit.SECONDS, false);
+        Double maxDistance = maxDistanceArgumentCaptor.getValue();
         // The max distance based on 8 seconds will be around 200 - ((10.8-8) * 27.77 meters/second) ~ 122.2 meters
         assertThat(maxDistance).isCloseTo(122.2, Percentage.withPercentage(0.1));
     }
+
 
     private void wrapWithStaticMock(Runnable function) {
         try (MockedStatic<QueryGraph> queryGraphStaticMock = Mockito.mockStatic(QueryGraph.class)) {
