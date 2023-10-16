@@ -1,6 +1,5 @@
 package nu.ndw.nls.routingmapmatcher.graphhopper.viterbi;
 
-import static nu.ndw.nls.routingmapmatcher.constants.GlobalConstants.CAR_SHORTEST;
 import static nu.ndw.nls.routingmapmatcher.graphhopper.util.MatchUtil.getQueryResults;
 
 import com.google.common.base.Preconditions;
@@ -23,6 +22,7 @@ import nu.ndw.nls.routingmapmatcher.domain.LineStringMapMatcher;
 import nu.ndw.nls.routingmapmatcher.domain.model.MatchStatus;
 import nu.ndw.nls.routingmapmatcher.domain.model.linestring.LineStringLocation;
 import nu.ndw.nls.routingmapmatcher.domain.model.linestring.LineStringMatch;
+import nu.ndw.nls.routingmapmatcher.domain.model.routing.RoutingProfile;
 import nu.ndw.nls.routingmapmatcher.graphhopper.NetworkGraphHopper;
 import nu.ndw.nls.routingmapmatcher.graphhopper.util.LineStringMatchUtil;
 import nu.ndw.nls.routingmapmatcher.graphhopper.util.LineStringScoreUtil;
@@ -112,7 +112,7 @@ public class ViterbiLineStringMapMatcher implements LineStringMapMatcher {
 
     private static PMap createHints() {
         PMap hints = new PMap();
-        hints.putObject(PROFILE_KEY, CAR_SHORTEST);
+        hints.putObject(PROFILE_KEY, RoutingProfile.CAR_SHORTEST.getLabel());
         hints.putObject(Parameters.CH.DISABLE, true);
         return hints;
     }

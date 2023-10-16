@@ -1,37 +1,63 @@
 package nu.ndw.nls.routingmapmatcher.graphhopper;
 
-import static nu.ndw.nls.routingmapmatcher.constants.GlobalConstants.CAR_FASTEST;
-import static nu.ndw.nls.routingmapmatcher.constants.GlobalConstants.CAR_SHORTEST;
-import static nu.ndw.nls.routingmapmatcher.constants.GlobalConstants.VEHICLE_CAR;
 import static nu.ndw.nls.routingmapmatcher.constants.GlobalConstants.WEIGHTING_FASTEST;
 import static nu.ndw.nls.routingmapmatcher.constants.GlobalConstants.WEIGHTING_SHORTEST;
+import static nu.ndw.nls.routingmapmatcher.graphhopper.ev.EncodedTag.WAY_ID;
 
 import com.graphhopper.config.Profile;
 import java.nio.file.Path;
-import nu.ndw.nls.routingmapmatcher.graphhopper.ev.LinkCarVehicleEncodedValuesFactory;
-import nu.ndw.nls.routingmapmatcher.graphhopper.ev.LinkEncodedValuesFactory;
-import nu.ndw.nls.routingmapmatcher.graphhopper.ev.WayId;
-import nu.ndw.nls.routingmapmatcher.graphhopper.ev.parsers.LinkCarVehicleTagParsersFactory;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+import nu.ndw.nls.routingmapmatcher.domain.model.routing.RoutingProfile;
+import nu.ndw.nls.routingmapmatcher.graphhopper.ev.CustomEncodedValuesFactory;
+import nu.ndw.nls.routingmapmatcher.graphhopper.ev.CustomVehicleEncodedValuesFactory;
+import nu.ndw.nls.routingmapmatcher.graphhopper.ev.EncodedTag;
+import nu.ndw.nls.routingmapmatcher.graphhopper.ev.VehicleType;
 import nu.ndw.nls.routingmapmatcher.graphhopper.ev.parsers.LinkTagParserFactory;
+import nu.ndw.nls.routingmapmatcher.graphhopper.ev.parsers.LinkVehicleTagParsersFactory;
 
 public final class GraphHopperConfigurator {
+
 
     private GraphHopperConfigurator() {
     }
 
     static void configureGraphHopper(NetworkGraphHopper networkGraphHopper, Path path) {
         networkGraphHopper.setElevation(false);
-        networkGraphHopper.setVehicleEncodedValuesFactory(new LinkCarVehicleEncodedValuesFactory());
-        networkGraphHopper.setVehicleTagParserFactory(new LinkCarVehicleTagParsersFactory());
-        networkGraphHopper.setEncodedValueFactory(new LinkEncodedValuesFactory());
+        networkGraphHopper.setVehicleEncodedValuesFactory(new CustomVehicleEncodedValuesFactory());
+        networkGraphHopper.setVehicleTagParserFactory(new LinkVehicleTagParsersFactory());
+        networkGraphHopper.setEncodedValueFactory(new CustomEncodedValuesFactory());
         networkGraphHopper.setTagParserFactory(new LinkTagParserFactory());
-        networkGraphHopper.setProfiles(new Profile(CAR_FASTEST)
-                        .setVehicle(VEHICLE_CAR)
+        networkGraphHopper.setProfiles(new Profile(RoutingProfile.CAR_FASTEST.getLabel())
+                        .setVehicle(VehicleType.CAR.getName())
                         .setWeighting(WEIGHTING_FASTEST),
-                new Profile(CAR_SHORTEST)
-                        .setVehicle(VEHICLE_CAR)
+                new Profile(RoutingProfile.CAR_SHORTEST.getLabel())
+                        .setVehicle(VehicleType.CAR.getName())
                         .setWeighting(WEIGHTING_SHORTEST));
-        networkGraphHopper.setEncodedValuesString(WayId.KEY);
+        networkGraphHopper.setEncodedValuesString(WAY_ID.getKey());
+        networkGraphHopper.setMinNetworkSize(0);
+        networkGraphHopper.setGraphHopperLocation(path.toString());
+    }
+
+    static void configureGraphHopperForAccessibility(NetworkGraphHopper networkGraphHopper, Path path) {
+        networkGraphHopper.setElevation(false);
+        networkGraphHopper.setVehicleEncodedValuesFactory(new CustomVehicleEncodedValuesFactory());
+        networkGraphHopper.setVehicleTagParserFactory(new LinkVehicleTagParsersFactory());
+        networkGraphHopper.setEncodedValueFactory(new CustomEncodedValuesFactory());
+        networkGraphHopper.setTagParserFactory(new LinkTagParserFactory());
+        networkGraphHopper.setProfiles(
+                new Profile(RoutingProfile.CAR_FASTEST.getLabel())
+                        .setVehicle(VehicleType.CAR.getName())
+                        .setWeighting(WEIGHTING_FASTEST),
+                new Profile(RoutingProfile.CAR_SHORTEST.getLabel())
+                        .setVehicle(VehicleType.CAR.getName())
+                        .setWeighting(WEIGHTING_SHORTEST),
+                VehicleType.HGV.createProfile(RoutingProfile.HGV_CUSTOM.getLabel()),
+                VehicleType.BUS.createProfile(RoutingProfile.BUS_CUSTOM.getLabel()));
+        networkGraphHopper.setEncodedValuesString(
+                Stream.of(EncodedTag.values())
+                        .map(EncodedTag::getKey)
+                        .collect(Collectors.joining(",")));
         networkGraphHopper.setMinNetworkSize(0);
         networkGraphHopper.setGraphHopperLocation(path.toString());
     }

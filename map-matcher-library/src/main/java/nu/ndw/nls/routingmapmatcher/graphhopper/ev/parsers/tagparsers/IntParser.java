@@ -1,35 +1,30 @@
 package nu.ndw.nls.routingmapmatcher.graphhopper.ev.parsers.tagparsers;
 
-import com.graphhopper.reader.ReaderWay;
 import com.graphhopper.routing.ev.EncodedValueLookup;
 import com.graphhopper.routing.ev.IntEncodedValue;
-import com.graphhopper.routing.util.parsers.TagParser;
 import com.graphhopper.storage.IntsRef;
-import nu.ndw.nls.routingmapmatcher.domain.model.LinkTag;
 import nu.ndw.nls.routingmapmatcher.graphhopper.ev.EncodedTag;
 
-public class IntParser implements TagParser {
+public class IntParser extends AbstractTagParser<Integer> {
 
     private static final String CODE_TOO_LARGE_MSG =
-            "Cannot store %s: %d as it is too large (> %d). "
-            + "You can disable %s if you do not need to store the municipality codes";
+            "Cannot store %s: %d as it is too large (> %d). You can disable %s if you do not need it.";
     private final IntEncodedValue intEnc;
-    private final LinkTag linkTag;
-    private final String key;
+    private final String label;
 
     public IntParser(EncodedValueLookup lookup, EncodedTag encodedTag) {
-        this.key = encodedTag.getKey();
-        this.intEnc = lookup.getIntEncodedValue(key);
-        this.linkTag = encodedTag.getLinkTag();
+        super(encodedTag, 0);
+        this.intEnc = lookup.getIntEncodedValue(encodedTag.getKey());
+        this.label = encodedTag.getLinkTag().getLabel();
     }
 
     @Override
-    public void handleWayTags(IntsRef edgeFlags, ReaderWay way, IntsRef relationFlags) {
-        int municipalityCode = way.getTag(linkTag.getLabel(), 0);
-        if (municipalityCode > intEnc.getMaxStorableInt()) {
+    protected void set(boolean reverse, IntsRef edgeFlags, Integer value) {
+        if (value > intEnc.getMaxStorableInt()) {
             throw new IllegalArgumentException(CODE_TOO_LARGE_MSG.formatted(
-                    key, municipalityCode, intEnc.getMaxStorableInt(), intEnc.getName()));
+                    label, value, intEnc.getMaxStorableInt(), intEnc.getName()));
         }
-        intEnc.setInt(false, edgeFlags, municipalityCode);
+        intEnc.setInt(reverse, edgeFlags, value);
     }
+
 }

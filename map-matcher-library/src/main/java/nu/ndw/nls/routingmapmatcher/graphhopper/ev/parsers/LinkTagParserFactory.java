@@ -17,14 +17,6 @@
  */
 package nu.ndw.nls.routingmapmatcher.graphhopper.ev.parsers;
 
-import static nu.ndw.nls.routingmapmatcher.graphhopper.ev.EncodedTag.HGV_ACCESSIBLE;
-import static nu.ndw.nls.routingmapmatcher.graphhopper.ev.EncodedTag.MAX_AXLE_LOAD;
-import static nu.ndw.nls.routingmapmatcher.graphhopper.ev.EncodedTag.MAX_HEIGHT;
-import static nu.ndw.nls.routingmapmatcher.graphhopper.ev.EncodedTag.MAX_LENGTH;
-import static nu.ndw.nls.routingmapmatcher.graphhopper.ev.EncodedTag.MAX_WEIGHT;
-import static nu.ndw.nls.routingmapmatcher.graphhopper.ev.EncodedTag.MAX_WIDTH;
-import static nu.ndw.nls.routingmapmatcher.graphhopper.ev.EncodedTag.MUNICIPALITY_CODE;
-
 import com.graphhopper.routing.ev.EncodedValueLookup;
 import com.graphhopper.routing.util.parsers.TagParser;
 import com.graphhopper.routing.util.parsers.TagParserFactory;
@@ -33,21 +25,23 @@ import nu.ndw.nls.routingmapmatcher.graphhopper.ev.EncodedTag;
 import nu.ndw.nls.routingmapmatcher.graphhopper.ev.parsers.tagparsers.BooleanParser;
 import nu.ndw.nls.routingmapmatcher.graphhopper.ev.parsers.tagparsers.DoubleParser;
 import nu.ndw.nls.routingmapmatcher.graphhopper.ev.parsers.tagparsers.IntParser;
+import nu.ndw.nls.routingmapmatcher.graphhopper.ev.parsers.tagparsers.StringParser;
 
 public class LinkTagParserFactory implements TagParserFactory {
 
     @Override
     public TagParser create(EncodedValueLookup lookup, String name, PMap properties) {
-        return switch (EncodedTag.withKey(name)) {
-            case WAY_ID -> null;
-            case MAX_WEIGHT -> new DoubleParser(lookup, MAX_WEIGHT);
-            case MAX_WIDTH -> new DoubleParser(lookup, MAX_WIDTH);
-            case MAX_LENGTH -> new DoubleParser(lookup, MAX_LENGTH);
-            case MAX_AXLE_LOAD -> new DoubleParser(lookup, MAX_AXLE_LOAD);
-            case MAX_HEIGHT -> new DoubleParser(lookup, MAX_HEIGHT);
-            case MUNICIPALITY_CODE -> new IntParser(lookup, MUNICIPALITY_CODE);
-            case HGV_ACCESSIBLE -> new BooleanParser(lookup, HGV_ACCESSIBLE);
-        };
+        EncodedTag encodedTag = EncodedTag.withKey(name);
+        if(encodedTag.getLinkTag() == null) {
+            return null;
+        } else {
+            return switch (encodedTag.getEncodingType()) {
+                case STRING -> new StringParser(lookup, encodedTag);
+                case INT -> new IntParser(lookup, encodedTag);
+                case DECIMAL -> new DoubleParser(lookup, encodedTag);
+                case BOOLEAN -> new BooleanParser(lookup, encodedTag);
+            };
+        }
     }
 
 }

@@ -1,5 +1,6 @@
 package nu.ndw.nls.routingmapmatcher.graphhopper;
 
+import static nu.ndw.nls.routingmapmatcher.graphhopper.ev.EncodedTag.WAY_ID;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.mockito.ArgumentMatchers.any;
@@ -20,7 +21,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.function.Supplier;
 import nu.ndw.nls.routingmapmatcher.domain.model.Link;
-import nu.ndw.nls.routingmapmatcher.graphhopper.ev.WayId;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -79,7 +79,7 @@ class NetworkReaderTest {
         List<Link> links = Collections.singletonList(link);
         Supplier<Iterator<Link>> networkSupplier = links::iterator;
         List<TagParser> tagParsers = Collections.singletonList(tagParser);
-        when(encodingManager.getIntEncodedValue(WayId.KEY))
+        when(encodingManager.getIntEncodedValue(WAY_ID.getKey()))
                 .thenReturn(intEncodedValue);
         networkReader = new NetworkReader(baseGraph, encodingManager, networkSupplier, tagParsers,
                 nodeIdToInternalNodeIdMap);

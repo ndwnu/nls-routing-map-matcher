@@ -3,7 +3,7 @@ package nu.ndw.nls.routingmapmatcher.graphhopper.isochrone;
 
 import static java.util.Comparator.comparing;
 import static nu.ndw.nls.routingmapmatcher.constants.GlobalConstants.VEHICLE_CAR;
-import static nu.ndw.nls.routingmapmatcher.graphhopper.ev.WayId.KEY;
+import static nu.ndw.nls.routingmapmatcher.graphhopper.ev.EncodedTag.WAY_ID;
 import static nu.ndw.nls.routingmapmatcher.graphhopper.util.PathUtil.determineEdgeDirection;
 
 import com.graphhopper.routing.ev.DecimalEncodedValue;
@@ -182,7 +182,7 @@ public class IsochroneService {
         } else {
             boolean isCorrect = true;
             EdgeIteratorState currentEdge = queryGraph.getEdgeIteratorState(isoLabel.edge, isoLabel.node);
-            int roadSectionId = currentEdge.get(encodingManager.getIntEncodedValue(KEY));
+            int roadSectionId = currentEdge.get(encodingManager.getIntEncodedValue(WAY_ID.getKey()));
             if (isochroneMatchMapper.isStartSegment(roadSectionId, startSegment)) {
                 isCorrect = edgeIteratorStateReverseExtractor.hasReversed(currentEdge) == reverse;
             }

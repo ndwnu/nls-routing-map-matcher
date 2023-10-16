@@ -28,4 +28,20 @@ public class NetworkGraphHopperFactory {
         return graphHopper;
     }
 
+    public IndexedNetworkGraphHopper createIndexedNetwork(RoutingNetwork routingNetwork) {
+        return createIndexedNetwork(routingNetwork, false, GlobalConstants.DEFAULT_FOLDER_PREFIX);
+    }
+
+    public IndexedNetworkGraphHopper createIndexedNetwork(RoutingNetwork routingNetwork, boolean storeOnDisk,
+            Path graphhopperRootPath) {
+        IndexedNetworkGraphHopper graphHopper = new IndexedNetworkGraphHopper(routingNetwork.getLinkSupplier());
+        Path path = GraphHopperNetworkPathUtils.formatNormalizedPath(graphhopperRootPath,
+                routingNetwork.getNetworkNameAndVersion());
+        graphHopper.setStoreOnFlush(storeOnDisk);
+        configureGraphHopper(graphHopper,path);
+        graphHopper.importOrLoad();
+        graphHopper.setAllowWrites(false);
+        return graphHopper;
+    }
+
 }
