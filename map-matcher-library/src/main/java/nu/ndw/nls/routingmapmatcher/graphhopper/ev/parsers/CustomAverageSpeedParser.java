@@ -1,8 +1,5 @@
 package nu.ndw.nls.routingmapmatcher.graphhopper.ev.parsers;
 
-
-
-import static nu.ndw.nls.routingmapmatcher.constants.GlobalConstants.VEHICLE_CAR;
 import static nu.ndw.nls.routingmapmatcher.graphhopper.NetworkReader.castToLink;
 import static nu.ndw.nls.routingmapmatcher.graphhopper.NetworkReader.getAccess;
 
@@ -15,23 +12,22 @@ import com.graphhopper.routing.util.parsers.AbstractAverageSpeedParser;
 import com.graphhopper.storage.IntsRef;
 import com.graphhopper.util.PMap;
 import nu.ndw.nls.routingmapmatcher.domain.model.Link;
+import nu.ndw.nls.routingmapmatcher.graphhopper.ev.VehicleType;
 
 
-public class LinkCarAverageSpeedParser extends AbstractAverageSpeedParser {
+public class CustomAverageSpeedParser extends AbstractAverageSpeedParser {
 
-    public static final double CAR_MAX_SPEED = 130;
-    public static final String NAME_PROPERTY = "name";
+    private static final String NAME = "name";
 
-    public LinkCarAverageSpeedParser(EncodedValueLookup lookup, PMap properties) {
-        this(
-                lookup.getDecimalEncodedValue(VehicleSpeed.key(properties.getString(NAME_PROPERTY, VEHICLE_CAR))),
-                lookup.getDecimalEncodedValue(VehicleSpeed.key(properties.getString(NAME_PROPERTY, VEHICLE_CAR)))
-                        .getNextStorableValue(CAR_MAX_SPEED)
-        );
+    public CustomAverageSpeedParser(EncodedValueLookup lookup, PMap properties, VehicleType vehicleType) {
+        super(getDecimalEncodedValue(lookup, properties, vehicleType),
+                getDecimalEncodedValue(lookup, properties, vehicleType)
+                        .getNextStorableValue(vehicleType.getMaxSpeed()));
     }
 
-    protected LinkCarAverageSpeedParser(DecimalEncodedValue speedEnc, double maxPossibleSpeed) {
-        super(speedEnc, maxPossibleSpeed);
+    private static DecimalEncodedValue getDecimalEncodedValue(EncodedValueLookup lookup, PMap properties,
+            VehicleType vehicleType) {
+        return lookup.getDecimalEncodedValue(VehicleSpeed.key(properties.getString(NAME, vehicleType.getName())));
     }
 
     @Override

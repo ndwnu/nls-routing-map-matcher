@@ -1,7 +1,7 @@
 package nu.ndw.nls.routingmapmatcher.graphhopper.util;
 
 import static nu.ndw.nls.routingmapmatcher.constants.GlobalConstants.VEHICLE_CAR;
-import static nu.ndw.nls.routingmapmatcher.graphhopper.ev.WayId.KEY;
+import static nu.ndw.nls.routingmapmatcher.graphhopper.ev.EncodedTag.WAY_ID;
 
 import com.graphhopper.routing.ev.VehicleAccess;
 import com.graphhopper.routing.querygraph.QueryGraph;
@@ -32,7 +32,7 @@ public final class PathUtil {
             Collection<EdgeIteratorState> edges) {
         List<MatchedLink> matchedLinks = new ArrayList<>();
         for (EdgeIteratorState edge : edges) {
-            int matchedLinkId = edge.get(encodingManager.getIntEncodedValue(KEY));
+            int matchedLinkId = edge.get(encodingManager.getIntEncodedValue(WAY_ID.getKey()));
             if (matchedLinks.isEmpty() || matchedLinks.get(matchedLinks.size() - 1).getLinkId() != matchedLinkId) {
                 matchedLinks.add(MatchedLink.builder()
                         .linkId(matchedLinkId)

@@ -1,6 +1,8 @@
 package nu.ndw.nls.routingmapmatcher.graphhopper;
 
 
+import static nu.ndw.nls.routingmapmatcher.graphhopper.ev.EncodedTag.WAY_ID;
+
 import com.google.common.base.Preconditions;
 import com.graphhopper.coll.LongIntMap;
 import com.graphhopper.reader.ReaderWay;
@@ -17,7 +19,6 @@ import java.util.List;
 import java.util.function.Supplier;
 import lombok.extern.slf4j.Slf4j;
 import nu.ndw.nls.routingmapmatcher.domain.model.Link;
-import nu.ndw.nls.routingmapmatcher.graphhopper.ev.WayId;
 import org.locationtech.jts.geom.Coordinate;
 
 @Slf4j
@@ -41,7 +42,7 @@ public class NetworkReader {
         this.encodingManager = Preconditions.checkNotNull(encodingManager);
         this.vehicleTagParsers = Preconditions.checkNotNull(vehicleTagParsers);
         this.baseGraph = Preconditions.checkNotNull(baseGraph);
-        this.idEncoder = encodingManager.getIntEncodedValue(WayId.KEY);
+        this.idEncoder = encodingManager.getIntEncodedValue(WAY_ID.getKey());
     }
 
     public void readGraph() {
@@ -80,7 +81,7 @@ public class NetworkReader {
         }
     }
 
-    private void addLink(Link link) {
+    protected int addLink(Link link) {
         Coordinate[] coordinates = link.getGeometry().getCoordinates();
         if (coordinates.length < COORDINATES_LENGTH_START_END) {
             throw new IllegalStateException("Invalid geometry");
@@ -97,6 +98,7 @@ public class NetworkReader {
             PointList geometry = createPointListWithoutStartAndEndPoint(coordinates);
             edge.setWayGeometry(geometry);
         }
+        return edge.getEdgeKey();
     }
 
     private int addNodeIfNeeded(long id, double latitude, double longitude) {

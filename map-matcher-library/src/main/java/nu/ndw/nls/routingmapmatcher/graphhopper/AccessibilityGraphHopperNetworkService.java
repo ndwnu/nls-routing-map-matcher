@@ -1,14 +1,15 @@
 package nu.ndw.nls.routingmapmatcher.graphhopper;
 
-import static nu.ndw.nls.routingmapmatcher.graphhopper.GraphHopperConfigurator.configureGraphHopper;
+import static nu.ndw.nls.routingmapmatcher.graphhopper.GraphHopperConfigurator.configureGraphHopperForAccessibility;
 
 import java.nio.file.Path;
 import nu.ndw.nls.routingmapmatcher.domain.model.RoutingNetwork;
 
-public class GraphHopperNetworkService extends AbstractGraphHopperNetworkService<NetworkGraphHopper> {
+public class AccessibilityGraphHopperNetworkService extends AbstractGraphHopperNetworkService<NetworkGraphHopper> {
 
+    @Override
     protected void configure(NetworkGraphHopper graphHopper, Path path) {
-        configureGraphHopper(graphHopper, path);
+        configureGraphHopperForAccessibility(graphHopper, path);
     }
 
     @Override
@@ -20,5 +21,4 @@ public class GraphHopperNetworkService extends AbstractGraphHopperNetworkService
     protected NetworkGraphHopper createNetwork(RoutingNetwork routingNetwork) {
         return new NetworkGraphHopper(routingNetwork.getLinkSupplier());
     }
-
 }

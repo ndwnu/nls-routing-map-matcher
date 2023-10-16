@@ -1,5 +1,8 @@
 package nu.ndw.nls.routingmapmatcher.domain.model;
 
+import static nu.ndw.nls.routingmapmatcher.domain.model.LinkTag.FORWARD_SUFFIX;
+import static nu.ndw.nls.routingmapmatcher.domain.model.LinkTag.REVERSE_SUFFIX;
+
 import com.graphhopper.reader.ReaderWay;
 import lombok.Builder;
 import lombok.Getter;
@@ -29,11 +32,42 @@ public final class Link extends ReaderWay {
         this.geometry = geometry;
     }
 
-    public void setTag(LinkTag tag, Object value) {
-        if(!tag.getClazz().isInstance(value)) {
-            throw new IllegalArgumentException("Value for tag \"%s\" should be of class %s, is %s instead"
-                    .formatted(tag.getLabel(), tag.getClazz(), value.getClass()));
+    public <T> void setTag(LinkTag<T> tag, T value, boolean reverse) {
+        if(!tag.isSeparateValuesPerDirection()) {
+            throw new IllegalArgumentException(
+                    ("Link tag %s does not store separate values for both directions. "
+                     + "Use setTag method without boolean 'reverse' parameter.").formatted(tag.getLabel()));
+        }
+        String suffix = reverse ? REVERSE_SUFFIX : FORWARD_SUFFIX;
+        this.setTag(tag.getLabel() + suffix, value);
+    }
+
+    public <T> T getTag(LinkTag<T> tag, T defaultValue, boolean reverse) {
+        if(!tag.isSeparateValuesPerDirection()) {
+            throw new IllegalArgumentException(
+                    ("Link tag %s does not store separate values for both directions. "
+                     + "Use getTag method without boolean 'reverse' parameter.").formatted(tag.getLabel()));
+        }
+        String suffix = reverse ? REVERSE_SUFFIX : FORWARD_SUFFIX;
+        return this.getTag(tag.getLabel() + suffix, defaultValue);
+    }
+
+    public <T> void setTag(LinkTag<T> tag, T value) {
+        if(tag.isSeparateValuesPerDirection()) {
+            throw new IllegalArgumentException(
+                    ("Link tag %s stores separate values for both directions. "
+                     + "Use setTag method with boolean 'reverse' parameter.").formatted(tag.getLabel()));
         }
         this.setTag(tag.getLabel(), value);
     }
+
+    public <T> T getTag(LinkTag<T> tag, T defaultValue) {
+        if(tag.isSeparateValuesPerDirection()) {
+            throw new IllegalArgumentException(
+                    ("Link tag %s stores separate values for both directions. "
+                     + "Use getTag method with boolean 'reverse' parameter.").formatted(tag.getLabel()));
+        }
+        return this.getTag(tag.getLabel(), defaultValue);
+    }
+
 }

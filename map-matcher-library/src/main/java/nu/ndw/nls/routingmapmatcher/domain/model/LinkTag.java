@@ -1,18 +1,28 @@
 package nu.ndw.nls.routingmapmatcher.domain.model;
 
+import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
-@RequiredArgsConstructor
+@RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 @Getter
-public enum LinkTag {
-    MAX_HEIGHT("max-height", Double.class),
-    MAX_WIDTH("max-width", Double.class),
-    MAX_WEIGHT("max-weight", Double.class),
-    MAX_LENGTH("max-length", Double.class),
-    MAX_AXLE_LOAD("max-axle-load", Double.class),
-    MUNICIPALITY_CODE("municipality-code", Integer.class),
-    HGV_ACCESSIBLE("hgv-accessible", Boolean.class);
+public final class LinkTag<T> {
+
+    public static final LinkTag<Double> MAX_HEIGHT = new LinkTag<>("max-height", Double.class, true);
+    public static final LinkTag<Double> MAX_WIDTH = new LinkTag<>("max-width", Double.class, true);
+    public static final LinkTag<Double> MAX_WEIGHT = new LinkTag<>("max-weight", Double.class, true);
+    public static final LinkTag<Double> MAX_LENGTH = new LinkTag<>("max-length", Double.class, true);
+    public static final LinkTag<Double> MAX_AXLE_LOAD = new LinkTag<>("max-axle-load", Double.class, true);
+    public static final LinkTag<Integer> MUNICIPALITY_CODE = new LinkTag<>("municipality-code", Integer.class, false);
+    public static final LinkTag<Boolean> HGV_ACCESSIBLE = new LinkTag<>("hgv-accessible", Boolean.class, true);
+    public static final LinkTag<Boolean> BUS_ACCESSIBLE = new LinkTag<>("bus-accessible", Boolean.class, true);
+    public static final LinkTag<Boolean> GEN_ACCESSIBLE = new LinkTag<>("gen-accessible", Boolean.class, false);
+
+    public static final String FORWARD_SUFFIX = ":forward";
+    public static final String REVERSE_SUFFIX = ":reverse";
+
     private final String label;
-    private final Class<?> clazz;
+    private final Class<T> clazz;
+    private final boolean separateValuesPerDirection;
+
 }

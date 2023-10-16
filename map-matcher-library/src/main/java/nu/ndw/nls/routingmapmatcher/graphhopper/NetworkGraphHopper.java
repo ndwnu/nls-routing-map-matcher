@@ -55,13 +55,18 @@ public class NetworkGraphHopper extends GraphHopper implements Network {
     protected void importOSM() {
         log.info("Start creating graph from db ");
         this.createBaseGraphAndProperties();
-        NetworkReader networkReader = new NetworkReader(getBaseGraph().getBaseGraph(), getEncodingManager(),
-                this.linkSupplier, getOSMParsers().getWayTagParsers(),
-                nodeIdToInternalNodeIdMap);
+        NetworkReader networkReader = getNetworkReader(this.linkSupplier, nodeIdToInternalNodeIdMap);
         networkReader.readGraph();
         DateFormat f = Helper.createFormatter();
         getProperties().put(DATAREADER_IMPORT_DATE, f.format(new Date()));
         this.writeEncodingManagerToProperties();
+    }
+    
+    protected NetworkReader getNetworkReader(Supplier<Iterator<Link>> linkSupplier,
+            LongIntMap nodeIdToInternalNodeIdMap) {
+        return new NetworkReader(getBaseGraph().getBaseGraph(), getEncodingManager(),
+                linkSupplier, getOSMParsers().getWayTagParsers(),
+                nodeIdToInternalNodeIdMap);
     }
 
     @Override
@@ -99,4 +104,5 @@ public class NetworkGraphHopper extends GraphHopper implements Network {
                 getCHGraphs(), getLandmarks())
                 .calcPaths(request);
     }
+
 }
