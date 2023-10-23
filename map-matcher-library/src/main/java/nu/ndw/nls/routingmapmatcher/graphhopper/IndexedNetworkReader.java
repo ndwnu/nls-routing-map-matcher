@@ -7,6 +7,7 @@ import com.graphhopper.storage.BaseGraph;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.OptionalInt;
 import java.util.function.Supplier;
 import lombok.extern.slf4j.Slf4j;
 import nu.ndw.nls.routingmapmatcher.domain.model.Link;
@@ -24,9 +25,9 @@ public class IndexedNetworkReader extends NetworkReader {
     }
 
     @Override
-    protected int addLink(Link link) {
-        int edgeKey = super.addLink(link);
-        edgeMap.put(link.getId(), edgeKey);
+    protected OptionalInt addLink(Link link) {
+        OptionalInt edgeKey = super.addLink(link);
+        edgeKey.ifPresent(k -> edgeMap.put(link.getId(), k));
         return edgeKey;
     }
 }

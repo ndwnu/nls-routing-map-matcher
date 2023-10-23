@@ -17,6 +17,7 @@ import com.graphhopper.util.EdgeIteratorState;
 import com.graphhopper.util.PointList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.OptionalInt;
 import java.util.function.Supplier;
 import lombok.extern.slf4j.Slf4j;
 import nu.ndw.nls.routingmapmatcher.domain.model.Link;
@@ -81,10 +82,14 @@ public class NetworkReader {
         }
     }
 
-    protected int addLink(Link link) {
+    protected OptionalInt addLink(Link link) {
         Coordinate[] coordinates = link.getGeometry().getCoordinates();
         if (coordinates.length < COORDINATES_LENGTH_START_END) {
             throw new IllegalStateException("Invalid geometry");
+        }
+        if (link.getFromNodeId() == link.getToNodeId()) {
+            log.debug("GraphHopper >= 8.0 does not support loop edges, skipping link ID " + link.getId());
+            return OptionalInt.empty();
         }
         int internalFromNodeId = addNodeIfNeeded(link.getFromNodeId(), coordinates[0].y, coordinates[0].x);
         int internalToNodeId = addNodeIfNeeded(link.getToNodeId(), coordinates[coordinates.length - 1].y,
@@ -97,7 +102,7 @@ public class NetworkReader {
             PointList geometry = createPointListWithoutStartAndEndPoint(coordinates);
             edge.setWayGeometry(geometry);
         }
-        return edge.getEdgeKey();
+        return OptionalInt.of(edge.getEdgeKey());
     }
 
     private int addNodeIfNeeded(long id, double latitude, double longitude) {
