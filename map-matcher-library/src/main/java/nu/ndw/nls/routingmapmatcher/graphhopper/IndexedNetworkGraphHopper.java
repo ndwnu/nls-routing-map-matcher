@@ -3,7 +3,7 @@ package nu.ndw.nls.routingmapmatcher.graphhopper;
 import com.esotericsoftware.kryo.kryo5.Kryo;
 import com.esotericsoftware.kryo.kryo5.io.Input;
 import com.esotericsoftware.kryo.kryo5.io.Output;
-import com.graphhopper.coll.LongIntMap;
+import com.graphhopper.coll.LongLongMap;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -38,7 +38,7 @@ public class IndexedNetworkGraphHopper extends NetworkGraphHopper {
 
     @Override
     protected NetworkReader getNetworkReader(Supplier<Iterator<Link>> linkSupplier,
-            LongIntMap nodeIdToInternalNodeIdMap) {
+            LongLongMap nodeIdToInternalNodeIdMap) {
         return new IndexedNetworkReader(getBaseGraph().getBaseGraph(), getEncodingManager(),
                 linkSupplier, getOSMParsers().getWayTagParsers(),
                 nodeIdToInternalNodeIdMap, this.edgeMap);

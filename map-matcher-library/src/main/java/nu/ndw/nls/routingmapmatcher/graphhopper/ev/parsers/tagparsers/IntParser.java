@@ -1,8 +1,8 @@
 package nu.ndw.nls.routingmapmatcher.graphhopper.ev.parsers.tagparsers;
 
+import com.graphhopper.routing.ev.EdgeIntAccess;
 import com.graphhopper.routing.ev.EncodedValueLookup;
 import com.graphhopper.routing.ev.IntEncodedValue;
-import com.graphhopper.storage.IntsRef;
 import nu.ndw.nls.routingmapmatcher.graphhopper.ev.EncodedTag;
 
 public class IntParser extends AbstractTagParser<Integer> {
@@ -19,12 +19,11 @@ public class IntParser extends AbstractTagParser<Integer> {
     }
 
     @Override
-    protected void set(boolean reverse, IntsRef edgeFlags, Integer value) {
+    protected void set(boolean reverse, int edgeId, EdgeIntAccess edgeIntAccess, Integer value) {
         if (value > intEnc.getMaxStorableInt()) {
             throw new IllegalArgumentException(CODE_TOO_LARGE_MSG.formatted(
                     label, value, intEnc.getMaxStorableInt(), intEnc.getName()));
         }
-        intEnc.setInt(reverse, edgeFlags, value);
+        intEnc.setInt(reverse, edgeId, edgeIntAccess, value);
     }
-
 }

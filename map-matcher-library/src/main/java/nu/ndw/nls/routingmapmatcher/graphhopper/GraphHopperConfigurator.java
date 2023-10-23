@@ -1,10 +1,9 @@
 package nu.ndw.nls.routingmapmatcher.graphhopper;
 
-import static nu.ndw.nls.routingmapmatcher.constants.GlobalConstants.WEIGHTING_FASTEST;
-import static nu.ndw.nls.routingmapmatcher.constants.GlobalConstants.WEIGHTING_SHORTEST;
 import static nu.ndw.nls.routingmapmatcher.graphhopper.ev.EncodedTag.WAY_ID;
 
 import com.graphhopper.config.Profile;
+import com.graphhopper.util.CustomModel;
 import java.nio.file.Path;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -18,6 +17,7 @@ import nu.ndw.nls.routingmapmatcher.graphhopper.ev.parsers.LinkVehicleTagParsers
 
 public final class GraphHopperConfigurator {
 
+    private static final double WEIGHTING_SHORTEST_DISTANCE_INFLUENCE = 10_000d;
 
     private GraphHopperConfigurator() {
     }
@@ -29,11 +29,10 @@ public final class GraphHopperConfigurator {
         networkGraphHopper.setEncodedValueFactory(new CustomEncodedValuesFactory());
         networkGraphHopper.setTagParserFactory(new LinkTagParserFactory());
         networkGraphHopper.setProfiles(new Profile(RoutingProfile.CAR_FASTEST.getLabel())
-                        .setVehicle(VehicleType.CAR.getName())
-                        .setWeighting(WEIGHTING_FASTEST),
+                        .setVehicle(VehicleType.CAR.getName()),
                 new Profile(RoutingProfile.CAR_SHORTEST.getLabel())
                         .setVehicle(VehicleType.CAR.getName())
-                        .setWeighting(WEIGHTING_SHORTEST));
+                        .setCustomModel(new CustomModel().setDistanceInfluence(WEIGHTING_SHORTEST_DISTANCE_INFLUENCE)));
         networkGraphHopper.setEncodedValuesString(WAY_ID.getKey());
         networkGraphHopper.setMinNetworkSize(0);
         networkGraphHopper.setGraphHopperLocation(path.toString());
@@ -47,11 +46,10 @@ public final class GraphHopperConfigurator {
         networkGraphHopper.setTagParserFactory(new LinkTagParserFactory());
         networkGraphHopper.setProfiles(
                 new Profile(RoutingProfile.CAR_FASTEST.getLabel())
-                        .setVehicle(VehicleType.CAR.getName())
-                        .setWeighting(WEIGHTING_FASTEST),
+                        .setVehicle(VehicleType.CAR.getName()),
                 new Profile(RoutingProfile.CAR_SHORTEST.getLabel())
                         .setVehicle(VehicleType.CAR.getName())
-                        .setWeighting(WEIGHTING_SHORTEST),
+                        .setCustomModel(new CustomModel().setDistanceInfluence(WEIGHTING_SHORTEST_DISTANCE_INFLUENCE)),
                 VehicleType.HGV.createProfile(RoutingProfile.HGV_CUSTOM.getLabel()),
                 VehicleType.BUS.createProfile(RoutingProfile.BUS_CUSTOM.getLabel()));
         networkGraphHopper.setEncodedValuesString(

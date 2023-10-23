@@ -26,8 +26,9 @@
         <maven.compiler.target>17</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.javadoc.failOnError>false</maven.javadoc.failOnError>
-        <graphhopper.version>7.0</graphhopper.version>
-        <janino.version>3.1.2</janino.version>
+        <graphhopper.version>8.0</graphhopper.version>
+        <!-- Janino version should match the one used in GraphHopper -->
+        <janino.version>3.1.9</janino.version>
         <jts-core.version>1.19.0</jts-core.version>
         <guava.version>32.1.2-jre</guava.version>
         <hamcrest.version>2.2</hamcrest.version>
