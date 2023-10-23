@@ -17,7 +17,7 @@ import nu.ndw.nls.routingmapmatcher.graphhopper.ev.parsers.LinkVehicleTagParsers
 
 public final class GraphHopperConfigurator {
 
-    private static final double WEIGHTING_SHORTEST_DISTANCE_INFLUENCE = 10_000d;
+    private static final double WEIGHTING_SHORTEST_DISTANCE_INFLUENCE = 10_000D;
 
     private GraphHopperConfigurator() {
     }
