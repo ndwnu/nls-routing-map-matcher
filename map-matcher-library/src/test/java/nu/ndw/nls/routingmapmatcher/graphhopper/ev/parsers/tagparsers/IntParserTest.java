@@ -6,9 +6,9 @@ import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.graphhopper.routing.ev.EdgeIntAccess;
 import com.graphhopper.routing.ev.EncodedValueLookup;
 import com.graphhopper.routing.ev.IntEncodedValue;
-import com.graphhopper.storage.IntsRef;
 import nu.ndw.nls.routingmapmatcher.domain.model.Link;
 import nu.ndw.nls.routingmapmatcher.domain.model.LinkTag;
 import nu.ndw.nls.routingmapmatcher.graphhopper.ev.EncodedTag;
@@ -20,6 +20,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 @ExtendWith(MockitoExtension.class)
 class IntParserTest {
 
+    private static final int EDGE_ID = 1;
     private static final int EXPECTED_A = 2;
     private static final int EXPECTED_B = 3;
     private static final int INT_TOO_LARGE = 100;
@@ -27,26 +28,26 @@ class IntParserTest {
     private static final int MAX_STORABLE_INT = 10;
 
     @Mock
-    LinkTag<Integer> linkTag;
+    private LinkTag<Integer> linkTag;
     @Mock
-    IntsRef edgeFlags;
+    private EdgeIntAccess egdeIntAccess;
     @Mock
-    Link link;
+    private Link link;
     @Mock
-    IntEncodedValue intEncodedValue;
+    private IntEncodedValue intEncodedValue;
     @Mock
-    EncodedTag encodedTag;
+    private EncodedTag encodedTag;
     @Mock
-    EncodedValueLookup encodedValueLookup;
+    private EncodedValueLookup encodedValueLookup;
 
     @Test
     void handleWayTags_ok_oneValueForBothDirections() {
         IntParser intParser = getIntParser(false);
         when(link.getTag(linkTag, 0)).thenReturn(EXPECTED_A);
 
-        intParser.handleWayTags(edgeFlags, link, null);
+        intParser.handleWayTags(EDGE_ID, egdeIntAccess, link, null);
 
-        verify(intEncodedValue).setInt(false, edgeFlags, EXPECTED_A);
+        verify(intEncodedValue).setInt(false, EDGE_ID, egdeIntAccess, EXPECTED_A);
     }
 
     @Test
@@ -55,10 +56,10 @@ class IntParserTest {
         when(link.getTag(linkTag, 0, false)).thenReturn(EXPECTED_A);
         when(link.getTag(linkTag, 0, true)).thenReturn(EXPECTED_B);
 
-        intParser.handleWayTags(edgeFlags, link, null);
+        intParser.handleWayTags(EDGE_ID, egdeIntAccess, link, null);
 
-        verify(intEncodedValue).setInt(false, edgeFlags, EXPECTED_A);
-        verify(intEncodedValue).setInt(true, edgeFlags, EXPECTED_B);
+        verify(intEncodedValue).setInt(false, EDGE_ID, egdeIntAccess, EXPECTED_A);
+        verify(intEncodedValue).setInt(true, EDGE_ID, egdeIntAccess, EXPECTED_B);
     }
 
     @Test
@@ -68,7 +69,8 @@ class IntParserTest {
         IntParser intParser = getIntParser(false);
         when(link.getTag(linkTag, 0)).thenReturn(INT_TOO_LARGE);
 
-        var exception = assertThrows(IllegalArgumentException.class, () -> intParser.handleWayTags(edgeFlags, link, null));
+        var exception = assertThrows(IllegalArgumentException.class,
+                () -> intParser.handleWayTags(EDGE_ID, egdeIntAccess, link, null));
         assertThat(exception).hasMessage("Cannot store test-link-tag: 100 as it is too large (> 10). "
                             + "You can disable test_encoded_tag if you do not need it.");
     }
@@ -82,5 +84,4 @@ class IntParserTest {
 
         return new IntParser(encodedValueLookup, encodedTag);
     }
-
 }

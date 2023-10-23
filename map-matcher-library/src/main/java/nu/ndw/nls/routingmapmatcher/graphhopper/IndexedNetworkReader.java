@@ -1,7 +1,6 @@
 package nu.ndw.nls.routingmapmatcher.graphhopper;
 
-
-import com.graphhopper.coll.LongIntMap;
+import com.graphhopper.coll.LongLongMap;
 import com.graphhopper.routing.util.EncodingManager;
 import com.graphhopper.routing.util.parsers.TagParser;
 import com.graphhopper.storage.BaseGraph;
@@ -19,7 +18,7 @@ public class IndexedNetworkReader extends NetworkReader {
 
     public IndexedNetworkReader(BaseGraph baseGraph, EncodingManager encodingManager,
             Supplier<Iterator<Link>> linkSupplier, List<TagParser> vehicleTagParsers,
-            LongIntMap nodeIdToInternalNodeIdMap, Map<Long, Integer> edgeMap) {
+            LongLongMap nodeIdToInternalNodeIdMap, Map<Long, Integer> edgeMap) {
         super(baseGraph, encodingManager, linkSupplier, vehicleTagParsers, nodeIdToInternalNodeIdMap);
         this.edgeMap = edgeMap;
     }
@@ -30,5 +29,4 @@ public class IndexedNetworkReader extends NetworkReader {
         edgeMap.put(link.getId(), edgeKey);
         return edgeKey;
     }
-
 }

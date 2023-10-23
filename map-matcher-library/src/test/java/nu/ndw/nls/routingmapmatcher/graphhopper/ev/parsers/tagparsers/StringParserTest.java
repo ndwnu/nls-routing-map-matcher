@@ -4,9 +4,9 @@ import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.graphhopper.routing.ev.EdgeIntAccess;
 import com.graphhopper.routing.ev.EncodedValueLookup;
 import com.graphhopper.routing.ev.StringEncodedValue;
-import com.graphhopper.storage.IntsRef;
 import nu.ndw.nls.routingmapmatcher.domain.model.Link;
 import nu.ndw.nls.routingmapmatcher.domain.model.LinkTag;
 import nu.ndw.nls.routingmapmatcher.graphhopper.ev.EncodedTag;
@@ -18,31 +18,32 @@ import org.mockito.junit.jupiter.MockitoExtension;
 @ExtendWith(MockitoExtension.class)
 class StringParserTest {
 
+    private static final int EDGE_ID = 1;
     private static final String EXPECTED_A = "A";
     private static final String EXPECTED_B = "B";
     private static final String TAG_KEY = "key";
 
     @Mock
-    LinkTag<String> linkTag;
+    private LinkTag<String> linkTag;
     @Mock
-    IntsRef edgeFlags;
+    private EdgeIntAccess egdeIntAccess;
     @Mock
-    Link link;
+    private Link link;
     @Mock
-    StringEncodedValue stringEncodedValue;
+    private StringEncodedValue stringEncodedValue;
     @Mock
-    EncodedTag encodedTag;
+    private EncodedTag encodedTag;
     @Mock
-    EncodedValueLookup encodedValueLookup;
+    private EncodedValueLookup encodedValueLookup;
 
     @Test
     void handleWayTags_ok_oneValueForBothDirections() {
         StringParser stringParser = getStringParser(false);
         when(link.getTag(linkTag, "")).thenReturn(EXPECTED_A);
 
-        stringParser.handleWayTags(edgeFlags, link, null);
+        stringParser.handleWayTags(EDGE_ID, egdeIntAccess, link, null);
 
-        verify(stringEncodedValue).setString(false, edgeFlags, EXPECTED_A);
+        verify(stringEncodedValue).setString(false, EDGE_ID, egdeIntAccess, EXPECTED_A);
     }
 
     @Test
@@ -51,10 +52,10 @@ class StringParserTest {
         when(link.getTag(linkTag, "", false)).thenReturn(EXPECTED_A);
         when(link.getTag(linkTag, "", true)).thenReturn(EXPECTED_B);
 
-        stringParser.handleWayTags(edgeFlags, link, null);
+        stringParser.handleWayTags(EDGE_ID, egdeIntAccess, link, null);
 
-        verify(stringEncodedValue).setString(false, edgeFlags, EXPECTED_A);
-        verify(stringEncodedValue).setString(true, edgeFlags, EXPECTED_B);
+        verify(stringEncodedValue).setString(false, EDGE_ID, egdeIntAccess, EXPECTED_A);
+        verify(stringEncodedValue).setString(true, EDGE_ID, egdeIntAccess, EXPECTED_B);
     }
 
     private StringParser getStringParser(boolean separateValuesPerDirection) {
@@ -65,5 +66,4 @@ class StringParserTest {
 
         return new StringParser(encodedValueLookup, encodedTag);
     }
-
 }
