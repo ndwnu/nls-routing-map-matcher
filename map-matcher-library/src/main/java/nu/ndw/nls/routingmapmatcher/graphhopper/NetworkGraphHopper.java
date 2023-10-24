@@ -2,8 +2,8 @@ package nu.ndw.nls.routingmapmatcher.graphhopper;
 
 import com.graphhopper.GHRequest;
 import com.graphhopper.GraphHopper;
-import com.graphhopper.coll.GHLongIntBTree;
-import com.graphhopper.coll.LongIntMap;
+import com.graphhopper.coll.GHLongLongBTree;
+import com.graphhopper.coll.LongLongMap;
 import com.graphhopper.config.Profile;
 import com.graphhopper.routing.Path;
 import com.graphhopper.routing.PathRouter;
@@ -22,21 +22,21 @@ import lombok.extern.slf4j.Slf4j;
 import nu.ndw.nls.routingmapmatcher.domain.Network;
 import nu.ndw.nls.routingmapmatcher.domain.model.Link;
 
-
 @Slf4j
 public class NetworkGraphHopper extends GraphHopper implements Network {
 
     private static final int MAX_LEAF_ENTRIES = 200;
+    private static final int BYTES_PER_INTEGER = 4;
+    private static final int EMPTY_VALUE = -1;
     private static final String DATAREADER_IMPORT_DATE = "datareader.import.date";
 
     private Supplier<Iterator<Link>> linkSupplier;
 
-    private LongIntMap nodeIdToInternalNodeIdMap;
+    private LongLongMap nodeIdToInternalNodeIdMap;
 
     public NetworkGraphHopper(Supplier<Iterator<Link>> linkSupplier) {
         this.linkSupplier = linkSupplier;
-        this.nodeIdToInternalNodeIdMap = new GHLongIntBTree(MAX_LEAF_ENTRIES);
-
+        this.nodeIdToInternalNodeIdMap = new GHLongLongBTree(MAX_LEAF_ENTRIES, BYTES_PER_INTEGER, EMPTY_VALUE);
     }
 
     /**
@@ -63,10 +63,9 @@ public class NetworkGraphHopper extends GraphHopper implements Network {
     }
     
     protected NetworkReader getNetworkReader(Supplier<Iterator<Link>> linkSupplier,
-            LongIntMap nodeIdToInternalNodeIdMap) {
-        return new NetworkReader(getBaseGraph().getBaseGraph(), getEncodingManager(),
-                linkSupplier, getOSMParsers().getWayTagParsers(),
-                nodeIdToInternalNodeIdMap);
+            LongLongMap nodeIdToInternalNodeIdMap) {
+        return new NetworkReader(getBaseGraph().getBaseGraph(), getEncodingManager(), linkSupplier,
+                getOSMParsers().getWayTagParsers(), nodeIdToInternalNodeIdMap);
     }
 
     @Override
@@ -104,5 +103,4 @@ public class NetworkGraphHopper extends GraphHopper implements Network {
                 getCHGraphs(), getLandmarks())
                 .calcPaths(request);
     }
-
 }

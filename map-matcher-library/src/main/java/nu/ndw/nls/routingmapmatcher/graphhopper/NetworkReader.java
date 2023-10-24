@@ -4,8 +4,9 @@ package nu.ndw.nls.routingmapmatcher.graphhopper;
 import static nu.ndw.nls.routingmapmatcher.graphhopper.ev.EncodedTag.WAY_ID;
 
 import com.google.common.base.Preconditions;
-import com.graphhopper.coll.LongIntMap;
+import com.graphhopper.coll.LongLongMap;
 import com.graphhopper.reader.ReaderWay;
+import com.graphhopper.routing.ev.EdgeIntAccess;
 import com.graphhopper.routing.ev.IntEncodedValue;
 import com.graphhopper.routing.util.EncodingManager;
 import com.graphhopper.routing.util.WayAccess;
@@ -16,6 +17,7 @@ import com.graphhopper.util.EdgeIteratorState;
 import com.graphhopper.util.PointList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.OptionalInt;
 import java.util.function.Supplier;
 import lombok.extern.slf4j.Slf4j;
 import nu.ndw.nls.routingmapmatcher.domain.model.Link;
@@ -27,21 +29,20 @@ public class NetworkReader {
     private static final int COORDINATES_LENGTH_START_END = 2;
 
     private final Supplier<Iterator<Link>> linkSupplier;
-    private final LongIntMap nodeIdToInternalNodeIdMap;
-    private final EncodingManager encodingManager;
+    private final LongLongMap nodeIdToInternalNodeIdMap;
+    private final EdgeIntAccess edgeIntAccess;
     private final List<TagParser> vehicleTagParsers;
     private final IntEncodedValue idEncoder;
 
     private final BaseGraph baseGraph;
 
     public NetworkReader(BaseGraph baseGraph, EncodingManager encodingManager, Supplier<Iterator<Link>> linkSupplier,
-            List<TagParser> vehicleTagParsers,
-            LongIntMap nodeIdToInternalNodeIdMap) {
+            List<TagParser> vehicleTagParsers, LongLongMap nodeIdToInternalNodeIdMap) {
         this.linkSupplier = linkSupplier;
         this.nodeIdToInternalNodeIdMap = Preconditions.checkNotNull(nodeIdToInternalNodeIdMap);
-        this.encodingManager = Preconditions.checkNotNull(encodingManager);
         this.vehicleTagParsers = Preconditions.checkNotNull(vehicleTagParsers);
         this.baseGraph = Preconditions.checkNotNull(baseGraph);
+        this.edgeIntAccess = baseGraph.createEdgeIntAccess();
         this.idEncoder = encodingManager.getIntEncodedValue(WAY_ID.getKey());
     }
 
@@ -81,28 +82,31 @@ public class NetworkReader {
         }
     }
 
-    protected int addLink(Link link) {
+    protected OptionalInt addLink(Link link) {
         Coordinate[] coordinates = link.getGeometry().getCoordinates();
         if (coordinates.length < COORDINATES_LENGTH_START_END) {
             throw new IllegalStateException("Invalid geometry");
+        }
+        if (link.getFromNodeId() == link.getToNodeId()) {
+            log.debug("GraphHopper >= 8.0 does not support loop edges, skipping link ID " + link.getId());
+            return OptionalInt.empty();
         }
         int internalFromNodeId = addNodeIfNeeded(link.getFromNodeId(), coordinates[0].y, coordinates[0].x);
         int internalToNodeId = addNodeIfNeeded(link.getToNodeId(), coordinates[coordinates.length - 1].y,
                 coordinates[coordinates.length - 1].x);
 
-        IntsRef wayFlags = determineWayFlags(link);
         EdgeIteratorState edge = baseGraph.edge(internalFromNodeId, internalToNodeId)
-                .setDistance(link.getDistanceInMeters())
-                .setFlags(wayFlags);
+                .setDistance(link.getDistanceInMeters());
+        setWayFlags(link, edge.getEdge());
         if (coordinates.length > COORDINATES_LENGTH_START_END) {
             PointList geometry = createPointListWithoutStartAndEndPoint(coordinates);
             edge.setWayGeometry(geometry);
         }
-        return edge.getEdgeKey();
+        return OptionalInt.of(edge.getEdgeKey());
     }
 
     private int addNodeIfNeeded(long id, double latitude, double longitude) {
-        int internalNodeId = nodeIdToInternalNodeIdMap.get(id);
+        int internalNodeId = Math.toIntExact(nodeIdToInternalNodeIdMap.get(id));
         if (internalNodeId < 0) {
             internalNodeId = Math.toIntExact(nodeIdToInternalNodeIdMap.getSize());
             nodeIdToInternalNodeIdMap.put(id, internalNodeId);
@@ -111,17 +115,13 @@ public class NetworkReader {
         return internalNodeId;
     }
 
-    private IntsRef determineWayFlags(Link link) {
+    private void setWayFlags(Link link, int edgeId) {
         if (getAccess(link).canSkip()) {
-            log.warn("link {} is inaccessible and will be ignored in the network",link);
-            return IntsRef.EMPTY;
+            log.warn("link {} is inaccessible and will be ignored in the network", link);
+            return;
         }
-        IntsRef wayFlags = encodingManager.createEdgeFlags();
-        vehicleTagParsers
-                .forEach(tagParser -> tagParser.handleWayTags(wayFlags,
-                        link, IntsRef.EMPTY));
-        idEncoder.setInt(false, wayFlags, Math.toIntExact(link.getId()));
-        return wayFlags;
+        vehicleTagParsers.forEach(tagParser -> tagParser.handleWayTags(edgeId, edgeIntAccess, link, IntsRef.EMPTY));
+        idEncoder.setInt(false, edgeId, edgeIntAccess, Math.toIntExact(link.getId()));
     }
 
     private PointList createPointListWithoutStartAndEndPoint(Coordinate[] coordinates) {
@@ -145,5 +145,4 @@ public class NetworkReader {
             log.debug("Read {} links", count);
         }
     }
-
 }

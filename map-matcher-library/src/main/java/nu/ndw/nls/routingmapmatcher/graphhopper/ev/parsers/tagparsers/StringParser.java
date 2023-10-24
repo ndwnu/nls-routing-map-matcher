@@ -1,8 +1,8 @@
 package nu.ndw.nls.routingmapmatcher.graphhopper.ev.parsers.tagparsers;
 
+import com.graphhopper.routing.ev.EdgeIntAccess;
 import com.graphhopper.routing.ev.EncodedValueLookup;
 import com.graphhopper.routing.ev.StringEncodedValue;
-import com.graphhopper.storage.IntsRef;
 import nu.ndw.nls.routingmapmatcher.graphhopper.ev.EncodedTag;
 
 public class StringParser extends AbstractTagParser<String> {
@@ -15,7 +15,7 @@ public class StringParser extends AbstractTagParser<String> {
     }
 
     @Override
-    protected void set(boolean reverse, IntsRef edgeFlags, String value) {
-        stringEncodedValue.setString(reverse, edgeFlags, value);
+    protected void set(boolean reverse, int edgeId, EdgeIntAccess edgeIntAccess, String value) {
+        stringEncodedValue.setString(reverse, edgeId, edgeIntAccess, value);
     }
 }

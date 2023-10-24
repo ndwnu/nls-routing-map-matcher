@@ -1,8 +1,8 @@
 package nu.ndw.nls.routingmapmatcher.graphhopper.ev.parsers.tagparsers;
 
 import com.graphhopper.routing.ev.DecimalEncodedValue;
+import com.graphhopper.routing.ev.EdgeIntAccess;
 import com.graphhopper.routing.ev.EncodedValueLookup;
-import com.graphhopper.storage.IntsRef;
 import lombok.extern.slf4j.Slf4j;
 import nu.ndw.nls.routingmapmatcher.graphhopper.ev.EncodedTag;
 
@@ -17,8 +17,7 @@ public class DoubleParser extends AbstractTagParser<Double> {
     }
 
     @Override
-    protected void set(boolean reverse, IntsRef edgeFlags, Double value) {
-        doubleEnc.setDecimal(reverse, edgeFlags, value);
+    protected void set(boolean reverse, int edgeId, EdgeIntAccess edgeIntAccess, Double value) {
+        doubleEnc.setDecimal(reverse, edgeId, edgeIntAccess, value);
     }
-
 }

@@ -4,9 +4,9 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.graphhopper.routing.ev.BooleanEncodedValue;
+import com.graphhopper.routing.ev.EdgeIntAccess;
 import com.graphhopper.routing.ev.EncodedValueLookup;
 import com.graphhopper.routing.ev.VehicleAccess;
-import com.graphhopper.storage.IntsRef;
 import com.graphhopper.util.PMap;
 import nu.ndw.nls.routingmapmatcher.domain.model.Link;
 import nu.ndw.nls.routingmapmatcher.graphhopper.ev.VehicleType;
@@ -19,18 +19,19 @@ import org.mockito.junit.jupiter.MockitoExtension;
 @ExtendWith(MockitoExtension.class)
 class CustomAccessParserTest {
 
+    private static final int EDGE_ID = 1;
     private static final VehicleType VEHICLE_TYPE = VehicleType.HGV;
 
     @Mock
-    EncodedValueLookup lookup;
+    private EncodedValueLookup lookup;
     @Mock
-    PMap properties;
+    private PMap properties;
     @Mock
-    BooleanEncodedValue booleanEncodedValue;
+    private BooleanEncodedValue booleanEncodedValue;
     @Mock
-    IntsRef edgeFlags;
+    private EdgeIntAccess egdeIntAccess;
     @Mock
-    Link link;
+    private Link link;
 
     private CustomAccessParser customAccessParser;
 
@@ -46,10 +47,10 @@ class CustomAccessParserTest {
         when(link.getTag(VEHICLE_TYPE.getAccessTag(), true, false)).thenReturn(false);
         when(link.getTag(VEHICLE_TYPE.getAccessTag(), true, true)).thenReturn(false);
 
-        customAccessParser.handleWayTags(edgeFlags, link);
+        customAccessParser.handleWayTags(EDGE_ID, egdeIntAccess, link);
 
-        verify(booleanEncodedValue).setBool(false, edgeFlags, false);
-        verify(booleanEncodedValue).setBool(true, edgeFlags, false);
+        verify(booleanEncodedValue).setBool(false, EDGE_ID, egdeIntAccess, false);
+        verify(booleanEncodedValue).setBool(true, EDGE_ID, egdeIntAccess, false);
     }
 
     @Test
@@ -59,10 +60,10 @@ class CustomAccessParserTest {
         when(link.getSpeedInKilometersPerHour()).thenReturn(0.0);
         when(link.getReverseSpeedInKilometersPerHour()).thenReturn(0.0);
 
-        customAccessParser.handleWayTags(edgeFlags, link);
+        customAccessParser.handleWayTags(EDGE_ID, egdeIntAccess, link);
 
-        verify(booleanEncodedValue).setBool(false, edgeFlags, false);
-        verify(booleanEncodedValue).setBool(true, edgeFlags, false);
+        verify(booleanEncodedValue).setBool(false, EDGE_ID, egdeIntAccess, false);
+        verify(booleanEncodedValue).setBool(true, EDGE_ID, egdeIntAccess, false);
     }
 
     @Test
@@ -72,10 +73,9 @@ class CustomAccessParserTest {
         when(link.getSpeedInKilometersPerHour()).thenReturn(10.0);
         when(link.getReverseSpeedInKilometersPerHour()).thenReturn(10.0);
 
-        customAccessParser.handleWayTags(edgeFlags, link);
+        customAccessParser.handleWayTags(EDGE_ID, egdeIntAccess, link);
 
-        verify(booleanEncodedValue).setBool(false, edgeFlags, true);
-        verify(booleanEncodedValue).setBool(true, edgeFlags, true);
+        verify(booleanEncodedValue).setBool(false, EDGE_ID, egdeIntAccess, true);
+        verify(booleanEncodedValue).setBool(true, EDGE_ID, egdeIntAccess, true);
     }
-
 }

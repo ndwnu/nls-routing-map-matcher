@@ -1,19 +1,17 @@
 package nu.ndw.nls.routingmapmatcher.graphhopper.ev.parsers;
 
-
 import static nu.ndw.nls.routingmapmatcher.graphhopper.NetworkReader.castToLink;
 
 import com.graphhopper.reader.ReaderWay;
+import com.graphhopper.routing.ev.EdgeIntAccess;
 import com.graphhopper.routing.ev.EncodedValueLookup;
 import com.graphhopper.routing.ev.VehicleAccess;
 import com.graphhopper.routing.util.parsers.AbstractAccessParser;
-import com.graphhopper.storage.IntsRef;
 import com.graphhopper.util.PMap;
 import java.util.Optional;
 import nu.ndw.nls.routingmapmatcher.domain.model.Link;
 import nu.ndw.nls.routingmapmatcher.domain.model.LinkTag;
 import nu.ndw.nls.routingmapmatcher.graphhopper.ev.VehicleType;
-
 
 public class CustomAccessParser extends AbstractAccessParser {
 
@@ -27,12 +25,11 @@ public class CustomAccessParser extends AbstractAccessParser {
         this.accessTag = vehicleType.getAccessTag();
     }
 
-
     @Override
-    public void handleWayTags(IntsRef edgeFlags, ReaderWay readerWay) {
+    public void handleWayTags(int edgeId, EdgeIntAccess edgeIntAccess, ReaderWay readerWay) {
         Link link = castToLink(readerWay);
-        accessEnc.setBool(false, edgeFlags, isForwardAccessible(link));
-        accessEnc.setBool(true, edgeFlags, isReverseAccessible(link));
+        accessEnc.setBool(false, edgeId, edgeIntAccess, isForwardAccessible(link));
+        accessEnc.setBool(true, edgeId, edgeIntAccess, isReverseAccessible(link));
     }
 
     protected boolean isForwardAccessible(Link link) {
