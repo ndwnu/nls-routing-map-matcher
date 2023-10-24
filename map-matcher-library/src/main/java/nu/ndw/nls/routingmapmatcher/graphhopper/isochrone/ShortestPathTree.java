@@ -125,7 +125,7 @@ public class ShortestPathTree extends AbstractRoutingAlgorithm {
                 }
 
                 double nextWeight =
-                        GHUtility.calcWeightWithTurnWeightWithAccess(weighting, iter, reverseFlow, currentLabel.edge)
+                        GHUtility.calcWeightWithTurnWeight(weighting, iter, reverseFlow, currentLabel.edge)
                                 + currentLabel.weight;
                 if (Double.isInfinite(nextWeight)) {
                     continue;

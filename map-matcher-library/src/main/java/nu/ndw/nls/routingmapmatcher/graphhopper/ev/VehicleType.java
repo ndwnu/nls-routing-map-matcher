@@ -2,7 +2,6 @@ package nu.ndw.nls.routingmapmatcher.graphhopper.ev;
 
 import com.graphhopper.config.Profile;
 import com.graphhopper.routing.util.TransportationMode;
-import com.graphhopper.routing.weighting.custom.CustomProfile;
 import com.graphhopper.util.CustomModel;
 import java.util.stream.Stream;
 import lombok.Getter;
@@ -32,7 +31,6 @@ public enum VehicleType {
     }
 
     public Profile createProfile(String profileName) {
-        return new CustomProfile(profileName).setCustomModel(new CustomModel()).setVehicle(this.name);
+        return new Profile(profileName).setCustomModel(new CustomModel()).setVehicle(this.name);
     }
-
 }

@@ -13,7 +13,7 @@
 
     <groupId>nu.ndw.nls</groupId>
     <artifactId>routing-map-matcher-parent</artifactId>
-    <version>7.3.3-SNAPSHOT</version>
+    <version>7.4.0-SNAPSHOT</version>
     <name>routing map matcher parent</name>
     <description>Routing Map Matcher modules containing the core library and spring boot starter modules</description>
     <packaging>pom</packaging>
@@ -26,8 +26,9 @@
         <maven.compiler.target>17</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.javadoc.failOnError>false</maven.javadoc.failOnError>
-        <graphhopper.version>7.0</graphhopper.version>
-        <janino.version>3.1.2</janino.version>
+        <graphhopper.version>8.0</graphhopper.version>
+        <!-- Janino version should match the one used in GraphHopper -->
+        <janino.version>3.1.9</janino.version>
         <jts-core.version>1.19.0</jts-core.version>
         <guava.version>32.1.2-jre</guava.version>
         <hamcrest.version>2.2</hamcrest.version>

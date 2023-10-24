@@ -5,8 +5,8 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.graphhopper.routing.ev.DecimalEncodedValue;
+import com.graphhopper.routing.ev.EdgeIntAccess;
 import com.graphhopper.routing.ev.EncodedValueLookup;
-import com.graphhopper.storage.IntsRef;
 import nu.ndw.nls.routingmapmatcher.domain.model.Link;
 import nu.ndw.nls.routingmapmatcher.domain.model.LinkTag;
 import nu.ndw.nls.routingmapmatcher.graphhopper.ev.EncodedTag;
@@ -18,31 +18,32 @@ import org.mockito.junit.jupiter.MockitoExtension;
 @ExtendWith(MockitoExtension.class)
 class DoubleParserTest {
 
+    private static final int EDGE_ID = 1;
     private static final double EXPECTED_A = 0.1;
     private static final double EXPECTED_B = 0.2;
     private static final String TAG_KEY = "key";
 
     @Mock
-    LinkTag<Double> linkTag;
+    private LinkTag<Double> linkTag;
     @Mock
-    IntsRef edgeFlags;
+    private EdgeIntAccess egdeIntAccess;
     @Mock
-    Link link;
+    private Link link;
     @Mock
-    DecimalEncodedValue decimalEncodedValue;
+    private DecimalEncodedValue decimalEncodedValue;
     @Mock
-    EncodedTag encodedTag;
+    private EncodedTag encodedTag;
     @Mock
-    EncodedValueLookup encodedValueLookup;
+    private EncodedValueLookup encodedValueLookup;
 
     @Test
     void handleWayTags_ok_oneValueForBothDirections() {
         DoubleParser doubleParser = getDoubleParser(false);
         when(link.getTag(linkTag, Double.POSITIVE_INFINITY)).thenReturn(EXPECTED_A);
 
-        doubleParser.handleWayTags(edgeFlags, link, null);
+        doubleParser.handleWayTags(EDGE_ID, egdeIntAccess, link, null);
 
-        verify(decimalEncodedValue).setDecimal(false, edgeFlags, EXPECTED_A);
+        verify(decimalEncodedValue).setDecimal(false, EDGE_ID, egdeIntAccess, EXPECTED_A);
     }
 
     @Test
@@ -51,10 +52,10 @@ class DoubleParserTest {
         when(link.getTag(linkTag, Double.POSITIVE_INFINITY, false)).thenReturn(EXPECTED_A);
         when(link.getTag(linkTag, Double.POSITIVE_INFINITY, true)).thenReturn(EXPECTED_B);
 
-        doubleParser.handleWayTags(edgeFlags, link, null);
+        doubleParser.handleWayTags(EDGE_ID, egdeIntAccess, link, null);
 
-        verify(decimalEncodedValue).setDecimal(false, edgeFlags, EXPECTED_A);
-        verify(decimalEncodedValue).setDecimal(true, edgeFlags, EXPECTED_B);
+        verify(decimalEncodedValue).setDecimal(false, EDGE_ID, egdeIntAccess, EXPECTED_A);
+        verify(decimalEncodedValue).setDecimal(true, EDGE_ID, egdeIntAccess, EXPECTED_B);
     }
 
     private DoubleParser getDoubleParser(boolean separateValuesPerDirection) {
@@ -65,5 +66,4 @@ class DoubleParserTest {
 
         return new DoubleParser(encodedValueLookup, encodedTag);
     }
-
 }
