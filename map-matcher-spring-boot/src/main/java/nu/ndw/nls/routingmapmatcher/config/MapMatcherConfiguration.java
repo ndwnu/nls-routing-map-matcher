@@ -8,6 +8,7 @@ import nu.ndw.nls.routingmapmatcher.domain.SinglePointMapMatcher;
 import nu.ndw.nls.routingmapmatcher.domain.StartToEndMapMatcher;
 import nu.ndw.nls.routingmapmatcher.graphhopper.AccessibilityGraphHopperNetworkService;
 import nu.ndw.nls.routingmapmatcher.graphhopper.GraphHopperNetworkService;
+import nu.ndw.nls.routingmapmatcher.graphhopper.IndexedGraphHopperNetworkService;
 import nu.ndw.nls.routingmapmatcher.graphhopper.NetworkGraphHopperFactory;
 import nu.ndw.nls.routingmapmatcher.graphhopper.routing.GraphHopperRouterFactory;
 import nu.ndw.nls.routingmapmatcher.graphhopper.singlepoint.GraphHopperSinglePointMapMatcherFactory;
@@ -32,6 +33,12 @@ public class MapMatcherConfiguration {
     @ConditionalOnMissingBean
     AccessibilityGraphHopperNetworkService accessibilityGraphHopperNetworkService() {
         return new AccessibilityGraphHopperNetworkService();
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
+    IndexedGraphHopperNetworkService indexedGraphHopperNetworkService() {
+        return new IndexedGraphHopperNetworkService();
     }
 
     @Bean

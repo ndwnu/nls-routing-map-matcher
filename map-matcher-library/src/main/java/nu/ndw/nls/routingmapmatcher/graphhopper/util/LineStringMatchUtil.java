@@ -29,7 +29,7 @@ import nu.ndw.nls.routingmapmatcher.domain.model.linestring.LineStringMatch;
 import nu.ndw.nls.routingmapmatcher.domain.model.linestring.MatchedLink;
 import nu.ndw.nls.routingmapmatcher.graphhopper.NetworkGraphHopper;
 import nu.ndw.nls.routingmapmatcher.graphhopper.isochrone.IsochroneService;
-import nu.ndw.nls.routingmapmatcher.graphhopper.isochrone.ShortestPathTreeFactory;
+import nu.ndw.nls.routingmapmatcher.graphhopper.isochrone.algorithm.ShortestPathTreeFactory;
 import nu.ndw.nls.routingmapmatcher.graphhopper.isochrone.mappers.IsochroneMatchMapper;
 import org.locationtech.jts.geom.LineString;
 import org.locationtech.jts.geom.Point;

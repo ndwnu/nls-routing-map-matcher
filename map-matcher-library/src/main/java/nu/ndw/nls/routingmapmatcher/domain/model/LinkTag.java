@@ -18,6 +18,16 @@ public final class LinkTag<T> {
     public static final LinkTag<Boolean> BUS_ACCESSIBLE = new LinkTag<>("bus-accessible", Boolean.class, true);
     public static final LinkTag<Boolean> GEN_ACCESSIBLE = new LinkTag<>("gen-accessible", Boolean.class, false);
 
+    public static final LinkTag<Boolean> HGV_ACCESS_FORBIDDEN = new LinkTag<>("hgv-access-forbidden", Boolean.class,
+            true);
+    public static final LinkTag<Boolean> CAR_ACCESS_FORBIDDEN = new LinkTag<>("car-access-forbidden", Boolean.class,
+            true);
+    public static final LinkTag<Boolean> AUTO_BUS_ACCESS_FORBIDDEN = new LinkTag<>("auto-bus-access-forbidden",
+            Boolean.class, true);
+    public static final LinkTag<Boolean> TRAILER_ACCESS_FORBIDDEN = new LinkTag<>("trailer-access-forbidden",
+            Boolean.class, true);
+
+
     public static final String FORWARD_SUFFIX = ":forward";
     public static final String REVERSE_SUFFIX = ":reverse";
 
