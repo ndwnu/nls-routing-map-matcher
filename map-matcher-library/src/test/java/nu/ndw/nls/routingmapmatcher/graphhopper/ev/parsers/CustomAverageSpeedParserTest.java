@@ -25,6 +25,8 @@ class CustomAverageSpeedParserTest {
     private static final int EDGE_ID = 1;
     private static final int SPEED = 50;
     private static final int REVERSE_SPEED = 30;
+    private static final double SMALLEST_NON_ZERO_VALUE = 5.0;
+    private static final double MAX_STORABLE_DECIMAL = 155.0;
 
     @Mock
     private EncodedValueLookup lookup;
@@ -49,6 +51,7 @@ class CustomAverageSpeedParserTest {
 
     @Test
     void handleWayTags_ok_bidirectionalAccess() {
+        mockMinMaxSpeeds();
         Link link = createLink(SPEED, REVERSE_SPEED);
         customAverageSpeedParser.handleWayTags(EDGE_ID, edgeIntAccess, link);
         verify(averageSpeedEncoder).setDecimal(false, EDGE_ID, edgeIntAccess, SPEED);
@@ -57,6 +60,7 @@ class CustomAverageSpeedParserTest {
 
     @Test
     void handleWayTags_ok_forwardAccessOnly() {
+        mockMinMaxSpeeds();
         Link link = createLink(0, REVERSE_SPEED);
         customAverageSpeedParser.handleWayTags(EDGE_ID, edgeIntAccess, link);
         verify(averageSpeedEncoder, never()).setDecimal(eq(false), eq(EDGE_ID), eq(edgeIntAccess), anyDouble());
@@ -65,6 +69,7 @@ class CustomAverageSpeedParserTest {
 
     @Test
     void handleWayTags_ok_backwardAccessOnly() {
+        mockMinMaxSpeeds();
         Link link = createLink(SPEED, 0);
         customAverageSpeedParser.handleWayTags(EDGE_ID, edgeIntAccess, link);
         verify(averageSpeedEncoder).setDecimal(false, EDGE_ID, edgeIntAccess, SPEED);
@@ -80,12 +85,25 @@ class CustomAverageSpeedParserTest {
 
     @Test
     void handleWayTags_ok_belowMinimumSpeed() {
-        double smallestNonZeroValue = 5.0;
-        when(averageSpeedEncoder.getSmallestNonZeroValue()).thenReturn(smallestNonZeroValue);
+        mockMinMaxSpeeds();
         Link link = createLink(1, 4);
         customAverageSpeedParser.handleWayTags(EDGE_ID, edgeIntAccess, link);
-        verify(averageSpeedEncoder).setDecimal(false, EDGE_ID, edgeIntAccess, smallestNonZeroValue);
-        verify(averageSpeedEncoder).setDecimal(true, EDGE_ID, edgeIntAccess, smallestNonZeroValue);
+        verify(averageSpeedEncoder).setDecimal(false, EDGE_ID, edgeIntAccess, SMALLEST_NON_ZERO_VALUE);
+        verify(averageSpeedEncoder).setDecimal(true, EDGE_ID, edgeIntAccess, SMALLEST_NON_ZERO_VALUE);
+    }
+
+    @Test
+    void handleWayTags_ok_aboveMinimumSpeed() {
+        mockMinMaxSpeeds();
+        Link link = createLink(156, 169);
+        customAverageSpeedParser.handleWayTags(EDGE_ID, edgeIntAccess, link);
+        verify(averageSpeedEncoder).setDecimal(false, EDGE_ID, edgeIntAccess, MAX_STORABLE_DECIMAL);
+        verify(averageSpeedEncoder).setDecimal(true, EDGE_ID, edgeIntAccess, MAX_STORABLE_DECIMAL);
+    }
+
+    private void mockMinMaxSpeeds() {
+        when(averageSpeedEncoder.getSmallestNonZeroValue()).thenReturn(SMALLEST_NON_ZERO_VALUE);
+        when(averageSpeedEncoder.getMaxStorableDecimal()).thenReturn(MAX_STORABLE_DECIMAL);
     }
 
     private Link createLink(int speed, int reverseSpeed) {
