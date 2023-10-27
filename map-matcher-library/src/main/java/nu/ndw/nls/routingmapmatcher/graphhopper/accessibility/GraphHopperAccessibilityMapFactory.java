@@ -1,6 +1,5 @@
 package nu.ndw.nls.routingmapmatcher.graphhopper.accessibility;
 
-import lombok.RequiredArgsConstructor;
 import nu.ndw.nls.routingmapmatcher.domain.AccessibilityMap;
 import nu.ndw.nls.routingmapmatcher.domain.AccessibilityMapFactory;
 import nu.ndw.nls.routingmapmatcher.domain.Network;

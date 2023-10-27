@@ -11,7 +11,6 @@ import com.graphhopper.routing.ev.VehicleSpeed;
 import com.graphhopper.routing.querygraph.QueryGraph;
 import com.graphhopper.routing.util.EdgeFilter;
 import com.graphhopper.routing.util.EncodingManager;
-import com.graphhopper.routing.util.FiniteWeightFilter;
 import com.graphhopper.routing.weighting.Weighting;
 import com.graphhopper.storage.BaseGraph;
 import com.graphhopper.storage.EdgeIteratorStateReverseExtractor;
@@ -19,7 +18,6 @@ import com.graphhopper.storage.index.LocationIndexTree;
 import com.graphhopper.storage.index.Snap;
 import com.graphhopper.util.EdgeIteratorState;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -82,9 +80,9 @@ public class IsochroneService {
     }
 
     /**
-     * Creates Isochrone for an entire municipality based on start point. The start point has to be withing the municipality
-     * This can be used to create an accessibility map by first calling this method with a weighting that has no
-     * restriction and consequently calling this method with a weighting that has restrictions based on vehicles
+     * Creates Isochrone for an entire municipality based on start point. The start point has to be withing the
+     * municipality This can be used to create an accessibility map by first calling this method with a weighting that
+     * has no restriction and consequently calling this method with a weighting that has restrictions based on vehicles
      * dimensions etc.
      *
      * @param weighting      The specific weighting ie Custom weighting to filter out inaccessible roads based on
@@ -99,10 +97,10 @@ public class IsochroneService {
             int municipalityId) {
         double latitude = startPoint.getY();
         double longitude = startPoint.getX();
-        // Get the  start segment for the  calculation FiniteWeightFilter prevents snapping to inaccessible roads
+
         Snap startSegment
                 = locationIndexTree
-                .findClosest(latitude, longitude, new FiniteWeightFilter(weighting));
+                .findClosest(latitude, longitude, EdgeFilter.ALL_EDGES);
         /*
             Lookup will create virtual edges based on the snapped point, thereby cutting the segment in 2 line strings.
             It also sets the closestNode of the matchedQueryResult to the virtual node id. In this way it creates a
@@ -111,7 +109,7 @@ public class IsochroneService {
         QueryGraph queryGraph = QueryGraph.create(baseGraph, startSegment);
         IsochroneByMunicipality accessibilityPathTree = shortestPathTreeFactory.createShortestPathTree(queryGraph,
                 weighting, encodingManager, municipalityId);
-        Set<IsoLabel> isoLabels = new HashSet<>();
+        List<IsoLabel> isoLabels = new ArrayList<>();
         accessibilityPathTree.search(startSegment.getClosestNode(), isoLabels::add);
         return isoLabels.stream()
                 .filter(isoLabel -> isoLabel.edge != ROOT_PARENT)
