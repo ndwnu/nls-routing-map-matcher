@@ -1,10 +1,9 @@
-package nu.ndw.nls.routingmapmatcher.graphhopper.isochrone;
+package nu.ndw.nls.routingmapmatcher.graphhopper.isochrone.algorithm;
 
 
 import static java.util.Comparator.comparingDouble;
 
 import com.carrotsearch.hppc.IntObjectHashMap;
-import com.carrotsearch.hppc.cursors.ObjectCursor;
 import com.graphhopper.coll.GHIntObjectHashMap;
 import com.graphhopper.routing.AbstractRoutingAlgorithm;
 import com.graphhopper.routing.Path;
@@ -13,13 +12,11 @@ import com.graphhopper.routing.weighting.Weighting;
 import com.graphhopper.storage.Graph;
 import com.graphhopper.util.EdgeIterator;
 import com.graphhopper.util.GHUtility;
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.PriorityQueue;
 import java.util.function.Consumer;
 
 /**
- * This class is a fork of the com.graphhopper.isochrone.algorithm.ShortestPathTree class. The inclusion logic is
+ * This class is a fork of the com.graphhopper.isochrone.algorithm.IsochroneByTimeDistanceAndWeight class. The inclusion logic is
  * different from the original class because the original current implementation differed from the previous
  * implementation in v 0.12. The previous implementation in v 0.12 included IsoLabels which had a partial limit (ie a
  * road-segment of 100 meters which still could be travelled for 50 meters until reaching the limit was included). The
@@ -27,49 +24,18 @@ import java.util.function.Consumer;
  * results for nls requirements. This class fixes this by replacing the original check for inclusion
  * getExploreValue(label) <= limit with (this.limit - getExploreValue(isoLabel.parent)) > 0.
  */
-public class ShortestPathTree extends AbstractRoutingAlgorithm {
+public abstract class AbstractShortestPathTree extends AbstractRoutingAlgorithm {
 
-    enum ExploreType {TIME, DISTANCE, WEIGHT}
 
-    public static class IsoLabel {
 
-        IsoLabel(int node, int edge, double weight, long time, double distance, IsoLabel parent) {
-            this.node = node;
-            this.edge = edge;
-            this.weight = weight;
-            this.time = time;
-            this.distance = distance;
-            this.parent = parent;
-        }
-
-        public boolean deleted;
-        public int node;
-        public int edge;
-        public double weight;
-        public long time;
-        public double distance;
-        public IsoLabel parent;
-
-        @Override
-        public String toString() {
-            return "IsoLabel{" +
-                    "node=" + node +
-                    ", edge=" + edge +
-                    ", weight=" + weight +
-                    ", time=" + time +
-                    ", distance=" + distance +
-                    '}';
-        }
-    }
 
     private final IntObjectHashMap<IsoLabel> fromMap;
     private final PriorityQueue<IsoLabel> queueByWeighting;
     private int visitedNodes;
-    private double limit = -1;
-    private ExploreType exploreType = ExploreType.TIME;
+
     private final boolean reverseFlow;
 
-    public ShortestPathTree(Graph g, Weighting weighting, boolean reverseFlow, TraversalMode traversalMode) {
+    public AbstractShortestPathTree(Graph g, Weighting weighting, boolean reverseFlow, TraversalMode traversalMode) {
         super(g, weighting, traversalMode);
         queueByWeighting = new PriorityQueue<>(1000, comparingDouble(l -> l.weight));
         fromMap = new GHIntObjectHashMap<>(1000);
@@ -79,27 +45,6 @@ public class ShortestPathTree extends AbstractRoutingAlgorithm {
     @Override
     public Path calcPath(int from, int to) {
         throw new IllegalStateException("call search instead");
-    }
-
-    /**
-     * Time limit in milliseconds
-     */
-    public void setTimeLimit(double limit) {
-        exploreType = ExploreType.TIME;
-        this.limit = limit;
-    }
-
-    /**
-     * Distance limit in meter
-     */
-    public void setDistanceLimit(double limit) {
-        exploreType = ExploreType.DISTANCE;
-        this.limit = limit;
-    }
-
-    public void setWeightLimit(double limit) {
-        exploreType = ExploreType.WEIGHT;
-        this.limit = limit;
     }
 
     public void search(int from, final Consumer<IsoLabel> consumer) {
@@ -156,31 +101,8 @@ public class ShortestPathTree extends AbstractRoutingAlgorithm {
         }
     }
 
-    public Collection<IsoLabel> getIsochroneEdges() {
-        // assert alreadyRun
-        ArrayList<IsoLabel> result = new ArrayList<>();
-        for (ObjectCursor<IsoLabel> cursor : fromMap.values()) {
-            if (getExploreValue(cursor.value) > limit) {
-                assert cursor.value.parent == null || getExploreValue(cursor.value.parent) <= limit;
-                result.add(cursor.value);
-            }
-        }
-        return result;
-    }
 
-    private double getExploreValue(IsoLabel label) {
-        if (exploreType == ExploreType.TIME) {
-            return label.time;
-        }
-        if (exploreType == ExploreType.WEIGHT) {
-            return label.weight;
-        }
-        return label.distance;
-    }
-
-    private boolean isInLimit(IsoLabel isoLabel) {
-        return (this.limit - getExploreValue(isoLabel.parent)) > 0;
-    }
+    protected abstract boolean isInLimit(IsoLabel isoLabel);
 
     @Override
     public String getName() {
@@ -192,3 +114,7 @@ public class ShortestPathTree extends AbstractRoutingAlgorithm {
         return visitedNodes;
     }
 }
+
+
+
+

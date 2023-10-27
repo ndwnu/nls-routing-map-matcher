@@ -39,7 +39,7 @@ class BooleanParserTest {
     @Test
     void handleWayTags_ok_oneValueForBothDirections() {
         BooleanParser booleanParser = getBooleanParser(false);
-        when(link.getTag(linkTag, true)).thenReturn(EXPECTED_A);
+        when(link.getTag(linkTag, false)).thenReturn(EXPECTED_A);
 
         booleanParser.handleWayTags(EDGE_ID, egdeIntAccess, link, null);
 
@@ -49,8 +49,8 @@ class BooleanParserTest {
     @Test
     void handleWayTags_ok_separateValuesPerDirection() {
         BooleanParser booleanParser = getBooleanParser(true);
-        when(link.getTag(linkTag, true, false)).thenReturn(EXPECTED_A);
-        when(link.getTag(linkTag, true, true)).thenReturn(EXPECTED_B);
+        when(link.getTag(linkTag, false, false)).thenReturn(EXPECTED_A);
+        when(link.getTag(linkTag, false, true)).thenReturn(EXPECTED_B);
 
         booleanParser.handleWayTags(EDGE_ID, egdeIntAccess, link, null);
 

@@ -15,7 +15,7 @@ import com.graphhopper.util.FetchMode;
 import com.graphhopper.util.PointList;
 import nu.ndw.nls.routingmapmatcher.constants.GlobalConstants;
 import nu.ndw.nls.routingmapmatcher.domain.model.IsochroneMatch;
-import nu.ndw.nls.routingmapmatcher.graphhopper.isochrone.ShortestPathTree.IsoLabel;
+import nu.ndw.nls.routingmapmatcher.graphhopper.isochrone.algorithm.IsoLabel;
 import nu.ndw.nls.routingmapmatcher.graphhopper.util.CrsTransformer;
 import nu.ndw.nls.routingmapmatcher.graphhopper.util.FractionAndDistanceCalculator;
 import org.assertj.core.data.Percentage;
