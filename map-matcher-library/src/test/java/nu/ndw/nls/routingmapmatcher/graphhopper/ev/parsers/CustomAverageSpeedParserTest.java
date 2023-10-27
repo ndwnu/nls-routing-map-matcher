@@ -78,6 +78,16 @@ class CustomAverageSpeedParserTest {
         verify(averageSpeedEncoder, never()).setDecimal(anyBoolean(), eq(EDGE_ID), eq(edgeIntAccess), anyDouble());
     }
 
+    @Test
+    void handleWayTags_ok_belowMinimumSpeed() {
+        double smallestNonZeroValue = 5.0;
+        when(averageSpeedEncoder.getSmallestNonZeroValue()).thenReturn(smallestNonZeroValue);
+        Link link = createLink(1, 4);
+        customAverageSpeedParser.handleWayTags(EDGE_ID, edgeIntAccess, link);
+        verify(averageSpeedEncoder).setDecimal(false, EDGE_ID, edgeIntAccess, smallestNonZeroValue);
+        verify(averageSpeedEncoder).setDecimal(true, EDGE_ID, edgeIntAccess, smallestNonZeroValue);
+    }
+
     private Link createLink(int speed, int reverseSpeed) {
         return Link.builder().speedInKilometersPerHour(speed).reverseSpeedInKilometersPerHour(reverseSpeed).build();
     }
