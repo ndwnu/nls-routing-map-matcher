@@ -31,11 +31,14 @@ public class CustomAverageSpeedParser extends AbstractAverageSpeedParser {
             return;
         }
         Link link = castToLink(readerWay);
-        if (link.getSpeedInKilometersPerHour() > NEAR_ZERO) {
-            setSpeed(false, edgeId, edgeIntAccess, link.getSpeedInKilometersPerHour());
-        }
-        if (link.getReverseSpeedInKilometersPerHour() > NEAR_ZERO) {
-            setSpeed(true, edgeId, edgeIntAccess, link.getReverseSpeedInKilometersPerHour());
+        setSpeed(false, edgeId, edgeIntAccess, link.getSpeedInKilometersPerHour());
+        setSpeed(true, edgeId, edgeIntAccess, link.getReverseSpeedInKilometersPerHour());
+    }
+
+    @Override
+    protected void setSpeed(boolean reverse, int edgeId, EdgeIntAccess edgeIntAccess, double speed) {
+        if (speed > NEAR_ZERO) {
+            super.setSpeed(reverse, edgeId, edgeIntAccess, Math.max(speed, avgSpeedEnc.getSmallestNonZeroValue()));
         }
     }
 }
