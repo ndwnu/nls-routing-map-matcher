@@ -114,11 +114,7 @@ class IsochroneServiceTest {
         when(shortestPathTreeFactory.createShortestPathTree(any(),
                 anyDouble(), any(), anyBoolean()))
                 .thenReturn(isochroneByTimeDistanceAndWeight);
-        doAnswer(ans -> {
-            Consumer<IsoLabel> callback = ans.getArgument(1, Consumer.class);
-            callback.accept(isoLabel);
-            return null;
-        }).when(isochroneByTimeDistanceAndWeight).search(eq(START_NODE_ID), any());
+        doSearchWithMockConsumer(isoLabel);
         when(encodingManager.getBooleanEncodedValue(VehicleAccess.key(VEHICLE_CAR))).thenReturn(booleanEncodedValue);
         when(startEdge.get(booleanEncodedValue)).thenReturn(true);
         when(startEdge.getReverse(booleanEncodedValue)).thenReturn(false);
@@ -136,6 +132,14 @@ class IsochroneServiceTest {
 
     }
 
+    private void doSearchWithMockConsumer(IsoLabel isoLabel) {
+        doAnswer(ans -> {
+            Consumer<IsoLabel> callback = ans.getArgument(1, Consumer.class);
+            callback.accept(isoLabel);
+            return null;
+        }).when(isochroneByTimeDistanceAndWeight).search(eq(START_NODE_ID), any());
+    }
+
     @Test
     void getUpstreamIsochroneMatches_ok_filter() {
         IsoLabel isoLabel = createIsoLabel(100, 0);
@@ -145,11 +149,7 @@ class IsochroneServiceTest {
         when(shortestPathTreeFactory.createShortestPathTree(any(),
                 anyDouble(), any(), anyBoolean()))
                 .thenReturn(isochroneByTimeDistanceAndWeight);
-        doAnswer(ans -> {
-            Consumer<IsoLabel> callback = ans.getArgument(1, Consumer.class);
-            callback.accept(isoLabel);
-            return null;
-        }).when(isochroneByTimeDistanceAndWeight).search(eq(START_NODE_ID), any());
+        doSearchWithMockConsumer(isoLabel);
 
         when(location.getUpstreamIsochrone()).thenReturn(ISOCHRONE_VALUE_METERS);
         when(location.getUpstreamIsochroneUnit()).thenReturn(IsochroneUnit.METERS);
@@ -166,11 +166,7 @@ class IsochroneServiceTest {
         when(shortestPathTreeFactory.createShortestPathTree(any(),
                 anyDouble(), any(), anyBoolean()))
                 .thenReturn(isochroneByTimeDistanceAndWeight);
-        doAnswer(ans -> {
-            Consumer<IsoLabel> callback = ans.getArgument(1, Consumer.class);
-            callback.accept(endLabel);
-            return null;
-        }).when(isochroneByTimeDistanceAndWeight).search(eq(START_NODE_ID), any());
+        doSearchWithMockConsumer(endLabel);
         when(encodingManager.getBooleanEncodedValue(VehicleAccess.key(VEHICLE_CAR))).thenReturn(booleanEncodedValue);
         when(startEdge.get(booleanEncodedValue)).thenReturn(true);
         when(startEdge.getReverse(booleanEncodedValue)).thenReturn(false);
@@ -201,11 +197,7 @@ class IsochroneServiceTest {
         when(shortestPathTreeFactory.createShortestPathTree(any(),
                 anyDouble(), any(), anyBoolean()))
                 .thenReturn(isochroneByTimeDistanceAndWeight);
-        doAnswer(ans -> {
-            Consumer<IsoLabel> callback = ans.getArgument(1, Consumer.class);
-            callback.accept(endLabel);
-            return null;
-        }).when(isochroneByTimeDistanceAndWeight).search(eq(START_NODE_ID), any());
+        doSearchWithMockConsumer(endLabel);
         when(encodingManager.getBooleanEncodedValue(VehicleAccess.key(VEHICLE_CAR))).thenReturn(booleanEncodedValue);
         when(startEdge.get(booleanEncodedValue)).thenReturn(true);
         when(startEdge.getReverse(booleanEncodedValue)).thenReturn(false);
@@ -255,11 +247,7 @@ class IsochroneServiceTest {
         when(shortestPathTreeFactory.createShortestPathTree(any(),
                 anyDouble(), any(), anyBoolean()))
                 .thenReturn(isochroneByTimeDistanceAndWeight);
-        doAnswer(ans -> {
-            Consumer<IsoLabel> callback = ans.getArgument(1, Consumer.class);
-            callback.accept(isoLabel);
-            return null;
-        }).when(isochroneByTimeDistanceAndWeight).search(eq(START_NODE_ID), any());
+        doSearchWithMockConsumer(isoLabel);
         when(encodingManager.getBooleanEncodedValue(VehicleAccess.key(VEHICLE_CAR))).thenReturn(booleanEncodedValue);
         when(startEdge.get(booleanEncodedValue)).thenReturn(true);
         when(startEdge.getReverse(booleanEncodedValue)).thenReturn(false);

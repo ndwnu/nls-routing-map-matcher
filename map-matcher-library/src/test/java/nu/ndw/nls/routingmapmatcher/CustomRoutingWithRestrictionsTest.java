@@ -2,19 +2,17 @@ package nu.ndw.nls.routingmapmatcher;
 
 
 import static nu.ndw.nls.routingmapmatcher.constants.GlobalConstants.WGS84_SRID;
-import static nu.ndw.nls.routingmapmatcher.domain.model.LinkTag.GEN_ACCESSIBLE;
-import static nu.ndw.nls.routingmapmatcher.domain.model.LinkTag.HGV_ACCESSIBLE;
-import static nu.ndw.nls.routingmapmatcher.domain.model.LinkTag.MAX_AXLE_LOAD;
-import static nu.ndw.nls.routingmapmatcher.domain.model.LinkTag.MAX_HEIGHT;
-import static nu.ndw.nls.routingmapmatcher.domain.model.LinkTag.MAX_LENGTH;
-import static nu.ndw.nls.routingmapmatcher.domain.model.LinkTag.MAX_WIDTH;
+import static nu.ndw.nls.routingmapmatcher.domain.model.LinkTag.C7_HGV_ACCESS_FORBIDDEN;
+import static nu.ndw.nls.routingmapmatcher.domain.model.LinkTag.C20_MAX_AXLE_LOAD;
+import static nu.ndw.nls.routingmapmatcher.domain.model.LinkTag.C19_MAX_HEIGHT;
+import static nu.ndw.nls.routingmapmatcher.domain.model.LinkTag.C17_MAX_LENGTH;
+import static nu.ndw.nls.routingmapmatcher.domain.model.LinkTag.C18_MAX_WIDTH;
 import static nu.ndw.nls.routingmapmatcher.domain.model.LinkTag.MUNICIPALITY_CODE;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.graphhopper.GHRequest;
 import com.graphhopper.GHResponse;
 import com.graphhopper.routing.ev.BooleanEncodedValue;
-import com.graphhopper.routing.ev.VehicleAccess;
 import com.graphhopper.util.EdgeIteratorState;
 import com.graphhopper.util.shapes.GHPoint;
 import java.nio.file.Path;
@@ -23,13 +21,13 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import lombok.extern.slf4j.Slf4j;
 import nu.ndw.nls.routingmapmatcher.domain.model.Link;
+import nu.ndw.nls.routingmapmatcher.domain.model.accessibility.VehicleProperties;
 import nu.ndw.nls.routingmapmatcher.graphhopper.IndexedNetworkGraphHopper;
 import nu.ndw.nls.routingmapmatcher.graphhopper.NetworkGraphHopper;
 import nu.ndw.nls.routingmapmatcher.graphhopper.ev.CustomEncodedValuesFactory;
 import nu.ndw.nls.routingmapmatcher.graphhopper.ev.CustomVehicleEncodedValuesFactory;
 import nu.ndw.nls.routingmapmatcher.graphhopper.ev.EncodedTag;
 import nu.ndw.nls.routingmapmatcher.graphhopper.ev.VehicleRestrictionsModel;
-import nu.ndw.nls.routingmapmatcher.domain.model.accessibility.VehicleProperties;
 import nu.ndw.nls.routingmapmatcher.graphhopper.ev.VehicleType;
 import nu.ndw.nls.routingmapmatcher.graphhopper.ev.parsers.LinkTagParserFactory;
 import nu.ndw.nls.routingmapmatcher.graphhopper.ev.parsers.LinkVehicleTagParsersFactory;
@@ -44,7 +42,7 @@ import org.locationtech.jts.geom.impl.CoordinateArraySequence;
 public class CustomRoutingWithRestrictionsTest {
 
     private static final String CAR_PROFILE = "profile_car";
-    private static final String TRUCK_PROFILE = "profile_truck";
+
 
     private static final Coordinate START_NODE = new Coordinate(5.108409, 52.081079);
     private static final Coordinate NODE_A = new Coordinate(5.1099461, 52.0794303);
@@ -64,7 +62,7 @@ public class CustomRoutingWithRestrictionsTest {
     @Test
     void route_okWithShorterRoute_notRestrictedForCar() {
         IndexedNetworkGraphHopper graphHopper = createGhNetwork();
-        GHRequest req = getRequest(START_NODE_GH, END_NODE_GH, CAR_PROFILE);
+        GHRequest req = getRequest(START_NODE_GH, END_NODE_GH);
 
         GHResponse res = graphHopper.route(req);
 
@@ -74,8 +72,9 @@ public class CustomRoutingWithRestrictionsTest {
     @Test
     void route_okWithLongerRoute_restrictedForTruck() {
         NetworkGraphHopper graphHopper = createGhNetwork();
-        GHRequest req = getRequest(START_NODE_GH, END_NODE_GH, TRUCK_PROFILE);
-
+        GHRequest req = getRequest(START_NODE_GH, END_NODE_GH);
+        req.setCustomModel(new VehicleRestrictionsModel(VehicleProperties
+                .builder().hgvAccessForbidden(true).build()));
         GHResponse res = graphHopper.route(req);
 
         assertBestDistance(res, 450.0);
@@ -84,8 +83,9 @@ public class CustomRoutingWithRestrictionsTest {
     @Test
     void route_okWithLongerRoute_restrictedInReverseForTruck() {
         NetworkGraphHopper graphHopper = createGhNetwork();
-        GHRequest req = getRequest(END_NODE_GH, START_NODE_GH, TRUCK_PROFILE);
-
+        GHRequest req = getRequest(END_NODE_GH, START_NODE_GH);
+        req.setCustomModel(new VehicleRestrictionsModel(VehicleProperties
+                .builder().hgvAccessForbidden(true).build()));
         GHResponse res = graphHopper.route(req);
 
         assertBestDistance(res, 450.0);
@@ -94,7 +94,9 @@ public class CustomRoutingWithRestrictionsTest {
     @Test
     void route_okWithShorterRoute_restrictionsLiftedAfterInit() {
         IndexedNetworkGraphHopper graphHopper = createGhNetwork();
-        GHRequest req = getRequest(END_NODE_GH, START_NODE_GH, TRUCK_PROFILE);
+        GHRequest req = getRequest(END_NODE_GH, START_NODE_GH);
+        req.setCustomModel(new VehicleRestrictionsModel(VehicleProperties
+                .builder().hgvAccessForbidden(true).build()));
 
         GHResponse responseBefore = graphHopper.route(req);
 
@@ -115,9 +117,9 @@ public class CustomRoutingWithRestrictionsTest {
         VehicleProperties shortHgv = VehicleProperties.builder().length(3.5).build();
         VehicleProperties longHgv = VehicleProperties.builder().length(4.5).build();
 
-        GHRequest shortHgvRequest = getRequest(START_NODE_GH, END_NODE_GH, TRUCK_PROFILE)
+        GHRequest shortHgvRequest = getRequest(START_NODE_GH, END_NODE_GH)
                 .setCustomModel(new VehicleRestrictionsModel(shortHgv));
-        GHRequest longHgvRequest = getRequest(START_NODE_GH, END_NODE_GH, TRUCK_PROFILE)
+        GHRequest longHgvRequest = getRequest(START_NODE_GH, END_NODE_GH)
                 .setCustomModel(new VehicleRestrictionsModel(longHgv));
 
         GHResponse shortHgvResponse = graphHopper.route(shortHgvRequest);
@@ -132,11 +134,11 @@ public class CustomRoutingWithRestrictionsTest {
         Integer edgeKey = graphHopper.getEdgeMap().get(1L);
         EdgeIteratorState edge = graphHopper.getBaseGraph().getEdgeIteratorStateForKey(edgeKey);
         BooleanEncodedValue encodedValue = graphHopper.getEncodingManager()
-                .getBooleanEncodedValue(VehicleAccess.key(VehicleType.HGV.getName()));
+                .getBooleanEncodedValue(EncodedTag.HGV_ACCESS_FORBIDDEN.getKey());
         if (reverse) {
-            edge.setReverse(encodedValue, true);
+            edge.setReverse(encodedValue, false);
         } else {
-            edge.set(encodedValue, true);
+            edge.set(encodedValue, false);
         }
     }
 
@@ -146,9 +148,9 @@ public class CustomRoutingWithRestrictionsTest {
         return getNetworkGraphHopper();
     }
 
-    private static GHRequest getRequest(GHPoint from, GHPoint to, String profile) {
+    private static GHRequest getRequest(GHPoint from, GHPoint to) {
         return new GHRequest()
-                .setProfile(profile)
+                .setProfile(CustomRoutingWithRestrictionsTest.CAR_PROFILE)
                 .addPoint(from)
                 .addPoint(to);
     }
@@ -160,20 +162,19 @@ public class CustomRoutingWithRestrictionsTest {
     }
 
     private static void addTags() {
-        CustomRoutingWithRestrictionsTest.link1.setTag(MAX_HEIGHT, 3.5, false);
-        CustomRoutingWithRestrictionsTest.link1.setTag(MAX_WIDTH, 2.0, false);
-        CustomRoutingWithRestrictionsTest.link1.setTag(MAX_LENGTH, 4.0, false);
-        CustomRoutingWithRestrictionsTest.link1.setTag(MAX_AXLE_LOAD, 3.0, false);
-        CustomRoutingWithRestrictionsTest.link1.setTag(HGV_ACCESSIBLE, false, false);
+        CustomRoutingWithRestrictionsTest.link1.setTag(C19_MAX_HEIGHT, 3.5, false);
+        CustomRoutingWithRestrictionsTest.link1.setTag(C18_MAX_WIDTH, 2.0, false);
+        CustomRoutingWithRestrictionsTest.link1.setTag(C17_MAX_LENGTH, 4.0, false);
+        CustomRoutingWithRestrictionsTest.link1.setTag(C20_MAX_AXLE_LOAD, 3.0, false);
+        CustomRoutingWithRestrictionsTest.link1.setTag(C7_HGV_ACCESS_FORBIDDEN, true, false);
 
-        CustomRoutingWithRestrictionsTest.link1.setTag(MAX_HEIGHT, 3.5, true);
-        CustomRoutingWithRestrictionsTest.link1.setTag(MAX_WIDTH, 2.0, true);
-        CustomRoutingWithRestrictionsTest.link1.setTag(MAX_LENGTH, 4.0, true);
-        CustomRoutingWithRestrictionsTest.link1.setTag(MAX_AXLE_LOAD, 3.0, true);
-        CustomRoutingWithRestrictionsTest.link1.setTag(HGV_ACCESSIBLE, false, true);
+        CustomRoutingWithRestrictionsTest.link1.setTag(C19_MAX_HEIGHT, 3.5, true);
+        CustomRoutingWithRestrictionsTest.link1.setTag(C18_MAX_WIDTH, 2.0, true);
+        CustomRoutingWithRestrictionsTest.link1.setTag(C17_MAX_LENGTH, 4.0, true);
+        CustomRoutingWithRestrictionsTest.link1.setTag(C20_MAX_AXLE_LOAD, 3.0, true);
+        CustomRoutingWithRestrictionsTest.link1.setTag(C7_HGV_ACCESS_FORBIDDEN, true, true);
 
         CustomRoutingWithRestrictionsTest.link1.setTag(MUNICIPALITY_CODE, 200);
-        CustomRoutingWithRestrictionsTest.link1.setTag(GEN_ACCESSIBLE, false);
     }
 
 
@@ -188,7 +189,6 @@ public class CustomRoutingWithRestrictionsTest {
         graphHopper.setEncodedValueFactory(new CustomEncodedValuesFactory());
         graphHopper.setTagParserFactory(new LinkTagParserFactory());
         graphHopper.setProfiles(
-                VehicleType.HGV.createProfile(TRUCK_PROFILE),
                 VehicleType.CAR.createProfile(CAR_PROFILE)
         );
         graphHopper.setEncodedValuesString(

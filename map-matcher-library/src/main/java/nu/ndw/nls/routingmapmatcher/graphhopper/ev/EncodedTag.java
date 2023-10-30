@@ -18,25 +18,32 @@ public enum EncodedTag {
 
     WAY_ID("way_id", INT, null, 31, false, vd -> null, null),
     MUNICIPALITY_CODE("municipality_code", INT, LinkTag.MUNICIPALITY_CODE, 17, false, vd -> null, null),
-    MAX_AXLE_LOAD("max_axle_load", DECIMAL, LinkTag.MAX_AXLE_LOAD, 7, true, VehicleProperties::axleLoad, SMALLER_THAN),
-    MAX_HEIGHT("max_height", DECIMAL, LinkTag.MAX_HEIGHT, 7, true, VehicleProperties::height, SMALLER_THAN),
-    MAX_LENGTH("max_length", DECIMAL, LinkTag.MAX_LENGTH, 7, true, VehicleProperties::length, SMALLER_THAN),
-    MAX_WEIGHT("max_weight", DECIMAL, LinkTag.MAX_WEIGHT, 7, true, VehicleProperties::weight, SMALLER_THAN),
-    MAX_WIDTH("max_width", DECIMAL, LinkTag.MAX_WIDTH, 7, true, VehicleProperties::width, SMALLER_THAN),
-
-    HGV_ACCESS_FORBIDDEN("hgv_access_forbidden", EncodingType.BOOLEAN, LinkTag.HGV_ACCESS_FORBIDDEN, null, true,
+    MAX_AXLE_LOAD("max_axle_load", DECIMAL, LinkTag.C20_MAX_AXLE_LOAD, 7, true, VehicleProperties::axleLoad, SMALLER_THAN),
+    MAX_HEIGHT("max_height", DECIMAL, LinkTag.C19_MAX_HEIGHT, 7, true, VehicleProperties::height, SMALLER_THAN),
+    MAX_LENGTH("max_length", DECIMAL, LinkTag.C17_MAX_LENGTH, 7, true, VehicleProperties::length, SMALLER_THAN),
+    MAX_WEIGHT("max_weight", DECIMAL, LinkTag.C21_MAX_WEIGHT, 7, true, VehicleProperties::weight, SMALLER_THAN),
+    MAX_WIDTH("max_width", DECIMAL, LinkTag.C18_MAX_WIDTH, 7, true, VehicleProperties::width, SMALLER_THAN),
+    HGV_ACCESS_FORBIDDEN("hgv_access_forbidden", EncodingType.BOOLEAN, LinkTag.C7_HGV_ACCESS_FORBIDDEN, null, true,
             VehicleProperties::hgvAccessForbidden, EQUALS),
-
-    CAR_ACCESS_FORBIDDEN("car_access_forbidden", EncodingType.BOOLEAN, LinkTag.CAR_ACCESS_FORBIDDEN, null, true,
+    CAR_ACCESS_FORBIDDEN("car_access_forbidden", EncodingType.BOOLEAN, LinkTag.C6_CAR_ACCESS_FORBIDDEN, null, true,
             VehicleProperties::carAccessForbidden, EQUALS),
-
-    AUTO_BUS_ACCESS_FORBIDDEN("auto_bus_access_forbidden", EncodingType.BOOLEAN, LinkTag.AUTO_BUS_ACCESS_FORBIDDEN,
+    AUTO_BUS_ACCESS_FORBIDDEN("auto_bus_access_forbidden", EncodingType.BOOLEAN, LinkTag.C7A_AUTO_BUS_ACCESS_FORBIDDEN,
             null, true,
             VehicleProperties::autoBusAccessForbidden, EQUALS),
-
-    TRAILER_ACCESS_FORBIDDEN("trailer_access_forbidden", EncodingType.BOOLEAN, LinkTag.TRAILER_ACCESS_FORBIDDEN, null,
+    TRAILER_ACCESS_FORBIDDEN("trailer_access_forbidden", EncodingType.BOOLEAN, LinkTag.C10_TRAILER_ACCESS_FORBIDDEN, null,
             true,
-            VehicleProperties::autoBusAccessForbidden, EQUALS);
+            VehicleProperties::trailerAccessForbidden, EQUALS),
+
+    HGV_AND_AUTO_BUS_ACCESS_FORBIDDEN("hgv_and_auto_bus_access_forbidden", EncodingType.BOOLEAN, LinkTag.C7B_HGV_AND_AUTO_BUS_ACCESS_FORBIDDEN, null,
+            true,
+            VehicleProperties::hgvAndAutoBusAccessForbidden, EQUALS),
+    MOTOR_BIKE_ACCESS_FORBIDDEN("motor_bike_access_forbidden", EncodingType.BOOLEAN, LinkTag.C11_MOTOR_BIKE_ACCESS_FORBIDDEN, null,
+            true,
+            VehicleProperties::motorBikeAccessForbidden, EQUALS),
+    MOTOR_VEHICLE_ACCESS_FORBIDDEN("motor_vehicle_access_forbidden", EncodingType.BOOLEAN, LinkTag.C12_MOTOR_VEHICLE_ACCESS_FORBIDDEN, null,
+            true,
+            VehicleProperties::motorVehicleAccessForbidden, EQUALS)
+    ;
 
     private static final String NONEXISTENT_TAG_MSG =
             "No tag exists with label \"%s\". New tags can be added in the routing-map-matcher library when needed.";

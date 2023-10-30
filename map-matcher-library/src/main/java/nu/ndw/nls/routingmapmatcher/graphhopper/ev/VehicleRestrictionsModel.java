@@ -1,7 +1,5 @@
 package nu.ndw.nls.routingmapmatcher.graphhopper.ev;
 
-import static nu.ndw.nls.routingmapmatcher.graphhopper.ev.EncodedTag.Operator.SMALLER_THAN;
-
 import com.graphhopper.json.Statement;
 import com.graphhopper.json.Statement.Op;
 import com.graphhopper.util.CustomModel;
@@ -34,9 +32,15 @@ public class VehicleRestrictionsModel extends CustomModel {
     private Optional<String> getPartialExpression(VehicleProperties vehicleProperties, EncodedTag encodedTag) {
 
         return Optional.ofNullable(encodedTag.getValueFunction().apply(vehicleProperties))
-                .map(value -> String.format(Locale.US,
-                        encodedTag.getOperator() == SMALLER_THAN ? SMALLER_THAN_EXPRESSION_TEMPLATE
-                                : EQUALS_EXPRESSION_TEMPLATE, encodedTag.getKey(), value));
+                .map(value ->
+                        switch (encodedTag.getOperator()) {
+                            case SMALLER_THAN -> String.format(Locale.US,
+                                    SMALLER_THAN_EXPRESSION_TEMPLATE, encodedTag.getKey(), value);
+                            case EQUALS -> String.format(Locale.US,
+                                    EQUALS_EXPRESSION_TEMPLATE, encodedTag.getKey(), value);
+
+                        });
+
 
     }
 

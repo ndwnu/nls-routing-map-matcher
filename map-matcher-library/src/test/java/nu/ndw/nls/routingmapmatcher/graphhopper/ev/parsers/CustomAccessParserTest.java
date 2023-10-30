@@ -20,7 +20,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 class CustomAccessParserTest {
 
     private static final int EDGE_ID = 1;
-    private static final VehicleType VEHICLE_TYPE = VehicleType.HGV;
+    private static final VehicleType VEHICLE_TYPE = VehicleType.CAR;
 
     @Mock
     private EncodedValueLookup lookup;
@@ -44,37 +44,25 @@ class CustomAccessParserTest {
 
     @Test
     void handleWayTags_ok_booleanInaccessible() {
-        when(link.getTag(VEHICLE_TYPE.getAccessTag(), true, false)).thenReturn(false);
-        when(link.getTag(VEHICLE_TYPE.getAccessTag(), true, true)).thenReturn(false);
-
         customAccessParser.handleWayTags(EDGE_ID, egdeIntAccess, link);
-
         verify(booleanEncodedValue).setBool(false, EDGE_ID, egdeIntAccess, false);
         verify(booleanEncodedValue).setBool(true, EDGE_ID, egdeIntAccess, false);
     }
 
     @Test
     void handleWayTags_ok_speedLimitZero() {
-        when(link.getTag(VEHICLE_TYPE.getAccessTag(), true, false)).thenReturn(true);
-        when(link.getTag(VEHICLE_TYPE.getAccessTag(), true, true)).thenReturn(true);
         when(link.getSpeedInKilometersPerHour()).thenReturn(0.0);
         when(link.getReverseSpeedInKilometersPerHour()).thenReturn(0.0);
-
         customAccessParser.handleWayTags(EDGE_ID, egdeIntAccess, link);
-
         verify(booleanEncodedValue).setBool(false, EDGE_ID, egdeIntAccess, false);
         verify(booleanEncodedValue).setBool(true, EDGE_ID, egdeIntAccess, false);
     }
 
     @Test
     void handleWayTags_ok_accessible() {
-        when(link.getTag(VEHICLE_TYPE.getAccessTag(), true, false)).thenReturn(true);
-        when(link.getTag(VEHICLE_TYPE.getAccessTag(), true, true)).thenReturn(true);
         when(link.getSpeedInKilometersPerHour()).thenReturn(10.0);
         when(link.getReverseSpeedInKilometersPerHour()).thenReturn(10.0);
-
         customAccessParser.handleWayTags(EDGE_ID, egdeIntAccess, link);
-
         verify(booleanEncodedValue).setBool(false, EDGE_ID, egdeIntAccess, true);
         verify(booleanEncodedValue).setBool(true, EDGE_ID, egdeIntAccess, true);
     }

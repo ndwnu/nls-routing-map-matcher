@@ -1,6 +1,6 @@
 package nu.ndw.nls.routingmapmatcher.domain.model;
 
-import static nu.ndw.nls.routingmapmatcher.domain.model.LinkTag.MAX_WEIGHT;
+import static nu.ndw.nls.routingmapmatcher.domain.model.LinkTag.C21_MAX_WEIGHT;
 import static nu.ndw.nls.routingmapmatcher.domain.model.LinkTag.MUNICIPALITY_CODE;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
@@ -13,11 +13,11 @@ class LinkTest {
 
     @Test
     void setAndGetTag_ok_separateValuesPerDirection() {
-        link.setTag(MAX_WEIGHT, 2.0, false);
-        link.setTag(MAX_WEIGHT, 3.0, true);
+        link.setTag(C21_MAX_WEIGHT, 2.0, false);
+        link.setTag(C21_MAX_WEIGHT, 3.0, true);
 
-        assertEquals(2.0, link.getTag(MAX_WEIGHT, null, false));
-        assertEquals(3.0, link.getTag(MAX_WEIGHT, null, true));
+        assertEquals(2.0, link.getTag(C21_MAX_WEIGHT, null, false));
+        assertEquals(3.0, link.getTag(C21_MAX_WEIGHT, null, true));
     }
 
     @Test
@@ -29,14 +29,14 @@ class LinkTest {
 
     @Test
     void setTag_exception_separateValuesButNoDirectionSpecified() {
-        var exception = assertThrows(IllegalArgumentException.class, () -> link.setTag(MAX_WEIGHT, 2.0));
+        var exception = assertThrows(IllegalArgumentException.class, () -> link.setTag(C21_MAX_WEIGHT, 2.0));
         assertThat(exception).hasMessage("Link tag max-weight stores separate values for both directions. "
                                          + "Use setTag method with boolean 'reverse' parameter.");
     }
 
     @Test
     void getTag_exception_separateValuesButNoDirectionSpecified() {
-        var exception = assertThrows(IllegalArgumentException.class, () -> link.getTag(MAX_WEIGHT, null));
+        var exception = assertThrows(IllegalArgumentException.class, () -> link.getTag(C21_MAX_WEIGHT, null));
         assertThat(exception).hasMessage("Link tag max-weight stores separate values for both directions. "
                                          + "Use getTag method with boolean 'reverse' parameter.");
     }

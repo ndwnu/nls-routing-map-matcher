@@ -18,20 +18,26 @@ class VehicleRestrictionsModelTest {
             + "hgv_access_forbidden == true || "
             + "car_access_forbidden == true || "
             + "auto_bus_access_forbidden == true || "
-            + "trailer_access_forbidden == true";
+            + "trailer_access_forbidden == true || "
+            + "hgv_and_auto_bus_access_forbidden == true || "
+            + "motor_bike_access_forbidden == true || "
+            + "motor_vehicle_access_forbidden == true";
     private static final String EXPECTED_PARTIAL_EXPRESSION = "hgv_access_forbidden == true || "
             + "car_access_forbidden == true || "
             + "auto_bus_access_forbidden == true || "
             + "trailer_access_forbidden == true";
 
     @Test
-    void test_vehicle_model_will_parse_ok() {
+    void VehicleRestrictionsModel_will_parse_ok() {
         VehicleProperties vehicleProperties = VehicleProperties
                 .builder()
                 .autoBusAccessForbidden(true)
                 .carAccessForbidden(true)
                 .trailerAccessForbidden(true)
                 .hgvAccessForbidden(true)
+                .motorVehicleAccessForbidden(true)
+                .hgvAndAutoBusAccessForbidden(true)
+                .motorBikeAccessForbidden(true)
                 .axleLoad(10.00)
                 .weight(26.5)
                 .height(2.65)
@@ -50,7 +56,7 @@ class VehicleRestrictionsModelTest {
 
 
     @Test
-    void test_vehicle_model_with_null_values_will_parse_ok() {
+    void VehicleRestrictionsModel_with_null_values_will_parse_ok() {
         VehicleProperties vehicleProperties = VehicleProperties
                 .builder()
                 .autoBusAccessForbidden(true)
@@ -68,7 +74,7 @@ class VehicleRestrictionsModelTest {
         assertThat(statement.getCondition()).isEqualTo(EXPECTED_PARTIAL_EXPRESSION);
     }
     @Test
-    void test_vehicle_model_with_null_properties_will_parse_ok() {
+    void VehicleRestrictionsModel_with_null_properties_will_parse_ok() {
         VehicleRestrictionsModel vehicleRestrictionsModel = new VehicleRestrictionsModel(null);
         assertThat(vehicleRestrictionsModel.getPriority()).hasSize(0);
     }

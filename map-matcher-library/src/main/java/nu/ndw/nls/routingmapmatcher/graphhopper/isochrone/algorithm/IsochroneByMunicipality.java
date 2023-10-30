@@ -11,9 +11,9 @@ import com.graphhopper.storage.Graph;
 import com.graphhopper.util.EdgeIteratorState;
 
 /**
- * This class is a fork of the com.graphhopper.isochrone.algorithm. ShortestPathTree class. The inclusion logic is must
- * be implemented in the isInLimit method for this subclass this is weather the road section is withing the specified
- * municipality.
+ * This class is a fork of the com.graphhopper.isochrone.algorithm. ShortestPathTree class.
+ * The inclusion logic must be implemented in the isInLimit method.
+ * For this subclass, this is whether the road section is within the specified municipality
  */
 public class IsochroneByMunicipality extends AbstractShortestPathTree {
 

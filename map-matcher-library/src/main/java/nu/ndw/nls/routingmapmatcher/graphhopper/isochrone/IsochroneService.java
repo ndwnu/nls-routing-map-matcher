@@ -80,7 +80,7 @@ public class IsochroneService {
     }
 
     /**
-     * Creates Isochrone for an entire municipality based on start point. The start point has to be withing the
+     * Creates Isochrone for an entire municipality based on start point. The start point has to be within the
      * municipality This can be used to create an accessibility map by first calling this method with a weighting that
      * has no restriction and consequently calling this method with a weighting that has restrictions based on vehicles
      * dimensions etc.
