@@ -17,6 +17,10 @@
             <artifactId>graphhopper-core</artifactId>
         </dependency>
         <dependency>
+            <groupId>org.codehaus.janino</groupId>
+            <artifactId>janino</artifactId>
+        </dependency>
+        <dependency>
             <groupId>com.graphhopper</groupId>
             <artifactId>graphhopper-map-matching</artifactId>
         </dependency>
