@@ -28,7 +28,7 @@ class VehicleRestrictionsModelTest {
             + "trailer_access_forbidden == true";
 
     @Test
-    void VehicleRestrictionsModel_will_parse_ok() {
+    void vehicleRestrictionsModel_will_parse_ok() {
         VehicleProperties vehicleProperties = VehicleProperties
                 .builder()
                 .autoBusAccessForbidden(true)
@@ -56,7 +56,7 @@ class VehicleRestrictionsModelTest {
 
 
     @Test
-    void VehicleRestrictionsModel_with_null_values_will_parse_ok() {
+    void vehicleRestrictionsModel_with_null_values_will_parse_ok() {
         VehicleProperties vehicleProperties = VehicleProperties
                 .builder()
                 .autoBusAccessForbidden(true)
@@ -74,7 +74,7 @@ class VehicleRestrictionsModelTest {
         assertThat(statement.getCondition()).isEqualTo(EXPECTED_PARTIAL_EXPRESSION);
     }
     @Test
-    void VehicleRestrictionsModel_with_null_properties_will_parse_ok() {
+    void vehicleRestrictionsModel_with_null_properties_will_parse_ok() {
         VehicleRestrictionsModel vehicleRestrictionsModel = new VehicleRestrictionsModel(null);
         assertThat(vehicleRestrictionsModel.getPriority()).hasSize(0);
     }
