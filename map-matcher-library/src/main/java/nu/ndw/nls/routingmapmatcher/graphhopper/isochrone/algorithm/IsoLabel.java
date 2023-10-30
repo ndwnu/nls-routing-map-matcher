@@ -7,6 +7,14 @@ import lombok.Setter;
 @Setter
 public class IsoLabel {
 
+    private boolean deleted;
+    private int node;
+    private int edge;
+    private double weight;
+    private long time;
+    private double distance;
+    private IsoLabel parent;
+
     public IsoLabel(int node, int edge, double weight, long time, double distance, IsoLabel parent) {
         this.node = node;
         this.edge = edge;
@@ -15,14 +23,6 @@ public class IsoLabel {
         this.distance = distance;
         this.parent = parent;
     }
-
-    private boolean deleted;
-    private int node;
-    private int edge;
-    private double weight;
-    private long time;
-    private double distance;
-    private IsoLabel parent;
 
     @Override
     public String toString() {
