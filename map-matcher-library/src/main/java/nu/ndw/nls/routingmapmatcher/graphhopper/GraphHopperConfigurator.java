@@ -51,7 +51,9 @@ public final class GraphHopperConfigurator {
                         .setVehicle(VehicleType.CAR.getName())
                         .setCustomModel(new CustomModel().setDistanceInfluence(WEIGHTING_SHORTEST_DISTANCE_INFLUENCE)),
                 VehicleType.HGV.createProfile(RoutingProfile.HGV_CUSTOM.getLabel()),
-                VehicleType.BUS.createProfile(RoutingProfile.BUS_CUSTOM.getLabel()));
+                VehicleType.BUS.createProfile(RoutingProfile.BUS_CUSTOM.getLabel()),
+                VehicleType.CAR.createProfile(RoutingProfile.MOTOR_VEHICLE_CUSTOM.getLabel()));
+
         networkGraphHopper.setEncodedValuesString(
                 Stream.of(EncodedTag.values())
                         .map(EncodedTag::getKey)
