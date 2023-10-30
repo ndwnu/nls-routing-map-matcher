@@ -1,11 +1,11 @@
 package nu.ndw.nls.routingmapmatcher.graphhopper.accessibility;
 
 import static nu.ndw.nls.routingmapmatcher.constants.GlobalConstants.WGS84_GEOMETRY_FACTORY;
-import static nu.ndw.nls.routingmapmatcher.domain.model.LinkTag.HGV_ACCESS_FORBIDDEN;
-import static nu.ndw.nls.routingmapmatcher.domain.model.LinkTag.MAX_AXLE_LOAD;
-import static nu.ndw.nls.routingmapmatcher.domain.model.LinkTag.MAX_HEIGHT;
-import static nu.ndw.nls.routingmapmatcher.domain.model.LinkTag.MAX_LENGTH;
-import static nu.ndw.nls.routingmapmatcher.domain.model.LinkTag.MAX_WIDTH;
+import static nu.ndw.nls.routingmapmatcher.domain.model.LinkTag.C7_HGV_ACCESS_FORBIDDEN;
+import static nu.ndw.nls.routingmapmatcher.domain.model.LinkTag.C20_MAX_AXLE_LOAD;
+import static nu.ndw.nls.routingmapmatcher.domain.model.LinkTag.C19_MAX_HEIGHT;
+import static nu.ndw.nls.routingmapmatcher.domain.model.LinkTag.C17_MAX_LENGTH;
+import static nu.ndw.nls.routingmapmatcher.domain.model.LinkTag.C18_MAX_WIDTH;
 import static nu.ndw.nls.routingmapmatcher.domain.model.LinkTag.MUNICIPALITY_CODE;
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -100,7 +100,7 @@ class GraphHopperAccessibilityMapIT {
           0----1-----2
     */
     @Test
-    void test_accessibility_with_restrictions_ok() {
+    void getAccessibleRoadSections_ok_withRestrictions() {
         addRestrictions(link1_1_link1);
         addRestrictions(link3_3_link3);
         graphHopper = createGhNetwork();
@@ -140,17 +140,17 @@ class GraphHopperAccessibilityMapIT {
 
     private static void addRestrictions(Link link) {
 
-        link.setTag(MAX_HEIGHT, 3.5, false);
-        link.setTag(MAX_WIDTH, 2.0, false);
-        link.setTag(MAX_LENGTH, 4.0, false);
-        link.setTag(MAX_AXLE_LOAD, 3.0, false);
-        link.setTag(HGV_ACCESS_FORBIDDEN, true, false);
+        link.setTag(C19_MAX_HEIGHT, 3.5, false);
+        link.setTag(C18_MAX_WIDTH, 2.0, false);
+        link.setTag(C17_MAX_LENGTH, 4.0, false);
+        link.setTag(C20_MAX_AXLE_LOAD, 3.0, false);
+        link.setTag(C7_HGV_ACCESS_FORBIDDEN, true, false);
 
-        link.setTag(MAX_HEIGHT, 3.5, true);
-        link.setTag(MAX_WIDTH, 2.0, true);
-        link.setTag(MAX_LENGTH, 4.0, true);
-        link.setTag(MAX_AXLE_LOAD, 3.0, true);
-        link.setTag(HGV_ACCESS_FORBIDDEN, true, true);
+        link.setTag(C19_MAX_HEIGHT, 3.5, true);
+        link.setTag(C18_MAX_WIDTH, 2.0, true);
+        link.setTag(C17_MAX_LENGTH, 4.0, true);
+        link.setTag(C20_MAX_AXLE_LOAD, 3.0, true);
+        link.setTag(C7_HGV_ACCESS_FORBIDDEN, true, true);
 
     }
 
