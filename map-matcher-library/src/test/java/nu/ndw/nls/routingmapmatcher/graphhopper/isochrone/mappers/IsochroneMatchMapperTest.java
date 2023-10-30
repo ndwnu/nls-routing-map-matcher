@@ -150,7 +150,7 @@ class IsochroneMatchMapperTest {
 
     private void setupFixture(boolean reversed, double distance, int startSegmentId) {
         isoLabel = createIsoLabel(distance, 0);
-        when(queryGraph.getEdgeIteratorState(isoLabel.edge, isoLabel.node)).thenReturn(edgeIteratorState);
+        when(queryGraph.getEdgeIteratorState(isoLabel.getEdge(), isoLabel.getNode())).thenReturn(edgeIteratorState);
         when(edgeIteratorStateReverseExtractor.hasReversed(edgeIteratorState)).thenReturn(reversed, false);
         when(encodingManager.getIntEncodedValue(WAY_ID.getKey())).thenReturn(intEncodedValue);
         when(edgeIteratorState.get(intEncodedValue)).thenReturn(MATCHED_LINK_ID_ONE);

@@ -4,11 +4,9 @@ package nu.ndw.nls.routingmapmatcher.graphhopper.isochrone.algorithm;
 import com.graphhopper.routing.util.TraversalMode;
 import com.graphhopper.routing.weighting.Weighting;
 import com.graphhopper.storage.Graph;
-import nu.ndw.nls.routingmapmatcher.graphhopper.isochrone.algorithm.AbstractShortestPathTree;
-import nu.ndw.nls.routingmapmatcher.graphhopper.isochrone.algorithm.IsoLabel;
 
 /**
- * This class is a fork of the com.graphhopper.isochrone.algorithm.IsochroneByTimeDistanceAndWeight class. The inclusion logic is
+ * This class is a fork of the com.graphhopper.isochrone.algorithm. ShortestPathTree class. The inclusion logic is
  * different from the original class because the original current implementation differed from the previous
  * implementation in v 0.12. The previous implementation in v 0.12 included IsoLabels which had a partial limit (ie a
  * road-segment of 100 meters which still could be travelled for 50 meters until reaching the limit was included). The
@@ -23,10 +21,12 @@ public class IsochroneByTimeDistanceAndWeight extends AbstractShortestPathTree {
     private double limit = -1;
     private ExploreType exploreType = ExploreType.TIME;
 
-    public IsochroneByTimeDistanceAndWeight(Graph g, Weighting weighting, boolean reverseFlow, TraversalMode traversalMode) {
+    public IsochroneByTimeDistanceAndWeight(Graph g, Weighting weighting, boolean reverseFlow,
+            TraversalMode traversalMode) {
         super(g, weighting, reverseFlow, traversalMode);
 
     }
+
     /**
      * Time limit in milliseconds
      */
@@ -50,16 +50,17 @@ public class IsochroneByTimeDistanceAndWeight extends AbstractShortestPathTree {
 
     private double getExploreValue(IsoLabel label) {
         if (exploreType == ExploreType.TIME) {
-            return label.time;
+            return label.getTime();
         }
         if (exploreType == ExploreType.WEIGHT) {
-            return label.weight;
+            return label.getWeight();
         }
-        return label.distance;
+        return label.getDistance();
     }
+
     @Override
     protected boolean isInLimit(IsoLabel isoLabel) {
-        return (this.limit - getExploreValue(isoLabel.parent)) > 0;
+        return (this.limit - getExploreValue(isoLabel.getParent())) > 0;
     }
 
 }
