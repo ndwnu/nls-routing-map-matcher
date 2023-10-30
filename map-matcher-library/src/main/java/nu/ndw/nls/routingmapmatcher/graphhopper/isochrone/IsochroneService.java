@@ -232,7 +232,8 @@ public class IsochroneService {
                 isCorrect = edgeIteratorStateReverseExtractor.hasReversed(currentEdge) == reverse;
             }
             if (isoLabel.getParent().getEdge() != ROOT_PARENT) {
-                return isSegmentFromStartSegmentInCorrectDirection(reverse, isoLabel.getParent(), startSegment, queryGraph);
+                return isSegmentFromStartSegmentInCorrectDirection(reverse, isoLabel.getParent(), startSegment,
+                        queryGraph);
             }
             return isCorrect;
         }

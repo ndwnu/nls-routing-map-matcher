@@ -23,6 +23,7 @@ import java.util.function.Consumer;
 public abstract class AbstractShortestPathTree extends AbstractRoutingAlgorithm {
 
 
+    private static final int INITIAL_CAPACITY = 1000;
     private final IntObjectHashMap<IsoLabel> fromMap;
     private final PriorityQueue<IsoLabel> queueByWeighting;
     private int visitedNodes;
@@ -31,9 +32,9 @@ public abstract class AbstractShortestPathTree extends AbstractRoutingAlgorithm 
 
     public AbstractShortestPathTree(Graph g, Weighting weighting, boolean reverseFlow, TraversalMode traversalMode) {
         super(g, weighting, traversalMode);
-        queueByWeighting = new PriorityQueue<>(1000,
+        queueByWeighting = new PriorityQueue<>(INITIAL_CAPACITY,
                 comparingDouble(IsoLabel::getWeight));
-        fromMap = new GHIntObjectHashMap<>(1000);
+        fromMap = new GHIntObjectHashMap<>(INITIAL_CAPACITY);
         this.reverseFlow = reverseFlow;
     }
 
