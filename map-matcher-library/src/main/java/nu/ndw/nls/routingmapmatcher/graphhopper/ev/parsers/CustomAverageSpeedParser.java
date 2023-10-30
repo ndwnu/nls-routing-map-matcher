@@ -38,7 +38,9 @@ public class CustomAverageSpeedParser extends AbstractAverageSpeedParser {
     @Override
     protected void setSpeed(boolean reverse, int edgeId, EdgeIntAccess edgeIntAccess, double speed) {
         if (speed > NEAR_ZERO) {
-            super.setSpeed(reverse, edgeId, edgeIntAccess, Math.max(speed, avgSpeedEnc.getSmallestNonZeroValue()));
+            double minSpeed = avgSpeedEnc.getSmallestNonZeroValue();
+            double maxSpeed = avgSpeedEnc.getMaxStorableDecimal();
+            super.setSpeed(reverse, edgeId, edgeIntAccess, Math.min(Math.max(speed, minSpeed), maxSpeed));
         }
     }
 }
