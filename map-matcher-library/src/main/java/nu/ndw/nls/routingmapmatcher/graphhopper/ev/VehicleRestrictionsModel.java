@@ -20,12 +20,14 @@ public class VehicleRestrictionsModel extends CustomModel {
     private static final String EQUALS_EXPRESSION_TEMPLATE = "%s == %b";
 
     public VehicleRestrictionsModel(VehicleProperties vehicleProperties) {
-        String fullExpression = Stream.of(EncodedTag.values())
-                .map(tag -> getPartialExpression(vehicleProperties, tag))
-                .flatMap(Optional::stream)
-                .collect(Collectors.joining(" || "));
-        if (!fullExpression.isEmpty()) {
-            super.addToPriority(Statement.If(fullExpression, Op.MULTIPLY, "0"));
+        if (vehicleProperties != null) {
+            String fullExpression = Stream.of(EncodedTag.values())
+                    .map(tag -> getPartialExpression(vehicleProperties, tag))
+                    .flatMap(Optional::stream)
+                    .collect(Collectors.joining(" || "));
+            if (!fullExpression.isEmpty()) {
+                super.addToPriority(Statement.If(fullExpression, Op.MULTIPLY, "0"));
+            }
         }
     }
 

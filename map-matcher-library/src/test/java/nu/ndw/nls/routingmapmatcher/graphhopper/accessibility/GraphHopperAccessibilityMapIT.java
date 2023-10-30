@@ -107,7 +107,6 @@ class GraphHopperAccessibilityMapIT {
         GraphHopperAccessibilityMap graphHopperAccessibilityMap = new GraphHopperAccessibilityMap(graphHopper);
         AccessibilityRequest accessibilityRequestAll = AccessibilityRequest
                 .builder()
-                .vehicleProperties(VehicleProperties.builder().build())
                 .municipalityId(1)
                 .startPoint(WGS84_GEOMETRY_FACTORY.createPoint(START_NODE))
                 .build();
