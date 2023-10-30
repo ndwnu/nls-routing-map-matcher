@@ -16,17 +16,11 @@ import java.util.PriorityQueue;
 import java.util.function.Consumer;
 
 /**
- * This class is a fork of the com.graphhopper.isochrone.algorithm.IsochroneByTimeDistanceAndWeight class. The inclusion logic is
- * different from the original class because the original current implementation differed from the previous
- * implementation in v 0.12. The previous implementation in v 0.12 included IsoLabels which had a partial limit (ie a
- * road-segment of 100 meters which still could be travelled for 50 meters until reaching the limit was included). The
- * current implementation in the graphhopper Library did not include those partial road-segments leading to unwanted
- * results for nls requirements. This class fixes this by replacing the original check for inclusion
- * getExploreValue(label) <= limit with (this.limit - getExploreValue(isoLabel.parent)) > 0.
+ * This class is a fork of the com.graphhopper.isochrone.algorithm. ShortestPathTree class. The inclusion logic is moved
+ * to an abstract template method to allow more limiting conditions in subclasses and still reusing the tree traversal
+ * algorithm.
  */
 public abstract class AbstractShortestPathTree extends AbstractRoutingAlgorithm {
-
-
 
 
     private final IntObjectHashMap<IsoLabel> fromMap;
@@ -37,7 +31,8 @@ public abstract class AbstractShortestPathTree extends AbstractRoutingAlgorithm 
 
     public AbstractShortestPathTree(Graph g, Weighting weighting, boolean reverseFlow, TraversalMode traversalMode) {
         super(g, weighting, traversalMode);
-        queueByWeighting = new PriorityQueue<>(1000, comparingDouble(l -> l.weight));
+        queueByWeighting = new PriorityQueue<>(1000,
+                comparingDouble(IsoLabel::getWeight));
         fromMap = new GHIntObjectHashMap<>(1000);
         this.reverseFlow = reverseFlow;
     }
@@ -56,29 +51,29 @@ public abstract class AbstractShortestPathTree extends AbstractRoutingAlgorithm 
         }
         while (!queueByWeighting.isEmpty()) {
             currentLabel = queueByWeighting.poll();
-            if (currentLabel.deleted) {
+            if (currentLabel.isDeleted()) {
                 continue;
             }
             consumer.accept(currentLabel);
-            currentLabel.deleted = true;
+            currentLabel.setDeleted(true);
             visitedNodes++;
 
-            EdgeIterator iter = edgeExplorer.setBaseNode(currentLabel.node);
+            EdgeIterator iter = edgeExplorer.setBaseNode(currentLabel.getNode());
             while (iter.next()) {
-                if (!accept(iter, currentLabel.edge)) {
+                if (!accept(iter, currentLabel.getEdge())) {
                     continue;
                 }
 
                 double nextWeight =
-                        GHUtility.calcWeightWithTurnWeight(weighting, iter, reverseFlow, currentLabel.edge)
-                                + currentLabel.weight;
+                        GHUtility.calcWeightWithTurnWeight(weighting, iter, reverseFlow, currentLabel.getEdge())
+                                + currentLabel.getWeight();
                 if (Double.isInfinite(nextWeight)) {
                     continue;
                 }
 
-                double nextDistance = iter.getDistance() + currentLabel.distance;
-                long nextTime = GHUtility.calcMillisWithTurnMillis(weighting, iter, reverseFlow, currentLabel.edge)
-                        + currentLabel.time;
+                double nextDistance = iter.getDistance() + currentLabel.getDistance();
+                long nextTime = GHUtility.calcMillisWithTurnMillis(weighting, iter, reverseFlow, currentLabel.getEdge())
+                        + currentLabel.getTime();
                 int nextTraversalId = traversalMode.createTraversalId(iter, reverseFlow);
                 IsoLabel label = fromMap.get(nextTraversalId);
                 if (label == null) {
@@ -88,8 +83,8 @@ public abstract class AbstractShortestPathTree extends AbstractRoutingAlgorithm 
                     if (isInLimit(label)) {
                         queueByWeighting.add(label);
                     }
-                } else if (label.weight > nextWeight) {
-                    label.deleted = true;
+                } else if (label.getWeight() > nextWeight) {
+                    label.setDeleted(true);
                     label = new IsoLabel(iter.getAdjNode(), iter.getEdge(), nextWeight, nextTime, nextDistance,
                             currentLabel);
                     fromMap.put(nextTraversalId, label);

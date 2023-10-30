@@ -10,7 +10,11 @@ import com.graphhopper.routing.weighting.Weighting;
 import com.graphhopper.storage.Graph;
 import com.graphhopper.util.EdgeIteratorState;
 
-
+/**
+ * This class is a fork of the com.graphhopper.isochrone.algorithm. ShortestPathTree class. The inclusion logic is must
+ * be implemented in the isInLimit method for this subclass this is weather the road section is withing the specified
+ * municipality.
+ */
 public class IsochroneByMunicipality extends AbstractShortestPathTree {
 
     private final long municipalityId;
@@ -27,7 +31,7 @@ public class IsochroneByMunicipality extends AbstractShortestPathTree {
 
     @Override
     protected boolean isInLimit(IsoLabel isoLabel) {
-        EdgeIteratorState currentEdge = this.graph.getEdgeIteratorState(isoLabel.edge, isoLabel.node);
+        EdgeIteratorState currentEdge = this.graph.getEdgeIteratorState(isoLabel.getEdge(), isoLabel.getNode());
         IntEncodedValue idEnc = encodingManager.getIntEncodedValue(MUNICIPALITY_CODE.getKey());
         int mCode = currentEdge.get(idEnc);
         return mCode == municipalityId;

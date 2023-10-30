@@ -12,6 +12,6 @@ public record VehicleProperties(Double length,
                                 Boolean carAccessForbidden,
                                 Boolean autoBusAccessForbidden,
                                 Boolean trailerAccessForbidden
-                                ) {
+) {
 
 }

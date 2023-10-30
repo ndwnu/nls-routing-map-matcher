@@ -1,6 +1,10 @@
 package nu.ndw.nls.routingmapmatcher.graphhopper.isochrone.algorithm;
 
+import lombok.Getter;
+import lombok.Setter;
 
+@Getter
+@Setter
 public class IsoLabel {
 
     public IsoLabel(int node, int edge, double weight, long time, double distance, IsoLabel parent) {
@@ -12,13 +16,13 @@ public class IsoLabel {
         this.parent = parent;
     }
 
-    public boolean deleted;
-    public int node;
-    public int edge;
-    public double weight;
-    public long time;
-    public double distance;
-    public IsoLabel parent;
+    private boolean deleted;
+    private int node;
+    private int edge;
+    private double weight;
+    private long time;
+    private double distance;
+    private IsoLabel parent;
 
     @Override
     public String toString() {

@@ -112,7 +112,7 @@ public class IsochroneService {
         List<IsoLabel> isoLabels = new ArrayList<>();
         accessibilityPathTree.search(startSegment.getClosestNode(), isoLabels::add);
         return isoLabels.stream()
-                .filter(isoLabel -> isoLabel.edge != ROOT_PARENT)
+                .filter(isoLabel -> isoLabel.getEdge() != ROOT_PARENT)
                 .map(isoLabel -> isochroneMatchMapper.mapToIsochroneMatch(isoLabel, Double.POSITIVE_INFINITY,
                         queryGraph,
                         startSegment))
@@ -147,7 +147,7 @@ public class IsochroneService {
         isochrone.search(startSegment.getClosestNode(), isoLabels::add);
         boolean searchDirectionReversed = reversed != reverseFlow;
         return isoLabels.stream()
-                .filter(isoLabel -> isoLabel.edge != ROOT_PARENT)
+                .filter(isoLabel -> isoLabel.getEdge() != ROOT_PARENT)
                 /*
                     With bidirectional start segments the search goes two ways for both down and upstream isochrones.
                     The  branches that are starting in the wrong direction of travelling
@@ -157,7 +157,7 @@ public class IsochroneService {
                         isoLabel,
                         startSegment,
                         queryGraph))
-                .sorted(comparing(isoLabel -> isoLabel.distance))
+                .sorted(comparing(IsoLabel::getDistance))
                 .map(isoLabel -> {
                       /*
                             Specify the maximum distance on which to crop the geometries use meters
@@ -180,20 +180,20 @@ public class IsochroneService {
      */
     private double calculateMaxDistance(QueryGraph queryGraph, double maximumTimeInSeconds,
             IsoLabel isoLabel, boolean useSpeedFromReversedDirection) {
-        EdgeIteratorState currentEdge = queryGraph.getEdgeIteratorState(isoLabel.edge,
-                isoLabel.node);
+        EdgeIteratorState currentEdge = queryGraph.getEdgeIteratorState(isoLabel.getEdge(),
+                isoLabel.getNode());
         double averageSpeed = getAverageSpeedFromEdge(currentEdge, useSpeedFromReversedDirection);
-        double totalTime = (double) isoLabel.time / MILLISECONDS;
+        double totalTime = (double) isoLabel.getTime() / MILLISECONDS;
         double maxDistance;
         if (totalTime <= maximumTimeInSeconds) {
-            maxDistance = isoLabel.distance;
+            maxDistance = isoLabel.getDistance();
         } else {
             /*  Assuming that the iso label values for distance
                 and time are correctly calculated based on the average speed.
                 We can then calculate the max distance by subtracting the time difference * metersPerSecond
              */
             double metersPerSecond = averageSpeed * METERS / SECONDS_PER_HOUR;
-            maxDistance = isoLabel.distance - ((totalTime - maximumTimeInSeconds) * metersPerSecond);
+            maxDistance = isoLabel.getDistance() - ((totalTime - maximumTimeInSeconds) * metersPerSecond);
         }
         return maxDistance;
     }
@@ -226,13 +226,13 @@ public class IsochroneService {
             return true;
         } else {
             boolean isCorrect = true;
-            EdgeIteratorState currentEdge = queryGraph.getEdgeIteratorState(isoLabel.edge, isoLabel.node);
+            EdgeIteratorState currentEdge = queryGraph.getEdgeIteratorState(isoLabel.getEdge(), isoLabel.getNode());
             int roadSectionId = currentEdge.get(encodingManager.getIntEncodedValue(WAY_ID.getKey()));
             if (isochroneMatchMapper.isStartSegment(roadSectionId, startSegment)) {
                 isCorrect = edgeIteratorStateReverseExtractor.hasReversed(currentEdge) == reverse;
             }
-            if (isoLabel.parent.edge != ROOT_PARENT) {
-                return isSegmentFromStartSegmentInCorrectDirection(reverse, isoLabel.parent, startSegment, queryGraph);
+            if (isoLabel.getParent().getEdge() != ROOT_PARENT) {
+                return isSegmentFromStartSegmentInCorrectDirection(reverse, isoLabel.getParent(), startSegment, queryGraph);
             }
             return isCorrect;
         }
