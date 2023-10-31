@@ -12,9 +12,7 @@ import nu.ndw.nls.routingmapmatcher.domain.model.LinkTag;
 @Getter
 public enum VehicleType {
 
-    CAR("car", TransportationMode.CAR, null, 130),
-    HGV("hgv", TransportationMode.HGV, LinkTag.HGV_ACCESSIBLE, 80),
-    BUS("bus", TransportationMode.BUS, LinkTag.BUS_ACCESSIBLE, 100);
+    CAR("car", TransportationMode.CAR, null, 130);
 
     private static final String NONEXISTENT_VEHICLE_MSG = "No vehicle exists with name \"%s\".";
 

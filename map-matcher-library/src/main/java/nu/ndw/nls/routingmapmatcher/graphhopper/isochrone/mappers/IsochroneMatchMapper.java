@@ -14,7 +14,7 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import lombok.RequiredArgsConstructor;
 import nu.ndw.nls.routingmapmatcher.domain.model.IsochroneMatch;
-import nu.ndw.nls.routingmapmatcher.graphhopper.isochrone.ShortestPathTree.IsoLabel;
+import nu.ndw.nls.routingmapmatcher.graphhopper.isochrone.algorithm.IsoLabel;
 import nu.ndw.nls.routingmapmatcher.graphhopper.util.CrsTransformer;
 import nu.ndw.nls.routingmapmatcher.graphhopper.util.FractionAndDistanceCalculator;
 import org.locationtech.jts.geom.Geometry;
@@ -39,7 +39,7 @@ public class IsochroneMatchMapper {
      */
     public IsochroneMatch mapToIsochroneMatch(IsoLabel isoLabel, double maxDistance, QueryGraph queryGraph,
             Snap startSegment) {
-        EdgeIteratorState currentEdge = queryGraph.getEdgeIteratorState(isoLabel.edge, isoLabel.node);
+        EdgeIteratorState currentEdge = queryGraph.getEdgeIteratorState(isoLabel.getEdge(), isoLabel.getNode());
         /*  Here the reversed boolean indicates the direction of travelling along the edge
          *  with respect to the original alignment of the geometry
          * (can be backward for bidirectional edges or for upstream isochrone searches).
@@ -47,7 +47,7 @@ public class IsochroneMatchMapper {
         boolean reversed = edgeIteratorStateReverseExtractor.hasReversed(currentEdge);
         IntEncodedValue idEnc = encodingManager.getIntEncodedValue(WAY_ID.getKey());
         int roadSectionId = currentEdge.get(idEnc);
-        double totalDistanceTravelled = isoLabel.distance;
+        double totalDistanceTravelled = isoLabel.getDistance();
         double startFraction = 0D;
         double endFraction = 1D;
         // This is the entire way geometry except for the start segment which is split up at the start point

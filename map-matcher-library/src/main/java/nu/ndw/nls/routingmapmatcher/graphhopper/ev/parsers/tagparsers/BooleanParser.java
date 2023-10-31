@@ -10,7 +10,7 @@ public class BooleanParser extends AbstractTagParser<Boolean> {
     private final BooleanEncodedValue booleanEnc;
 
     public BooleanParser(EncodedValueLookup lookup, EncodedTag encodedTag) {
-        super(encodedTag, true);
+        super(encodedTag, false);
         this.booleanEnc = lookup.getBooleanEncodedValue(encodedTag.getKey());
     }
 

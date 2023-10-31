@@ -11,6 +11,7 @@ import com.graphhopper.routing.ev.VehicleSpeed;
 import com.graphhopper.routing.querygraph.QueryGraph;
 import com.graphhopper.routing.util.EdgeFilter;
 import com.graphhopper.routing.util.EncodingManager;
+import com.graphhopper.routing.weighting.Weighting;
 import com.graphhopper.storage.BaseGraph;
 import com.graphhopper.storage.EdgeIteratorStateReverseExtractor;
 import com.graphhopper.storage.index.LocationIndexTree;
@@ -18,12 +19,16 @@ import com.graphhopper.storage.index.Snap;
 import com.graphhopper.util.EdgeIteratorState;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import nu.ndw.nls.routingmapmatcher.domain.model.IsochroneMatch;
 import nu.ndw.nls.routingmapmatcher.domain.model.IsochroneUnit;
 import nu.ndw.nls.routingmapmatcher.domain.model.base.BaseLocation;
-import nu.ndw.nls.routingmapmatcher.graphhopper.isochrone.ShortestPathTree.IsoLabel;
+import nu.ndw.nls.routingmapmatcher.graphhopper.isochrone.algorithm.IsoLabel;
+import nu.ndw.nls.routingmapmatcher.graphhopper.isochrone.algorithm.IsochroneByMunicipality;
+import nu.ndw.nls.routingmapmatcher.graphhopper.isochrone.algorithm.IsochroneByTimeDistanceAndWeight;
+import nu.ndw.nls.routingmapmatcher.graphhopper.isochrone.algorithm.ShortestPathTreeFactory;
 import nu.ndw.nls.routingmapmatcher.graphhopper.isochrone.mappers.IsochroneMatchMapper;
 import nu.ndw.nls.routingmapmatcher.graphhopper.model.EdgeIteratorTravelDirection;
 import org.locationtech.jts.geom.Point;
@@ -74,6 +79,45 @@ public class IsochroneService {
                 location.getDownstreamIsochroneUnit(), false);
     }
 
+    /**
+     * Creates Isochrone for an entire municipality based on start point. The start point has to be within the
+     * municipality This can be used to create an accessibility map by first calling this method with a weighting that
+     * has no restriction and consequently calling this method with a weighting that has restrictions based on vehicles
+     * dimensions etc.
+     *
+     * @param weighting      The specific weighting ie Custom weighting to filter out inaccessible roads based on
+     *                       vehicle dimensions.
+     * @param startPoint     The start point of the isochrone search
+     * @param municipalityId The id of the municipality to get the isochrone for
+     * @return The list of isochrone matches
+     * @see <a href="https://github.com/graphhopper/graphhopper/blob/master/docs/core/custom-models.md">Custom
+     * models</a>
+     */
+    public Set<IsochroneMatch> getIsochroneMatchesByMunicipalityId(Weighting weighting, Point startPoint,
+            int municipalityId) {
+        double latitude = startPoint.getY();
+        double longitude = startPoint.getX();
+
+        Snap startSegment
+                = locationIndexTree
+                .findClosest(latitude, longitude, EdgeFilter.ALL_EDGES);
+        /*
+            Lookup will create virtual edges based on the snapped point, thereby cutting the segment in 2 line strings.
+            It also sets the closestNode of the matchedQueryResult to the virtual node id. In this way it creates a
+            start point for isochrone calculation based on the snapped point coordinates.
+        */
+        QueryGraph queryGraph = QueryGraph.create(baseGraph, startSegment);
+        IsochroneByMunicipality accessibilityPathTree = shortestPathTreeFactory.createShortestPathTree(queryGraph,
+                weighting, encodingManager, municipalityId);
+        List<IsoLabel> isoLabels = new ArrayList<>();
+        accessibilityPathTree.search(startSegment.getClosestNode(), isoLabels::add);
+        return isoLabels.stream()
+                .filter(isoLabel -> isoLabel.getEdge() != ROOT_PARENT)
+                .map(isoLabel -> isochroneMatchMapper.mapToIsochroneMatch(isoLabel, Double.POSITIVE_INFINITY,
+                        queryGraph,
+                        startSegment))
+                .collect(Collectors.toSet());
+    }
 
     private List<IsochroneMatch> getIsochroneMatches(Point startPoint,
             boolean reversed,
@@ -95,14 +139,15 @@ public class IsochroneService {
         */
 
         QueryGraph queryGraph = QueryGraph.create(baseGraph, startSegment);
-        ShortestPathTree isochrone = shortestPathTreeFactory.createShortestPathtree(queryGraph, isochroneValue,
+        IsochroneByTimeDistanceAndWeight isochrone = shortestPathTreeFactory.createShortestPathTree(queryGraph,
+                isochroneValue,
                 isochroneUnit, reverseFlow);
         // Here the ClosestNode is the virtual node id created by the queryGraph.lookup.
         List<IsoLabel> isoLabels = new ArrayList<>();
         isochrone.search(startSegment.getClosestNode(), isoLabels::add);
         boolean searchDirectionReversed = reversed != reverseFlow;
         return isoLabels.stream()
-                .filter(isoLabel -> isoLabel.edge != ROOT_PARENT)
+                .filter(isoLabel -> isoLabel.getEdge() != ROOT_PARENT)
                 /*
                     With bidirectional start segments the search goes two ways for both down and upstream isochrones.
                     The  branches that are starting in the wrong direction of travelling
@@ -112,7 +157,7 @@ public class IsochroneService {
                         isoLabel,
                         startSegment,
                         queryGraph))
-                .sorted(comparing(isoLabel -> isoLabel.distance))
+                .sorted(comparing(IsoLabel::getDistance))
                 .map(isoLabel -> {
                       /*
                             Specify the maximum distance on which to crop the geometries use meters
@@ -135,20 +180,20 @@ public class IsochroneService {
      */
     private double calculateMaxDistance(QueryGraph queryGraph, double maximumTimeInSeconds,
             IsoLabel isoLabel, boolean useSpeedFromReversedDirection) {
-        EdgeIteratorState currentEdge = queryGraph.getEdgeIteratorState(isoLabel.edge,
-                isoLabel.node);
+        EdgeIteratorState currentEdge = queryGraph.getEdgeIteratorState(isoLabel.getEdge(),
+                isoLabel.getNode());
         double averageSpeed = getAverageSpeedFromEdge(currentEdge, useSpeedFromReversedDirection);
-        double totalTime = (double) isoLabel.time / MILLISECONDS;
+        double totalTime = (double) isoLabel.getTime() / MILLISECONDS;
         double maxDistance;
         if (totalTime <= maximumTimeInSeconds) {
-            maxDistance = isoLabel.distance;
+            maxDistance = isoLabel.getDistance();
         } else {
             /*  Assuming that the iso label values for distance
                 and time are correctly calculated based on the average speed.
                 We can then calculate the max distance by subtracting the time difference * metersPerSecond
              */
             double metersPerSecond = averageSpeed * METERS / SECONDS_PER_HOUR;
-            maxDistance = isoLabel.distance - ((totalTime - maximumTimeInSeconds) * metersPerSecond);
+            maxDistance = isoLabel.getDistance() - ((totalTime - maximumTimeInSeconds) * metersPerSecond);
         }
         return maxDistance;
     }
@@ -181,13 +226,14 @@ public class IsochroneService {
             return true;
         } else {
             boolean isCorrect = true;
-            EdgeIteratorState currentEdge = queryGraph.getEdgeIteratorState(isoLabel.edge, isoLabel.node);
+            EdgeIteratorState currentEdge = queryGraph.getEdgeIteratorState(isoLabel.getEdge(), isoLabel.getNode());
             int roadSectionId = currentEdge.get(encodingManager.getIntEncodedValue(WAY_ID.getKey()));
             if (isochroneMatchMapper.isStartSegment(roadSectionId, startSegment)) {
                 isCorrect = edgeIteratorStateReverseExtractor.hasReversed(currentEdge) == reverse;
             }
-            if (isoLabel.parent.edge != ROOT_PARENT) {
-                return isSegmentFromStartSegmentInCorrectDirection(reverse, isoLabel.parent, startSegment, queryGraph);
+            if (isoLabel.getParent().getEdge() != ROOT_PARENT) {
+                return isSegmentFromStartSegmentInCorrectDirection(reverse, isoLabel.getParent(), startSegment,
+                        queryGraph);
             }
             return isCorrect;
         }
