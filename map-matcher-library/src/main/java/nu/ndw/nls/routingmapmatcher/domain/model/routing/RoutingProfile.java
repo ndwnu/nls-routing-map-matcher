@@ -6,8 +6,6 @@ import lombok.Getter;
 public enum RoutingProfile {
     CAR_FASTEST("car_fastest"),
     CAR_SHORTEST("car_shortest"),
-    HGV_CUSTOM("hgv_custom"),
-    BUS_CUSTOM("bus_custom"),
     MOTOR_VEHICLE_CUSTOM("motor_vehicle_custom");
     private final String label;
 
