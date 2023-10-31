@@ -110,10 +110,6 @@ class IsochroneServiceTest {
     void getUpstreamIsochroneMatches_ok_meters() {
         IsoLabel isoLabel = createIsoLabel(100, 0);
         setupFixture();
-        when(startSegment.getClosestEdge()).thenReturn(startEdge);
-        when(shortestPathTreeFactory.createShortestPathTree(any(),
-                anyDouble(), any(), anyBoolean()))
-                .thenReturn(isochroneByTimeDistanceAndWeight);
         doSearchWithMockConsumer(isoLabel);
         when(encodingManager.getBooleanEncodedValue(VehicleAccess.key(VEHICLE_CAR))).thenReturn(booleanEncodedValue);
         when(startEdge.get(booleanEncodedValue)).thenReturn(true);
