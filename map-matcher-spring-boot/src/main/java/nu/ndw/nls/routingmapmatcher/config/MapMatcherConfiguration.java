@@ -1,5 +1,6 @@
 package nu.ndw.nls.routingmapmatcher.config;
 
+import nu.ndw.nls.routingmapmatcher.domain.AccessibilityMap;
 import nu.ndw.nls.routingmapmatcher.domain.LineStringMapMatcher;
 import nu.ndw.nls.routingmapmatcher.domain.MapMatcherFactory;
 import nu.ndw.nls.routingmapmatcher.domain.Router;
@@ -8,7 +9,9 @@ import nu.ndw.nls.routingmapmatcher.domain.SinglePointMapMatcher;
 import nu.ndw.nls.routingmapmatcher.domain.StartToEndMapMatcher;
 import nu.ndw.nls.routingmapmatcher.graphhopper.AccessibilityGraphHopperNetworkService;
 import nu.ndw.nls.routingmapmatcher.graphhopper.GraphHopperNetworkService;
+import nu.ndw.nls.routingmapmatcher.graphhopper.IndexedGraphHopperNetworkService;
 import nu.ndw.nls.routingmapmatcher.graphhopper.NetworkGraphHopperFactory;
+import nu.ndw.nls.routingmapmatcher.graphhopper.accessibility.GraphHopperAccessibilityMapFactory;
 import nu.ndw.nls.routingmapmatcher.graphhopper.routing.GraphHopperRouterFactory;
 import nu.ndw.nls.routingmapmatcher.graphhopper.singlepoint.GraphHopperSinglePointMapMatcherFactory;
 import nu.ndw.nls.routingmapmatcher.graphhopper.starttoend.GraphHopperStartToEndMapMatcherFactory;
@@ -24,14 +27,20 @@ public class MapMatcherConfiguration {
 
     @Bean
     @ConditionalOnMissingBean
-    GraphHopperNetworkService graphHopperNetworkService() {
+    public GraphHopperNetworkService graphHopperNetworkService() {
         return new GraphHopperNetworkService();
     }
 
     @Bean
     @ConditionalOnMissingBean
-    AccessibilityGraphHopperNetworkService accessibilityGraphHopperNetworkService() {
+    public AccessibilityGraphHopperNetworkService accessibilityGraphHopperNetworkService() {
         return new AccessibilityGraphHopperNetworkService();
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
+    public IndexedGraphHopperNetworkService indexedGraphHopperNetworkService() {
+        return new IndexedGraphHopperNetworkService();
     }
 
     @Bean
@@ -48,6 +57,13 @@ public class MapMatcherConfiguration {
     @ConditionalOnMissingBean
     public NetworkGraphHopperFactory networkGraphHopperFactory() {
         return new NetworkGraphHopperFactory();
+    }
+
+    @Bean
+    @ConditionalOnMissingBean(value = AccessibilityMap.class, parameterizedContainer = MapMatcherFactory.class)
+    public MapMatcherFactory<AccessibilityMap> accessibilityMapFactory() {
+        return new GraphHopperAccessibilityMapFactory();
+
     }
 
     @Bean

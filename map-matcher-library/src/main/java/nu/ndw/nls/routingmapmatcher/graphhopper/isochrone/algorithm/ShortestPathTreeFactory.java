@@ -1,6 +1,7 @@
-package nu.ndw.nls.routingmapmatcher.graphhopper.isochrone;
+package nu.ndw.nls.routingmapmatcher.graphhopper.isochrone.algorithm;
 
 import com.graphhopper.routing.querygraph.QueryGraph;
+import com.graphhopper.routing.util.EncodingManager;
 import com.graphhopper.routing.util.TraversalMode;
 import com.graphhopper.routing.weighting.Weighting;
 import lombok.RequiredArgsConstructor;
@@ -10,12 +11,13 @@ import nu.ndw.nls.routingmapmatcher.domain.model.IsochroneUnit;
 public class ShortestPathTreeFactory {
 
     private static final int MILLISECONDS = 1000;
-    private final Weighting weighting;
+    private final Weighting defaultWeighting;
 
-    public ShortestPathTree createShortestPathtree(QueryGraph queryGraph, double isochroneValue,
+    public IsochroneByTimeDistanceAndWeight createShortestPathTree(QueryGraph queryGraph, double isochroneValue,
             IsochroneUnit isochroneUnit,
             boolean reverseFlow) {
-        ShortestPathTree isochrone = new ShortestPathTree(queryGraph, this.weighting, reverseFlow,
+        IsochroneByTimeDistanceAndWeight isochrone = new IsochroneByTimeDistanceAndWeight(queryGraph,
+                this.defaultWeighting, reverseFlow,
                 TraversalMode.NODE_BASED);
         if (isochroneUnit == IsochroneUnit.METERS) {
             isochrone.setDistanceLimit(isochroneValue);
@@ -26,4 +28,11 @@ public class ShortestPathTreeFactory {
         }
         return isochrone;
     }
+
+    public IsochroneByMunicipality createShortestPathTree(QueryGraph queryGraph, Weighting weighting,
+            EncodingManager encodingManager, int municipalityId) {
+        return new IsochroneByMunicipality(queryGraph, weighting,
+                TraversalMode.EDGE_BASED, encodingManager, municipalityId);
+    }
+
 }

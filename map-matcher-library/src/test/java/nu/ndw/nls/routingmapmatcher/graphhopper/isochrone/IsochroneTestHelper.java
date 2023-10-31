@@ -2,7 +2,7 @@ package nu.ndw.nls.routingmapmatcher.graphhopper.isochrone;
 
 import java.lang.reflect.Constructor;
 import lombok.SneakyThrows;
-import nu.ndw.nls.routingmapmatcher.graphhopper.isochrone.ShortestPathTree.IsoLabel;
+import nu.ndw.nls.routingmapmatcher.graphhopper.isochrone.algorithm.IsoLabel;
 
 public final class IsochroneTestHelper {
 
