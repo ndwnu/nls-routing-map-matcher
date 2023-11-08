@@ -19,6 +19,6 @@ public class AccessibilityGraphHopperNetworkService extends AbstractGraphHopperN
 
     @Override
     protected NetworkGraphHopper createNetwork(RoutingNetwork routingNetwork) {
-        return new NetworkGraphHopper(routingNetwork.getLinkSupplier());
+        return new NetworkGraphHopper(routingNetwork.getLinkSupplier(), routingNetwork.getDataDate());
     }
 }

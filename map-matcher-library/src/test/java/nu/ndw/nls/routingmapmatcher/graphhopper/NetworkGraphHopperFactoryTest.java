@@ -2,10 +2,12 @@ package nu.ndw.nls.routingmapmatcher.graphhopper;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.notNullValue;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.mockito.Mockito.when;
 
 import java.nio.file.Path;
+import java.time.Instant;
 import java.util.Collections;
 import nu.ndw.nls.routingmapmatcher.domain.model.Link;
 import nu.ndw.nls.routingmapmatcher.domain.model.RoutingNetwork;
@@ -32,9 +34,10 @@ class NetworkGraphHopperFactoryTest {
     private static final Coordinate coordinateA1 = new Coordinate(LONG_1, LAT_1);
     private static final Coordinate coordinateA2 = new Coordinate(LONG_2, LAT_2);
     private static final Coordinate coordinateA3 = new Coordinate(LONG_3, LAT_3);
-
-    public static final Path CUSTOM_GRAPHHOPPER_DIRECTORY = Path.of("CUSTOM_GRAPHHOPPER_DIRECTORY");
-    public static final String DEFAULT_GRAPHHOPPER_ROOT_DIRECTORY = "graphhopper_";
+    private static final Path CUSTOM_GRAPHHOPPER_DIRECTORY = Path.of("CUSTOM_GRAPHHOPPER_DIRECTORY");
+    private static final String DEFAULT_GRAPHHOPPER_ROOT_DIRECTORY = "graphhopper_";
+    private static final Instant DATA_DATE = Instant.parse("2023-11-07T15:37:23.129Z");
+    private static final Instant DATA_DATE_TRUNCATED = Instant.parse("2023-11-07T15:37:23Z");
 
     @Mock
     private RoutingNetwork routingNetwork;
@@ -47,10 +50,10 @@ class NetworkGraphHopperFactoryTest {
     private NetworkGraphHopperFactory networkGraphHopperFactory;
 
     @BeforeEach
-    void setup() {
+    void setUp() {
         Coordinate[] coordinates = {coordinateA1, coordinateA2, coordinateA3};
         when(lineString.getCoordinates()).thenReturn(coordinates);
-        link =  Link.builder()
+        link = Link.builder()
                 .id(20L)
                 .fromNodeId(FROM_NODE_ID)
                 .toNodeId(TO_NODE_ID)
@@ -61,25 +64,30 @@ class NetworkGraphHopperFactoryTest {
                 .build();
         when(routingNetwork.getNetworkNameAndVersion()).thenReturn(TEST_NETWORK);
         when(routingNetwork.getLinkSupplier()).thenReturn(() -> Collections.singletonList(link).iterator());
+        when(routingNetwork.getDataDate()).thenReturn(DATA_DATE);
         networkGraphHopperFactory = new NetworkGraphHopperFactory();
     }
 
     @Test
-    void testCreateNetworkGraphHopper() {
+    void createNetwork_ok() {
         NetworkGraphHopper graphHopper = networkGraphHopperFactory.createNetwork(routingNetwork);
         assertThat(graphHopper.getGraphHopperLocation(),
                 is(Path.of(DEFAULT_GRAPHHOPPER_ROOT_DIRECTORY, TEST_NETWORK).toString()));
         assertFalse(graphHopper.isAllowWrites());
         assertFalse(graphHopper.hasElevation());
+        assertThat(graphHopper.getImportDate(), notNullValue());
+        assertThat(graphHopper.getDataDate(), is(DATA_DATE_TRUNCATED));
     }
 
     @Test
-    void testCreateNetworkGraphHopper_with_Network() {
+    void createNetwork_ok_withNetwork() {
         NetworkGraphHopper graphHopper = networkGraphHopperFactory.createNetwork(routingNetwork, false,
                 CUSTOM_GRAPHHOPPER_DIRECTORY);
         assertThat(graphHopper.getGraphHopperLocation(),
                 is(CUSTOM_GRAPHHOPPER_DIRECTORY.resolve(TEST_NETWORK).toString()));
         assertFalse(graphHopper.isAllowWrites());
         assertFalse(graphHopper.hasElevation());
+        assertThat(graphHopper.getImportDate(), notNullValue());
+        assertThat(graphHopper.getDataDate(), is(DATA_DATE_TRUNCATED));
     }
 }

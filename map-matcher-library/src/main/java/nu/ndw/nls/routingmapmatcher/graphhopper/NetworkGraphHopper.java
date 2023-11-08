@@ -8,9 +8,9 @@ import com.graphhopper.config.Profile;
 import com.graphhopper.routing.Path;
 import com.graphhopper.routing.PathRouter;
 import com.graphhopper.storage.index.LocationIndexTree;
-import com.graphhopper.util.Helper;
-import java.text.DateFormat;
-import java.util.Date;
+import java.time.Instant;
+import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -29,19 +29,26 @@ public class NetworkGraphHopper extends GraphHopper implements Network {
     private static final int BYTES_PER_INTEGER = 4;
     private static final int EMPTY_VALUE = -1;
     private static final String DATAREADER_IMPORT_DATE = "datareader.import.date";
+    private static final String DATAREADER_DATA_DATE = "datareader.data.date";
 
     private Supplier<Iterator<Link>> linkSupplier;
+    private Instant dataDate;
 
     private LongLongMap nodeIdToInternalNodeIdMap;
 
     public NetworkGraphHopper(Supplier<Iterator<Link>> linkSupplier) {
+        this(linkSupplier, null);
+    }
+
+    public NetworkGraphHopper(Supplier<Iterator<Link>> linkSupplier, Instant dataDate) {
         this.linkSupplier = linkSupplier;
+        this.dataDate = dataDate;
         this.nodeIdToInternalNodeIdMap = new GHLongLongBTree(MAX_LEAF_ENTRIES, BYTES_PER_INTEGER, EMPTY_VALUE);
     }
 
     /**
      * Loading an existing network from disk does not require a link supplier and nodeIdToInternalNodeIdMap
-     **/
+     */
     public NetworkGraphHopper() {
 
     }
@@ -57,11 +64,13 @@ public class NetworkGraphHopper extends GraphHopper implements Network {
         this.createBaseGraphAndProperties();
         NetworkReader networkReader = getNetworkReader(this.linkSupplier, nodeIdToInternalNodeIdMap);
         networkReader.readGraph();
-        DateFormat f = Helper.createFormatter();
-        getProperties().put(DATAREADER_IMPORT_DATE, f.format(new Date()));
+        putDateProperty(DATAREADER_IMPORT_DATE, Instant.now());
+        if (this.dataDate != null) {
+            putDateProperty(DATAREADER_DATA_DATE, this.dataDate);
+        }
         this.writeEncodingManagerToProperties();
     }
-    
+
     protected NetworkReader getNetworkReader(Supplier<Iterator<Link>> linkSupplier,
             LongLongMap nodeIdToInternalNodeIdMap) {
         return new NetworkReader(getBaseGraph().getBaseGraph(), getEncodingManager(), linkSupplier,
@@ -102,5 +111,22 @@ public class NetworkGraphHopper extends GraphHopper implements Network {
                 createWeightingFactory(),
                 getCHGraphs(), getLandmarks())
                 .calcPaths(request);
+    }
+
+    public Instant getImportDate() {
+        return getDateProperty(DATAREADER_IMPORT_DATE);
+    }
+
+    public Instant getDataDate() {
+        return getDateProperty(DATAREADER_DATA_DATE);
+    }
+
+    private void putDateProperty(String propertyKey, Instant date) {
+        getProperties().put(propertyKey, DateTimeFormatter.ISO_INSTANT.format(date.truncatedTo(ChronoUnit.SECONDS)));
+    }
+
+    private Instant getDateProperty(String propertyKey) {
+        String date = getProperties().get(propertyKey);
+        return date != null ? Instant.parse(date) : null;
     }
 }
