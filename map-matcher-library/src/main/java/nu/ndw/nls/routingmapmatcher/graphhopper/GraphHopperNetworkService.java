@@ -18,7 +18,6 @@ public class GraphHopperNetworkService extends AbstractGraphHopperNetworkService
 
     @Override
     protected NetworkGraphHopper createNetwork(RoutingNetwork routingNetwork) {
-        return new NetworkGraphHopper(routingNetwork.getLinkSupplier());
+        return new NetworkGraphHopper(routingNetwork.getLinkSupplier(), routingNetwork.getDataDate());
     }
-
 }

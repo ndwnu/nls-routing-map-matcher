@@ -19,7 +19,6 @@ public class IndexedGraphHopperNetworkService extends AbstractGraphHopperNetwork
 
     @Override
     protected IndexedNetworkGraphHopper createNetwork(RoutingNetwork routingNetwork) {
-        return new IndexedNetworkGraphHopper(routingNetwork.getLinkSupplier());
+        return new IndexedNetworkGraphHopper(routingNetwork.getLinkSupplier(), routingNetwork.getDataDate());
     }
-
 }
