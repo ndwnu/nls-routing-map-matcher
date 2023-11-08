@@ -26,7 +26,7 @@ public abstract class AbstractGraphHopperNetworkService<T extends NetworkGraphHo
         boolean loaded = graphHopper.load();
         if (!loaded) {
             throw new GraphHopperNotImportedException("The requested graphhopper version is not imported on disk "
-                                                      + routingNetwork.getNetworkNameAndVersion());
+                    + routingNetwork.getNetworkNameAndVersion());
         }
         return graphHopper;
     }
@@ -54,5 +54,4 @@ public abstract class AbstractGraphHopperNetworkService<T extends NetworkGraphHo
     protected abstract T createNetwork();
 
     protected abstract T createNetwork(RoutingNetwork routingNetwork);
-
 }

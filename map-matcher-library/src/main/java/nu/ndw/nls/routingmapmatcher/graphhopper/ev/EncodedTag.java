@@ -1,5 +1,6 @@
 package nu.ndw.nls.routingmapmatcher.graphhopper.ev;
 
+import static nu.ndw.nls.routingmapmatcher.graphhopper.ev.EncodedTag.EncodingType.BOOLEAN;
 import static nu.ndw.nls.routingmapmatcher.graphhopper.ev.EncodedTag.EncodingType.DECIMAL;
 import static nu.ndw.nls.routingmapmatcher.graphhopper.ev.EncodedTag.EncodingType.INT;
 import static nu.ndw.nls.routingmapmatcher.graphhopper.ev.EncodedTag.Operator.EQUALS;
@@ -16,10 +17,12 @@ import nu.ndw.nls.routingmapmatcher.domain.model.accessibility.VehicleProperties
 @Getter
 public enum EncodedTag {
 
-    WAY_ID("way_id", INT, null, 31, false,
+    WAY_ID("way_id", INT,
+            null, 31, false,
             vd -> null, null),
     MUNICIPALITY_CODE("municipality_code", INT,
-            LinkTag.MUNICIPALITY_CODE, 17, false, vd -> null, null),
+            LinkTag.MUNICIPALITY_CODE, 17, false,
+            vd -> null, null),
     MAX_AXLE_LOAD("max_axle_load", DECIMAL,
             LinkTag.C20_MAX_AXLE_LOAD, 7, true,
             VehicleProperties::axleLoad, SMALLER_THAN),
@@ -35,32 +38,26 @@ public enum EncodedTag {
     MAX_WIDTH("max_width", DECIMAL,
             LinkTag.C18_MAX_WIDTH, 7, true,
             VehicleProperties::width, SMALLER_THAN),
-    HGV_ACCESS_FORBIDDEN("hgv_access_forbidden", EncodingType.BOOLEAN,
+    HGV_ACCESS_FORBIDDEN("hgv_access_forbidden", BOOLEAN,
             LinkTag.C7_HGV_ACCESS_FORBIDDEN, null, true,
             VehicleProperties::hgvAccessForbidden, EQUALS),
-    CAR_ACCESS_FORBIDDEN("car_access_forbidden", EncodingType.BOOLEAN,
+    CAR_ACCESS_FORBIDDEN("car_access_forbidden", BOOLEAN,
             LinkTag.C6_CAR_ACCESS_FORBIDDEN, null, true,
             VehicleProperties::carAccessForbidden, EQUALS),
-    AUTO_BUS_ACCESS_FORBIDDEN("auto_bus_access_forbidden", EncodingType.BOOLEAN,
-            LinkTag.C7A_AUTO_BUS_ACCESS_FORBIDDEN,
-            null, true,
+    AUTO_BUS_ACCESS_FORBIDDEN("auto_bus_access_forbidden", BOOLEAN,
+            LinkTag.C7A_AUTO_BUS_ACCESS_FORBIDDEN, null, true,
             VehicleProperties::autoBusAccessForbidden, EQUALS),
-    TRAILER_ACCESS_FORBIDDEN("trailer_access_forbidden", EncodingType.BOOLEAN,
-            LinkTag.C10_TRAILER_ACCESS_FORBIDDEN, null,
-            true,
+    TRAILER_ACCESS_FORBIDDEN("trailer_access_forbidden", BOOLEAN,
+            LinkTag.C10_TRAILER_ACCESS_FORBIDDEN, null, true,
             VehicleProperties::trailerAccessForbidden, EQUALS),
-
-    HGV_AND_AUTO_BUS_ACCESS_FORBIDDEN("hgv_and_auto_bus_access_forbidden", EncodingType.BOOLEAN,
-            LinkTag.C7B_HGV_AND_AUTO_BUS_ACCESS_FORBIDDEN, null,
-            true,
+    HGV_AND_AUTO_BUS_ACCESS_FORBIDDEN("hgv_and_auto_bus_access_forbidden", BOOLEAN,
+            LinkTag.C7B_HGV_AND_AUTO_BUS_ACCESS_FORBIDDEN, null, true,
             VehicleProperties::hgvAndAutoBusAccessForbidden, EQUALS),
-    MOTOR_BIKE_ACCESS_FORBIDDEN("motor_bike_access_forbidden", EncodingType.BOOLEAN,
-            LinkTag.C11_MOTOR_BIKE_ACCESS_FORBIDDEN, null,
-            true,
+    MOTOR_BIKE_ACCESS_FORBIDDEN("motor_bike_access_forbidden", BOOLEAN,
+            LinkTag.C11_MOTOR_BIKE_ACCESS_FORBIDDEN, null, true,
             VehicleProperties::motorBikeAccessForbidden, EQUALS),
-    MOTOR_VEHICLE_ACCESS_FORBIDDEN("motor_vehicle_access_forbidden",
-            EncodingType.BOOLEAN, LinkTag.C12_MOTOR_VEHICLE_ACCESS_FORBIDDEN, null,
-            true,
+    MOTOR_VEHICLE_ACCESS_FORBIDDEN("motor_vehicle_access_forbidden", BOOLEAN,
+            LinkTag.C12_MOTOR_VEHICLE_ACCESS_FORBIDDEN, null, true,
             VehicleProperties::motorVehicleAccessForbidden, EQUALS);
 
     private static final String NONEXISTENT_TAG_MSG =
@@ -92,5 +89,4 @@ public enum EncodedTag {
         SMALLER_THAN,
         EQUALS
     }
-
 }

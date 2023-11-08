@@ -51,7 +51,6 @@ class GraphHopperAccessibilityMapIT {
     private static final Coordinate NODE_E_E = new Coordinate(10.0, 15.0);
     private static final Coordinate NODE_F_F = new Coordinate(5, 15.0);
 
-
     private static final Link link0 = createLineLink(0, 0, 1, 10, NODE_A, NODE_B);
     private static final Link link1 = createLineLink(1, 1, 2, 10, NODE_B, NODE_C);
     private static final Link link2 = createLineLink(2, 2, 3, 20, NODE_C, NODE_D);
@@ -133,13 +132,11 @@ class GraphHopperAccessibilityMapIT {
         assertThat(notAccessible).hasSize(16);
     }
 
-
     private static IndexedNetworkGraphHopper createGhNetwork() {
         return getNetworkGraphHopper(linkList);
     }
 
     private static void addRestrictions(Link link) {
-
         link.setTag(C19_MAX_HEIGHT, 3.5, false);
         link.setTag(C18_MAX_WIDTH, 2.0, false);
         link.setTag(C17_MAX_LENGTH, 4.0, false);
@@ -151,7 +148,6 @@ class GraphHopperAccessibilityMapIT {
         link.setTag(C17_MAX_LENGTH, 4.0, true);
         link.setTag(C20_MAX_AXLE_LOAD, 3.0, true);
         link.setTag(C7_HGV_ACCESS_FORBIDDEN, true, true);
-
     }
 
     private static IndexedNetworkGraphHopper getNetworkGraphHopper(List<Link> links) {
@@ -190,7 +186,6 @@ class GraphHopperAccessibilityMapIT {
                 .build();
         link.setTag(MUNICIPALITY_CODE, 1);
         return link;
-
     }
 
     private static LineString createLineString(Coordinate... coordinates) {
