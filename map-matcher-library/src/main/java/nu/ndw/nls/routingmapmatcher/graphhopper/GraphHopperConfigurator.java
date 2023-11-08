@@ -28,7 +28,8 @@ public final class GraphHopperConfigurator {
         networkGraphHopper.setVehicleTagParserFactory(new LinkVehicleTagParsersFactory());
         networkGraphHopper.setEncodedValueFactory(new CustomEncodedValuesFactory());
         networkGraphHopper.setTagParserFactory(new LinkTagParserFactory());
-        networkGraphHopper.setProfiles(new Profile(RoutingProfile.CAR_FASTEST.getLabel())
+        networkGraphHopper.setProfiles(
+                new Profile(RoutingProfile.CAR_FASTEST.getLabel())
                         .setVehicle(VehicleType.CAR.getName()),
                 new Profile(RoutingProfile.CAR_SHORTEST.getLabel())
                         .setVehicle(VehicleType.CAR.getName())

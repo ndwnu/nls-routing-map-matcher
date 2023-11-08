@@ -8,6 +8,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.time.Instant;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.function.Supplier;
@@ -15,7 +16,6 @@ import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import nu.ndw.nls.routingmapmatcher.domain.exception.GraphHopperFlushException;
 import nu.ndw.nls.routingmapmatcher.domain.model.Link;
-
 
 @Slf4j
 public class IndexedNetworkGraphHopper extends NetworkGraphHopper {
@@ -29,19 +29,22 @@ public class IndexedNetworkGraphHopper extends NetworkGraphHopper {
         super(linkSupplier);
     }
 
+    public IndexedNetworkGraphHopper(Supplier<Iterator<Link>> linkSupplier, Instant dataDate) {
+        super(linkSupplier, dataDate);
+    }
+
     /**
      * Loading an existing network from disk does not require a link supplier and nodeIdToInternalNodeIdMap
      **/
     public IndexedNetworkGraphHopper() {
-
+        super();
     }
 
     @Override
     protected NetworkReader getNetworkReader(Supplier<Iterator<Link>> linkSupplier,
             LongLongMap nodeIdToInternalNodeIdMap) {
-        return new IndexedNetworkReader(getBaseGraph().getBaseGraph(), getEncodingManager(),
-                linkSupplier, getOSMParsers().getWayTagParsers(),
-                nodeIdToInternalNodeIdMap, this.edgeMap);
+        return new IndexedNetworkReader(getBaseGraph().getBaseGraph(), getEncodingManager(), linkSupplier,
+                getOSMParsers().getWayTagParsers(), nodeIdToInternalNodeIdMap, this.edgeMap);
     }
 
     @Override
@@ -55,7 +58,7 @@ public class IndexedNetworkGraphHopper extends NetworkGraphHopper {
     public void flush() {
         super.flush();
 
-        if(storeOnFlush) {
+        if (storeOnFlush) {
             try (FileOutputStream outputStream = new FileOutputStream(getEdgeMapFilePath())) {
                 Output output = new Output(outputStream);
                 getKryo().writeObject(output, this.edgeMap);
@@ -64,7 +67,6 @@ public class IndexedNetworkGraphHopper extends NetworkGraphHopper {
                 throw new GraphHopperFlushException("Error saving EdgeMap to file", e);
             }
         }
-
     }
 
     @Override
@@ -93,5 +95,4 @@ public class IndexedNetworkGraphHopper extends NetworkGraphHopper {
         kryo.register(HashMap.class);
         return kryo;
     }
-
 }

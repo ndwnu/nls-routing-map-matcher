@@ -1,5 +1,6 @@
 package nu.ndw.nls.routingmapmatcher.domain.model;
 
+import java.time.Instant;
 import java.util.Iterator;
 import java.util.function.Supplier;
 import lombok.Builder;
@@ -15,4 +16,5 @@ public class RoutingNetwork {
 
     private final String networkNameAndVersion;
     private final Supplier<Iterator<Link>> linkSupplier;
+    private final Instant dataDate;
 }

@@ -1,6 +1,5 @@
 package nu.ndw.nls.routingmapmatcher;
 
-
 import static nu.ndw.nls.routingmapmatcher.constants.GlobalConstants.WGS84_SRID;
 import static nu.ndw.nls.routingmapmatcher.domain.model.LinkTag.C7_HGV_ACCESS_FORBIDDEN;
 import static nu.ndw.nls.routingmapmatcher.domain.model.LinkTag.C20_MAX_AXLE_LOAD;
@@ -42,7 +41,6 @@ import org.locationtech.jts.geom.impl.CoordinateArraySequence;
 public class CustomRoutingWithRestrictionsTest {
 
     private static final String CAR_PROFILE = "profile_car";
-
 
     private static final Coordinate START_NODE = new Coordinate(5.108409, 52.081079);
     private static final Coordinate NODE_A = new Coordinate(5.1099461, 52.0794303);
@@ -177,7 +175,6 @@ public class CustomRoutingWithRestrictionsTest {
         CustomRoutingWithRestrictionsTest.link1.setTag(MUNICIPALITY_CODE, 200);
     }
 
-
     private static IndexedNetworkGraphHopper getNetworkGraphHopper() {
         IndexedNetworkGraphHopper graphHopper = new IndexedNetworkGraphHopper(
                 CustomRoutingWithRestrictionsTest.linkList::iterator);
@@ -219,5 +216,4 @@ public class CustomRoutingWithRestrictionsTest {
         return new LineString(new CoordinateArraySequence(coordinates),
                 new GeometryFactory(new PrecisionModel(), WGS84_SRID));
     }
-
 }
