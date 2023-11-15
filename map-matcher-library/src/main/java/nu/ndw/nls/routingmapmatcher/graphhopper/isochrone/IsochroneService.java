@@ -109,7 +109,8 @@ public class IsochroneService {
             start point for isochrone calculation based on the snapped point coordinates.
         */
         QueryGraph queryGraph = QueryGraph.create(baseGraph, startSegment);
-        IsochroneByTimeDistanceAndWeight accessibilityPathTree = shortestPathTreeFactory.createShortestPathTreeByTimeDistanceAndWeight(
+        IsochroneByTimeDistanceAndWeight accessibilityPathTree = shortestPathTreeFactory
+                .createShortestPathTreeByTimeDistanceAndWeight(
                 weighting, queryGraph,
                 TraversalMode.EDGE_BASED, searchDistanceInMetres, IsochroneUnit.METERS, false);
         List<IsoLabel> isoLabels = new ArrayList<>();
@@ -150,7 +151,8 @@ public class IsochroneService {
         */
 
         QueryGraph queryGraph = QueryGraph.create(baseGraph, startSegment);
-        IsochroneByTimeDistanceAndWeight isochrone = shortestPathTreeFactory.createShortestPathTreeByTimeDistanceAndWeight(
+        IsochroneByTimeDistanceAndWeight isochrone = shortestPathTreeFactory
+                .createShortestPathTreeByTimeDistanceAndWeight(
                 null, queryGraph,
                 TraversalMode.NODE_BASED,
                 isochroneValue,
