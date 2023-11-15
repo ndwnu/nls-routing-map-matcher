@@ -2,6 +2,7 @@
 package nu.ndw.nls.routingmapmatcher.graphhopper.isochrone;
 
 import static nu.ndw.nls.routingmapmatcher.constants.GlobalConstants.VEHICLE_CAR;
+import static nu.ndw.nls.routingmapmatcher.graphhopper.ev.EncodedTag.MUNICIPALITY_CODE;
 import static nu.ndw.nls.routingmapmatcher.graphhopper.isochrone.IsochroneTestHelper.createIsoLabel;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -22,6 +23,7 @@ import com.graphhopper.routing.ev.VehicleSpeed;
 import com.graphhopper.routing.querygraph.QueryGraph;
 import com.graphhopper.routing.util.EdgeFilter;
 import com.graphhopper.routing.util.EncodingManager;
+import com.graphhopper.routing.util.TraversalMode;
 import com.graphhopper.routing.weighting.Weighting;
 import com.graphhopper.storage.BaseGraph;
 import com.graphhopper.storage.EdgeIteratorStateReverseExtractor;
@@ -33,7 +35,6 @@ import nu.ndw.nls.routingmapmatcher.domain.model.IsochroneMatch;
 import nu.ndw.nls.routingmapmatcher.domain.model.IsochroneUnit;
 import nu.ndw.nls.routingmapmatcher.domain.model.base.BaseLocation;
 import nu.ndw.nls.routingmapmatcher.graphhopper.isochrone.algorithm.IsoLabel;
-import nu.ndw.nls.routingmapmatcher.graphhopper.isochrone.algorithm.IsochroneByMunicipality;
 import nu.ndw.nls.routingmapmatcher.graphhopper.isochrone.algorithm.IsochroneByTimeDistanceAndWeight;
 import nu.ndw.nls.routingmapmatcher.graphhopper.isochrone.algorithm.ShortestPathTreeFactory;
 import nu.ndw.nls.routingmapmatcher.graphhopper.isochrone.mappers.IsochroneMatchMapper;
@@ -60,6 +61,8 @@ class IsochroneServiceTest {
     private static final double SPEED = 100D;
     private static final double REVERSE_SPEED = 50D;
     public static final boolean REVERSED = false;
+    private static final int MUNICIPALITY_ID = 1;
+
     @Mock
     private EncodingManager encodingManager;
     @Mock
@@ -84,7 +87,7 @@ class IsochroneServiceTest {
     private IsochroneByTimeDistanceAndWeight isochroneByTimeDistanceAndWeight;
 
     @Mock
-    private IsochroneByMunicipality isochroneByMunicipality;
+    private IsochroneByTimeDistanceAndWeight isochroneAlgorithm;
     @Mock
     private EdgeIteratorState startEdge;
 
@@ -122,7 +125,8 @@ class IsochroneServiceTest {
         wrapWithStaticMock(() -> isochroneService.getUpstreamIsochroneMatches(point,
                 REVERSED,
                 location));
-        verify(shortestPathTreeFactory).createShortestPathTree(queryGraph, ISOCHRONE_VALUE_METERS,
+        verify(shortestPathTreeFactory).createShortestPathTreeByTimeDistanceAndWeight(null, queryGraph,
+                TraversalMode.NODE_BASED, ISOCHRONE_VALUE_METERS,
                 IsochroneUnit.METERS, true);
 
 
@@ -160,7 +164,9 @@ class IsochroneServiceTest {
         verify(isochroneMatchMapper).mapToIsochroneMatch(eq(endLabel),
                 maxDistanceArgumentCaptor.capture(), eq(queryGraph),
                 eq(startSegment));
-        verify(shortestPathTreeFactory).createShortestPathTree(queryGraph, ISOCHRONE_VALUE_SECONDS,
+        verify(shortestPathTreeFactory).createShortestPathTreeByTimeDistanceAndWeight(null, queryGraph,
+                TraversalMode.NODE_BASED,
+                ISOCHRONE_VALUE_SECONDS,
                 IsochroneUnit.SECONDS, true);
         Double maxDistance = maxDistanceArgumentCaptor.getValue();
         // The max distance based on 8 seconds will be around 200 - ((10.8-8) * 13.89 meters/second) ~ 161.1 meters
@@ -187,7 +193,8 @@ class IsochroneServiceTest {
         verify(isochroneMatchMapper).mapToIsochroneMatch(eq(endLabel),
                 maxDistanceArgumentCaptor.capture(), eq(queryGraph),
                 eq(startSegment));
-        verify(shortestPathTreeFactory).createShortestPathTree(queryGraph, ISOCHRONE_VALUE_SECONDS,
+        verify(shortestPathTreeFactory).createShortestPathTreeByTimeDistanceAndWeight(null, queryGraph,
+                TraversalMode.NODE_BASED, ISOCHRONE_VALUE_SECONDS,
                 IsochroneUnit.SECONDS, false);
         Double maxDistance = maxDistanceArgumentCaptor.getValue();
         // The max distance based on 8 seconds will be around 200 - ((10.8-8) * 27.77 meters/second) ~ 122.2 meters
@@ -198,19 +205,33 @@ class IsochroneServiceTest {
     void getIsochroneMatchesByMunicipalityId_ok() {
         IsoLabel isoLabel = createIsoLabel(100, 0);
         setupFixture();
-        when(shortestPathTreeFactory.createShortestPathTree(any(), any(), any(),
-                anyInt()))
-                .thenReturn(isochroneByMunicipality);
+        when(shortestPathTreeFactory.createShortestPathTreeByTimeDistanceAndWeight(
+                any(Weighting.class),
+                any(QueryGraph.class),
+                eq(TraversalMode.EDGE_BASED),
+                anyDouble(), eq(IsochroneUnit.METERS)
+                , eq(false)))
+                .thenReturn(isochroneAlgorithm);
+
+        when(queryGraph.getEdgeIteratorState(anyInt(), anyInt()))
+                .thenReturn(currentEdge);
+        when(encodingManager.getIntEncodedValue(MUNICIPALITY_CODE.getKey()))
+                .thenReturn(intEncodedValue);
+        when(currentEdge.get(intEncodedValue)).thenReturn(MUNICIPALITY_ID);
         doAnswer(ans -> {
             Consumer<IsoLabel> callback = ans.getArgument(1, Consumer.class);
             callback.accept(isoLabel);
             return null;
-        }).when(isochroneByMunicipality).search(eq(START_NODE_ID), any());
+        }).when(isochroneAlgorithm).search(eq(START_NODE_ID), any());
         when(isochroneMatchMapper.mapToIsochroneMatch(isoLabel, Double.POSITIVE_INFINITY, queryGraph,
                 startSegment)).thenReturn(
                 IsochroneMatch.builder().build());
-        wrapWithStaticMock(() -> isochroneService.getIsochroneMatchesByMunicipalityId(weighting, point, 1));
-        verify(shortestPathTreeFactory).createShortestPathTree(queryGraph, weighting, encodingManager, 1);
+        wrapWithStaticMock(
+                () -> isochroneService.getIsochroneMatchesByMunicipalityId(weighting, point, MUNICIPALITY_ID,
+                        ISOCHRONE_VALUE_METERS));
+        verify(shortestPathTreeFactory).createShortestPathTreeByTimeDistanceAndWeight(weighting, queryGraph,
+                TraversalMode.EDGE_BASED, ISOCHRONE_VALUE_METERS,
+                IsochroneUnit.METERS, false);
     }
 
     @Test
@@ -228,7 +249,8 @@ class IsochroneServiceTest {
                 startSegment)).thenReturn(
                 IsochroneMatch.builder().build());
         wrapWithStaticMock(() -> isochroneService.getDownstreamIsochroneMatches(point, REVERSED, location));
-        verify(shortestPathTreeFactory).createShortestPathTree(queryGraph, ISOCHRONE_VALUE_METERS,
+        verify(shortestPathTreeFactory).createShortestPathTreeByTimeDistanceAndWeight(null, queryGraph,
+                TraversalMode.NODE_BASED, ISOCHRONE_VALUE_METERS,
                 IsochroneUnit.METERS, false);
 
     }
@@ -244,8 +266,8 @@ class IsochroneServiceTest {
 
     private void doSearchWithMockConsumer(IsoLabel isoLabel) {
         when(startSegment.getClosestEdge()).thenReturn(startEdge);
-        when(shortestPathTreeFactory.createShortestPathTree(any(),
-                anyDouble(), any(), anyBoolean()))
+        when(shortestPathTreeFactory.createShortestPathTreeByTimeDistanceAndWeight(any(), any(),
+                any(), anyDouble(), any(), anyBoolean()))
                 .thenReturn(isochroneByTimeDistanceAndWeight);
         doAnswer(ans -> {
             Consumer<IsoLabel> callback = ans.getArgument(1, Consumer.class);
