@@ -96,7 +96,7 @@ public class IsochroneService {
      * models</a>
      */
     public Set<IsochroneMatch> getIsochroneMatchesByMunicipalityId(Weighting weighting, Point startPoint,
-            int municipalityId,double searchDistanceInMetres) {
+            int municipalityId, double searchDistanceInMetres) {
         double latitude = startPoint.getY();
         double longitude = startPoint.getX();
 
@@ -109,20 +109,21 @@ public class IsochroneService {
             start point for isochrone calculation based on the snapped point coordinates.
         */
         QueryGraph queryGraph = QueryGraph.create(baseGraph, startSegment);
-        IsochroneByTimeDistanceAndWeight accessibilityPathTree = shortestPathTreeFactory.createShortestPathTreeByTimeDistanceAndWeight(weighting,queryGraph,
-                 TraversalMode.EDGE_BASED,searchDistanceInMetres,IsochroneUnit.METERS,false);
+        IsochroneByTimeDistanceAndWeight accessibilityPathTree = shortestPathTreeFactory.createShortestPathTreeByTimeDistanceAndWeight(
+                weighting, queryGraph,
+                TraversalMode.EDGE_BASED, searchDistanceInMetres, IsochroneUnit.METERS, false);
         List<IsoLabel> isoLabels = new ArrayList<>();
         accessibilityPathTree.search(startSegment.getClosestNode(), isoLabels::add);
         return isoLabels.stream()
                 .filter(isoLabel -> isoLabel.getEdge() != ROOT_PARENT)
-                .filter(isoLabel -> isInMunicipality(isoLabel,municipalityId,queryGraph))
+                .filter(isoLabel -> isInMunicipality(isoLabel, municipalityId, queryGraph))
                 .map(isoLabel -> isochroneMatchMapper.mapToIsochroneMatch(isoLabel, Double.POSITIVE_INFINITY,
                         queryGraph,
                         startSegment))
                 .collect(Collectors.toSet());
     }
 
-    private  boolean isInMunicipality(IsoLabel isoLabel, int municipalityId,QueryGraph queryGraph) {
+    private boolean isInMunicipality(IsoLabel isoLabel, int municipalityId, QueryGraph queryGraph) {
         EdgeIteratorState currentEdge = queryGraph.getEdgeIteratorState(isoLabel.getEdge(), isoLabel.getNode());
         IntEncodedValue idEnc = encodingManager.getIntEncodedValue(MUNICIPALITY_CODE.getKey());
         int mCode = currentEdge.get(idEnc);
@@ -149,7 +150,8 @@ public class IsochroneService {
         */
 
         QueryGraph queryGraph = QueryGraph.create(baseGraph, startSegment);
-        IsochroneByTimeDistanceAndWeight isochrone = shortestPathTreeFactory.createShortestPathTreeByTimeDistanceAndWeight(null,queryGraph,
+        IsochroneByTimeDistanceAndWeight isochrone = shortestPathTreeFactory.createShortestPathTreeByTimeDistanceAndWeight(
+                null, queryGraph,
                 TraversalMode.NODE_BASED,
                 isochroneValue,
                 isochroneUnit, reverseFlow);
