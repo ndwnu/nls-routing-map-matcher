@@ -47,6 +47,6 @@ public class GraphHopperAccessibilityMap implements AccessibilityMap {
         profile.setCustomModel(new VehicleRestrictionsModel(accessibilityRequest.vehicleProperties()));
         Weighting weighting = network.createWeighting(profile, new PMap());
         return isochroneService.getIsochroneMatchesByMunicipalityId(weighting, accessibilityRequest.startPoint(),
-                accessibilityRequest.municipalityId(),accessibilityRequest.searchRadiusInMetres());
+                accessibilityRequest.municipalityId(),accessibilityRequest.searchDistanceInMetres());
     }
 }
