@@ -96,7 +96,7 @@ public class IsochroneService {
      * models</a>
      */
     public Set<IsochroneMatch> getIsochroneMatchesByMunicipalityId(Weighting weighting, Point startPoint,
-            int municipalityId,double travellingDistanceInMetres) {
+            int municipalityId,double searchRadiusInMetres) {
         double latitude = startPoint.getY();
         double longitude = startPoint.getX();
 
@@ -110,7 +110,7 @@ public class IsochroneService {
         */
         QueryGraph queryGraph = QueryGraph.create(baseGraph, startSegment);
         IsochroneByTimeDistanceAndWeight accessibilityPathTree = shortestPathTreeFactory.createShortestPathTreeByTimeDistanceAndWeight(weighting,queryGraph,
-                 TraversalMode.EDGE_BASED,travellingDistanceInMetres,IsochroneUnit.METERS,false);
+                 TraversalMode.EDGE_BASED,searchRadiusInMetres,IsochroneUnit.METERS,false);
         List<IsoLabel> isoLabels = new ArrayList<>();
         accessibilityPathTree.search(startSegment.getClosestNode(), isoLabels::add);
         return isoLabels.stream()
