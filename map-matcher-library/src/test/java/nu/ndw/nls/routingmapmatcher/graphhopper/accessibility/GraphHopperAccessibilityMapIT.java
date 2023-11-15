@@ -110,23 +110,6 @@ class GraphHopperAccessibilityMapIT {
         assertThat(notAccessible).hasSize(16);
     }
 
-    private static AccessibilityRequest getAccessibilityRequest() {
-        return AccessibilityRequest
-                .builder()
-                .vehicleProperties(VehicleProperties
-                        .builder()
-                        .hgvAccessForbidden(true)
-                        .axleLoad(10.00)
-                        .weight(26.5)
-                        .height(2.65)
-                        .length(8.23)
-                        .width(2.55)
-                        .build())
-                .municipalityId(1)
-                .searchDistanceInMetres(SEARCH_DISTANCE_IN_METRES)
-                .startPoint(WGS84_GEOMETRY_FACTORY.createPoint(START_NODE))
-                .build();
-    }
 
      /*
          Test network for accessibility
@@ -158,6 +141,24 @@ class GraphHopperAccessibilityMapIT {
         // restricted access links 1-7 and 4-10 are outside the municipality. The inner square links are within
         // 6 in total in both directions
         assertThat(notAccessible).hasSize(12);
+    }
+
+    private static AccessibilityRequest getAccessibilityRequest() {
+        return AccessibilityRequest
+                .builder()
+                .vehicleProperties(VehicleProperties
+                        .builder()
+                        .hgvAccessForbidden(true)
+                        .axleLoad(10.00)
+                        .weight(26.5)
+                        .height(2.65)
+                        .length(8.23)
+                        .width(2.55)
+                        .build())
+                .municipalityId(1)
+                .searchDistanceInMetres(SEARCH_DISTANCE_IN_METRES)
+                .startPoint(WGS84_GEOMETRY_FACTORY.createPoint(START_NODE))
+                .build();
     }
 
     @NotNull
