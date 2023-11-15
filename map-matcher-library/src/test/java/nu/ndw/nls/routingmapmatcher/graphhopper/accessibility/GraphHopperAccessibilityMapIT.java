@@ -84,7 +84,7 @@ class GraphHopperAccessibilityMapIT {
             link1_1_link1,
             link3_3_link3
     );
-    private static final double TRAVELLING_DISTANCE_IN_METRES = 500.0;
+    private static final double SEARCH_RADIUS_IN_METRES = 500.0;
     private IndexedNetworkGraphHopper graphHopper;
 
     /*
@@ -123,7 +123,7 @@ class GraphHopperAccessibilityMapIT {
                         .width(2.55)
                         .build())
                 .municipalityId(1)
-                .travellingDistanceInMetres(TRAVELLING_DISTANCE_IN_METRES)
+                .searchRadiusInMetres(SEARCH_RADIUS_IN_METRES)
                 .startPoint(WGS84_GEOMETRY_FACTORY.createPoint(START_NODE))
                 .build();
     }
@@ -177,7 +177,7 @@ class GraphHopperAccessibilityMapIT {
                 .builder()
                 .municipalityId(1)
                 .startPoint(WGS84_GEOMETRY_FACTORY.createPoint(START_NODE))
-                .travellingDistanceInMetres(TRAVELLING_DISTANCE_IN_METRES)
+                .searchRadiusInMetres(SEARCH_RADIUS_IN_METRES)
                 .build();
     }
 
