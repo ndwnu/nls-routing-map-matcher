@@ -203,7 +203,7 @@ class GraphHopperAccessibilityMapIT {
 
     private static IndexedNetworkGraphHopper getNetworkGraphHopper() {
         IndexedNetworkGraphHopper graphHopper = new IndexedNetworkGraphHopper(
-                GraphHopperAccessibilityMapIT.linkList::iterator);
+                linkList::iterator);
         Path path = Path.of("graphhopper", "test_network_2");
         graphHopper.setStoreOnFlush(false);
         graphHopper.setElevation(false);

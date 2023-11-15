@@ -13,7 +13,8 @@ public class ShortestPathTreeFactory {
     private static final int MILLISECONDS = 1000;
     private final Weighting defaultWeighting;
 
-    public IsochroneByTimeDistanceAndWeight createShortestPathTreeByTimeDistanceAndWeight(Weighting weighting, QueryGraph queryGraph,
+    public IsochroneByTimeDistanceAndWeight createShortestPathTreeByTimeDistanceAndWeight(Weighting weighting,
+            QueryGraph queryGraph,
             TraversalMode traversalMode,
             double isochroneValue,
             IsochroneUnit isochroneUnit,
@@ -31,7 +32,6 @@ public class ShortestPathTreeFactory {
         }
         return isochrone;
     }
-
 
 
     public IsochroneByMunicipality createShortestPathTreeByMunicipality(QueryGraph queryGraph, Weighting weighting,
