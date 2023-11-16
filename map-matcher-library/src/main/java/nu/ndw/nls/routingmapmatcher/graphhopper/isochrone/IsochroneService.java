@@ -3,14 +3,17 @@ package nu.ndw.nls.routingmapmatcher.graphhopper.isochrone;
 
 import static java.util.Comparator.comparing;
 import static nu.ndw.nls.routingmapmatcher.constants.GlobalConstants.VEHICLE_CAR;
+import static nu.ndw.nls.routingmapmatcher.graphhopper.ev.EncodedTag.MUNICIPALITY_CODE;
 import static nu.ndw.nls.routingmapmatcher.graphhopper.ev.EncodedTag.WAY_ID;
 import static nu.ndw.nls.routingmapmatcher.graphhopper.util.PathUtil.determineEdgeDirection;
 
 import com.graphhopper.routing.ev.DecimalEncodedValue;
+import com.graphhopper.routing.ev.IntEncodedValue;
 import com.graphhopper.routing.ev.VehicleSpeed;
 import com.graphhopper.routing.querygraph.QueryGraph;
 import com.graphhopper.routing.util.EdgeFilter;
 import com.graphhopper.routing.util.EncodingManager;
+import com.graphhopper.routing.util.TraversalMode;
 import com.graphhopper.routing.weighting.Weighting;
 import com.graphhopper.storage.BaseGraph;
 import com.graphhopper.storage.EdgeIteratorStateReverseExtractor;
@@ -26,7 +29,6 @@ import nu.ndw.nls.routingmapmatcher.domain.model.IsochroneMatch;
 import nu.ndw.nls.routingmapmatcher.domain.model.IsochroneUnit;
 import nu.ndw.nls.routingmapmatcher.domain.model.base.BaseLocation;
 import nu.ndw.nls.routingmapmatcher.graphhopper.isochrone.algorithm.IsoLabel;
-import nu.ndw.nls.routingmapmatcher.graphhopper.isochrone.algorithm.IsochroneByMunicipality;
 import nu.ndw.nls.routingmapmatcher.graphhopper.isochrone.algorithm.IsochroneByTimeDistanceAndWeight;
 import nu.ndw.nls.routingmapmatcher.graphhopper.isochrone.algorithm.ShortestPathTreeFactory;
 import nu.ndw.nls.routingmapmatcher.graphhopper.isochrone.mappers.IsochroneMatchMapper;
@@ -94,7 +96,7 @@ public class IsochroneService {
      * models</a>
      */
     public Set<IsochroneMatch> getIsochroneMatchesByMunicipalityId(Weighting weighting, Point startPoint,
-            int municipalityId) {
+            int municipalityId, double searchDistanceInMetres) {
         double latitude = startPoint.getY();
         double longitude = startPoint.getX();
 
@@ -107,16 +109,26 @@ public class IsochroneService {
             start point for isochrone calculation based on the snapped point coordinates.
         */
         QueryGraph queryGraph = QueryGraph.create(baseGraph, startSegment);
-        IsochroneByMunicipality accessibilityPathTree = shortestPathTreeFactory.createShortestPathTree(queryGraph,
-                weighting, encodingManager, municipalityId);
+        IsochroneByTimeDistanceAndWeight accessibilityPathTree = shortestPathTreeFactory
+                .createShortestPathTreeByTimeDistanceAndWeight(
+                weighting, queryGraph,
+                TraversalMode.EDGE_BASED, searchDistanceInMetres, IsochroneUnit.METERS, false);
         List<IsoLabel> isoLabels = new ArrayList<>();
         accessibilityPathTree.search(startSegment.getClosestNode(), isoLabels::add);
         return isoLabels.stream()
                 .filter(isoLabel -> isoLabel.getEdge() != ROOT_PARENT)
+                .filter(isoLabel -> isInMunicipality(isoLabel, municipalityId, queryGraph))
                 .map(isoLabel -> isochroneMatchMapper.mapToIsochroneMatch(isoLabel, Double.POSITIVE_INFINITY,
                         queryGraph,
                         startSegment))
                 .collect(Collectors.toSet());
+    }
+
+    private boolean isInMunicipality(IsoLabel isoLabel, int municipalityId, QueryGraph queryGraph) {
+        EdgeIteratorState currentEdge = queryGraph.getEdgeIteratorState(isoLabel.getEdge(), isoLabel.getNode());
+        IntEncodedValue idEnc = encodingManager.getIntEncodedValue(MUNICIPALITY_CODE.getKey());
+        int mCode = currentEdge.get(idEnc);
+        return mCode == municipalityId;
     }
 
     private List<IsochroneMatch> getIsochroneMatches(Point startPoint,
@@ -139,7 +151,10 @@ public class IsochroneService {
         */
 
         QueryGraph queryGraph = QueryGraph.create(baseGraph, startSegment);
-        IsochroneByTimeDistanceAndWeight isochrone = shortestPathTreeFactory.createShortestPathTree(queryGraph,
+        IsochroneByTimeDistanceAndWeight isochrone = shortestPathTreeFactory
+                .createShortestPathTreeByTimeDistanceAndWeight(
+                null, queryGraph,
+                TraversalMode.NODE_BASED,
                 isochroneValue,
                 isochroneUnit, reverseFlow);
         // Here the ClosestNode is the virtual node id created by the queryGraph.lookup.
