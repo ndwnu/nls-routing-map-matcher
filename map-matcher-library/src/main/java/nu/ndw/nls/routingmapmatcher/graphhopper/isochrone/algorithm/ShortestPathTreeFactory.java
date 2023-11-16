@@ -13,12 +13,16 @@ public class ShortestPathTreeFactory {
     private static final int MILLISECONDS = 1000;
     private final Weighting defaultWeighting;
 
-    public IsochroneByTimeDistanceAndWeight createShortestPathTree(QueryGraph queryGraph, double isochroneValue,
+    public IsochroneByTimeDistanceAndWeight createShortestPathTreeByTimeDistanceAndWeight(Weighting weighting,
+            QueryGraph queryGraph,
+            TraversalMode traversalMode,
+            double isochroneValue,
             IsochroneUnit isochroneUnit,
-            boolean reverseFlow) {
+            boolean reverseFlow
+    ) {
         IsochroneByTimeDistanceAndWeight isochrone = new IsochroneByTimeDistanceAndWeight(queryGraph,
-                this.defaultWeighting, reverseFlow,
-                TraversalMode.NODE_BASED);
+                weighting == null ? this.defaultWeighting : weighting, reverseFlow,
+                traversalMode);
         if (isochroneUnit == IsochroneUnit.METERS) {
             isochrone.setDistanceLimit(isochroneValue);
         } else if (isochroneUnit == IsochroneUnit.SECONDS) {
@@ -29,7 +33,8 @@ public class ShortestPathTreeFactory {
         return isochrone;
     }
 
-    public IsochroneByMunicipality createShortestPathTree(QueryGraph queryGraph, Weighting weighting,
+
+    public IsochroneByMunicipality createShortestPathTreeByMunicipality(QueryGraph queryGraph, Weighting weighting,
             EncodingManager encodingManager, int municipalityId) {
         return new IsochroneByMunicipality(queryGraph, weighting,
                 TraversalMode.EDGE_BASED, encodingManager, municipalityId);

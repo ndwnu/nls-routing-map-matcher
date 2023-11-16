@@ -1,11 +1,11 @@
 package nu.ndw.nls.routingmapmatcher.graphhopper.accessibility;
 
 import static nu.ndw.nls.routingmapmatcher.constants.GlobalConstants.WGS84_GEOMETRY_FACTORY;
-import static nu.ndw.nls.routingmapmatcher.domain.model.LinkTag.C7_HGV_ACCESS_FORBIDDEN;
-import static nu.ndw.nls.routingmapmatcher.domain.model.LinkTag.C20_MAX_AXLE_LOAD;
-import static nu.ndw.nls.routingmapmatcher.domain.model.LinkTag.C19_MAX_HEIGHT;
 import static nu.ndw.nls.routingmapmatcher.domain.model.LinkTag.C17_MAX_LENGTH;
 import static nu.ndw.nls.routingmapmatcher.domain.model.LinkTag.C18_MAX_WIDTH;
+import static nu.ndw.nls.routingmapmatcher.domain.model.LinkTag.C19_MAX_HEIGHT;
+import static nu.ndw.nls.routingmapmatcher.domain.model.LinkTag.C20_MAX_AXLE_LOAD;
+import static nu.ndw.nls.routingmapmatcher.domain.model.LinkTag.C7_HGV_ACCESS_FORBIDDEN;
 import static nu.ndw.nls.routingmapmatcher.domain.model.LinkTag.MUNICIPALITY_CODE;
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -27,6 +27,7 @@ import nu.ndw.nls.routingmapmatcher.graphhopper.ev.EncodedTag;
 import nu.ndw.nls.routingmapmatcher.graphhopper.ev.VehicleType;
 import nu.ndw.nls.routingmapmatcher.graphhopper.ev.parsers.LinkTagParserFactory;
 import nu.ndw.nls.routingmapmatcher.graphhopper.ev.parsers.LinkVehicleTagParsersFactory;
+import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.Test;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.GeometryFactory;
@@ -83,6 +84,7 @@ class GraphHopperAccessibilityMapIT {
             link1_1_link1,
             link3_3_link3
     );
+    private static final double SEARCH_DISTANCE_IN_METRES = 500.0;
     private IndexedNetworkGraphHopper graphHopper;
 
     /*
@@ -103,13 +105,46 @@ class GraphHopperAccessibilityMapIT {
         addRestrictions(link1_1_link1);
         addRestrictions(link3_3_link3);
         graphHopper = createGhNetwork();
-        GraphHopperAccessibilityMap graphHopperAccessibilityMap = new GraphHopperAccessibilityMap(graphHopper);
-        AccessibilityRequest accessibilityRequestAll = AccessibilityRequest
-                .builder()
-                .municipalityId(1)
-                .startPoint(WGS84_GEOMETRY_FACTORY.createPoint(START_NODE))
-                .build();
-        AccessibilityRequest restrictedAccessRequest = AccessibilityRequest
+        final Set<IsochroneMatch> notAccessible = getIsochroneMatches();
+        // restricted access links 1-7 and 4-10  plus inner square links 8 in total in both directions
+        assertThat(notAccessible).hasSize(16);
+    }
+
+
+     /*
+         Test network for accessibility
+         If 4-10 and 1-7 links are blocked and the start point is 0,0,
+         the links in the inner square are not accessible as well.
+
+         In this test case links 4-10 and 1-7 are placed in a different municipality
+         The algorithm should be able to traverse these links
+         and determine the accessibility of the inner square
+
+          5----4-----3
+          |    |     |
+          | 11-10-9  |
+          | |     |  |
+          | 6--7--8  |
+          |    |     |
+          0----1-----2
+    */
+
+
+    @Test
+    void getAccessibleRoadSections_ok_withRestrictions_and_accessRoadsOutsideMunicipality() {
+        addRestrictions(link1_1_link1);
+        addRestrictions(link3_3_link3);
+        link1_1_link1.setTag(MUNICIPALITY_CODE, 2);
+        link3_3_link3.setTag(MUNICIPALITY_CODE, 2);
+        graphHopper = createGhNetwork();
+        final Set<IsochroneMatch> notAccessible = getIsochroneMatches();
+        // restricted access links 1-7 and 4-10 are outside the municipality. The inner square links are within
+        // 6 in total in both directions
+        assertThat(notAccessible).hasSize(12);
+    }
+
+    private static AccessibilityRequest getAccessibilityRequest() {
+        return AccessibilityRequest
                 .builder()
                 .vehicleProperties(VehicleProperties
                         .builder()
@@ -121,19 +156,35 @@ class GraphHopperAccessibilityMapIT {
                         .width(2.55)
                         .build())
                 .municipalityId(1)
+                .searchDistanceInMetres(SEARCH_DISTANCE_IN_METRES)
                 .startPoint(WGS84_GEOMETRY_FACTORY.createPoint(START_NODE))
                 .build();
+    }
+
+    @NotNull
+    private Set<IsochroneMatch> getIsochroneMatches() {
+        GraphHopperAccessibilityMap graphHopperAccessibilityMap = new GraphHopperAccessibilityMap(graphHopper);
+        final AccessibilityRequest accessibilityRequestAll = getAccessibilityRequestAll();
+        final AccessibilityRequest restrictedAccessRequest = getAccessibilityRequest();
         Set<IsochroneMatch> allAccessible = graphHopperAccessibilityMap.getAccessibleRoadSections(
                 accessibilityRequestAll);
         Set<IsochroneMatch> restrictedAccess = graphHopperAccessibilityMap.getAccessibleRoadSections(
                 restrictedAccessRequest);
-        Set<IsochroneMatch> notAccessible = Sets.difference(allAccessible, restrictedAccess);
-        // restricted access links 1-7 and 4-10  plus inner square links 8 in total in both directions
-        assertThat(notAccessible).hasSize(16);
+        return Sets.difference(allAccessible, restrictedAccess);
     }
 
+    private static AccessibilityRequest getAccessibilityRequestAll() {
+        return AccessibilityRequest
+                .builder()
+                .municipalityId(1)
+                .startPoint(WGS84_GEOMETRY_FACTORY.createPoint(START_NODE))
+                .searchDistanceInMetres(SEARCH_DISTANCE_IN_METRES)
+                .build();
+    }
+
+
     private static IndexedNetworkGraphHopper createGhNetwork() {
-        return getNetworkGraphHopper(linkList);
+        return getNetworkGraphHopper();
     }
 
     private static void addRestrictions(Link link) {
@@ -150,8 +201,9 @@ class GraphHopperAccessibilityMapIT {
         link.setTag(C7_HGV_ACCESS_FORBIDDEN, true, true);
     }
 
-    private static IndexedNetworkGraphHopper getNetworkGraphHopper(List<Link> links) {
-        IndexedNetworkGraphHopper graphHopper = new IndexedNetworkGraphHopper(links::iterator);
+    private static IndexedNetworkGraphHopper getNetworkGraphHopper() {
+        IndexedNetworkGraphHopper graphHopper = new IndexedNetworkGraphHopper(
+                linkList::iterator);
         Path path = Path.of("graphhopper", "test_network_2");
         graphHopper.setStoreOnFlush(false);
         graphHopper.setElevation(false);
