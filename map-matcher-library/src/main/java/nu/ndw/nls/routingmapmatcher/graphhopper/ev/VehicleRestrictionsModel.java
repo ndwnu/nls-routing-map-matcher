@@ -30,7 +30,6 @@ public class VehicleRestrictionsModel extends CustomModel {
     }
 
     private Optional<String> getPartialExpression(VehicleProperties vehicleProperties, EncodedTag encodedTag) {
-
         return Optional.ofNullable(encodedTag.getValueFunction().apply(vehicleProperties))
                 .map(value ->
                         switch (encodedTag.getOperator()) {
@@ -38,10 +37,6 @@ public class VehicleRestrictionsModel extends CustomModel {
                                     SMALLER_THAN_EXPRESSION_TEMPLATE, encodedTag.getKey(), value);
                             case EQUALS -> String.format(Locale.US,
                                     EQUALS_EXPRESSION_TEMPLATE, encodedTag.getKey(), value);
-
                         });
-
-
     }
-
 }
