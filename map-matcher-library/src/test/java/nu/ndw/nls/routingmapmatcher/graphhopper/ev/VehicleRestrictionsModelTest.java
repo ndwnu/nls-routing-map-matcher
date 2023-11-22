@@ -60,7 +60,7 @@ class VehicleRestrictionsModelTest {
     }
 
     @Test
-    void vehicleRestrictionsModel_ok_withNullValues() {
+    void vehicleRestrictionsModel_ok_withFalseValues() {
         VehicleProperties vehicleProperties = VehicleProperties.builder()
                 .carAccessForbidden(true)
                 .hgvAccessForbidden(true)
