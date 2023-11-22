@@ -5,7 +5,7 @@
     <parent>
         <groupId>nu.ndw.nls</groupId>
         <artifactId>routing-map-matcher-parent</artifactId>
-        <version>7.7.1-SNAPSHOT</version>
+        <version>7.7.1</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <artifactId>routing-map-matcher-spring-boot</artifactId>
