@@ -6,7 +6,7 @@ import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 import nu.ndw.nls.routingmapmatcher.domain.model.IsochroneUnit;
 
-@SuperBuilder
+@SuperBuilder(toBuilder = true)
 @Getter
 @EqualsAndHashCode
 @ToString
