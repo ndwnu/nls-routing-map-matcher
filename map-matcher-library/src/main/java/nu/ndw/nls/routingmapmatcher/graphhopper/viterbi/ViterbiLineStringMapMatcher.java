@@ -65,7 +65,7 @@ public class ViterbiLineStringMapMatcher implements LineStringMapMatcher {
     /**
      * The tolerance used in smoothing the line before executing map matching
      */
-    private static final double LINE_SMOOTHING_TOLERANCE = 0.5d;
+    private static final double LINE_SMOOTHING_TOLERANCE = 0.5D;
 
     private static final GeometryFactory WGS84_GEOMETRY_FACTORY = new GeometryFactory(new PrecisionModel(),
             GlobalConstants.WGS84_SRID);
@@ -173,7 +173,7 @@ public class ViterbiLineStringMapMatcher implements LineStringMapMatcher {
         return lineStringMatchUtil.createMatch(lineStringLocation, path, queryGraph, reliability);
     }
 
-    // PointList.toLineString rounds to 6 digits. This can affect the route slightly, so this way we prevent that rounding
+    // PointList.toLineString rounds to 6 digits. This can affect the route slightly, this method prevents that
     private LineString pointListToLineString(PointList pointList) {
         Coordinate[] coordinates = new Coordinate[pointList.size() == 1 ? 2 : pointList.size()];
 
