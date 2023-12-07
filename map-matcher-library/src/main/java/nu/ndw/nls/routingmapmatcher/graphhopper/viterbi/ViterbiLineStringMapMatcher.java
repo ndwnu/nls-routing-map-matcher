@@ -73,8 +73,8 @@ public class ViterbiLineStringMapMatcher implements LineStringMapMatcher {
     private static final int COORDINATES_LENGTH_START_END = 2;
     private static final String PROFILE_KEY = "profile";
 
-    private final int MINIMUM_LINESTRING_SIZE = 2;
-    private final int LINESTRING_DIMENSIONS = 2;
+    private static final int MINIMUM_LINESTRING_SIZE = 2;
+    private static final int LINESTRING_DIMENSIONS = 2;
 
     private final LocationIndexTree locationIndexTree;
     private final NetworkGraphHopper networkGraphHopper;
