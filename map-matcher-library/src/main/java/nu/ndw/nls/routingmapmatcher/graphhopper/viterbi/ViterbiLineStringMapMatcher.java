@@ -73,6 +73,9 @@ public class ViterbiLineStringMapMatcher implements LineStringMapMatcher {
     private static final int COORDINATES_LENGTH_START_END = 2;
     private static final String PROFILE_KEY = "profile";
 
+    private final int MINIMUM_LINESTRING_SIZE = 2;
+    private final int LINESTRING_DIMENSIONS = 2;
+
     private final LocationIndexTree locationIndexTree;
     private final NetworkGraphHopper networkGraphHopper;
     private final LineStringMatchUtil lineStringMatchUtil;
@@ -84,13 +87,6 @@ public class ViterbiLineStringMapMatcher implements LineStringMapMatcher {
         this.locationIndexTree = networkGraphHopper.getLocationIndex();
         this.lineStringMatchUtil = new LineStringMatchUtil(networkGraphHopper);
         this.lineStringScoreUtil = new LineStringScoreUtil();
-    }
-
-    private static PMap createHints() {
-        PMap hints = new PMap();
-        hints.putObject(PROFILE_KEY, RoutingProfile.CAR_SHORTEST.getLabel());
-        hints.putObject(Parameters.CH.DISABLE, true);
-        return hints;
     }
 
     @Override
@@ -135,6 +131,13 @@ public class ViterbiLineStringMapMatcher implements LineStringMapMatcher {
         return mapMatching;
     }
 
+    private static PMap createHints() {
+        PMap hints = new PMap();
+        hints.putObject(PROFILE_KEY, RoutingProfile.CAR_SHORTEST.getLabel());
+        hints.putObject(Parameters.CH.DISABLE, true);
+        return hints;
+    }
+
     private List<Observation> convertToObservations(LineString lineString) {
         CoordinateSequence coordinateSequence = lineString.getCoordinateSequence();
         List<Observation> observations = new ArrayList<>();
@@ -175,7 +178,7 @@ public class ViterbiLineStringMapMatcher implements LineStringMapMatcher {
 
     // PointList.toLineString rounds to 6 digits. This can affect the route slightly, this method prevents that
     private LineString pointListToLineString(PointList pointList) {
-        Coordinate[] coordinates = new Coordinate[pointList.size() == 1 ? 2 : pointList.size()];
+        Coordinate[] coordinates = new Coordinate[pointList.size() == 1 ? MINIMUM_LINESTRING_SIZE : pointList.size()];
 
         for (int i = 0; i < pointList.size(); ++i) {
             coordinates[i] = new Coordinate(pointList.getLon(i), pointList.getLat(i));
@@ -185,6 +188,6 @@ public class ViterbiLineStringMapMatcher implements LineStringMapMatcher {
             coordinates[1] = coordinates[0];
         }
 
-        return WGS84_GEOMETRY_FACTORY.createLineString(new PackedCoordinateSequence.Double(coordinates, 2));
+        return WGS84_GEOMETRY_FACTORY.createLineString(new PackedCoordinateSequence.Double(coordinates, LINESTRING_DIMENSIONS));
     }
 }
