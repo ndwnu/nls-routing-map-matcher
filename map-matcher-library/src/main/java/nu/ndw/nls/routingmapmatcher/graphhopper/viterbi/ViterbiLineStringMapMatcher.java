@@ -188,6 +188,7 @@ public class ViterbiLineStringMapMatcher implements LineStringMapMatcher {
             coordinates[1] = coordinates[0];
         }
 
-        return WGS84_GEOMETRY_FACTORY.createLineString(new PackedCoordinateSequence.Double(coordinates, LINESTRING_DIMENSIONS));
+        return WGS84_GEOMETRY_FACTORY.createLineString(
+                new PackedCoordinateSequence.Double(coordinates, LINESTRING_DIMENSIONS));
     }
 }
