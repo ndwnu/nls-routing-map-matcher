@@ -3,10 +3,10 @@ package nu.ndw.nls.routingmapmatcher.constants;
 import com.graphhopper.util.DistancePlaneProjection;
 import java.nio.file.Path;
 import nu.ndw.nls.routingmapmatcher.graphhopper.ev.VehicleType;
+import org.geotools.api.referencing.crs.CoordinateReferenceSystem;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.PrecisionModel;
-import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 public final class GlobalConstants {
 
