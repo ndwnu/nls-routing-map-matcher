@@ -1,6 +1,7 @@
 package nu.ndw.nls.routingmapmatcher.graphhopper.viterbi;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -79,6 +80,40 @@ class ViterbiLineStringMapMatcherIT {
                 new Coordinate(5.425628, 52.178159), new Coordinate(5.425557, 52.178177),
                 new Coordinate(5.425238, 52.178299), new Coordinate(5.425227, 52.178303),
                 new Coordinate(5.425037, 52.178409), new Coordinate(5.424792, 52.178546)});
+    }
+
+    @SneakyThrows
+    @Test
+    void match_ok_doubleEnd() {
+        String locationJson = IOUtils.toString(
+                Objects.requireNonNull(
+                        getClass().getResourceAsStream("/test-data/matched_linestring_location_double_end.json")),
+                StandardCharsets.UTF_8);
+        LineStringLocation lineStringLocation = mapper.readValue(locationJson, LineStringLocation.class);
+        LineStringMatch lineStringMatch = viterbiLineStringMapMatcher.match(lineStringLocation);
+        assertThat(lineStringMatch.getId()).isEqualTo(29);
+        assertThat(lineStringMatch.getStatus()).isEqualTo(MatchStatus.MATCH);
+        assertThat(lineStringMatch.getReliability()).isEqualTo(59.97209861861505);
+        assertThat(lineStringMatch.getLocationIndex()).isEqualTo(-1);
+        assertThat(lineStringMatch.isReversed()).isTrue();
+        assertThat(lineStringMatch.getMatchedLinks()).containsExactly(
+                MatchedLink.builder().linkId(600767674).reversed(false).build(),
+                MatchedLink.builder().linkId(252408103).reversed(false).build(),
+                MatchedLink.builder().linkId(252408066).reversed(false).build(),
+                MatchedLink.builder().linkId(600125366).reversed(false).build(),
+                MatchedLink.builder().linkId(600126141).reversed(false).build(),
+                MatchedLink.builder().linkId(600126144).reversed(false).build(),
+                MatchedLink.builder().linkId(600126143).reversed(false).build(),
+                MatchedLink.builder().linkId(600126037).reversed(false).build(),
+                MatchedLink.builder().linkId(600125593).reversed(false).build(),
+                MatchedLink.builder().linkId(250409010).reversed(false).build());
+        assertNull(lineStringMatch.getUpstreamLinkIds());
+        assertNull(lineStringMatch.getDownstreamLinkIds());
+        assertThat(lineStringMatch.getStartLinkFraction()).isEqualTo(0.6608445201176048);
+        assertThat(lineStringMatch.getEndLinkFraction()).isEqualTo(0.3047612754692782);
+        assertThat(lineStringMatch.getWeight()).isEqualTo(2432.198);
+        assertThat(lineStringMatch.getDuration()).isEqualTo(87.559);
+        assertThat(lineStringMatch.getDistance()).isEqualTo(2432.198);
     }
 
     @SneakyThrows

@@ -7,7 +7,7 @@ import lombok.experimental.SuperBuilder;
 import nu.ndw.nls.routingmapmatcher.domain.model.base.BaseLocation;
 import org.locationtech.jts.geom.LineString;
 
-@SuperBuilder
+@SuperBuilder(toBuilder=true)
 @Getter
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
