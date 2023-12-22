@@ -13,7 +13,7 @@
 
     <groupId>nu.ndw.nls</groupId>
     <artifactId>routing-map-matcher-parent</artifactId>
-    <version>7.7.4</version>
+    <version>7.7.5-SNAPSHOT</version>
     <name>routing map matcher parent</name>
     <description>Routing Map Matcher modules containing the core library and spring boot starter modules</description>
     <packaging>pom</packaging>
