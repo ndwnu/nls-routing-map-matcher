@@ -34,7 +34,7 @@ public class NetworkReader {
     private final List<TagParser> vehicleTagParsers;
     private final IntEncodedValue idEncoder;
 
-    private final BaseGraph baseGraph;
+    protected final BaseGraph baseGraph;
 
     public NetworkReader(BaseGraph baseGraph, EncodingManager encodingManager, Supplier<Iterator<Link>> linkSupplier,
             List<TagParser> vehicleTagParsers, LongLongMap nodeIdToInternalNodeIdMap) {

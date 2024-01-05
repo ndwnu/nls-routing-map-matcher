@@ -17,7 +17,7 @@ public class NetworkGraphHopperFactory {
     public NetworkGraphHopper createNetwork(RoutingNetwork routingNetwork, boolean storeOnDisk,
             Path graphhopperRootPath) {
         NetworkGraphHopper graphHopper = new NetworkGraphHopper(routingNetwork.getLinkSupplier(),
-                routingNetwork.getDataDate());
+                routingNetwork.getDataDate(), routingNetwork.isExpandBounds());
         Path path = GraphHopperNetworkPathUtils.formatNormalizedPath(graphhopperRootPath,
                 routingNetwork.getNetworkNameAndVersion());
         graphHopper.setStoreOnFlush(storeOnDisk);

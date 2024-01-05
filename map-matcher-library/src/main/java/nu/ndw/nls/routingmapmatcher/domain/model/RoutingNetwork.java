@@ -17,4 +17,7 @@ public class RoutingNetwork {
     private final String networkNameAndVersion;
     private final Supplier<Iterator<Link>> linkSupplier;
     private final Instant dataDate;
+    @Builder.Default
+    private final boolean expandBounds = false;
+
 }

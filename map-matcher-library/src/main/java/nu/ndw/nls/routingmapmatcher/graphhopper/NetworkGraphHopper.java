@@ -7,6 +7,8 @@ import com.graphhopper.coll.LongLongMap;
 import com.graphhopper.config.Profile;
 import com.graphhopper.routing.Path;
 import com.graphhopper.routing.PathRouter;
+import com.graphhopper.routing.util.parsers.TagParser;
+import com.graphhopper.storage.BaseGraph;
 import com.graphhopper.storage.index.LocationIndexTree;
 import java.time.Instant;
 import java.time.format.DateTimeFormatter;
@@ -18,6 +20,7 @@ import java.util.Map;
 import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import nu.ndw.nls.routingmapmatcher.domain.Network;
 import nu.ndw.nls.routingmapmatcher.domain.model.Link;
@@ -35,22 +38,29 @@ public class NetworkGraphHopper extends GraphHopper implements Network {
     private Instant dataDate;
 
     private LongLongMap nodeIdToInternalNodeIdMap;
+    @Getter
+    private final boolean expandBounds;
 
     public NetworkGraphHopper(Supplier<Iterator<Link>> linkSupplier) {
         this(linkSupplier, null);
     }
 
     public NetworkGraphHopper(Supplier<Iterator<Link>> linkSupplier, Instant dataDate) {
+        this(linkSupplier, dataDate, false);
+    }
+
+    public NetworkGraphHopper(Supplier<Iterator<Link>> linkSupplier, Instant dataDate, boolean expandBounds) {
         this.linkSupplier = linkSupplier;
         this.dataDate = dataDate;
         this.nodeIdToInternalNodeIdMap = new GHLongLongBTree(MAX_LEAF_ENTRIES, BYTES_PER_INTEGER, EMPTY_VALUE);
+        this.expandBounds = expandBounds;
     }
 
     /**
      * Loading an existing network from disk does not require a link supplier and nodeIdToInternalNodeIdMap
      */
     public NetworkGraphHopper() {
-
+        expandBounds = false;
     }
 
     /**
@@ -73,8 +83,15 @@ public class NetworkGraphHopper extends GraphHopper implements Network {
 
     protected NetworkReader getNetworkReader(Supplier<Iterator<Link>> linkSupplier,
             LongLongMap nodeIdToInternalNodeIdMap) {
-        return new NetworkReader(getBaseGraph().getBaseGraph(), getEncodingManager(), linkSupplier,
-                getOSMParsers().getWayTagParsers(), nodeIdToInternalNodeIdMap);
+        BaseGraph baseGraph = getBaseGraph().getBaseGraph();
+        List<TagParser> wayTagParsers = getOSMParsers().getWayTagParsers();
+        if (expandBounds) {
+            return new ExpandedBoundsNetworkReader(baseGraph, getEncodingManager(), linkSupplier, wayTagParsers,
+                    nodeIdToInternalNodeIdMap);
+        } else {
+            return new NetworkReader(baseGraph, getEncodingManager(), linkSupplier, wayTagParsers,
+                    nodeIdToInternalNodeIdMap);
+        }
     }
 
     @Override
