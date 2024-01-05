@@ -4,6 +4,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.when;
 
 import java.nio.file.Path;
@@ -38,6 +39,7 @@ class NetworkGraphHopperFactoryTest {
     private static final String DEFAULT_GRAPHHOPPER_ROOT_DIRECTORY = "graphhopper_";
     private static final Instant DATA_DATE = Instant.parse("2023-11-07T15:37:23.129Z");
     private static final Instant DATA_DATE_TRUNCATED = Instant.parse("2023-11-07T15:37:23Z");
+    private static final boolean EXPAND_BOUNDS = true;
 
     @Mock
     private RoutingNetwork routingNetwork;
@@ -65,6 +67,7 @@ class NetworkGraphHopperFactoryTest {
         when(routingNetwork.getNetworkNameAndVersion()).thenReturn(TEST_NETWORK);
         when(routingNetwork.getLinkSupplier()).thenReturn(() -> Collections.singletonList(link).iterator());
         when(routingNetwork.getDataDate()).thenReturn(DATA_DATE);
+        when(routingNetwork.isExpandBounds()).thenReturn(EXPAND_BOUNDS);
         networkGraphHopperFactory = new NetworkGraphHopperFactory();
     }
 
@@ -77,6 +80,7 @@ class NetworkGraphHopperFactoryTest {
         assertFalse(graphHopper.hasElevation());
         assertThat(graphHopper.getImportDate(), notNullValue());
         assertThat(graphHopper.getDataDate(), is(DATA_DATE_TRUNCATED));
+        assertTrue(graphHopper.isExpandBounds());
     }
 
     @Test
@@ -89,5 +93,6 @@ class NetworkGraphHopperFactoryTest {
         assertFalse(graphHopper.hasElevation());
         assertThat(graphHopper.getImportDate(), notNullValue());
         assertThat(graphHopper.getDataDate(), is(DATA_DATE_TRUNCATED));
+        assertTrue(graphHopper.isExpandBounds());
     }
 }
