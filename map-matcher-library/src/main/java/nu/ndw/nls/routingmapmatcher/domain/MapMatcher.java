@@ -1,7 +1,7 @@
 package nu.ndw.nls.routingmapmatcher.domain;
 
-import nu.ndw.nls.routingmapmatcher.domain.model.base.BaseLocation;
-import nu.ndw.nls.routingmapmatcher.domain.model.base.MapMatch;
+import nu.ndw.nls.routingmapmatcher.model.base.BaseLocation;
+import nu.ndw.nls.routingmapmatcher.model.base.MapMatch;
 
 public interface MapMatcher<T extends BaseLocation, R extends MapMatch> {
 

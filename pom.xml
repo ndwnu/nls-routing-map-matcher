@@ -7,19 +7,18 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>3.2.1</version>
+        <version>3.2.2</version>
         <relativePath/>
     </parent>
 
     <groupId>nu.ndw.nls</groupId>
     <artifactId>routing-map-matcher-parent</artifactId>
-    <version>7.7.7-SNAPSHOT</version>
+    <version>8.0.0-SNAPSHOT</version>
     <name>routing map matcher parent</name>
     <description>Routing Map Matcher modules containing the core library and spring boot starter modules</description>
     <packaging>pom</packaging>
     <modules>
         <module>map-matcher-library</module>
-        <module>map-matcher-spring-boot</module>
     </modules>
     <properties>
         <maven.compiler.source>17</maven.compiler.source>
@@ -33,7 +32,7 @@
         <guava.version>33.0.0-jre</guava.version>
         <hamcrest.version>2.2</hamcrest.version>
         <jacoco.version>0.8.11</jacoco.version>
-        <geotools.version>30.1</geotools.version>
+        <geotools.version>30.2</geotools.version>
         <jts2geojson.version>0.18.1</jts2geojson.version>
         <commons-io.version>2.15.1</commons-io.version>
         <maven-failsafe-plugin.version>3.2.5</maven-failsafe-plugin.version>

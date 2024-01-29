@@ -1,19 +1,15 @@
 package nu.ndw.nls.routingmapmatcher.util;
 
 import java.io.IOException;
-import nu.ndw.nls.routingmapmatcher.constants.GlobalConstants;
 import org.locationtech.jts.geom.Geometry;
-import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.LineString;
 import org.locationtech.jts.geom.Point;
-import org.locationtech.jts.geom.PrecisionModel;
 import org.locationtech.jts.io.ParseException;
 import org.locationtech.jts.io.WKBReader;
 
 public class GeometryHelper {
 
-    private final WKBReader wkbReader = new WKBReader(new GeometryFactory(new PrecisionModel(),
-            GlobalConstants.WGS84_SRID));
+    private final WKBReader wkbReader = new WKBReader(GeometryConstants.WGS84_GEOMETRY_FACTORY);
 
     public synchronized LineString convertToLinestring(byte[] geometryWkb) throws IOException {
         try {

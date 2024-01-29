@@ -1,7 +1,7 @@
 package com.graphhopper.routing;
 
 import com.graphhopper.routing.querygraph.QueryGraph;
-import nu.ndw.nls.routingmapmatcher.domain.exception.RoutingMapMatcherException;
+import nu.ndw.nls.routingmapmatcher.exception.RoutingMapMatcherException;
 
 /**
  * Extract a query graph from a path.
