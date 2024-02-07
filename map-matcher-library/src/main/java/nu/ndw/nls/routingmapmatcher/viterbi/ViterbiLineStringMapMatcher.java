@@ -10,6 +10,9 @@ import com.graphhopper.matching.Observation;
 import com.graphhopper.routing.Path;
 import com.graphhopper.routing.QueryGraphExtractor;
 import com.graphhopper.routing.querygraph.QueryGraph;
+import com.graphhopper.routing.util.EdgeFilter;
+import com.graphhopper.routing.util.FiniteWeightFilter;
+import com.graphhopper.routing.weighting.Weighting;
 import com.graphhopper.storage.index.LocationIndexTree;
 import com.graphhopper.storage.index.Snap;
 import com.graphhopper.util.PMap;
@@ -92,7 +95,6 @@ public class ViterbiLineStringMapMatcher implements
     @Override
     public LineStringMatch match(LineStringLocation lineStringLocation) {
         Preconditions.checkNotNull(lineStringLocation);
-
         PointList pointList = PointList.fromLineString(lineStringLocation.getGeometry());
         var simplifier = new RamerDouglasPeucker();
         simplifier.setMaxDistance(LINE_SMOOTHING_TOLERANCE);
@@ -159,8 +161,11 @@ public class ViterbiLineStringMapMatcher implements
     private boolean isNearbyNdwNetwork(Observation observation) {
         Point point = WGS84_GEOMETRY_FACTORY.createPoint(
                 new Coordinate(observation.getPoint().getLon(), observation.getPoint().getLat()));
-        List<Snap> queryResults = getQueryResults(networkGraphHopper, point, MEASUREMENT_ERROR_SIGMA_IN_METERS,
-                locationIndexTree);
+        Weighting weighting = networkGraphHopper.createWeighting(profile,createHints());
+        EdgeFilter edgeFilter = new FiniteWeightFilter(weighting);
+        List<Snap> queryResults = getQueryResults(networkGraphHopper, point,
+                MEASUREMENT_ERROR_SIGMA_IN_METERS,
+                locationIndexTree,edgeFilter);
         for (Snap queryResult : queryResults) {
             if (queryResult.getQueryDistance() <= NEARBY_NDW_NETWORK_DISTANCE_IN_METERS) {
                 return true;

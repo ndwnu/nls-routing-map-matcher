@@ -2,7 +2,6 @@ package nu.ndw.nls.routingmapmatcher.starttoend;
 
 import static com.graphhopper.util.Parameters.Algorithms.DIJKSTRA_BI;
 import static nu.ndw.nls.routingmapmatcher.util.MatchUtil.getQueryResults;
-
 import com.google.common.base.Preconditions;
 import com.graphhopper.config.Profile;
 import com.graphhopper.routing.AlgorithmOptions;
@@ -13,7 +12,9 @@ import com.graphhopper.routing.RoutingAlgorithmFactorySimple;
 import com.graphhopper.routing.ev.VehicleAccess;
 import com.graphhopper.routing.ev.VehicleSpeed;
 import com.graphhopper.routing.querygraph.QueryGraph;
+import com.graphhopper.routing.util.EdgeFilter;
 import com.graphhopper.routing.util.EncodingManager;
+import com.graphhopper.routing.util.FiniteWeightFilter;
 import com.graphhopper.routing.util.TraversalMode;
 import com.graphhopper.routing.weighting.ShortestWeighting;
 import com.graphhopper.routing.weighting.Weighting;
@@ -91,7 +92,10 @@ public class StartToEndMapMatcher implements MapMatcher<LineStringLocation, Line
     }
 
     private List<Snap> findCandidates(Point point) {
-        return getQueryResults(networkGraphHopper, point, MAXIMUM_CANDIDATE_DISTANCE_IN_METERS, locationIndexTree);
+        EdgeFilter edgeFilter = new FiniteWeightFilter(weighting);
+        return getQueryResults(networkGraphHopper, point,
+                MAXIMUM_CANDIDATE_DISTANCE_IN_METERS,
+                locationIndexTree, edgeFilter);
     }
 
     private QueryGraph createQueryGraphAndAssignClosestNodePerCandidate(List<Snap> startCandidates,

@@ -2,6 +2,7 @@ package nu.ndw.nls.routingmapmatcher.util;
 
 import static nu.ndw.nls.routingmapmatcher.util.GeometryConstants.DIST_PLANE;
 
+import com.graphhopper.routing.util.EdgeFilter;
 import com.graphhopper.storage.index.LocationIndexTree;
 import com.graphhopper.storage.index.Snap;
 import com.graphhopper.util.EdgeIteratorState;
@@ -19,8 +20,9 @@ public final class MatchUtil {
     private MatchUtil() {
     }
 
+
     public static List<Snap> getQueryResults(NetworkGraphHopper network, Point point, double radius,
-            LocationIndexTree locationIndexTree) {
+            LocationIndexTree locationIndexTree, EdgeFilter edgeFilter) {
         double latitude = point.getY();
         double longitude = point.getX();
         Circle circle = new Circle(latitude, longitude, radius);
@@ -30,7 +32,7 @@ public final class MatchUtil {
             EdgeIteratorState edge = network.getBaseGraph()
                     .getEdgeIteratorStateForKey(edgeId * KEY_FACTOR);
             var geometry = edge.fetchWayGeometry(FetchMode.ALL).makeImmutable();
-            if (circle.intersects(geometry)) {
+            if (circle.intersects(geometry) && edgeFilter.accept(edge)) {
                 var snap = new Snap(latitude, longitude);
                 locationIndexTree
                         .traverseEdge(latitude, longitude, edge,

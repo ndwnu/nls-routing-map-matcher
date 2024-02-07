@@ -15,6 +15,7 @@ import com.graphhopper.routing.ev.DecimalEncodedValue;
 import com.graphhopper.routing.ev.VehicleAccess;
 import com.graphhopper.routing.ev.VehicleSpeed;
 import com.graphhopper.routing.util.EncodingManager;
+import com.graphhopper.routing.util.FiniteWeightFilter;
 import com.graphhopper.routing.weighting.ShortestWeighting;
 import com.graphhopper.routing.weighting.Weighting;
 import com.graphhopper.storage.BaseGraph;
@@ -22,6 +23,7 @@ import com.graphhopper.storage.EdgeIteratorStateReverseExtractor;
 import com.graphhopper.storage.index.LocationIndexTree;
 import com.graphhopper.storage.index.Snap;
 import com.graphhopper.util.FetchMode;
+import com.graphhopper.util.PMap;
 import com.graphhopper.util.PointList;
 import java.util.List;
 import nu.ndw.nls.routingmapmatcher.domain.MapMatcher;
@@ -86,9 +88,11 @@ public class SinglePointMapMatcher implements MapMatcher<SinglePointLocation, Si
 
     public SinglePointMatch match(SinglePointLocation singlePointLocation) {
         Preconditions.checkNotNull(singlePointLocation);
+        Weighting matchWeighting = network.createWeighting(profile, new PMap());
         Point inputPoint = singlePointLocation.getPoint();
         double inputRadius = singlePointLocation.getCutoffDistance();
-        List<Snap> queryResults = getQueryResults(network, inputPoint, inputRadius, locationIndexTree);
+        List<Snap> queryResults = getQueryResults(network, inputPoint, inputRadius, locationIndexTree,
+                new FiniteWeightFilter(matchWeighting));
         Polygon circle = createCircle(inputPoint, RADIUS_TO_DIAMETER * inputRadius);
         List<MatchedPoint> matches = getMatchedPoints(singlePointLocation, queryResults, circle);
         if (matches.isEmpty()) {
