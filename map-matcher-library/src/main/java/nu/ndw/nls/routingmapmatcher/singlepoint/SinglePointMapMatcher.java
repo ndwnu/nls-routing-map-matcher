@@ -73,9 +73,7 @@ public class SinglePointMapMatcher implements MapMatcher<SinglePointLocation, Si
         this.locationIndexTree = network.getLocationIndex();
         BaseGraph baseGraph = network.getBaseGraph();
         EncodingManager encodingManager = network.getEncodingManager();
-        BooleanEncodedValue accessEnc = encodingManager.getBooleanEncodedValue(VehicleAccess.key(profile.getVehicle()));
-        DecimalEncodedValue speedEnc = encodingManager.getDecimalEncodedValue(VehicleSpeed.key(profile.getVehicle()));
-        Weighting weighting = new ShortestWeighting(accessEnc, speedEnc);
+        Weighting weighting = network.createWeighting(profile, new PMap());
         GeodeticCalculator geodeticCalculator = new GeodeticCalculator();
         this.edgeIteratorStateReverseExtractor = new EdgeIteratorStateReverseExtractor();
         this.isochroneService = new IsochroneService(encodingManager, baseGraph, edgeIteratorStateReverseExtractor,
