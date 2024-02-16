@@ -11,6 +11,7 @@ import com.graphhopper.routing.ev.VehicleSpeed;
 import com.graphhopper.routing.querygraph.QueryGraph;
 import com.graphhopper.routing.util.EdgeFilter;
 import com.graphhopper.routing.util.EncodingManager;
+import com.graphhopper.routing.util.FiniteWeightFilter;
 import com.graphhopper.routing.util.TraversalMode;
 import com.graphhopper.storage.BaseGraph;
 import com.graphhopper.storage.EdgeIteratorStateReverseExtractor;
@@ -89,7 +90,8 @@ public class IsochroneService {
         // Get the  start segment for the isochrone calculation
         Snap startSegment
                 = locationIndexTree
-                .findClosest(latitude, longitude, EdgeFilter.ALL_EDGES);
+                .findClosest(latitude, longitude,
+                        new FiniteWeightFilter(shortestPathTreeFactory.getDefaultWeighting()));
 
         /*
             Lookup will create virtual edges based on the snapped point, thereby cutting the segment in 2 line strings.
@@ -100,10 +102,10 @@ public class IsochroneService {
         QueryGraph queryGraph = QueryGraph.create(baseGraph, startSegment);
         IsochroneByTimeDistanceAndWeight isochrone = shortestPathTreeFactory
                 .createShortestPathTreeByTimeDistanceAndWeight(
-                null, queryGraph,
-                TraversalMode.NODE_BASED,
-                isochroneValue,
-                isochroneUnit, reverseFlow);
+                        null, queryGraph,
+                        TraversalMode.NODE_BASED,
+                        isochroneValue,
+                        isochroneUnit, reverseFlow);
         // Here the ClosestNode is the virtual node id created by the queryGraph.lookup.
         List<IsoLabel> isoLabels = new ArrayList<>();
         isochrone.search(startSegment.getClosestNode(), isoLabels::add);

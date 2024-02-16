@@ -3,10 +3,12 @@ package nu.ndw.nls.routingmapmatcher.isochrone.algorithm;
 import com.graphhopper.routing.querygraph.QueryGraph;
 import com.graphhopper.routing.util.TraversalMode;
 import com.graphhopper.routing.weighting.Weighting;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import nu.ndw.nls.routingmapmatcher.model.IsochroneUnit;
 
 @RequiredArgsConstructor
+@Getter
 public class ShortestPathTreeFactory {
 
     private static final int MILLISECONDS = 1000;
