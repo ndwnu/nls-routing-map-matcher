@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
+import nu.ndw.nls.routingmapmatcher.model.IsochroneUnit;
 import nu.ndw.nls.routingmapmatcher.model.singlepoint.SinglePointLocation;
 import nu.ndw.nls.routingmapmatcher.model.singlepoint.SinglePointMatch;
 import nu.ndw.nls.routingmapmatcher.testutil.TestNetworkProvider.TestLink;
@@ -88,6 +89,8 @@ class SinglePointMapMatcherFilterNonAccessibleIT {
         return SinglePointLocation.builder()
                 .id(id)
                 .point(point)
+                .downstreamIsochrone(3000)
+                .downstreamIsochroneUnit(IsochroneUnit.METERS)
                 .build();
     }
 
