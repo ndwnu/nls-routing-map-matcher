@@ -254,8 +254,8 @@ class IsochroneServiceTest {
 
         when(point.getY()).thenReturn(Y_COORDINATE);
         when(point.getX()).thenReturn(X_COORDINATE);
-        when(locationIndexTree.findClosest(Y_COORDINATE, X_COORDINATE,
-                EdgeFilter.ALL_EDGES))
+        when(locationIndexTree.findClosest(eq(Y_COORDINATE), eq(X_COORDINATE),
+                any(EdgeFilter.class)))
                 .thenReturn(startSegment);
         when(startSegment.getClosestNode()).thenReturn(START_NODE_ID);
     }
