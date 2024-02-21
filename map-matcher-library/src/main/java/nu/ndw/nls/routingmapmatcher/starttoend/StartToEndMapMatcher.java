@@ -2,6 +2,7 @@ package nu.ndw.nls.routingmapmatcher.starttoend;
 
 import static com.graphhopper.util.Parameters.Algorithms.DIJKSTRA_BI;
 import static nu.ndw.nls.routingmapmatcher.util.MatchUtil.getQueryResults;
+
 import com.google.common.base.Preconditions;
 import com.graphhopper.config.Profile;
 import com.graphhopper.routing.AlgorithmOptions;
@@ -9,18 +10,15 @@ import com.graphhopper.routing.Path;
 import com.graphhopper.routing.RoutingAlgorithm;
 import com.graphhopper.routing.RoutingAlgorithmFactory;
 import com.graphhopper.routing.RoutingAlgorithmFactorySimple;
-import com.graphhopper.routing.ev.VehicleAccess;
-import com.graphhopper.routing.ev.VehicleSpeed;
 import com.graphhopper.routing.querygraph.QueryGraph;
 import com.graphhopper.routing.util.EdgeFilter;
-import com.graphhopper.routing.util.EncodingManager;
 import com.graphhopper.routing.util.FiniteWeightFilter;
 import com.graphhopper.routing.util.TraversalMode;
-import com.graphhopper.routing.weighting.ShortestWeighting;
 import com.graphhopper.routing.weighting.Weighting;
 import com.graphhopper.storage.BaseGraph;
 import com.graphhopper.storage.index.LocationIndexTree;
 import com.graphhopper.storage.index.Snap;
+import com.graphhopper.util.PMap;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -63,12 +61,9 @@ public class StartToEndMapMatcher implements MapMatcher<LineStringLocation, Line
                 .setTraversalMode(TraversalMode.NODE_BASED);
         this.algorithmFactory = new RoutingAlgorithmFactorySimple();
         this.locationIndexTree = networkGraphHopper.getLocationIndex();
-        EncodingManager encodingManager = networkGraphHopper.getEncodingManager();
         this.lineStringMatchUtil = new LineStringMatchUtil(networkGraphHopper, profile);
         this.lineStringScoreUtil = new LineStringScoreUtil();
-        this.weighting = new ShortestWeighting(
-                encodingManager.getBooleanEncodedValue(VehicleAccess.key(profile.getVehicle())),
-                encodingManager.getDecimalEncodedValue(VehicleSpeed.key(profile.getVehicle())));
+        this.weighting = networkGraphHopper.createWeighting(profile, new PMap());
     }
 
     public LineStringMatch match(LineStringLocation lineStringLocation) {
