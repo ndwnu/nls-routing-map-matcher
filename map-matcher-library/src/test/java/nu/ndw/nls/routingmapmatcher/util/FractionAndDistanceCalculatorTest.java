@@ -50,4 +50,40 @@ class FractionAndDistanceCalculatorTest {
         double lengthInMeters = FractionAndDistanceCalculator.calculateLengthInMeters(LINE_STRING);
         assertEquals(3.3758, lengthInMeters, DELTA);
     }
+
+    @Test
+    void getSubLineString_ok_betweenPoints() {
+        LineString originalLineString = createLineString(new Coordinate(5.0, 53.0), new Coordinate(5.0, 53.01));
+        LineString subLineString = FractionAndDistanceCalculator.getSubLineString(originalLineString, 0.5);
+        // Because we use the geodetic calculator, the answer is expected to slightly deviate from 53.005, which would
+        // be the result of simple Cartesian interpolation.
+        assertEquals(createLineString(new Coordinate(5.0, 53.0), new Coordinate(5.0, 53.00500000211479)),
+                subLineString);
+    }
+
+    @Test
+    void getSubLineString_ok_onPoint() {
+        LineString originalLineString = createLineString(new Coordinate(5.0, 53.0), new Coordinate(5.0, 53.01),
+                new Coordinate(5.0, 53.02));
+        LineString subLineString = FractionAndDistanceCalculator.getSubLineString(originalLineString, 0.5);
+        assertEquals(createLineString(new Coordinate(5.0, 53.0), new Coordinate(5.0, 53.01)), subLineString);
+    }
+
+    @Test
+    void getSubLineString_ok_zero() {
+        LineString originalLineString = createLineString(new Coordinate(5.0, 53.0), new Coordinate(5.0, 53.01));
+        LineString subLineString = FractionAndDistanceCalculator.getSubLineString(originalLineString, 0.0);
+        assertEquals(createLineString(new Coordinate(5.0, 53.0), new Coordinate(5.0, 53.0)), subLineString);
+    }
+
+    @Test
+    void getSubLineString_ok_one() {
+        LineString originalLineString = createLineString(new Coordinate(5.0, 53.0), new Coordinate(5.0, 53.01));
+        LineString subLineString = FractionAndDistanceCalculator.getSubLineString(originalLineString, 1.0);
+        assertEquals(originalLineString, subLineString);
+    }
+
+    private LineString createLineString(Coordinate... coordinates) {
+        return WGS84_GEOMETRY_FACTORY.createLineString(coordinates);
+    }
 }

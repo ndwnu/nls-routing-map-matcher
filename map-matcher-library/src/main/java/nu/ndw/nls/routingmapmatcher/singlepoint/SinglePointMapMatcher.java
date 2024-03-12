@@ -22,9 +22,9 @@ import com.graphhopper.storage.BaseGraph;
 import com.graphhopper.storage.EdgeIteratorStateReverseExtractor;
 import com.graphhopper.storage.index.LocationIndexTree;
 import com.graphhopper.storage.index.Snap;
+import com.graphhopper.util.EdgeIteratorState;
 import com.graphhopper.util.FetchMode;
 import com.graphhopper.util.PMap;
-import com.graphhopper.util.PointList;
 import java.util.List;
 import nu.ndw.nls.routingmapmatcher.domain.MapMatcher;
 import nu.ndw.nls.routingmapmatcher.isochrone.IsochroneService;
@@ -41,6 +41,7 @@ import nu.ndw.nls.routingmapmatcher.model.singlepoint.SinglePointMatch.Candidate
 import nu.ndw.nls.routingmapmatcher.network.NetworkGraphHopper;
 import nu.ndw.nls.routingmapmatcher.util.BearingCalculator;
 import nu.ndw.nls.routingmapmatcher.util.CrsTransformer;
+import nu.ndw.nls.routingmapmatcher.util.PointListUtil;
 import org.geotools.referencing.GeodeticCalculator;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Geometry;
@@ -53,7 +54,6 @@ public class SinglePointMapMatcher implements MapMatcher<SinglePointLocation, Si
 
     private static final int RADIUS_TO_DIAMETER = 2;
 
-    private static final boolean INCLUDE_ELEVATION = false;
     private static final int NUM_POINTS = 100;
     private static final double DISTANCE_THRESHOLD = 0.1;
     private static final double RELIABILITY_THRESHOLD = 0.5;
@@ -66,6 +66,7 @@ public class SinglePointMapMatcher implements MapMatcher<SinglePointLocation, Si
     private final EdgeIteratorStateReverseExtractor edgeIteratorStateReverseExtractor;
     private final NetworkGraphHopper network;
     private final Profile profile;
+    private final PointListUtil pointListUtil;
 
     public SinglePointMapMatcher(NetworkGraphHopper network, String profileName) {
         this.network = Preconditions.checkNotNull(network);
@@ -76,8 +77,9 @@ public class SinglePointMapMatcher implements MapMatcher<SinglePointLocation, Si
         Weighting weighting = network.createWeighting(profile, new PMap());
         GeodeticCalculator geodeticCalculator = new GeodeticCalculator();
         this.edgeIteratorStateReverseExtractor = new EdgeIteratorStateReverseExtractor();
+        this.pointListUtil = new PointListUtil();
         this.isochroneService = new IsochroneService(encodingManager, baseGraph, edgeIteratorStateReverseExtractor,
-                new IsochroneMatchMapper(new CrsTransformer(), encodingManager, edgeIteratorStateReverseExtractor),
+                new IsochroneMatchMapper(encodingManager, edgeIteratorStateReverseExtractor, pointListUtil),
                 new ShortestPathTreeFactory(weighting), this.locationIndexTree, profile);
         BearingCalculator bearingCalculator = new BearingCalculator(geodeticCalculator);
         this.pointMatchingService = new PointMatchingService(WGS84_GEOMETRY_FACTORY, bearingCalculator);
@@ -112,10 +114,10 @@ public class SinglePointMapMatcher implements MapMatcher<SinglePointLocation, Si
     private CandidateMatch mapToCandidateMatch(SinglePointLocation singlePointLocation, MatchedPoint matchedPoint) {
         List<IsochroneMatch> upstream = singlePointLocation.getUpstreamIsochroneUnit() == null ? null
                 : isochroneService.getUpstreamIsochroneMatches(matchedPoint.getSnappedPoint(),
-                        matchedPoint.isReversed(), singlePointLocation);
+                        matchedPoint.getMatchedLinkId(), matchedPoint.isReversed(), singlePointLocation);
         List<IsochroneMatch> downstream = singlePointLocation.getDownstreamIsochroneUnit() == null ? null
                 : isochroneService.getDownstreamIsochroneMatches(matchedPoint.getSnappedPoint(),
-                        matchedPoint.isReversed(), singlePointLocation);
+                        matchedPoint.getMatchedLinkId(), matchedPoint.isReversed(), singlePointLocation);
 
         return CandidateMatch
                 .builder()
@@ -134,15 +136,13 @@ public class SinglePointMapMatcher implements MapMatcher<SinglePointLocation, Si
     private List<MatchedPoint> getMatchedPoints(SinglePointLocation singlePointLocation, List<Snap> queryResults,
             Polygon circle) {
         List<MatchedPoint> sorted = queryResults.stream()
-                .filter(qr -> intersects(circle, qr))
-                .flatMap(qr -> calculateMatches(qr, circle, singlePointLocation)
+                .map(Snap::getClosestEdge)
+                .filter(e -> intersects(circle, e))
+                .flatMap(e -> calculateMatches(e, circle, singlePointLocation)
                         .stream())
                 .sorted(singlePointLocation.getMatchSort().getSort())
                 .toList();
-        if (sorted.isEmpty()) {
-            return sorted;
-        }
-        if (singlePointLocation.getMatchFilter() == ALL) {
+        if (sorted.isEmpty() || singlePointLocation.getMatchFilter() == ALL) {
             return sorted;
         } else {
             return switch (singlePointLocation.getMatchSort()) {
@@ -168,10 +168,9 @@ public class SinglePointMapMatcher implements MapMatcher<SinglePointLocation, Si
                 .toList();
     }
 
-
-    private boolean intersects(Polygon circle, Snap queryResult) {
-        PointList pl = queryResult.getClosestEdge().fetchWayGeometry(FetchMode.ALL);
-        return circle.intersects(pl.toLineString(INCLUDE_ELEVATION));
+    private boolean intersects(Polygon circle, EdgeIteratorState edge) {
+        LineString wayGeometry = pointListUtil.toLineString(edge.fetchWayGeometry(FetchMode.ALL));
+        return circle.intersects(wayGeometry);
     }
 
     private Polygon createCircle(Point pointWgs84, double diameterInMeters) {
@@ -185,11 +184,9 @@ public class SinglePointMapMatcher implements MapMatcher<SinglePointLocation, Si
         return (Polygon) crsTransformer.transformFromRdNewToWgs84(ellipseRd);
     }
 
-    private List<MatchedPoint> calculateMatches(Snap queryResult, Polygon circle,
+    private List<MatchedPoint> calculateMatches(EdgeIteratorState edge, Polygon circle,
             SinglePointLocation singlePointLocation) {
-        LineString wayGeometry = queryResult.getClosestEdge()
-                .fetchWayGeometry(FetchMode.ALL)
-                .toLineString(false);
+        LineString wayGeometry = pointListUtil.toLineString(edge.fetchWayGeometry(FetchMode.ALL));
         /*
            The geometry direction of the edge iterator wayGeometry does not necessarily reflect the direction of a
            street or the original encoded geometry direction. It is just the direction of the exploration of the graph.
@@ -197,13 +194,11 @@ public class SinglePointMapMatcher implements MapMatcher<SinglePointLocation, Si
            an internal attribute of the edge iterator state is used, indicating it has done so or not.
         */
         LineString originalGeometry =
-                edgeIteratorStateReverseExtractor.hasReversed(queryResult.getClosestEdge()) ? wayGeometry.reverse()
-                        : wayGeometry;
+                edgeIteratorStateReverseExtractor.hasReversed(edge) ? wayGeometry.reverse() : wayGeometry;
         Geometry cutoffGeometry = circle.intersection(originalGeometry);
-        EdgeIteratorTravelDirection travelDirection = determineEdgeDirection(queryResult, network.getEncodingManager(),
+        EdgeIteratorTravelDirection travelDirection = determineEdgeDirection(edge, network.getEncodingManager(),
                 profile.getVehicle());
-        int matchedLinkId = queryResult.getClosestEdge().get(network.getEncodingManager()
-                .getIntEncodedValue(WAY_ID_KEY));
+        int matchedLinkId = edge.get(network.getEncodingManager().getIntEncodedValue(WAY_ID_KEY));
         var matchedQueryResult = MatchedQueryResult.builder()
                 .matchedLinkId(matchedLinkId)
                 .inputPoint(singlePointLocation.getPoint())
@@ -215,7 +210,6 @@ public class SinglePointMapMatcher implements MapMatcher<SinglePointLocation, Si
                 .build();
 
         return pointMatchingService.calculateMatches(matchedQueryResult);
-
     }
 
     private SinglePointMatch createFailedMatch(SinglePointLocation singlePointLocation) {

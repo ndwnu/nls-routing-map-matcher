@@ -2,6 +2,7 @@ package nu.ndw.nls.routingmapmatcher.singlepoint;
 
 import static nu.ndw.nls.routingmapmatcher.testutil.TestNetworkProvider.CAR_FASTEST;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.closeTo;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -36,13 +37,14 @@ public class SinglePointMapMatcherWithIsochroneIT {
 
     @SneakyThrows
     private void setupNetwork() {
-        singlePointMapMatcher = new SinglePointMapMatcher(TestNetworkProvider.getTestNetworkFromFile(LINKS_RESOURCE), CAR_FASTEST);
+        singlePointMapMatcher = new SinglePointMapMatcher(TestNetworkProvider.getTestNetworkFromFile(LINKS_RESOURCE),
+                CAR_FASTEST);
         geometryFactory = GeometryConstants.WGS84_GEOMETRY_FACTORY;
     }
 
     @SneakyThrows
     @Test
-    void matchWithDownstreamIsochrone_Meters_ok() {
+    void matchWithDownstreamIsochrone_ok_meters() {
         setupNetwork();
         Point point = geometryFactory.createPoint(START_POINT);
         var request = SinglePointLocation
@@ -61,14 +63,14 @@ public class SinglePointMapMatcherWithIsochroneIT {
         CandidateMatch match = result.getCandidateMatches().get(0);
         assertThat(match.getDownstream(), hasSize(5));
         var startPoint = match.getDownstream().get(0);
-        assertThat(startPoint.getStartFraction(), is(0.673088825759));
+        assertThat(startPoint.getStartFraction(), closeTo(match.getFraction(), 0.000001));
         assertThat(startPoint.getEndFraction(), is(1.0));
         assertFalse(startPoint.isReversed());
     }
 
     @SneakyThrows
     @Test
-    void matchWithDownstreamIsochrone_Seconds_ok() {
+    void matchWithDownstreamIsochrone_ok_seconds() {
         setupNetwork();
         Point point = geometryFactory.createPoint(START_POINT);
         var request = SinglePointLocation
@@ -87,14 +89,14 @@ public class SinglePointMapMatcherWithIsochroneIT {
         CandidateMatch match = result.getCandidateMatches().get(0);
         assertThat(match.getDownstream(), hasSize(14));
         var startPoint = match.getDownstream().get(0);
-        assertThat(startPoint.getStartFraction(), is(0.673088825759));
+        assertThat(startPoint.getStartFraction(), closeTo(match.getFraction(), 0.000001));
         assertThat(startPoint.getEndFraction(), is(1.0));
         assertFalse(startPoint.isReversed());
     }
 
     @SneakyThrows
     @Test
-    void matchWithUpstreamIsochrone_Meters_ok() {
+    void matchWithUpstreamIsochrone_ok_meters() {
         setupNetwork();
         Point point = geometryFactory.createPoint(START_POINT);
         var request = SinglePointLocation
@@ -113,14 +115,14 @@ public class SinglePointMapMatcherWithIsochroneIT {
         CandidateMatch match = result.getCandidateMatches().get(0);
         assertThat(match.getUpstream(), hasSize(5));
         var startPoint = match.getUpstream().get(0);
-        assertThat(startPoint.getStartFraction(), is(0.326911174226));
+        assertThat(startPoint.getStartFraction(), closeTo(1 - match.getFraction(), 0.000001));
         assertThat(startPoint.getEndFraction(), is(1.0));
         assertTrue(startPoint.isReversed());
     }
 
     @SneakyThrows
     @Test
-    void matchWithUpstreamIsochrone_Seconds_ok() {
+    void matchWithUpstreamIsochrone_ok_seconds() {
         setupNetwork();
         Point point = geometryFactory.createPoint(START_POINT);
         var request = SinglePointLocation
@@ -139,7 +141,7 @@ public class SinglePointMapMatcherWithIsochroneIT {
         CandidateMatch match = result.getCandidateMatches().get(0);
         assertThat(match.getUpstream(), hasSize(11));
         var startPoint = match.getUpstream().get(0);
-        assertThat(startPoint.getStartFraction(), is(0.326911174226));
+        assertThat(startPoint.getStartFraction(), closeTo(1 - match.getFraction(), 0.000001));
         assertThat(startPoint.getEndFraction(), is(1.0));
         assertTrue(startPoint.isReversed());
     }

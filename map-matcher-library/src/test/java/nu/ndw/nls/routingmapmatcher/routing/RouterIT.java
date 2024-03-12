@@ -59,8 +59,8 @@ class RouterIT {
     }
 
     private void assertSuccess(RoutingResponse result, Coordinate[] coordinates) {
-        assertThat(result.getStartLinkFraction()).isEqualTo(0.8236516616727612);
-        assertThat(result.getEndLinkFraction()).isEqualTo(0.5228504089301351);
+        assertThat(result.getStartLinkFraction()).isEqualTo(0.8246035077811711);
+        assertThat(result.getEndLinkFraction()).isEqualTo(0.5215863361447783);
         assertThat(result.getMatchedLinks()).containsExactly(
                 MatchedLink.builder().linkId(7223072).reversed(false).build(),
                 MatchedLink.builder().linkId(7223073).reversed(false).build(),

@@ -7,21 +7,21 @@ import com.graphhopper.routing.querygraph.QueryGraph;
 import com.graphhopper.routing.querygraph.VirtualEdgeIteratorState;
 import com.graphhopper.routing.util.EncodingManager;
 import com.graphhopper.storage.EdgeIteratorStateReverseExtractor;
-import com.graphhopper.storage.index.Snap;
-import com.graphhopper.util.EdgeExplorer;
-import com.graphhopper.util.EdgeIterator;
 import com.graphhopper.util.EdgeIteratorState;
+import com.graphhopper.util.FetchMode;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import nu.ndw.nls.routingmapmatcher.exception.RoutingMapMatcherException;
 import nu.ndw.nls.routingmapmatcher.model.EdgeIteratorTravelDirection;
 import nu.ndw.nls.routingmapmatcher.model.linestring.MatchedLink;
+import org.locationtech.jts.geom.Coordinate;
+import org.locationtech.jts.geom.LineString;
 
 public final class PathUtil {
 
     private static final EdgeIteratorStateReverseExtractor EDGE_ITERATOR_STATE_REVERSE_EXTRACTOR =
             new EdgeIteratorStateReverseExtractor();
+    private static final PointListUtil POINT_LIST_UTIL = new PointListUtil();
 
     private PathUtil() {
         // Util class
@@ -46,18 +46,15 @@ public final class PathUtil {
      * This method determines the direction on which one can travel over a path. We always need to validate the travel
      * direction because of the way how graphhopper creates node indexes and always wants to store edges with the lower
      * node index followed by the higher node index:
-     * https://github.com/graphhopper/graphhopper/blob/master/docs/core/technical.md
+     * <a href="https://github.com/graphhopper/graphhopper/blob/master/docs/core/technical.md">Technical</a>
      * <p>
      * Even though we supply nodes in driving direction (base node to adjacent node), graphhopper sometimes decides to
      * return results in reverse direction.
      *
-     * @param queryResult
-     * @param encodingManager
      * @return travel direction on this specific edge
      */
-    public static EdgeIteratorTravelDirection determineEdgeDirection(Snap queryResult,
+    public static EdgeIteratorTravelDirection determineEdgeDirection(EdgeIteratorState edge,
             EncodingManager encodingManager, String vehicleName) {
-        EdgeIteratorState edge = queryResult.getClosestEdge();
         boolean edgeCanBeTraveledFromBaseToAdjacent = edge.get(
                 encodingManager.getBooleanEncodedValue(VehicleAccess.key(vehicleName)));
         boolean edgeCanBeTraveledFromAdjacentToBase = edge.getReverse(
@@ -77,12 +74,26 @@ public final class PathUtil {
         if (queryGraph.isVirtualNode(firstEdge.getBaseNode())) {
             EdgeIteratorState originalEdge = findOriginalEdge(firstEdge, queryGraph);
 
-            double distanceInOtherDirection = calculateDistanceFromVirtualNodeToNonVirtualNode(queryGraph,
-                    firstEdge.getBaseNode(), firstEdge.getAdjNode(), firstEdge);
-
-            return distanceInOtherDirection / originalEdge.getDistance();
+            LineString originalGeometry = POINT_LIST_UTIL.toLineString(originalEdge.fetchWayGeometry(FetchMode.ALL));
+            Coordinate coordinate = POINT_LIST_UTIL.toLineString(firstEdge.fetchWayGeometry(FetchMode.ALL))
+                    .getStartPoint().getCoordinate();
+            return FractionAndDistanceCalculator.calculateFractionAndDistance(originalGeometry, coordinate)
+                    .getFraction();
         }
         return 0D;
+    }
+
+    public static double determineEndLinkFraction(EdgeIteratorState lastEdge, QueryGraph queryGraph) {
+        if (queryGraph.isVirtualNode(lastEdge.getAdjNode())) {
+            EdgeIteratorState originalEdge = findOriginalEdge(lastEdge, queryGraph);
+
+            LineString originalGeometry = POINT_LIST_UTIL.toLineString(originalEdge.fetchWayGeometry(FetchMode.ALL));
+            Coordinate coordinate = POINT_LIST_UTIL.toLineString(lastEdge.fetchWayGeometry(FetchMode.ALL))
+                    .getEndPoint().getCoordinate();
+            return FractionAndDistanceCalculator.calculateFractionAndDistance(originalGeometry, coordinate)
+                    .getFraction();
+        }
+        return 1D;
     }
 
     private static EdgeIteratorState findOriginalEdge(EdgeIteratorState edge, QueryGraph queryGraph) {
@@ -94,60 +105,5 @@ public final class PathUtil {
             originalEdge = edge;
         }
         return originalEdge;
-    }
-
-    private static double calculateDistanceFromVirtualNodeToNonVirtualNode(QueryGraph queryGraph, int virtualNode,
-            int nodeToAvoid, EdgeIteratorState pathEdge) {
-        EdgeExplorer edgeExplorer = queryGraph.createEdgeExplorer();
-
-        double distanceInOtherDirection = 0D;
-        boolean distanceInOtherDirectionCalculated = false;
-        boolean distanceInOtherDirectionIsPositive = false;
-
-        EdgeIterator edges = edgeExplorer.setBaseNode(virtualNode);
-        int currentNodeToAvoid = nodeToAvoid;
-        while (edges.next()) {
-            if (edges.getAdjNode() != currentNodeToAvoid) {
-                distanceInOtherDirection += edges.getDistance();
-
-                // This assumes all edge lengths are > 0!
-                distanceInOtherDirectionIsPositive = true;
-
-                if (queryGraph.isVirtualNode(edges.getAdjNode())) {
-                    // Search further
-                    currentNodeToAvoid = edges.getBaseNode();
-                    edges = edgeExplorer.setBaseNode(edges.getAdjNode());
-                } else {
-                    // Done
-                    distanceInOtherDirectionCalculated = true;
-                    break;
-                }
-            }
-        }
-
-        if (!distanceInOtherDirectionCalculated) {
-            // This could be the case when an edge has one virtual node
-            if (!distanceInOtherDirectionIsPositive) {
-                EdgeIteratorState originalEdge = findOriginalEdge(pathEdge, queryGraph);
-                distanceInOtherDirection = originalEdge.getDistance() -
-                        pathEdge.getDistance();
-            } else {
-                throw new RoutingMapMatcherException("Unexpected: distance not correctly calculated");
-            }
-        }
-
-        return distanceInOtherDirection;
-    }
-
-    public static double determineEndLinkFraction(EdgeIteratorState lastEdge, QueryGraph queryGraph) {
-        if (queryGraph.isVirtualNode(lastEdge.getAdjNode())) {
-            EdgeIteratorState originalEdge = findOriginalEdge(lastEdge, queryGraph);
-
-            double distanceInOtherDirection = calculateDistanceFromVirtualNodeToNonVirtualNode(queryGraph,
-                    lastEdge.getAdjNode(), lastEdge.getBaseNode(), lastEdge);
-
-            return 1D - (distanceInOtherDirection / originalEdge.getDistance());
-        }
-        return 1D;
     }
 }

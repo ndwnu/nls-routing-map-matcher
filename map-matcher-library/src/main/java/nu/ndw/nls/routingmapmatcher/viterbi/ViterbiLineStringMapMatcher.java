@@ -32,12 +32,12 @@ import nu.ndw.nls.routingmapmatcher.network.NetworkGraphHopper;
 import nu.ndw.nls.routingmapmatcher.util.GeometryConstants;
 import nu.ndw.nls.routingmapmatcher.util.LineStringMatchUtil;
 import nu.ndw.nls.routingmapmatcher.util.LineStringScoreUtil;
+import nu.ndw.nls.routingmapmatcher.util.PointListUtil;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.CoordinateSequence;
 import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.LineString;
 import org.locationtech.jts.geom.Point;
-import org.locationtech.jts.geom.impl.PackedCoordinateSequence;
 
 @Slf4j
 public class ViterbiLineStringMapMatcher implements
@@ -75,14 +75,12 @@ public class ViterbiLineStringMapMatcher implements
     private static final int COORDINATES_LENGTH_START_END = 2;
     private static final String PROFILE_KEY = "profile";
 
-    private static final int MINIMUM_LINESTRING_SIZE = 2;
-    private static final int LINESTRING_DIMENSIONS = 2;
-
     private final LocationIndexTree locationIndexTree;
     private final NetworkGraphHopper networkGraphHopper;
     private final LineStringMatchUtil lineStringMatchUtil;
     private final LineStringScoreUtil lineStringScoreUtil;
     private final Profile profile;
+    private final PointListUtil pointListUtil;
 
     public ViterbiLineStringMapMatcher(NetworkGraphHopper networkGraphHopper, String profileName) {
         this.networkGraphHopper = Preconditions.checkNotNull(networkGraphHopper);
@@ -90,6 +88,7 @@ public class ViterbiLineStringMapMatcher implements
         this.profile = Preconditions.checkNotNull(networkGraphHopper.getProfile(profileName));
         this.lineStringMatchUtil = new LineStringMatchUtil(networkGraphHopper, this.profile);
         this.lineStringScoreUtil = new LineStringScoreUtil();
+        this.pointListUtil = new PointListUtil();
     }
 
     @Override
@@ -99,7 +98,7 @@ public class ViterbiLineStringMapMatcher implements
         var simplifier = new RamerDouglasPeucker();
         simplifier.setMaxDistance(LINE_SMOOTHING_TOLERANCE);
         PathSimplification.simplify(pointList, List.of(), simplifier);
-        LineString simplifiedLine = pointListToLineString(pointList);
+        LineString simplifiedLine = pointListUtil.toLineString(pointList);
         LineStringLocation simplifiedLineStringLocation = lineStringLocation.toBuilder().geometry(simplifiedLine)
                 .build();
 
@@ -157,7 +156,6 @@ public class ViterbiLineStringMapMatcher implements
         return observations;
     }
 
-
     private boolean isNearbyNdwNetwork(Observation observation) {
         Point point = WGS84_GEOMETRY_FACTORY.createPoint(
                 new Coordinate(observation.getPoint().getLon(), observation.getPoint().getLat()));
@@ -179,21 +177,5 @@ public class ViterbiLineStringMapMatcher implements
         QueryGraph queryGraph = QueryGraphExtractor.extractQueryGraph(path);
         double reliability = lineStringScoreUtil.calculateCandidatePathScore(path, lineStringLocation);
         return lineStringMatchUtil.createMatch(lineStringLocation, path, queryGraph, reliability);
-    }
-
-    // PointList.toLineString rounds to 6 digits. This can affect the route slightly, this method prevents that
-    private LineString pointListToLineString(PointList pointList) {
-        Coordinate[] coordinates = new Coordinate[pointList.size() == 1 ? MINIMUM_LINESTRING_SIZE : pointList.size()];
-
-        for (int i = 0; i < pointList.size(); ++i) {
-            coordinates[i] = new Coordinate(pointList.getLon(i), pointList.getLat(i));
-        }
-
-        if (pointList.size() == 1) {
-            coordinates[1] = coordinates[0];
-        }
-
-        return WGS84_GEOMETRY_FACTORY.createLineString(
-                new PackedCoordinateSequence.Double(coordinates, LINESTRING_DIMENSIONS));
     }
 }
