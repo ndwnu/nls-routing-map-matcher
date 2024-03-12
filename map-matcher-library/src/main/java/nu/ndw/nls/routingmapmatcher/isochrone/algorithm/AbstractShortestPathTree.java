@@ -22,7 +22,6 @@ import java.util.function.Consumer;
  */
 public abstract class AbstractShortestPathTree extends AbstractRoutingAlgorithm {
 
-
     private static final int INITIAL_CAPACITY = 1000;
     private final IntObjectHashMap<IsoLabel> fromMap;
     private final PriorityQueue<IsoLabel> queueByWeighting;
@@ -32,8 +31,7 @@ public abstract class AbstractShortestPathTree extends AbstractRoutingAlgorithm 
 
     public AbstractShortestPathTree(Graph g, Weighting weighting, boolean reverseFlow, TraversalMode traversalMode) {
         super(g, weighting, traversalMode);
-        queueByWeighting = new PriorityQueue<>(INITIAL_CAPACITY,
-                comparingDouble(IsoLabel::getWeight));
+        queueByWeighting = new PriorityQueue<>(INITIAL_CAPACITY, comparingDouble(IsoLabel::getWeight));
         fromMap = new GHIntObjectHashMap<>(INITIAL_CAPACITY);
         this.reverseFlow = reverseFlow;
     }
@@ -43,7 +41,7 @@ public abstract class AbstractShortestPathTree extends AbstractRoutingAlgorithm 
         throw new IllegalStateException("call search instead");
     }
 
-    public void search(int from, final Consumer<IsoLabel> consumer) {
+    public void search(int from, Consumer<IsoLabel> consumer) {
         checkAlreadyRun();
         IsoLabel currentLabel = new IsoLabel(from, -1, 0, 0, 0, null);
         queueByWeighting.add(currentLabel);
@@ -97,7 +95,6 @@ public abstract class AbstractShortestPathTree extends AbstractRoutingAlgorithm 
         }
     }
 
-
     protected abstract boolean isInLimit(IsoLabel isoLabel);
 
     @Override
@@ -110,7 +107,3 @@ public abstract class AbstractShortestPathTree extends AbstractRoutingAlgorithm 
         return visitedNodes;
     }
 }
-
-
-
-

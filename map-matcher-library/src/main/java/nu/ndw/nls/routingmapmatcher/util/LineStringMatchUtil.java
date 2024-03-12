@@ -41,6 +41,7 @@ public class LineStringMatchUtil {
 
     private final EncodingManager encodingManager;
     private final IsochroneService isochroneService;
+    private final PointListUtil pointListUtil;
 
     private LineStringMatchUtil(LocationIndexTree locationIndexTree, BaseGraph baseGraph,
             EncodingManager encodingManager, Profile profile) {
@@ -49,8 +50,9 @@ public class LineStringMatchUtil {
         DecimalEncodedValue speedEnc = encodingManager.getDecimalEncodedValue(VehicleSpeed.key(profile.getVehicle()));
         Weighting weighting = new ShortestWeighting(accessEnc, speedEnc);
         EdgeIteratorStateReverseExtractor edgeIteratorStateReverseExtractor = new EdgeIteratorStateReverseExtractor();
-        IsochroneMatchMapper isochroneMatchMapper = new IsochroneMatchMapper(new CrsTransformer(), encodingManager,
-                edgeIteratorStateReverseExtractor);
+        this.pointListUtil = new PointListUtil();
+        IsochroneMatchMapper isochroneMatchMapper = new IsochroneMatchMapper(encodingManager,
+                edgeIteratorStateReverseExtractor, pointListUtil);
         this.isochroneService = new IsochroneService(encodingManager, baseGraph, edgeIteratorStateReverseExtractor,
                 isochroneMatchMapper, new ShortestPathTreeFactory(weighting), locationIndexTree, profile);
     }
@@ -68,22 +70,21 @@ public class LineStringMatchUtil {
         }
         List<MatchedLink> matchedLinks = PathUtil.determineMatchedLinks(encodingManager, edges);
 
-        Point startPoint = edges.get(0)
-                .fetchWayGeometry(FetchMode.ALL)
-                .toLineString(INCLUDE_ELEVATION)
-                .getStartPoint();
+        EdgeIteratorState startEdge = edges.get(0);
+        Point startPoint = pointListUtil.toLineString(startEdge.fetchWayGeometry(FetchMode.ALL)).getStartPoint();
+        MatchedLink startLink = matchedLinks.get(0);
         List<IsochroneMatch> upstream = lineStringLocation.getUpstreamIsochroneUnit() != null ?
-                isochroneService.getUpstreamIsochroneMatches(startPoint, lineStringLocation.isReversed(),
+                isochroneService.getUpstreamIsochroneMatches(startPoint, startLink.getLinkId(), startLink.isReversed(),
                         lineStringLocation) : null;
-        Point endPoint = edges.get(edges.size() - 1).fetchWayGeometry(FetchMode.ALL)
-                .toLineString(INCLUDE_ELEVATION)
-                .getEndPoint();
+        EdgeIteratorState endEdge = edges.get(edges.size() - 1);
+        Point endPoint = pointListUtil.toLineString(endEdge.fetchWayGeometry(FetchMode.ALL)).getEndPoint();
+        MatchedLink endLink = matchedLinks.get(matchedLinks.size() - 1);
         List<IsochroneMatch> downstream = lineStringLocation.getDownstreamIsochroneUnit() != null ?
-                isochroneService.getDownstreamIsochroneMatches(endPoint, lineStringLocation.isReversed(),
+                isochroneService.getDownstreamIsochroneMatches(endPoint, endLink.getLinkId(), endLink.isReversed(),
                         lineStringLocation) : null;
 
-        double startLinkFraction = PathUtil.determineStartLinkFraction(edges.get(0), queryGraph);
-        double endLinkFraction = PathUtil.determineEndLinkFraction(edges.get(edges.size() - 1), queryGraph);
+        double startLinkFraction = PathUtil.determineStartLinkFraction(startEdge, queryGraph);
+        double endLinkFraction = PathUtil.determineEndLinkFraction(endEdge, queryGraph);
         PointList points = path.calcPoints();
         if (lineStringLocation.isSimplifyResponseGeometry()) {
             PathSimplification.simplify(points, List.of(), new RamerDouglasPeucker());

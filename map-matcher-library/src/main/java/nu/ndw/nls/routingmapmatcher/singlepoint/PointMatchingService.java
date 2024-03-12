@@ -17,10 +17,7 @@ import nu.ndw.nls.routingmapmatcher.util.BearingCalculator;
 import nu.ndw.nls.routingmapmatcher.util.FractionAndDistanceCalculator;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.GeometryFactory;
-import org.locationtech.jts.geom.LineSegment;
 import org.locationtech.jts.geom.LineString;
-import org.locationtech.jts.linearref.LinearLocation;
-import org.locationtech.jts.linearref.LocationIndexedLine;
 
 @RequiredArgsConstructor
 @Slf4j
@@ -82,14 +79,8 @@ public class PointMatchingService {
     private MatchedPoint createMatchedPoint(Coordinate input, int matchedLinkId, LineString originalGeometry,
             boolean reversed, LineString aggregatedGeometry, BearingFilter bearingFilter, double cutoffDistance) {
         ProjectionResult projectionResult = closestPoint(Arrays.asList(aggregatedGeometry.getCoordinates()), input);
-        LocationIndexedLine lineIndex = new LocationIndexedLine(aggregatedGeometry);
-        LinearLocation snappedPointLinearLocation = lineIndex.project(projectionResult.point);
-        LineSegment snappedPointSegment = snappedPointLinearLocation.getSegment(aggregatedGeometry);
-        Coordinate snappedCoordinate = snappedPointLinearLocation.getCoordinate(aggregatedGeometry);
-
         double fraction = FractionAndDistanceCalculator
-                .calculateFractionAndDistance(originalGeometry, snappedCoordinate).getFraction();
-        double bearing = bearingCalculator.calculateBearing(snappedPointSegment.p0, snappedPointSegment.p1);
+                .calculateFractionAndDistance(originalGeometry, projectionResult.point).getFraction();
 
         return MatchedPoint
                 .builder()
@@ -98,8 +89,9 @@ public class PointMatchingService {
                 .snappedPoint(geometryFactory.createPoint(projectionResult.point))
                 .fraction(reversed ? (1 - fraction) : fraction)
                 .distance(projectionResult.distance)
-                .reliability(calculateReliability(projectionResult.distance, bearing, bearingFilter, cutoffDistance))
-                .bearing(bearing)
+                .reliability(calculateReliability(projectionResult.distance, projectionResult.bearing, bearingFilter,
+                        cutoffDistance))
+                .bearing(projectionResult.bearing)
                 .build();
     }
 
@@ -177,9 +169,10 @@ public class PointMatchingService {
 
         return new ProjectionResult(
                 DIST_PLANE.calcDist(r.y, r.x, projection.lat, projection.lon),
+                bearingCalculator.calculateBearing(a, b),
                 new Coordinate(projection.lon, projection.lat)
         );
     }
 
-    record ProjectionResult(double distance, Coordinate point) {}
+    record ProjectionResult(double distance, double bearing, Coordinate point) {}
 }

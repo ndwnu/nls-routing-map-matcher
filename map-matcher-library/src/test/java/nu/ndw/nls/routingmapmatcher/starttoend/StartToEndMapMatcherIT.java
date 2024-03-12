@@ -73,8 +73,8 @@ class StartToEndMapMatcherIT {
                 MatchedLink.builder().linkId(6369288).reversed(false).build());
         assertThat(lineStringMatch.getUpstreamLinkIds()).isNull();
         assertThat(lineStringMatch.getDownstreamLinkIds()).isNull();
-        assertThat(lineStringMatch.getStartLinkFraction()).isEqualTo(0.6488926754519858);
-        assertThat(lineStringMatch.getEndLinkFraction()).isEqualTo(0.9813577658271124);
+        assertThat(lineStringMatch.getStartLinkFraction()).isEqualTo(0.6496530239639768);
+        assertThat(lineStringMatch.getEndLinkFraction()).isEqualTo(0.9813310134286733);
         assertThat(lineStringMatch.getWeight()).isEqualTo(727.039);
         assertThat(lineStringMatch.getDuration()).isEqualTo(75.91);
         assertThat(lineStringMatch.getDistance()).isEqualTo(727.039);
@@ -160,8 +160,8 @@ class StartToEndMapMatcherIT {
                 .containsExactlyInAnyOrder(3666097, 3666096, 3666095, 3666094, 7223062, 7223061);
         assertThat(lineStringMatch.getDownstreamLinkIds())
                 .containsExactlyInAnyOrder(3666086, 3666105, 3666106, 3666107, 3666108, 3666109, 3686216, 3686217);
-        assertThat(lineStringMatch.getStartLinkFraction()).isEqualTo(0.8805534312637381);
-        assertThat(lineStringMatch.getEndLinkFraction()).isEqualTo(0.45960570331968187);
+        assertThat(lineStringMatch.getStartLinkFraction()).isEqualTo(0.8813982849151963);
+        assertThat(lineStringMatch.getEndLinkFraction()).isEqualTo(0.4580642228401559);
         assertThat(lineStringMatch.getLineString()).isEqualTo(geometryFactory.createLineString(coordinates));
         assertThat(lineStringMatch.getWeight()).isEqualTo(520.87);
         assertThat(lineStringMatch.getDuration()).isEqualTo(18.748);
