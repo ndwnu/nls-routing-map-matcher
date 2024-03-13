@@ -4,7 +4,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.List;
 import lombok.SneakyThrows;
+import nu.ndw.nls.routingmapmatcher.mappers.MatchedLinkMapper;
 import nu.ndw.nls.routingmapmatcher.model.linestring.MatchedLink;
+import nu.ndw.nls.routingmapmatcher.model.routing.RoutingLegResponse;
 import nu.ndw.nls.routingmapmatcher.model.routing.RoutingRequest;
 import nu.ndw.nls.routingmapmatcher.model.routing.RoutingResponse;
 import nu.ndw.nls.routingmapmatcher.testutil.TestNetworkProvider;
@@ -16,12 +18,14 @@ import org.locationtech.jts.geom.Point;
 
 class RouterIT {
 
+    private static final double END_FRACTION_1 = 1.0;
+    private static final int START_FRACTION_0 = 0;
     private Router router;
     private GeometryFactory geometryFactory;
 
     @SneakyThrows
     private void setupNetwork() {
-        router = new Router(TestNetworkProvider.getTestNetworkFromFile("/test-data/links.json"));
+        router = new Router(TestNetworkProvider.getTestNetworkFromFile("/test-data/links.json"), new MatchedLinkMapper());
         geometryFactory = GeometryConstants.WGS84_GEOMETRY_FACTORY;
     }
 
@@ -59,16 +63,55 @@ class RouterIT {
     }
 
     private void assertSuccess(RoutingResponse result, Coordinate[] coordinates) {
-        assertThat(result.getStartLinkFraction()).isEqualTo(0.8246035077811711);
-        assertThat(result.getEndLinkFraction()).isEqualTo(0.5215863361447783);
-        assertThat(result.getMatchedLinks()).containsExactly(
-                MatchedLink.builder().linkId(7223072).reversed(false).build(),
-                MatchedLink.builder().linkId(7223073).reversed(false).build(),
-                MatchedLink.builder().linkId(3667130).reversed(false).build(),
-                MatchedLink.builder().linkId(3667131).reversed(false).build(),
-                MatchedLink.builder().linkId(3667132).reversed(false).build(),
-                MatchedLink.builder().linkId(3667133).reversed(false).build(),
-                MatchedLink.builder().linkId(3666204).reversed(false).build());
+
+        assertThat(result.getLegs()).containsExactly(
+                RoutingLegResponse.builder()
+                        .matchedLinks(List.of(
+                                MatchedLink.builder()
+                                        .linkId(7223072)
+                                        .reversed(false)
+                                        .startFraction(0.8246035077811711)
+                                        .endFraction(END_FRACTION_1)
+                                        .build(),
+                                MatchedLink.builder()
+                                        .linkId(7223073)
+                                        .reversed(false)
+                                        .startFraction(START_FRACTION_0)
+                                        .endFraction(END_FRACTION_1)
+                                        .build(),
+                                MatchedLink.builder()
+                                        .linkId(3667130)
+                                        .reversed(false)
+                                        .startFraction(START_FRACTION_0)
+                                        .endFraction(END_FRACTION_1)
+                                        .build(),
+                                MatchedLink.builder()
+                                        .linkId(3667131)
+                                        .reversed(false)
+                                        .startFraction(START_FRACTION_0)
+                                        .endFraction(END_FRACTION_1)
+                                        .build(),
+                                MatchedLink.builder()
+                                        .linkId(3667132)
+                                        .reversed(false)
+                                        .startFraction(START_FRACTION_0)
+                                        .endFraction(END_FRACTION_1)
+                                        .build(),
+                                MatchedLink.builder()
+                                        .linkId(3667133)
+                                        .reversed(false)
+                                        .startFraction(START_FRACTION_0)
+                                        .endFraction(END_FRACTION_1)
+                                        .build(),
+                                MatchedLink.builder()
+                                        .linkId(3666204)
+                                        .reversed(false)
+                                        .startFraction(START_FRACTION_0)
+                                        .endFraction(0.5215863361447783)
+                                        .build()
+                                ))
+                        .build());
+
         assertThat(result.getGeometry()).isEqualTo(geometryFactory.createLineString(coordinates));
         assertThat(result.getWeight()).isEqualTo(8.769);
         assertThat(result.getDuration()).isEqualTo(8.768);
