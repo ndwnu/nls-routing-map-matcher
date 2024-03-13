@@ -1,24 +1,15 @@
 package nu.ndw.nls.routingmapmatcher.model.linestring;
 
-
-import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
-import lombok.With;
 import lombok.experimental.SuperBuilder;
 
-
-
-@With
-@Getter
-@ToString
 @SuperBuilder
+@Getter
 @EqualsAndHashCode
-@AllArgsConstructor
-public class MatchedLink {
+@ToString
+public class MatchedEdgeLink {
     private final int linkId;
     private final boolean reversed;
-    private final double startFraction;
-    private final double endFraction;
 }

@@ -10,6 +10,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.SneakyThrows;
 import nu.ndw.nls.routingmapmatcher.exception.RoutingRequestException;
+import nu.ndw.nls.routingmapmatcher.mappers.MatchedLinkMapper;
 import nu.ndw.nls.routingmapmatcher.model.routing.RoutingRequest;
 import nu.ndw.nls.routingmapmatcher.network.annotations.EncodedValue;
 import nu.ndw.nls.routingmapmatcher.network.model.DirectionalDto;
@@ -133,7 +134,7 @@ class BikeRouterIT {
                 .linkSupplier(links::iterator)
                 .build();
 
-        router = new Router(getNetworkService(vehicles).inMemory(routingNetworkSettings));
+        router = new Router(getNetworkService(vehicles).inMemory(routingNetworkSettings), new MatchedLinkMapper());
     }
 
     @Test
@@ -146,7 +147,8 @@ class BikeRouterIT {
                 .build());
 
 
-        assertEquals(3, result.getMatchedLinks().size());
+        assertEquals(1, result.getLegs().size());
+        assertEquals(3, result.getLegs().get(0).getMatchedLinks().size());
     }
 
     @Test

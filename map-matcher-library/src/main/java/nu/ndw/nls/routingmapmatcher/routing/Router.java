@@ -17,11 +17,13 @@ import com.graphhopper.util.PointList;
 import com.graphhopper.util.RamerDouglasPeucker;
 import com.graphhopper.util.shapes.GHPoint;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 import nu.ndw.nls.routingmapmatcher.exception.RoutingException;
 import nu.ndw.nls.routingmapmatcher.exception.RoutingRequestException;
+import nu.ndw.nls.routingmapmatcher.mappers.MatchedLinkMapper;
+import nu.ndw.nls.routingmapmatcher.model.linestring.MatchedEdgeLink;
+import nu.ndw.nls.routingmapmatcher.model.routing.RoutingLegResponse;
 import nu.ndw.nls.routingmapmatcher.model.routing.RoutingRequest;
 import nu.ndw.nls.routingmapmatcher.model.routing.RoutingResponse;
 import nu.ndw.nls.routingmapmatcher.model.routing.RoutingResponse.RoutingResponseBuilder;
@@ -38,8 +40,11 @@ public class Router {
 
     private final NetworkGraphHopper networkGraphHopper;
 
-    public Router(NetworkGraphHopper networkGraphHopper) {
+    private final MatchedLinkMapper matchedLinkMapper;
+
+    public Router(NetworkGraphHopper networkGraphHopper, MatchedLinkMapper matchedLinkMapper) {
         this.networkGraphHopper = networkGraphHopper;
+        this.matchedLinkMapper = matchedLinkMapper;
         // This configuration is global for the routing network and is probably not thread safe.
         // To be able to configure simplification per request, it's safer to disable GraphHopper-internal simplification
         // and perform it in our own response mapping code below.
@@ -76,18 +81,26 @@ public class Router {
 
     private RoutingResponse setFractionsAndMatchedLinks(RoutingResponseBuilder routingResponseBuilder,
             GHRequest ghRequest) {
-        List<Path> paths = networkGraphHopper.calcPaths(ghRequest);
-        if (!paths.isEmpty()) {
-            List<EdgeIteratorState> edges = paths.stream().map(Path::calcEdges).flatMap(Collection::stream).toList();
-            if (!edges.isEmpty()) {
-                routingResponseBuilder
-                        .startLinkFraction(PathUtil.determineStartLinkFraction(edges.get(0),
-                                QueryGraphExtractor.extractQueryGraph(paths.get(0))))
-                        .endLinkFraction(PathUtil.determineEndLinkFraction(edges.get(edges.size() - 1),
-                                QueryGraphExtractor.extractQueryGraph(paths.get(paths.size() - 1))))
-                        .matchedLinks(PathUtil.determineMatchedLinks(networkGraphHopper.getEncodingManager(), edges));
-            }
+
+        List<RoutingLegResponse> routingLegResponse = new ArrayList<>();
+
+        for (Path path : networkGraphHopper.calcPaths(ghRequest)) {
+            List<EdgeIteratorState> edges = path.calcEdges();
+            double startFraction = PathUtil.determineStartLinkFraction(edges.get(0),
+                    QueryGraphExtractor.extractQueryGraph(path));
+            double endFraction = PathUtil.determineEndLinkFraction(edges.get(edges.size() - 1),
+                    QueryGraphExtractor.extractQueryGraph(path));
+            List<MatchedEdgeLink> matchedEdgeLinks = PathUtil.determineMatchedLinks(
+                    networkGraphHopper.getEncodingManager(),
+                    edges);
+
+            routingLegResponse.add(RoutingLegResponse.builder()
+                            .matchedLinks(matchedLinkMapper.map(matchedEdgeLinks, startFraction, endFraction))
+                    .build());
         }
+
+        routingResponseBuilder.legs(routingLegResponse);
+
         return routingResponseBuilder.build();
     }
 
@@ -103,8 +116,7 @@ public class Router {
     }
 
     private static List<GHPoint> getGHPointsFromPoints(List<Point> points) {
-        return points.stream().map(point -> new GHPoint(point.getY(), point.getX()))
-                .collect(Collectors.toList());
+        return points.stream().map(point -> new GHPoint(point.getY(), point.getX())).toList();
     }
 
     private static void ensurePathsAreNotEmpty(ResponsePath path) throws RoutingException {

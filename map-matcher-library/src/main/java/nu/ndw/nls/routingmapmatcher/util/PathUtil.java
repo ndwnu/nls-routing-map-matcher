@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import nu.ndw.nls.routingmapmatcher.model.EdgeIteratorTravelDirection;
+import nu.ndw.nls.routingmapmatcher.model.linestring.MatchedEdgeLink;
 import nu.ndw.nls.routingmapmatcher.model.linestring.MatchedLink;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.LineString;
@@ -27,19 +28,20 @@ public final class PathUtil {
         // Util class
     }
 
-    public static List<MatchedLink> determineMatchedLinks(EncodingManager encodingManager,
+    public static List<MatchedEdgeLink> determineMatchedLinks(EncodingManager encodingManager,
             Collection<EdgeIteratorState> edges) {
-        List<MatchedLink> matchedLinks = new ArrayList<>();
+        List<MatchedEdgeLink> matchedEdgeLinks = new ArrayList<>();
         for (EdgeIteratorState edge : edges) {
             int matchedLinkId = edge.get(encodingManager.getIntEncodedValue(WAY_ID_KEY));
-            if (matchedLinks.isEmpty() || matchedLinks.get(matchedLinks.size() - 1).getLinkId() != matchedLinkId) {
-                matchedLinks.add(MatchedLink.builder()
+            if (    matchedEdgeLinks.isEmpty() ||
+                    matchedEdgeLinks.get(matchedEdgeLinks.size() - 1).getLinkId() != matchedLinkId) {
+                matchedEdgeLinks.add(MatchedEdgeLink.builder()
                         .linkId(matchedLinkId)
                         .reversed(EDGE_ITERATOR_STATE_REVERSE_EXTRACTOR.hasReversed(edge))
                         .build());
             }
         }
-        return matchedLinks;
+        return matchedEdgeLinks;
     }
 
     /**
@@ -71,29 +73,34 @@ public final class PathUtil {
     }
 
     public static double determineStartLinkFraction(EdgeIteratorState firstEdge, QueryGraph queryGraph) {
-        if (queryGraph.isVirtualNode(firstEdge.getBaseNode())) {
-            EdgeIteratorState originalEdge = findOriginalEdge(firstEdge, queryGraph);
-
-            LineString originalGeometry = POINT_LIST_UTIL.toLineString(originalEdge.fetchWayGeometry(FetchMode.ALL));
-            Coordinate coordinate = POINT_LIST_UTIL.toLineString(firstEdge.fetchWayGeometry(FetchMode.ALL))
-                    .getStartPoint().getCoordinate();
-            return FractionAndDistanceCalculator.calculateFractionAndDistance(originalGeometry, coordinate)
-                    .getFraction();
+        if (!queryGraph.isVirtualNode(firstEdge.getBaseNode())) {
+            return 0D;
         }
-        return 0D;
+
+        EdgeIteratorState originalEdge = findOriginalEdge(firstEdge, queryGraph);
+
+        LineString originalGeometry = POINT_LIST_UTIL.toLineString(originalEdge.fetchWayGeometry(FetchMode.ALL));
+        Coordinate coordinate = POINT_LIST_UTIL.toLineString(firstEdge.fetchWayGeometry(FetchMode.ALL))
+                .getStartPoint().getCoordinate();
+        return FractionAndDistanceCalculator.calculateFractionAndDistance(originalGeometry, coordinate)
+                .getFraction();
+
     }
 
     public static double determineEndLinkFraction(EdgeIteratorState lastEdge, QueryGraph queryGraph) {
-        if (queryGraph.isVirtualNode(lastEdge.getAdjNode())) {
-            EdgeIteratorState originalEdge = findOriginalEdge(lastEdge, queryGraph);
-
-            LineString originalGeometry = POINT_LIST_UTIL.toLineString(originalEdge.fetchWayGeometry(FetchMode.ALL));
-            Coordinate coordinate = POINT_LIST_UTIL.toLineString(lastEdge.fetchWayGeometry(FetchMode.ALL))
-                    .getEndPoint().getCoordinate();
-            return FractionAndDistanceCalculator.calculateFractionAndDistance(originalGeometry, coordinate)
-                    .getFraction();
+        if (!queryGraph.isVirtualNode(lastEdge.getAdjNode())) {
+            return 1D;
         }
-        return 1D;
+
+        EdgeIteratorState originalEdge = findOriginalEdge(lastEdge, queryGraph);
+
+        LineString originalGeometry = POINT_LIST_UTIL.toLineString(originalEdge.fetchWayGeometry(FetchMode.ALL));
+        Coordinate coordinate = POINT_LIST_UTIL.toLineString(lastEdge.fetchWayGeometry(FetchMode.ALL))
+                .getEndPoint().getCoordinate();
+        return FractionAndDistanceCalculator.calculateFractionAndDistance(originalGeometry, coordinate)
+                .getFraction();
+
+
     }
 
     private static EdgeIteratorState findOriginalEdge(EdgeIteratorState edge, QueryGraph queryGraph) {

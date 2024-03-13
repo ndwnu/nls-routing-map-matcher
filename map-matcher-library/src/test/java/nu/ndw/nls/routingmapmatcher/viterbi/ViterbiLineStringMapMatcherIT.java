@@ -23,6 +23,9 @@ import org.locationtech.jts.geom.GeometryFactory;
 
 class ViterbiLineStringMapMatcherIT {
 
+    private static final int END_FRACTION_1 = 1;
+    private static final int START_FRACTION_0 = 0;
+    
     private ViterbiLineStringMapMatcher viterbiLineStringMapMatcher;
     private final ObjectMapper mapper = OBJECT_MAPPER;
     private GeometryFactory geometryFactory;
@@ -77,16 +80,26 @@ class ViterbiLineStringMapMatcherIT {
         assertThat(lineStringMatch.getLocationIndex()).isEqualTo(-1);
         assertThat(lineStringMatch.isReversed()).isTrue();
         assertThat(lineStringMatch.getMatchedLinks()).containsExactly(
-                MatchedLink.builder().linkId(600767674).reversed(false).build(),
-                MatchedLink.builder().linkId(252408103).reversed(false).build(),
-                MatchedLink.builder().linkId(252408066).reversed(false).build(),
-                MatchedLink.builder().linkId(600125366).reversed(false).build(),
-                MatchedLink.builder().linkId(600126141).reversed(false).build(),
-                MatchedLink.builder().linkId(600126144).reversed(false).build(),
-                MatchedLink.builder().linkId(600126143).reversed(false).build(),
-                MatchedLink.builder().linkId(600126037).reversed(false).build(),
-                MatchedLink.builder().linkId(600125593).reversed(false).build(),
-                MatchedLink.builder().linkId(250409010).reversed(false).build());
+                MatchedLink.builder().linkId(600767674).reversed(false).startFraction(0.6615449075921327)
+                        .endFraction(END_FRACTION_1).build(),
+                MatchedLink.builder().linkId(252408103).reversed(false).startFraction(START_FRACTION_0)
+                        .endFraction(END_FRACTION_1).build(),
+                MatchedLink.builder().linkId(252408066).reversed(false).startFraction(START_FRACTION_0)
+                        .endFraction(END_FRACTION_1).build(),
+                MatchedLink.builder().linkId(600125366).reversed(false).startFraction(START_FRACTION_0)
+                        .endFraction(END_FRACTION_1).build(),
+                MatchedLink.builder().linkId(600126141).reversed(false).startFraction(START_FRACTION_0)
+                        .endFraction(END_FRACTION_1).build(),
+                MatchedLink.builder().linkId(600126144).reversed(false).startFraction(START_FRACTION_0)
+                        .endFraction(END_FRACTION_1).build(),
+                MatchedLink.builder().linkId(600126143).reversed(false).startFraction(START_FRACTION_0)
+                        .endFraction(END_FRACTION_1).build(),
+                MatchedLink.builder().linkId(600126037).reversed(false).startFraction(START_FRACTION_0)
+                        .endFraction(END_FRACTION_1).build(),
+                MatchedLink.builder().linkId(600125593).reversed(false).startFraction(START_FRACTION_0)
+                        .endFraction(END_FRACTION_1).build(),
+                MatchedLink.builder().linkId(250409010).reversed(false).startFraction(START_FRACTION_0)
+                        .endFraction(0.30408706328439755).build());
         assertNull(lineStringMatch.getUpstreamLinkIds());
         assertNull(lineStringMatch.getDownstreamLinkIds());
         assertThat(lineStringMatch.getStartLinkFraction()).isEqualTo(0.6615449075921327);
@@ -136,18 +149,30 @@ class ViterbiLineStringMapMatcherIT {
         assertThat(lineStringMatch.getLocationIndex()).isEqualTo(-1);
         assertThat(lineStringMatch.isReversed()).isTrue();
         assertThat(lineStringMatch.getMatchedLinks()).containsExactly(
-                MatchedLink.builder().linkId(3666097).reversed(false).build(),
-                MatchedLink.builder().linkId(3666076).reversed(false).build(),
-                MatchedLink.builder().linkId(3666077).reversed(false).build(),
-                MatchedLink.builder().linkId(3666078).reversed(false).build(),
-                MatchedLink.builder().linkId(3666079).reversed(false).build(),
-                MatchedLink.builder().linkId(3666080).reversed(false).build(),
-                MatchedLink.builder().linkId(3666081).reversed(false).build(),
-                MatchedLink.builder().linkId(3666082).reversed(false).build(),
-                MatchedLink.builder().linkId(3666083).reversed(false).build(),
-                MatchedLink.builder().linkId(3666084).reversed(false).build(),
-                MatchedLink.builder().linkId(3666085).reversed(false).build(),
-                MatchedLink.builder().linkId(3666086).reversed(false).build());
+                MatchedLink.builder().linkId(3666097).reversed(false).startFraction(0.8813982849151963)
+                        .endFraction(END_FRACTION_1).build(),
+                MatchedLink.builder().linkId(3666076).reversed(false).startFraction(START_FRACTION_0)
+                        .endFraction(END_FRACTION_1).build(),
+                MatchedLink.builder().linkId(3666077).reversed(false).startFraction(START_FRACTION_0)
+                        .endFraction(END_FRACTION_1).build(),
+                MatchedLink.builder().linkId(3666078).reversed(false).startFraction(START_FRACTION_0)
+                        .endFraction(END_FRACTION_1).build(),
+                MatchedLink.builder().linkId(3666079).reversed(false).startFraction(START_FRACTION_0)
+                        .endFraction(END_FRACTION_1).build(),
+                MatchedLink.builder().linkId(3666080).reversed(false).startFraction(START_FRACTION_0)
+                        .endFraction(END_FRACTION_1).build(),
+                MatchedLink.builder().linkId(3666081).reversed(false).startFraction(START_FRACTION_0)
+                        .endFraction(END_FRACTION_1).build(),
+                MatchedLink.builder().linkId(3666082).reversed(false).startFraction(START_FRACTION_0)
+                        .endFraction(END_FRACTION_1).build(),
+                MatchedLink.builder().linkId(3666083).reversed(false).startFraction(START_FRACTION_0)
+                        .endFraction(END_FRACTION_1).build(),
+                MatchedLink.builder().linkId(3666084).reversed(false).startFraction(START_FRACTION_0)
+                        .endFraction(END_FRACTION_1).build(),
+                MatchedLink.builder().linkId(3666085).reversed(false).startFraction(START_FRACTION_0)
+                        .endFraction(END_FRACTION_1).build(),
+                MatchedLink.builder().linkId(3666086).reversed(false).startFraction(START_FRACTION_0)
+                        .endFraction(0.4580642228401559).build());
         assertThat(lineStringMatch.getUpstreamLinkIds())
                 .containsExactlyInAnyOrder(3666097, 3666096, 3666095, 3666094, 7223062, 7223061);
         assertThat(lineStringMatch.getDownstreamLinkIds())
@@ -171,7 +196,7 @@ class ViterbiLineStringMapMatcherIT {
         assertThat(lineStringMatch.getId()).isEqualTo(15);
         assertThat(lineStringMatch.getStatus()).isEqualTo(MatchStatus.NO_MATCH);
         assertThat(lineStringMatch.getReliability()).isEqualTo(0.0);
-        assertThat(lineStringMatch.getLocationIndex()).isEqualTo(0);
+        assertThat(lineStringMatch.getLocationIndex()).isZero();
         assertThat(lineStringMatch.isReversed()).isFalse();
         assertThat(lineStringMatch.getMatchedLinks()).isEmpty();
         assertThat(lineStringMatch.getUpstreamLinkIds()).isNull();
