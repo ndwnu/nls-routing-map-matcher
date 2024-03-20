@@ -116,7 +116,7 @@ class IsochroneServiceTest {
                 .thenReturn(IsochroneMatch.builder().build());
         wrapWithStaticMock(() -> isochroneService.getUpstreamIsochroneMatches(point, LINK_ID, REVERSED, location));
         verify(shortestPathTreeFactory).createShortestPathTreeByTimeDistanceAndWeight(null, queryGraph,
-                TraversalMode.NODE_BASED, ISOCHRONE_VALUE_METERS, IsochroneUnit.METERS, true);
+                TraversalMode.EDGE_BASED, ISOCHRONE_VALUE_METERS, IsochroneUnit.METERS, true);
     }
 
     @Test
@@ -150,7 +150,7 @@ class IsochroneServiceTest {
         verify(isochroneMatchMapper).mapToIsochroneMatch(eq(endLabel), maxDistanceArgumentCaptor.capture(),
                 eq(queryGraph), eq(startEdge));
         verify(shortestPathTreeFactory).createShortestPathTreeByTimeDistanceAndWeight(null, queryGraph,
-                TraversalMode.NODE_BASED, ISOCHRONE_VALUE_SECONDS, IsochroneUnit.SECONDS, true);
+                TraversalMode.EDGE_BASED, ISOCHRONE_VALUE_SECONDS, IsochroneUnit.SECONDS, true);
         Double maxDistance = maxDistanceArgumentCaptor.getValue();
         // The max distance based on 8 seconds will be around 200 - ((10.8-8) * 13.89 meters/second) ~ 161.1 meters
         assertThat(maxDistance).isCloseTo(161.1, Percentage.withPercentage(0.1));
@@ -175,7 +175,7 @@ class IsochroneServiceTest {
         verify(isochroneMatchMapper).mapToIsochroneMatch(eq(endLabel), maxDistanceArgumentCaptor.capture(),
                 eq(queryGraph), eq(startEdge));
         verify(shortestPathTreeFactory).createShortestPathTreeByTimeDistanceAndWeight(null, queryGraph,
-                TraversalMode.NODE_BASED, ISOCHRONE_VALUE_SECONDS, IsochroneUnit.SECONDS, false);
+                TraversalMode.EDGE_BASED, ISOCHRONE_VALUE_SECONDS, IsochroneUnit.SECONDS, false);
         Double maxDistance = maxDistanceArgumentCaptor.getValue();
         // The max distance based on 8 seconds will be around 200 - ((10.8-8) * 27.77 meters/second) ~ 122.2 meters
         assertThat(maxDistance).isCloseTo(122.2, Percentage.withPercentage(0.1));
@@ -196,7 +196,7 @@ class IsochroneServiceTest {
                 .thenReturn(IsochroneMatch.builder().build());
         wrapWithStaticMock(() -> isochroneService.getDownstreamIsochroneMatches(point, LINK_ID, REVERSED, location));
         verify(shortestPathTreeFactory).createShortestPathTreeByTimeDistanceAndWeight(null, queryGraph,
-                TraversalMode.NODE_BASED, ISOCHRONE_VALUE_METERS, IsochroneUnit.METERS, false);
+                TraversalMode.EDGE_BASED, ISOCHRONE_VALUE_METERS, IsochroneUnit.METERS, false);
     }
 
     private void wrapWithStaticMock(Runnable function) {
