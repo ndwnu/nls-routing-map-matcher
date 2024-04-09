@@ -9,6 +9,14 @@ for direct mapping between different maps without the need for an intermediate '
 applications need to create linestring geometries for their sourcemap and use those to match them with the target
 network.
 
+## GitHub vs Azure DevOps
+This project is maintained by Nationaal Dataportaal Wegverkeer (NDW)
+* It is primarily maintained within Azure Devops and mirrored to https://github.com/ndwnu/nls-routing-map-matcher 
+* It works within NDW infrastructure, with some of its constraints;
+* This repository contains functionality only, data is gathered from APIs/database, but not included;
+* Pipelines are not designed to be used within GitHub;
+* GitHub wiki and issues aren't enabled.
+
 ## Design
 
 
