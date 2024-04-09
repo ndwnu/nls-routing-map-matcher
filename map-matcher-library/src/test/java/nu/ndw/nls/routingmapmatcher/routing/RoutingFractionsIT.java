@@ -6,7 +6,6 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.graphhopper.config.Profile;
-import java.io.IOException;
 import java.util.List;
 import lombok.SneakyThrows;
 import nu.ndw.nls.geometry.factories.GeometryFactoryWgs84;
@@ -76,7 +75,7 @@ class RoutingFractionsIT {
 
     @BeforeEach
     @SneakyThrows
-    public void setup() throws IOException {
+    public void setup() {
 
         List<TestNetworkProvider.TestLink> testLinks = TestNetworkProvider.getTestLinks("/test-data/links.json");
 

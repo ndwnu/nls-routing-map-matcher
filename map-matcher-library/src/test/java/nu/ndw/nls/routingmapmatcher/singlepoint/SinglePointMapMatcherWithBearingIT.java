@@ -37,7 +37,6 @@ public class SinglePointMapMatcherWithBearingIT {
     @Autowired
     private GeometryFactoryWgs84 geometryFactoryWgs84;
     private SinglePointMapMatcher singlePointMapMatcher;
-    private Point startPoint;
 
     @SneakyThrows
     private void setupNetwork() {
@@ -77,7 +76,7 @@ public class SinglePointMapMatcherWithBearingIT {
 
     @Test
     void match_ok_withBearingFilterAndSnappedPointAtEnd() {
-        startPoint = createPoint(5.424289, 52.177873);
+        Point startPoint = createPoint(5.424289, 52.177873);
         SinglePointLocation request = SinglePointLocation.builder()
                 .id(1)
                 .point(startPoint)

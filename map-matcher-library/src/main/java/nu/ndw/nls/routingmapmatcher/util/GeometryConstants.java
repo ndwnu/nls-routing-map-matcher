@@ -1,8 +1,6 @@
 package nu.ndw.nls.routingmapmatcher.util;
 
 import com.graphhopper.util.DistancePlaneProjection;
-import org.locationtech.jts.geom.GeometryFactory;
-import org.locationtech.jts.geom.PrecisionModel;
 
 public final class GeometryConstants {
 
@@ -11,7 +9,4 @@ public final class GeometryConstants {
     private GeometryConstants() {
     }
 
-    private static GeometryFactory createGeometryFactory(int srid) {
-        return new GeometryFactory(new PrecisionModel(), srid);
-    }
 }

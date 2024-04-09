@@ -4,7 +4,6 @@ import java.io.IOException;
 import nu.ndw.nls.geometry.factories.GeometryFactoryWgs84;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.LineString;
-import org.locationtech.jts.geom.Point;
 import org.locationtech.jts.io.ParseException;
 import org.locationtech.jts.io.WKBReader;
 
@@ -24,15 +23,4 @@ public class GeometryHelper {
         }
     }
 
-    public synchronized Point convertToPoint(byte[] geometryWkb) throws IOException {
-        try {
-            Geometry geometry = this.wkbReader.read(geometryWkb);
-            if (!(geometry instanceof Point point)) {
-                throw new IOException("Unexpected geometry type: expected Point");
-            }
-            return point;
-        } catch (ParseException e) {
-            throw new IOException("Unable to parse WKB", e);
-        }
-    }
 }

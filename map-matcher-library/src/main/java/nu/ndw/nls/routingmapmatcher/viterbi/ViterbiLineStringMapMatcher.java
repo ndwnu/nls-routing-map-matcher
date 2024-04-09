@@ -79,14 +79,12 @@ public class ViterbiLineStringMapMatcher implements
     private final Profile profile;
     private final PointListUtil pointListUtil;
     private final GeometryFactoryWgs84 geometryFactoryWgs84;
-    private final FractionAndDistanceCalculator fractionAndDistanceCalculator;
 
     public ViterbiLineStringMapMatcher(NetworkGraphHopper networkGraphHopper, String profileName,
             GeometryFactoryWgs84 geometryFactoryWgs84, FractionAndDistanceCalculator fractionAndDistanceCalculator) {
         this.networkGraphHopper = Preconditions.checkNotNull(networkGraphHopper);
         this.locationIndexTree = networkGraphHopper.getLocationIndex();
         this.geometryFactoryWgs84 = geometryFactoryWgs84;
-        this.fractionAndDistanceCalculator = fractionAndDistanceCalculator;
         this.profile = Preconditions.checkNotNull(networkGraphHopper.getProfile(profileName));
         this.lineStringMatchUtil = new LineStringMatchUtil(networkGraphHopper, this.profile,fractionAndDistanceCalculator);
         this.lineStringScoreUtil = new LineStringScoreUtil(fractionAndDistanceCalculator);
