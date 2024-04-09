@@ -12,13 +12,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import lombok.SneakyThrows;
+import nu.ndw.nls.geometry.factories.GeometryFactoryWgs84;
 import nu.ndw.nls.routingmapmatcher.model.linestring.LineStringLocation;
 import nu.ndw.nls.routingmapmatcher.testutil.TestNetworkProvider.TestLink;
-import nu.ndw.nls.routingmapmatcher.util.GeometryConstants;
 import nu.ndw.nls.routingmapmatcher.viterbi.LineStringLocationDeserializer;
 import nu.ndw.nls.routingmapmatcher.viterbi.LinkDeserializer;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
+import org.jetbrains.annotations.NotNull;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.Polygon;
@@ -39,7 +40,8 @@ public class CreateGeoJsonFromLinksUtil {
     @SneakyThrows
     void createGeoJson() {
         String linksJson = IOUtils.toString(
-                Objects.requireNonNull(getClass().getResourceAsStream("/test-data/links.json")), StandardCharsets.UTF_8);
+                Objects.requireNonNull(getClass().getResourceAsStream("/test-data/links.json")),
+                StandardCharsets.UTF_8);
         mapper = new ObjectMapper();
         SimpleModule module = new SimpleModule();
         module.addDeserializer(TestLink.class, new LinkDeserializer());
@@ -69,14 +71,7 @@ public class CreateGeoJsonFromLinksUtil {
 
     @SneakyThrows
     void testIntersection() {
-        GeometryFactory gf = GeometryConstants.WGS84_GEOMETRY_FACTORY;
-        var shapeFactory = new GeometricShapeFactory(gf);
-        shapeFactory.setCentre(new Coordinate(5.426747, 52.176663));
-        shapeFactory.setNumPoints(100); // adjustable
-        // Length in meters of 1° of latitude = always 111.32 km
-        shapeFactory.setWidth(100d / 111320d);
-        // Length in meters of 1° of longitude = 40075 km * cos( latitude ) / 360
-        shapeFactory.setHeight(100d / (40075000 * Math.cos(Math.toRadians(5.426747)) / 360));
+        final var shapeFactory = createGeometricShapeFactory();
         Polygon circleA = shapeFactory.createEllipse();
         GeoJSONWriter writerCircle = new GeoJSONWriter();
         var circleGeometry = writerCircle.write(circleA);
@@ -118,5 +113,17 @@ public class CreateGeoJsonFromLinksUtil {
         FileUtils.writeStringToFile(new File("/tmp/network-cropped.geojson"), json.toString(),
                 Charset.defaultCharset().name());
 
+    }
+
+    private static @NotNull GeometricShapeFactory createGeometricShapeFactory() {
+        GeometryFactory gf = new GeometryFactoryWgs84();
+        var shapeFactory = new GeometricShapeFactory(gf);
+        shapeFactory.setCentre(new Coordinate(5.426747, 52.176663));
+        shapeFactory.setNumPoints(100); // adjustable
+        // Length in meters of 1° of latitude = always 111.32 km
+        shapeFactory.setWidth(100d / 111320d);
+        // Length in meters of 1° of longitude = 40075 km * cos( latitude ) / 360
+        shapeFactory.setHeight(100d / (40075000 * Math.cos(Math.toRadians(5.426747)) / 360));
+        return shapeFactory;
     }
 }

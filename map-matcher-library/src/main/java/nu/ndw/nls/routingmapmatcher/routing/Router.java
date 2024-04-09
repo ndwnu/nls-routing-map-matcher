@@ -1,7 +1,5 @@
 package nu.ndw.nls.routingmapmatcher.routing;
 
-import static nu.ndw.nls.routingmapmatcher.util.GeometryConstants.WGS84_GEOMETRY_FACTORY;
-
 import com.graphhopper.GHRequest;
 import com.graphhopper.GHResponse;
 import com.graphhopper.ResponsePath;
@@ -19,6 +17,8 @@ import com.graphhopper.util.shapes.GHPoint;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
+import nu.ndw.nls.geometry.distance.FractionAndDistanceCalculator;
+import nu.ndw.nls.geometry.factories.GeometryFactoryWgs84;
 import nu.ndw.nls.routingmapmatcher.exception.RoutingException;
 import nu.ndw.nls.routingmapmatcher.exception.RoutingRequestException;
 import nu.ndw.nls.routingmapmatcher.mappers.MatchedLinkMapper;
@@ -41,10 +41,15 @@ public class Router {
     private final NetworkGraphHopper networkGraphHopper;
 
     private final MatchedLinkMapper matchedLinkMapper;
+    private final GeometryFactoryWgs84 geometryFactoryWgs84;
+    private final FractionAndDistanceCalculator fractionAndDistanceCalculator;
 
-    public Router(NetworkGraphHopper networkGraphHopper, MatchedLinkMapper matchedLinkMapper) {
+    public Router(NetworkGraphHopper networkGraphHopper, MatchedLinkMapper matchedLinkMapper,
+            GeometryFactoryWgs84 geometryFactoryWgs84, FractionAndDistanceCalculator fractionAndDistanceCalculator) {
         this.networkGraphHopper = networkGraphHopper;
         this.matchedLinkMapper = matchedLinkMapper;
+        this.geometryFactoryWgs84 = geometryFactoryWgs84;
+        this.fractionAndDistanceCalculator = fractionAndDistanceCalculator;
         // This configuration is global for the routing network and is probably not thread safe.
         // To be able to configure simplification per request, it's safer to disable GraphHopper-internal simplification
         // and perform it in our own response mapping code below.
@@ -53,6 +58,9 @@ public class Router {
 
     public RoutingResponse route(RoutingRequest routingRequest) throws RoutingException, RoutingRequestException {
         GHRequest ghRequest = getGHRequest(routingRequest.getWayPoints(), routingRequest.getRoutingProfile());
+        if (routingRequest.getCustomModel() != null) {
+            ghRequest.setCustomModel(routingRequest.getCustomModel());
+        }
         return getRoutingResponse(ghRequest, routingRequest.isSimplifyResponseGeometry());
     }
 
@@ -87,15 +95,15 @@ public class Router {
         for (Path path : networkGraphHopper.calcPaths(ghRequest)) {
             List<EdgeIteratorState> edges = path.calcEdges();
             double startFraction = PathUtil.determineStartLinkFraction(edges.get(0),
-                    QueryGraphExtractor.extractQueryGraph(path));
+                    QueryGraphExtractor.extractQueryGraph(path),fractionAndDistanceCalculator);
             double endFraction = PathUtil.determineEndLinkFraction(edges.get(edges.size() - 1),
-                    QueryGraphExtractor.extractQueryGraph(path));
+                    QueryGraphExtractor.extractQueryGraph(path),fractionAndDistanceCalculator);
             List<MatchedEdgeLink> matchedEdgeLinks = PathUtil.determineMatchedLinks(
                     networkGraphHopper.getEncodingManager(),
                     edges);
 
             routingLegResponse.add(RoutingLegResponse.builder()
-                            .matchedLinks(matchedLinkMapper.map(matchedEdgeLinks, startFraction, endFraction))
+                    .matchedLinks(matchedLinkMapper.map(matchedEdgeLinks, startFraction, endFraction))
                     .build());
         }
 
@@ -133,10 +141,10 @@ public class Router {
         }
     }
 
-    private static List<Point> mapToSnappedWaypoints(PointList pointList) {
+    private List<Point> mapToSnappedWaypoints(PointList pointList) {
         List<Point> waypoints = new ArrayList<>(pointList.size());
         for (int i = 0; i < pointList.size(); i++) {
-            Point waypoint = WGS84_GEOMETRY_FACTORY.createPoint(
+            Point waypoint = geometryFactoryWgs84.createPoint(
                     new Coordinate(pointList.getLon(i), pointList.getLat(i)));
             waypoints.add(waypoint);
         }

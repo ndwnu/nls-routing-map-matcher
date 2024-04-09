@@ -10,9 +10,9 @@ import com.graphhopper.storage.EdgeIteratorStateReverseExtractor;
 import com.graphhopper.util.EdgeIteratorState;
 import com.graphhopper.util.FetchMode;
 import lombok.RequiredArgsConstructor;
+import nu.ndw.nls.geometry.distance.FractionAndDistanceCalculator;
 import nu.ndw.nls.routingmapmatcher.isochrone.algorithm.IsoLabel;
 import nu.ndw.nls.routingmapmatcher.model.IsochroneMatch;
-import nu.ndw.nls.routingmapmatcher.util.FractionAndDistanceCalculator;
 import nu.ndw.nls.routingmapmatcher.util.PointListUtil;
 import org.locationtech.jts.geom.LineString;
 
@@ -22,6 +22,7 @@ public class IsochroneMatchMapper {
     private final EncodingManager encodingManager;
     private final EdgeIteratorStateReverseExtractor edgeIteratorStateReverseExtractor;
     private final PointListUtil pointListUtil;
+    private final FractionAndDistanceCalculator fractionAndDistanceCalculator;
 
     /**
      * Maps an IsoLabel to an IsochroneMatch with cropped geometries aligned to travelling direction and respective
@@ -57,10 +58,10 @@ public class IsochroneMatchMapper {
                 : isoLabelWayGeometry;
 
         double startFraction = isStartSegment
-                ? FractionAndDistanceCalculator.calculateFractionAndDistance(fullGeometry,
+                ? fractionAndDistanceCalculator.calculateFractionAndDistance(fullGeometry,
                 isoLabelWayGeometry.getStartPoint().getCoordinate()).getFraction() : 0.0;
         double endFraction = isStartSegment || isEndSegment
-                ? FractionAndDistanceCalculator.calculateFractionAndDistance(fullGeometry,
+                ? fractionAndDistanceCalculator.calculateFractionAndDistance(fullGeometry,
                 partialGeometry.getEndPoint().getCoordinate()).getFraction() : 1.0;
 
         return IsochroneMatch.builder()
@@ -86,9 +87,9 @@ public class IsochroneMatchMapper {
 
     private LineString calculatePartialGeometry(LineString edgeGeometry, double totalDistanceTravelled,
             double maxDistance) {
-        double isoLabelEdgeGeometryDistance = FractionAndDistanceCalculator.calculateLengthInMeters(edgeGeometry);
+        double isoLabelEdgeGeometryDistance = fractionAndDistanceCalculator.calculateLengthInMeters(edgeGeometry);
         double partialFraction = (maxDistance - totalDistanceTravelled + isoLabelEdgeGeometryDistance)
                 / isoLabelEdgeGeometryDistance;
-        return FractionAndDistanceCalculator.getSubLineString(edgeGeometry, partialFraction);
+        return fractionAndDistanceCalculator.getSubLineString(edgeGeometry, partialFraction);
     }
 }

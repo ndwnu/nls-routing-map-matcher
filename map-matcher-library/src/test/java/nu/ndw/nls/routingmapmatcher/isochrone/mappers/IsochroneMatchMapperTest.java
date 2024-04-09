@@ -12,10 +12,11 @@ import com.graphhopper.storage.EdgeIteratorStateReverseExtractor;
 import com.graphhopper.util.EdgeIteratorState;
 import com.graphhopper.util.FetchMode;
 import com.graphhopper.util.PointList;
+import nu.ndw.nls.geometry.distance.FractionAndDistanceCalculator;
+import nu.ndw.nls.geometry.factories.GeometryFactoryWgs84;
+import nu.ndw.nls.routingmapmatcher.TestConfig;
 import nu.ndw.nls.routingmapmatcher.isochrone.algorithm.IsoLabel;
 import nu.ndw.nls.routingmapmatcher.model.IsochroneMatch;
-import nu.ndw.nls.routingmapmatcher.util.FractionAndDistanceCalculator;
-import nu.ndw.nls.routingmapmatcher.util.GeometryConstants;
 import nu.ndw.nls.routingmapmatcher.util.PointListUtil;
 import org.assertj.core.data.Percentage;
 import org.junit.jupiter.api.BeforeEach;
@@ -27,8 +28,12 @@ import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.LineString;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 
-@ExtendWith(MockitoExtension.class)
+@ExtendWith({MockitoExtension.class, SpringExtension.class})
+@ContextConfiguration(classes = {TestConfig.class})
 class IsochroneMatchMapperTest {
 
     private static final int MAX_DISTANCE = 200;
@@ -56,6 +61,8 @@ class IsochroneMatchMapperTest {
 
     @Mock
     private IntEncodedValue intEncodedValue;
+    @Autowired
+    private FractionAndDistanceCalculator fractionAndDistanceCalculator;
 
     private LineString startSegmentWayGeometry;
 
@@ -67,7 +74,7 @@ class IsochroneMatchMapperTest {
 
     @BeforeEach
     void setup() {
-        GeometryFactory geometryFactory = GeometryConstants.WGS84_GEOMETRY_FACTORY;
+        GeometryFactory geometryFactory = new GeometryFactoryWgs84();
         startSegmentWayGeometry = geometryFactory.createLineString(new Coordinate[]{
                 COORDINATE_1,
                 COORDINATE_2,
@@ -78,7 +85,7 @@ class IsochroneMatchMapperTest {
                 COORDINATE_2});
 
         isochroneMatchMapper = new IsochroneMatchMapper(encodingManager, edgeIteratorStateReverseExtractor,
-                pointListUtil);
+                pointListUtil, fractionAndDistanceCalculator);
     }
 
     @Test
@@ -113,7 +120,7 @@ class IsochroneMatchMapperTest {
         assertThat(result.getEndFraction()).isEqualTo(0.5063949887068743);
         assertThat(result.isReversed()).isFalse();
         assertThat(result.getGeometry().getLength()).isLessThan(originalGeometry.getLength());
-        double lengthInMeters = FractionAndDistanceCalculator.calculateLengthInMeters(result.getGeometry());
+        double lengthInMeters = fractionAndDistanceCalculator.calculateLengthInMeters(result.getGeometry());
         assertThat(lengthInMeters).isCloseTo(MAX_DISTANCE, Percentage.withPercentage(0.0001));
     }
 
@@ -128,7 +135,7 @@ class IsochroneMatchMapperTest {
         assertThat(result.getEndFraction()).isEqualTo(0.7990314030362362);
         assertThat(result.isReversed()).isFalse();
         assertThat(result.getGeometry().getLength()).isLessThan(originalGeometry.getLength());
-        double lengthInMeters = FractionAndDistanceCalculator.calculateLengthInMeters(result.getGeometry());
+        double lengthInMeters = fractionAndDistanceCalculator.calculateLengthInMeters(result.getGeometry());
         assertThat(lengthInMeters).isCloseTo(MAX_DISTANCE, Percentage.withPercentage(0.0001));
     }
 

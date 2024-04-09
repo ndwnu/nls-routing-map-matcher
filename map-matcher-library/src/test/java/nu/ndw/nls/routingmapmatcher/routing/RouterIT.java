@@ -4,29 +4,38 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.List;
 import lombok.SneakyThrows;
-import nu.ndw.nls.routingmapmatcher.mappers.MatchedLinkMapper;
+import nu.ndw.nls.geometry.factories.GeometryFactoryWgs84;
+import nu.ndw.nls.routingmapmatcher.TestConfig;
 import nu.ndw.nls.routingmapmatcher.model.linestring.MatchedLink;
 import nu.ndw.nls.routingmapmatcher.model.routing.RoutingLegResponse;
 import nu.ndw.nls.routingmapmatcher.model.routing.RoutingRequest;
 import nu.ndw.nls.routingmapmatcher.model.routing.RoutingResponse;
 import nu.ndw.nls.routingmapmatcher.testutil.TestNetworkProvider;
-import nu.ndw.nls.routingmapmatcher.util.GeometryConstants;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.locationtech.jts.geom.Coordinate;
-import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.Point;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 
+@ExtendWith(SpringExtension.class)
+@ContextConfiguration(classes = {TestConfig.class})
 class RouterIT {
 
     private static final double END_FRACTION_1 = 1.0;
     private static final int START_FRACTION_0 = 0;
+
+    @Autowired
+    private RouterFactory routerFactory;
+    @Autowired
+    private GeometryFactoryWgs84 geometryFactory;
     private Router router;
-    private GeometryFactory geometryFactory;
 
     @SneakyThrows
     private void setupNetwork() {
-        router = new Router(TestNetworkProvider.getTestNetworkFromFile("/test-data/links.json"), new MatchedLinkMapper());
-        geometryFactory = GeometryConstants.WGS84_GEOMETRY_FACTORY;
+        router = routerFactory.createMapMatcher(TestNetworkProvider.getTestNetworkFromFile("/test-data/links.json"),
+                "car");
     }
 
     @SneakyThrows
@@ -109,7 +118,7 @@ class RouterIT {
                                         .startFraction(START_FRACTION_0)
                                         .endFraction(0.5215863361447783)
                                         .build()
-                                ))
+                        ))
                         .build());
 
         assertThat(result.getGeometry()).isEqualTo(geometryFactory.createLineString(coordinates));
