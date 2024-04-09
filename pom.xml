@@ -19,6 +19,7 @@
     <packaging>pom</packaging>
     <modules>
         <module>map-matcher-library</module>
+        <module>map-matcher-geo</module>
     </modules>
     <properties>
         <maven.compiler.source>17</maven.compiler.source>
@@ -68,6 +69,11 @@
                 <version>${nls-geometry.version}</version>
             </dependency>
             <dependency>
+                <groupId>com.esotericsoftware.kryo</groupId>
+                <artifactId>kryo5</artifactId>
+                <version>${kryo5.version}</version>
+            </dependency>
+            <dependency>
                 <groupId>org.wololo</groupId>
                 <artifactId>jts2geojson</artifactId>
                 <version>${jts2geojson.version}</version>
@@ -90,12 +96,7 @@
                 <artifactId>graphhopper-map-matching</artifactId>
                 <version>${graphhopper.version}</version>
             </dependency>
-            <!-- JTS -->
-            <dependency>
-                <groupId>org.locationtech.jts</groupId>
-                <artifactId>jts-core</artifactId>
-                <version>${jts-core.version}</version>
-            </dependency>
+
             <!-- Utilities -->
             <dependency>
                 <groupId>com.google.guava</groupId>
@@ -115,11 +116,7 @@
                 <version>${hamcrest.version}</version>
                 <scope>test</scope>
             </dependency>
-            <dependency>
-                <groupId>com.esotericsoftware.kryo</groupId>
-                <artifactId>kryo5</artifactId>
-                <version>${kryo5.version}</version>
-            </dependency>
+
         </dependencies>
     </dependencyManagement>
 
