@@ -20,7 +20,6 @@ import com.graphhopper.util.FetchMode;
 import com.graphhopper.util.PMap;
 import java.util.List;
 import nu.ndw.nls.geometry.bearing.BearingCalculator;
-import nu.ndw.nls.geometry.crs.CrsTransformer;
 import nu.ndw.nls.geometry.distance.FractionAndDistanceCalculator;
 import nu.ndw.nls.geometry.factories.GeometryFactoryWgs84;
 import nu.ndw.nls.geometry.mappers.DiameterToPolygonMapper;
@@ -38,7 +37,6 @@ import nu.ndw.nls.routingmapmatcher.model.singlepoint.SinglePointMatch;
 import nu.ndw.nls.routingmapmatcher.model.singlepoint.SinglePointMatch.CandidateMatch;
 import nu.ndw.nls.routingmapmatcher.network.NetworkGraphHopper;
 import nu.ndw.nls.routingmapmatcher.util.PointListUtil;
-import org.geotools.referencing.GeodeticCalculator;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.LineString;
 import org.locationtech.jts.geom.Point;
@@ -53,36 +51,29 @@ public class SinglePointMapMatcher implements MapMatcher<SinglePointLocation, Si
     private final LocationIndexTree locationIndexTree;
     private final IsochroneService isochroneService;
     private final PointMatchingService pointMatchingService;
-    private final CrsTransformer crsTransformer;
     private final DiameterToPolygonMapper diameterToPolygonMapper;
-    private final BearingCalculator bearingCalculator;
-    private final GeometryFactoryWgs84 geometryFactoryWgs84;
-    private final FractionAndDistanceCalculator fractionAndDistanceCalculator;
     private final EdgeIteratorStateReverseExtractor edgeIteratorStateReverseExtractor;
     private final NetworkGraphHopper network;
     private final Profile profile;
     private final PointListUtil pointListUtil;
 
-    public SinglePointMapMatcher(CrsTransformer crsTransformer, DiameterToPolygonMapper diameterToPolygonMapper,
+    public SinglePointMapMatcher(DiameterToPolygonMapper diameterToPolygonMapper,
             BearingCalculator bearingCalculator, GeometryFactoryWgs84 geometryFactoryWgs84,
             FractionAndDistanceCalculator fractionAndDistanceCalculator, NetworkGraphHopper network,
             String profileName) {
-        this.crsTransformer = crsTransformer;
         this.diameterToPolygonMapper = diameterToPolygonMapper;
-        this.bearingCalculator = bearingCalculator;
-        this.geometryFactoryWgs84 = geometryFactoryWgs84;
-        this.fractionAndDistanceCalculator = fractionAndDistanceCalculator;
         this.network = Preconditions.checkNotNull(network);
         this.profile = Preconditions.checkNotNull(network.getProfile(profileName));
         this.locationIndexTree = network.getLocationIndex();
         BaseGraph baseGraph = network.getBaseGraph();
         EncodingManager encodingManager = network.getEncodingManager();
         Weighting weighting = network.createWeighting(profile, new PMap());
-        GeodeticCalculator geodeticCalculator = new GeodeticCalculator();
         this.edgeIteratorStateReverseExtractor = new EdgeIteratorStateReverseExtractor();
         this.pointListUtil = new PointListUtil();
         this.isochroneService = new IsochroneService(encodingManager, baseGraph, edgeIteratorStateReverseExtractor,
-                new IsochroneMatchMapper(encodingManager, edgeIteratorStateReverseExtractor, pointListUtil,fractionAndDistanceCalculator),
+                new IsochroneMatchMapper(encodingManager, edgeIteratorStateReverseExtractor,
+                        pointListUtil,
+                        fractionAndDistanceCalculator),
                 new ShortestPathTreeFactory(weighting), this.locationIndexTree, profile);
         this.pointMatchingService = new PointMatchingService(geometryFactoryWgs84, bearingCalculator,
                 fractionAndDistanceCalculator);
