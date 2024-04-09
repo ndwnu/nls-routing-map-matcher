@@ -39,6 +39,7 @@
         <maven-surefire-plugin.version>3.2.5</maven-surefire-plugin.version>
         <sonar-maven-plugin.version>3.9.1.2184</sonar-maven-plugin.version>
         <sonar.projectName>nls-routing-map-matcher</sonar.projectName>
+        <nls-geometry.version>1.0.3</nls-geometry.version>
         <kryo5.version>5.5.0</kryo5.version>
     </properties>
     <repositories>
@@ -52,28 +53,6 @@
                 <enabled>true</enabled>
             </snapshots>
         </repository>
-        <repository>
-            <id>osgeo</id>
-            <name>OSGeo Release Repository</name>
-            <url>https://repo.osgeo.org/repository/release/</url>
-            <snapshots>
-                <enabled>false</enabled>
-            </snapshots>
-            <releases>
-                <enabled>true</enabled>
-            </releases>
-        </repository>
-        <repository>
-            <id>osgeo-snapshot</id>
-            <name>OSGeo Snapshot Repository</name>
-            <url>https://repo.osgeo.org/repository/snapshot/</url>
-            <snapshots>
-                <enabled>true</enabled>
-            </snapshots>
-            <releases>
-                <enabled>false</enabled>
-            </releases>
-        </repository>
     </repositories>
     <distributionManagement>
         <repository>
@@ -84,24 +63,9 @@
     <dependencyManagement>
         <dependencies>
             <dependency>
-                <groupId>org.geotools</groupId>
-                <artifactId>gt-epsg-hsql</artifactId>
-                <version>${geotools.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.geotools</groupId>
-                <artifactId>gt-referencing</artifactId>
-                <version>${geotools.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.geotools</groupId>
-                <artifactId>gt-epsg-extension</artifactId>
-                <version>${geotools.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.geotools</groupId>
-                <artifactId>gt-geojson-core</artifactId>
-                <version>${geotools.version}</version>
+                <groupId>nu.ndw.nls.geometry</groupId>
+                <artifactId>nls-geometry</artifactId>
+                <version>${nls-geometry.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.wololo</groupId>

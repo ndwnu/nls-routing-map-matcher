@@ -2,7 +2,7 @@ package nu.ndw.nls.routingmapmatcher.model;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import nu.ndw.nls.routingmapmatcher.util.GeometryConstants;
+import nu.ndw.nls.geometry.factories.GeometryFactoryWgs84;
 import org.junit.jupiter.api.Test;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.LineString;
@@ -24,7 +24,7 @@ class MatchedQueryResultTest {
 
     @Test
     void getCutoffGeometriesAsLineStrings_ok() {
-        var geometryFactory = GeometryConstants.WGS84_GEOMETRY_FACTORY;
+        var geometryFactory = new GeometryFactoryWgs84();
         var lineString_1 = geometryFactory
                 .createLineString(new Coordinate[]{coordinateA1, coordinateA2, coordinateA3});
         var lineString_2 = geometryFactory

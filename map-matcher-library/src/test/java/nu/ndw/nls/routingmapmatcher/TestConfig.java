@@ -8,6 +8,6 @@ import org.springframework.context.annotation.Import;
 @Configuration
 @ComponentScan
 @Import(GeometryConfiguration.class)
-public class RoutingMapMatcherConfiguration {
+public class TestConfig {
 
 }

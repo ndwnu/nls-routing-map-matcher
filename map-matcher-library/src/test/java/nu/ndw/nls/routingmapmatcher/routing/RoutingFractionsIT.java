@@ -9,7 +9,8 @@ import com.graphhopper.config.Profile;
 import java.io.IOException;
 import java.util.List;
 import lombok.SneakyThrows;
-import nu.ndw.nls.routingmapmatcher.mappers.MatchedLinkMapper;
+import nu.ndw.nls.geometry.factories.GeometryFactoryWgs84;
+import nu.ndw.nls.routingmapmatcher.TestConfig;
 import nu.ndw.nls.routingmapmatcher.model.linestring.MatchedLink;
 import nu.ndw.nls.routingmapmatcher.model.routing.RoutingLegResponse;
 import nu.ndw.nls.routingmapmatcher.model.routing.RoutingRequest;
@@ -18,27 +19,37 @@ import nu.ndw.nls.routingmapmatcher.network.model.DirectionalDto;
 import nu.ndw.nls.routingmapmatcher.network.model.LinkVehicleMapper;
 import nu.ndw.nls.routingmapmatcher.network.model.RoutingNetworkSettings;
 import nu.ndw.nls.routingmapmatcher.testutil.TestNetworkProvider;
-import nu.ndw.nls.routingmapmatcher.util.GeometryConstants;
 import org.geotools.geometry.jts.WKTReader2;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.LineString;
 import org.locationtech.jts.geom.Point;
 import org.locationtech.jts.io.WKTReader;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 
+@ExtendWith(SpringExtension.class)
+@ContextConfiguration(classes = {TestConfig.class})
 class RoutingFractionsIT {
+
     private static final String VEHICLE = "car";
     private static final String PROFILE_NAME = "profile";
     private static final Profile PROFILE = new Profile(PROFILE_NAME).setVehicle(VEHICLE);
     private static final String NETWORK_NAME = "test_network";
-
+    @Autowired
+    private RouterFactory routerFactory;
+    @Autowired
+    private GeometryFactoryWgs84 geometryFactoryWgs84;
     private Router router;
 
 
     // Our sample data contains one way driving directions, but we need to simulate a U-turn to get fractions.
     // This vehicle mapper ignores the restrictions, so we can still simulate it
-    public static class AlwaysAccessibleAndHasSpeedVehicleMapper extends LinkVehicleMapper<TestNetworkProvider.TestLink> {
+    public static class AlwaysAccessibleAndHasSpeedVehicleMapper extends
+            LinkVehicleMapper<TestNetworkProvider.TestLink> {
 
         private static final double ALWAYS_SPEED = 10.0;
 
@@ -70,14 +81,16 @@ class RoutingFractionsIT {
         List<TestNetworkProvider.TestLink> testLinks = TestNetworkProvider.getTestLinks("/test-data/links.json");
 
         RoutingNetworkSettings<TestNetworkProvider.TestLink> routingNetworkSettings =
-                    RoutingNetworkSettings.builder(TestNetworkProvider.TestLink.class)
-                    .networkNameAndVersion(NETWORK_NAME)
-                    .profiles(List.of(PROFILE))
-                    .linkSupplier(testLinks::iterator)
-                    .build();
+                RoutingNetworkSettings.builder(TestNetworkProvider.TestLink.class)
+                        .networkNameAndVersion(NETWORK_NAME)
+                        .profiles(List.of(PROFILE))
+                        .linkSupplier(testLinks::iterator)
+                        .build();
 
-        router = new Router(getNetworkService(List.of(new AlwaysAccessibleAndHasSpeedVehicleMapper()))
-                .inMemory(routingNetworkSettings), new MatchedLinkMapper());
+        router = routerFactory.createMapMatcher(
+                getNetworkService(List.of(new AlwaysAccessibleAndHasSpeedVehicleMapper()))
+                        .inMemory(routingNetworkSettings), PROFILE.getName());
+
     }
 
     @Test
@@ -89,7 +102,7 @@ class RoutingFractionsIT {
         // Request a route over a single link
         var resultA = router.route(RoutingRequest.builder()
                 .routingProfile(PROFILE_NAME)
-                .wayPoints(List.of(pointA,pointB))
+                .wayPoints(List.of(pointA, pointB))
                 .build());
 
         assertEquals(1, resultA.getLegs().size());
@@ -104,7 +117,7 @@ class RoutingFractionsIT {
         // Now request the same route, but in reverse direction
         var resultB = router.route(RoutingRequest.builder()
                 .routingProfile(PROFILE_NAME)
-                .wayPoints(List.of(pointB,pointA))
+                .wayPoints(List.of(pointB, pointA))
                 .build());
 
         assertEquals(1, resultB.getLegs().size());
@@ -117,7 +130,6 @@ class RoutingFractionsIT {
         assertEquals(0.21711626527479014, matchedLinkB.getStartFraction());
         assertEquals(0.9293652101628306, matchedLinkB.getEndFraction());
 
-
         assertEquals(1.0, matchedLinkA.getStartFraction() + matchedLinkB.getEndFraction(), 0.0000001,
                 "Fractions are in the direction of driving, therefore the sum of the fraction and the fraction of the "
                         + "same point traveling in the reverse direction should always end up as 1.0");
@@ -127,43 +139,41 @@ class RoutingFractionsIT {
     }
 
     /**
-     * This test is using a part of north of the the 'Amersfoort knoopunt' that looks like this: --┴--
-     * First point is in the west, then turning north and last point is east
+     * This test is using a part of north of the the 'Amersfoort knoopunt' that looks like this: --┴-- First point is in
+     * the west, then turning north and last point is east
      */
     @Test
     @SneakyThrows
     void route_ok_uTurnResultsInLegsWithFractions() {
-       var result = router.route(RoutingRequest.builder()
+        var result = router.route(RoutingRequest.builder()
                 .routingProfile(PROFILE_NAME)
-                .wayPoints(List.of( createPoint(5.42511239, 52.17985105),
-                                    createPoint(5.42576075, 52.17986470),
-                                    createPoint(5.42639323, 52.17976530)))
+                .wayPoints(List.of(createPoint(5.42511239, 52.17985105),
+                        createPoint(5.42576075, 52.17986470),
+                        createPoint(5.42639323, 52.17976530)))
                 .build());
 
-
-       assertEquals(RoutingResponse.builder()
-                        .geometry(createLineString("LINESTRING (5.425123 52.179869, 5.42572 52.179779, "
-                                + "5.425755 52.179866, 5.42572 52.179779, 5.426393 52.179772)"))
+        assertEquals(RoutingResponse.builder()
+                        .geometry(createLineString())
                         .snappedWaypoints(List.of(createPoint(5.425122870485016, 52.17986902304874),
-                                        createPoint(5.425755082159361, 52.17986556367133),
-                                        createPoint(5.426393415313249, 52.179772178137206)))
+                                createPoint(5.425755082159361, 52.17986556367133),
+                                createPoint(5.426393415313249, 52.179772178137206)))
                         .distance(107.739)
                         .weight(38.786)
                         .duration(38.787)
                         .legs(List.of(RoutingLegResponse.builder()
                                         .matchedLinks(List.of(
                                                 MatchedLink.builder()
-                                                    .linkId(6369283)
-                                                    .reversed(false)
-                                                    .startFraction(0.11164377136022784)
-                                                    .endFraction(1.0)
-                                                    .build(),
+                                                        .linkId(6369283)
+                                                        .reversed(false)
+                                                        .startFraction(0.11164377136022784)
+                                                        .endFraction(1.0)
+                                                        .build(),
                                                 MatchedLink.builder()
-                                                    .linkId(6405185)
-                                                    .reversed(true)
-                                                    .startFraction(0.0)
-                                                    .endFraction(0.2075867812415673)
-                                                    .build())
+                                                        .linkId(6405185)
+                                                        .reversed(true)
+                                                        .startFraction(0.0)
+                                                        .endFraction(0.2075867812415673)
+                                                        .build())
                                         ).build(),
                                 RoutingLegResponse.builder()
                                         .matchedLinks(List.of(
@@ -180,19 +190,20 @@ class RoutingFractionsIT {
                                                         .endFraction(0.9745518261996916)
                                                         .build())
                                         ).build()
-                                )).build(),
-               result
-       );
+                        )).build(),
+                result
+        );
 
     }
 
     @SneakyThrows
-    private LineString createLineString(String wkt) {
+    private LineString createLineString() {
         WKTReader wktReader = new WKTReader2();
-        return (LineString) wktReader.read(wkt);
+        return (LineString) wktReader.read(
+                "LINESTRING (5.425123 52.179869, 5.42572 52.179779, 5.425755 52.179866, 5.42572 52.179779, 5.426393 52.179772)");
     }
 
     private Point createPoint(double x, double y) {
-        return GeometryConstants.WGS84_GEOMETRY_FACTORY.createPoint(new Coordinate(x,y));
+        return geometryFactoryWgs84.createPoint(new Coordinate(x, y));
     }
 }

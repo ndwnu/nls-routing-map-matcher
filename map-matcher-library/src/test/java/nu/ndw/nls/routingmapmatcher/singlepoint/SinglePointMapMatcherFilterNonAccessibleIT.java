@@ -8,30 +8,41 @@ import java.util.ArrayList;
 import java.util.List;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
+import nu.ndw.nls.geometry.factories.GeometryFactoryWgs84;
+import nu.ndw.nls.routingmapmatcher.TestConfig;
 import nu.ndw.nls.routingmapmatcher.model.IsochroneUnit;
 import nu.ndw.nls.routingmapmatcher.model.singlepoint.SinglePointLocation;
 import nu.ndw.nls.routingmapmatcher.model.singlepoint.SinglePointMatch;
 import nu.ndw.nls.routingmapmatcher.testutil.TestNetworkProvider.TestLink;
-import nu.ndw.nls.routingmapmatcher.util.GeometryConstants;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.locationtech.jts.geom.Coordinate;
-import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.LineString;
 import org.locationtech.jts.geom.Point;
 import org.locationtech.jts.io.WKTReader;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 @Slf4j
+@ExtendWith(SpringExtension.class)
+@ContextConfiguration(classes = {TestConfig.class})
 class SinglePointMapMatcherFilterNonAccessibleIT {
 
-    private GeometryFactory geometryFactory;
+    @Autowired
+    private SinglePointMapMatcherFactory singlePointMapMatcherFactory;
+
+    @Autowired
+    private GeometryFactoryWgs84 geometryFactoryWgs84;
+
     private SinglePointMapMatcher singlePointMapMatcher;
 
     @SneakyThrows
     @BeforeEach
     void setup() {
-        this.geometryFactory = GeometryConstants.WGS84_GEOMETRY_FACTORY;
-        this.singlePointMapMatcher = new SinglePointMapMatcher(getTestNetwork(createLinks()), CAR_FASTEST);
+        singlePointMapMatcher = singlePointMapMatcherFactory.createMapMatcher(getTestNetwork(createLinks()),
+                CAR_FASTEST);
     }
 
     /**
@@ -80,12 +91,12 @@ class SinglePointMapMatcherFilterNonAccessibleIT {
         lineStringSb.append(")");
 
         log.debug("Loading line string: {}", lineStringSb);
-        WKTReader wktReader = new WKTReader(this.geometryFactory);
+        WKTReader wktReader = new WKTReader(geometryFactoryWgs84);
         return (LineString) wktReader.read(lineStringSb.toString());
     }
 
     private SinglePointLocation createSinglePoint(int id, double x, double y) {
-        Point point = this.geometryFactory.createPoint(new Coordinate(x, y));
+        Point point = geometryFactoryWgs84.createPoint(new Coordinate(x, y));
         return SinglePointLocation.builder()
                 .id(id)
                 .point(point)
@@ -101,6 +112,7 @@ class SinglePointMapMatcherFilterNonAccessibleIT {
         assertEquals(0, match.getCandidateMatches().size());
 
     }
+
     @Test
     void matchSinglePoint_ok_match() {
         SinglePointLocation singlePoint = this.createSinglePoint(1, 6, 0);

@@ -1,9 +1,10 @@
 package nu.ndw.nls.routingmapmatcher.util;
 
-import static nu.ndw.nls.routingmapmatcher.util.GeometryConstants.WGS84_GEOMETRY_FACTORY;
 
 import com.graphhopper.util.PointList;
+import nu.ndw.nls.geometry.factories.GeometryFactoryWgs84;
 import org.locationtech.jts.geom.Coordinate;
+import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.LineString;
 import org.locationtech.jts.geom.impl.PackedCoordinateSequence;
 
@@ -11,6 +12,7 @@ public class PointListUtil {
 
     private static final int MINIMUM_LINESTRING_SIZE = 2;
     private static final int LINESTRING_DIMENSIONS = 2;
+    private static GeometryFactory WGS84_GEOMETRY_FACTORY = new GeometryFactoryWgs84();
 
     // PointList.toLineString rounds to 6 digits. This can affect the route slightly, this method prevents that
     public LineString toLineString(PointList pointList) {

@@ -24,18 +24,18 @@ import com.graphhopper.util.shapes.GHPoint;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
+import nu.ndw.nls.geometry.distance.FractionAndDistanceCalculator;
+import nu.ndw.nls.geometry.factories.GeometryFactoryWgs84;
 import nu.ndw.nls.routingmapmatcher.domain.MapMatcher;
 import nu.ndw.nls.routingmapmatcher.model.MatchStatus;
 import nu.ndw.nls.routingmapmatcher.model.linestring.LineStringLocation;
 import nu.ndw.nls.routingmapmatcher.model.linestring.LineStringMatch;
 import nu.ndw.nls.routingmapmatcher.network.NetworkGraphHopper;
-import nu.ndw.nls.routingmapmatcher.util.GeometryConstants;
 import nu.ndw.nls.routingmapmatcher.util.LineStringMatchUtil;
 import nu.ndw.nls.routingmapmatcher.util.LineStringScoreUtil;
 import nu.ndw.nls.routingmapmatcher.util.PointListUtil;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.CoordinateSequence;
-import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.LineString;
 import org.locationtech.jts.geom.Point;
 
@@ -69,9 +69,6 @@ public class ViterbiLineStringMapMatcher implements
      * The tolerance used in smoothing the line before executing map matching
      */
     private static final double LINE_SMOOTHING_TOLERANCE = 0.5D;
-
-    private static final GeometryFactory WGS84_GEOMETRY_FACTORY = GeometryConstants.WGS84_GEOMETRY_FACTORY;
-
     private static final int COORDINATES_LENGTH_START_END = 2;
     private static final String PROFILE_KEY = "profile";
 
@@ -81,13 +78,18 @@ public class ViterbiLineStringMapMatcher implements
     private final LineStringScoreUtil lineStringScoreUtil;
     private final Profile profile;
     private final PointListUtil pointListUtil;
+    private final GeometryFactoryWgs84 geometryFactoryWgs84;
+    private final FractionAndDistanceCalculator fractionAndDistanceCalculator;
 
-    public ViterbiLineStringMapMatcher(NetworkGraphHopper networkGraphHopper, String profileName) {
+    public ViterbiLineStringMapMatcher(NetworkGraphHopper networkGraphHopper, String profileName,
+            GeometryFactoryWgs84 geometryFactoryWgs84, FractionAndDistanceCalculator fractionAndDistanceCalculator) {
         this.networkGraphHopper = Preconditions.checkNotNull(networkGraphHopper);
         this.locationIndexTree = networkGraphHopper.getLocationIndex();
+        this.geometryFactoryWgs84 = geometryFactoryWgs84;
+        this.fractionAndDistanceCalculator = fractionAndDistanceCalculator;
         this.profile = Preconditions.checkNotNull(networkGraphHopper.getProfile(profileName));
-        this.lineStringMatchUtil = new LineStringMatchUtil(networkGraphHopper, this.profile);
-        this.lineStringScoreUtil = new LineStringScoreUtil();
+        this.lineStringMatchUtil = new LineStringMatchUtil(networkGraphHopper, this.profile,fractionAndDistanceCalculator);
+        this.lineStringScoreUtil = new LineStringScoreUtil(fractionAndDistanceCalculator);
         this.pointListUtil = new PointListUtil();
     }
 
@@ -157,13 +159,13 @@ public class ViterbiLineStringMapMatcher implements
     }
 
     private boolean isNearbyNdwNetwork(Observation observation) {
-        Point point = WGS84_GEOMETRY_FACTORY.createPoint(
+        Point point = geometryFactoryWgs84.createPoint(
                 new Coordinate(observation.getPoint().getLon(), observation.getPoint().getLat()));
-        Weighting weighting = networkGraphHopper.createWeighting(profile,createHints());
+        Weighting weighting = networkGraphHopper.createWeighting(profile, createHints());
         EdgeFilter edgeFilter = new FiniteWeightFilter(weighting);
         List<Snap> queryResults = getQueryResults(networkGraphHopper, point,
                 MEASUREMENT_ERROR_SIGMA_IN_METERS,
-                locationIndexTree,edgeFilter);
+                locationIndexTree, edgeFilter);
         for (Snap queryResult : queryResults) {
             if (queryResult.getQueryDistance() <= NEARBY_NDW_NETWORK_DISTANCE_IN_METERS) {
                 return true;
