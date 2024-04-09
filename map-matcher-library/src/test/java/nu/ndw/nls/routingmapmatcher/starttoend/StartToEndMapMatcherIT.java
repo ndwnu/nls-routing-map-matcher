@@ -8,33 +8,42 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import java.nio.charset.StandardCharsets;
 import java.util.Objects;
 import lombok.SneakyThrows;
+import nu.ndw.nls.geometry.factories.GeometryFactoryWgs84;
+import nu.ndw.nls.routingmapmatcher.TestConfig;
 import nu.ndw.nls.routingmapmatcher.model.MatchStatus;
 import nu.ndw.nls.routingmapmatcher.model.linestring.LineStringLocation;
 import nu.ndw.nls.routingmapmatcher.model.linestring.LineStringMatch;
 import nu.ndw.nls.routingmapmatcher.model.linestring.MatchedLink;
 import nu.ndw.nls.routingmapmatcher.model.linestring.ReliabilityCalculationType;
 import nu.ndw.nls.routingmapmatcher.testutil.TestNetworkProvider;
-import nu.ndw.nls.routingmapmatcher.util.GeometryConstants;
 import org.apache.commons.io.IOUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.locationtech.jts.geom.Coordinate;
-import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.LineString;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 
+@ExtendWith(SpringExtension.class)
+@ContextConfiguration(classes = {TestConfig.class})
 class StartToEndMapMatcherIT {
 
     private static final int END_FRACTION_1 = 1;
     private static final int START_FRACTION_0 = 0;
     private StartToEndMapMatcher startToEndMapMatcher;
     private final ObjectMapper mapper = OBJECT_MAPPER;
-    private GeometryFactory geometryFactory;
+    @Autowired
+    private StartToEndMapMatcherFactory startToEndMapMatcherFactory;
+    @Autowired
+    private GeometryFactoryWgs84 geometryFactory;
 
     @SneakyThrows
     @BeforeEach
     void setup() {
-        this.startToEndMapMatcher = new StartToEndMapMatcher(TestNetworkProvider.getTestNetworkFromFile("/test-data/links.json"), CAR_FASTEST);
-        this.geometryFactory = GeometryConstants.WGS84_GEOMETRY_FACTORY;
+        this.startToEndMapMatcher = startToEndMapMatcherFactory.createMapMatcher(
+                TestNetworkProvider.getTestNetworkFromFile("/test-data/links.json"), CAR_FASTEST);
     }
 
     @SneakyThrows

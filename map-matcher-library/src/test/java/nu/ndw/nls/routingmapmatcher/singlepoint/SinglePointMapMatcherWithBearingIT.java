@@ -6,31 +6,41 @@ import static org.hamcrest.Matchers.is;
 
 import java.util.List;
 import lombok.SneakyThrows;
+import nu.ndw.nls.geometry.factories.GeometryFactoryWgs84;
+import nu.ndw.nls.routingmapmatcher.TestConfig;
 import nu.ndw.nls.routingmapmatcher.model.MatchStatus;
 import nu.ndw.nls.routingmapmatcher.model.singlepoint.BearingFilter;
 import nu.ndw.nls.routingmapmatcher.model.singlepoint.SinglePointLocation;
 import nu.ndw.nls.routingmapmatcher.model.singlepoint.SinglePointMatch;
 import nu.ndw.nls.routingmapmatcher.testutil.TestNetworkProvider;
-import nu.ndw.nls.routingmapmatcher.util.GeometryConstants;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.TestInstance.Lifecycle;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Point;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 @TestInstance(Lifecycle.PER_CLASS)
+@ExtendWith(SpringExtension.class)
+@ContextConfiguration(classes = {TestConfig.class})
 public class SinglePointMapMatcherWithBearingIT {
 
     private static final String LINKS_RESOURCE = "/test-data/links.json";
     private static final double SNAPPED_RELIABILITY = 58.5059250048517;
-    private static final Point SNAPPED_REQUEST_POINT = createPoint(5.424289, 52.177873);
     private static final double BEARING_RELIABILITY = 7.956622176353855;
+    @Autowired
+    private SinglePointMapMatcherFactory singlePointMapMatcherFactory;
+    @Autowired
+    private GeometryFactoryWgs84 geometryFactoryWgs84;
     private SinglePointMapMatcher singlePointMapMatcher;
 
     @SneakyThrows
     private void setupNetwork() {
-        singlePointMapMatcher = new SinglePointMapMatcher(
+        singlePointMapMatcher = singlePointMapMatcherFactory.createMapMatcher(
                 TestNetworkProvider.getTestNetworkFromFile(LINKS_RESOURCE), CAR_FASTEST);
     }
 
@@ -66,9 +76,10 @@ public class SinglePointMapMatcherWithBearingIT {
 
     @Test
     void match_ok_withBearingFilterAndSnappedPointAtEnd() {
+        Point startPoint = createPoint(5.424289, 52.177873);
         SinglePointLocation request = SinglePointLocation.builder()
                 .id(1)
-                .point(SNAPPED_REQUEST_POINT)
+                .point(startPoint)
                 .cutoffDistance(25.0)
                 .bearingFilter(new BearingFilter(160, 5))
                 .build();
@@ -97,7 +108,7 @@ public class SinglePointMapMatcherWithBearingIT {
                 .build()));
     }
 
-    private static Point createPoint(double x, double y) {
-        return GeometryConstants.WGS84_GEOMETRY_FACTORY.createPoint(new Coordinate(x, y));
+    private Point createPoint(double x, double y) {
+        return geometryFactoryWgs84.createPoint(new Coordinate(x, y));
     }
 }

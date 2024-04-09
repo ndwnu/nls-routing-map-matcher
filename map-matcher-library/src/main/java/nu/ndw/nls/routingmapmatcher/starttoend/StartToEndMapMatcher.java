@@ -24,6 +24,7 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import nu.ndw.nls.geometry.distance.FractionAndDistanceCalculator;
 import nu.ndw.nls.routingmapmatcher.domain.MapMatcher;
 import nu.ndw.nls.routingmapmatcher.model.MatchStatus;
 import nu.ndw.nls.routingmapmatcher.model.linestring.LineStringLocation;
@@ -41,18 +42,16 @@ public class StartToEndMapMatcher implements MapMatcher<LineStringLocation, Line
     private static final double MAXIMUM_CANDIDATE_DISTANCE_IN_METERS = 20.0;
 
     private final BaseGraph routingGraph;
-
     private final NetworkGraphHopper networkGraphHopper;
     private final LocationIndexTree locationIndexTree;
     private final RoutingAlgorithmFactory algorithmFactory;
     private final AlgorithmOptions algorithmOptions;
-
     private final LineStringMatchUtil lineStringMatchUtil;
     private final LineStringScoreUtil lineStringScoreUtil;
-
     private final Weighting weighting;
 
-    public StartToEndMapMatcher(NetworkGraphHopper networkGraphHopper, String profileName) {
+    public StartToEndMapMatcher(NetworkGraphHopper networkGraphHopper, String profileName,
+            FractionAndDistanceCalculator fractionAndDistanceCalculator) {
         this.networkGraphHopper = Preconditions.checkNotNull(networkGraphHopper);
         Profile profile = Preconditions.checkNotNull(networkGraphHopper.getProfile(profileName));
         this.routingGraph = networkGraphHopper.getBaseGraph();
@@ -61,8 +60,8 @@ public class StartToEndMapMatcher implements MapMatcher<LineStringLocation, Line
                 .setTraversalMode(TraversalMode.NODE_BASED);
         this.algorithmFactory = new RoutingAlgorithmFactorySimple();
         this.locationIndexTree = networkGraphHopper.getLocationIndex();
-        this.lineStringMatchUtil = new LineStringMatchUtil(networkGraphHopper, profile);
-        this.lineStringScoreUtil = new LineStringScoreUtil();
+        this.lineStringMatchUtil = new LineStringMatchUtil(networkGraphHopper, profile, fractionAndDistanceCalculator);
+        this.lineStringScoreUtil = new LineStringScoreUtil(fractionAndDistanceCalculator);
         this.weighting = networkGraphHopper.createWeighting(profile, new PMap());
     }
 

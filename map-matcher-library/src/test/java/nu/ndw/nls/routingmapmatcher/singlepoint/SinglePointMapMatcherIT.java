@@ -14,6 +14,8 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 import lombok.SneakyThrows;
+import nu.ndw.nls.geometry.factories.GeometryFactoryWgs84;
+import nu.ndw.nls.routingmapmatcher.TestConfig;
 import nu.ndw.nls.routingmapmatcher.model.IsochroneUnit;
 import nu.ndw.nls.routingmapmatcher.model.MatchStatus;
 import nu.ndw.nls.routingmapmatcher.model.singlepoint.BearingFilter;
@@ -21,28 +23,37 @@ import nu.ndw.nls.routingmapmatcher.model.singlepoint.SinglePointLocation;
 import nu.ndw.nls.routingmapmatcher.model.singlepoint.SinglePointMatch;
 import nu.ndw.nls.routingmapmatcher.model.singlepoint.SinglePointMatch.CandidateMatch;
 import nu.ndw.nls.routingmapmatcher.testutil.TestNetworkProvider;
-import nu.ndw.nls.routingmapmatcher.util.GeometryConstants;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvFileSource;
 import org.locationtech.jts.geom.Coordinate;
-import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.Point;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 
+@ExtendWith(SpringExtension.class)
+@ContextConfiguration(classes = {TestConfig.class})
 public class SinglePointMapMatcherIT {
 
     private static final String LINKS_RESOURCE = "/test-data/links.json";
     private static final String SHIVI_LINKS_RESOURCE = "/test-data/shivi-verkeersbanen.json";
     private static final int ID = 123;
     private static final double DISTANCE_ROUNDING_ERROR = 0.1;
+    @Autowired
+    private SinglePointMapMatcherFactory singlePointMapMatcherFactory;
+    @Autowired
+    private GeometryFactoryWgs84 geometryFactory;
 
     private SinglePointMapMatcher singlePointMapMatcher;
-    private GeometryFactory geometryFactory;
+
 
     @SneakyThrows
     private void setupNetwork(String resource) {
-        singlePointMapMatcher = new SinglePointMapMatcher(TestNetworkProvider.getTestNetworkFromFile(resource), CAR_FASTEST);
-        geometryFactory = GeometryConstants.WGS84_GEOMETRY_FACTORY;
+        singlePointMapMatcher = singlePointMapMatcherFactory.createMapMatcher(
+                TestNetworkProvider.getTestNetworkFromFile(resource), CAR_FASTEST);
+
     }
 
     @SneakyThrows

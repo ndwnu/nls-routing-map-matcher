@@ -6,6 +6,7 @@ import com.graphhopper.util.PointList;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import nu.ndw.nls.geometry.distance.FractionAndDistanceCalculator;
 import nu.ndw.nls.routingmapmatcher.model.linestring.LineStringLocation;
 import nu.ndw.nls.routingmapmatcher.model.linestring.ReliabilityCalculationType;
 import org.locationtech.jts.geom.CoordinateSequence;
@@ -20,6 +21,11 @@ public class LineStringScoreUtil {
     private static final double PATH_LENGTH_DIFFERENCE_PENALTY_FACTOR = 0.1;
 
     private final DistanceCalcCustom distanceCalc = new DistanceCalcCustom();
+    private final FractionAndDistanceCalculator fractionAndDistanceCalculator;
+
+    public LineStringScoreUtil(FractionAndDistanceCalculator fractionAndDistanceCalculator) {
+        this.fractionAndDistanceCalculator = fractionAndDistanceCalculator;
+    }
 
     public double calculateCandidatePathScore(Path path, LineStringLocation lineStringLocation) {
         if (ReliabilityCalculationType.POINT_OBSERVATIONS == lineStringLocation.getReliabilityCalculationType()) {
@@ -61,7 +67,7 @@ public class LineStringScoreUtil {
                 originalGeometry);
 
         double lengthInMeters = originalDistance != null ? originalDistance
-                : FractionAndDistanceCalculator.calculateLengthInMeters(originalGeometry);
+                : fractionAndDistanceCalculator.calculateLengthInMeters(originalGeometry);
         double pathDistanceLengthDifferenceInMeters = Math.abs(pathDistance - lengthInMeters);
 
         return Math.max(MIN_RELIABILITY_SCORE, MAX_RELIABILITY_SCORE

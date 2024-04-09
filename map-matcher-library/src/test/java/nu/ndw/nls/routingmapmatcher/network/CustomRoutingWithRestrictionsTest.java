@@ -14,8 +14,8 @@ import com.graphhopper.util.EdgeIteratorState;
 import com.graphhopper.util.shapes.GHPoint;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
+import nu.ndw.nls.geometry.factories.GeometryFactoryWgs84;
 import nu.ndw.nls.routingmapmatcher.testutil.TestNetworkProvider.TestLink;
-import nu.ndw.nls.routingmapmatcher.util.GeometryConstants;
 import org.junit.jupiter.api.Test;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.LineString;
@@ -126,7 +126,7 @@ public class CustomRoutingWithRestrictionsTest {
     }
 
     private static LineString createLineStringWktReader(Coordinate... coordinates) {
-        return new LineString(new CoordinateArraySequence(coordinates), GeometryConstants.WGS84_GEOMETRY_FACTORY);
+        return new LineString(new CoordinateArraySequence(coordinates), new GeometryFactoryWgs84());
     }
 
 }

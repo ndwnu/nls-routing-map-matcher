@@ -20,6 +20,7 @@ import com.graphhopper.util.PathSimplification;
 import com.graphhopper.util.PointList;
 import com.graphhopper.util.RamerDouglasPeucker;
 import java.util.List;
+import nu.ndw.nls.geometry.distance.FractionAndDistanceCalculator;
 import nu.ndw.nls.routingmapmatcher.exception.RoutingMapMatcherException;
 import nu.ndw.nls.routingmapmatcher.isochrone.IsochroneService;
 import nu.ndw.nls.routingmapmatcher.isochrone.algorithm.ShortestPathTreeFactory;
@@ -43,26 +44,29 @@ public class LineStringMatchUtil {
     private final EncodingManager encodingManager;
     private final IsochroneService isochroneService;
     private final PointListUtil pointListUtil;
-
     private final MatchedLinkMapper matchedLinkMapper = new MatchedLinkMapper();
+    private final FractionAndDistanceCalculator fractionAndDistanceCalculator;
 
     private LineStringMatchUtil(LocationIndexTree locationIndexTree, BaseGraph baseGraph,
-            EncodingManager encodingManager, Profile profile) {
+            EncodingManager encodingManager, Profile profile,
+            FractionAndDistanceCalculator fractionAndDistanceCalculator) {
         this.encodingManager = encodingManager;
+        this.fractionAndDistanceCalculator = fractionAndDistanceCalculator;
         BooleanEncodedValue accessEnc = encodingManager.getBooleanEncodedValue(VehicleAccess.key(profile.getVehicle()));
         DecimalEncodedValue speedEnc = encodingManager.getDecimalEncodedValue(VehicleSpeed.key(profile.getVehicle()));
         Weighting weighting = new ShortestWeighting(accessEnc, speedEnc);
         EdgeIteratorStateReverseExtractor edgeIteratorStateReverseExtractor = new EdgeIteratorStateReverseExtractor();
         this.pointListUtil = new PointListUtil();
         IsochroneMatchMapper isochroneMatchMapper = new IsochroneMatchMapper(encodingManager,
-                edgeIteratorStateReverseExtractor, pointListUtil);
+                edgeIteratorStateReverseExtractor, pointListUtil,fractionAndDistanceCalculator);
         this.isochroneService = new IsochroneService(encodingManager, baseGraph, edgeIteratorStateReverseExtractor,
                 isochroneMatchMapper, new ShortestPathTreeFactory(weighting), locationIndexTree, profile);
     }
 
-    public LineStringMatchUtil(NetworkGraphHopper networkGraphHopper, Profile profile) {
+    public LineStringMatchUtil(NetworkGraphHopper networkGraphHopper, Profile profile,
+            FractionAndDistanceCalculator fractionAndDistanceCalculator) {
         this(networkGraphHopper.getLocationIndex(), networkGraphHopper.getBaseGraph(),
-                networkGraphHopper.getEncodingManager(), profile);
+                networkGraphHopper.getEncodingManager(), profile, fractionAndDistanceCalculator);
     }
 
     public LineStringMatch createMatch(LineStringLocation lineStringLocation, Path path, QueryGraph queryGraph,
@@ -75,8 +79,10 @@ public class LineStringMatchUtil {
         EdgeIteratorState startEdge = edges.get(0);
         EdgeIteratorState endEdge = edges.get(edges.size() - 1);
 
-        double startLinkFraction = PathUtil.determineStartLinkFraction(startEdge, queryGraph);
-        double endLinkFraction = PathUtil.determineEndLinkFraction(endEdge, queryGraph);
+        double startLinkFraction = PathUtil.determineStartLinkFraction(startEdge, queryGraph,
+                fractionAndDistanceCalculator);
+        double endLinkFraction = PathUtil.determineEndLinkFraction(endEdge, queryGraph,
+                fractionAndDistanceCalculator);
 
         List<MatchedLink> matchedLinks = matchedLinkMapper.map(
                 PathUtil.determineMatchedLinks(encodingManager, edges), startLinkFraction, endLinkFraction);
