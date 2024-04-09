@@ -11,6 +11,7 @@ import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import nu.ndw.nls.geometry.bearing.BearingCalculator;
+import nu.ndw.nls.geometry.constants.SRID;
 import nu.ndw.nls.geometry.distance.FractionAndDistanceCalculator;
 import nu.ndw.nls.routingmapmatcher.model.EdgeIteratorTravelDirection;
 import nu.ndw.nls.routingmapmatcher.model.MatchedQueryResult;
@@ -102,7 +103,7 @@ public class PointMatchingService {
         for (int i = 1; i < coordinates.length; i++) {
             Coordinate currentCoordinate = coordinates[i - 1];
             Coordinate nextCoordinate = coordinates[i];
-            double convertedBearing = bearingCalculator.calculateBearing(currentCoordinate, nextCoordinate, null);
+            double convertedBearing = bearingCalculator.calculateBearing(currentCoordinate, nextCoordinate, SRID.WGS84);
             // While bearing is in range, add coordinates to partialGeometry
             if (bearingCalculator.bearingIsInRange(convertedBearing, toGeometryFilter(bearingFilter))) {
                 if (partialGeometry.isEmpty()) {
@@ -170,7 +171,7 @@ public class PointMatchingService {
 
         return new ProjectionResult(
                 DIST_PLANE.calcDist(r.y, r.x, projection.lat, projection.lon),
-                bearingCalculator.calculateBearing(a, b,null),
+                bearingCalculator.calculateBearing(a, b,SRID.WGS84),
                 new Coordinate(projection.lon, projection.lat)
         );
     }
