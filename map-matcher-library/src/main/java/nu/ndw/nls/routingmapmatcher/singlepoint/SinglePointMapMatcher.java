@@ -2,21 +2,14 @@ package nu.ndw.nls.routingmapmatcher.singlepoint;
 
 import static nu.ndw.nls.routingmapmatcher.model.singlepoint.MatchFilter.ALL;
 import static nu.ndw.nls.routingmapmatcher.network.model.Link.WAY_ID_KEY;
-import static nu.ndw.nls.routingmapmatcher.util.GeometryConstants.RD_NEW_GEOMETRY_FACTORY;
-import static nu.ndw.nls.routingmapmatcher.util.GeometryConstants.WGS84_GEOMETRY_FACTORY;
 import static nu.ndw.nls.routingmapmatcher.util.MatchUtil.getQueryResults;
 import static nu.ndw.nls.routingmapmatcher.util.PathUtil.determineEdgeDirection;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 import com.graphhopper.config.Profile;
-import com.graphhopper.routing.ev.BooleanEncodedValue;
-import com.graphhopper.routing.ev.DecimalEncodedValue;
-import com.graphhopper.routing.ev.VehicleAccess;
-import com.graphhopper.routing.ev.VehicleSpeed;
 import com.graphhopper.routing.util.EncodingManager;
 import com.graphhopper.routing.util.FiniteWeightFilter;
-import com.graphhopper.routing.weighting.ShortestWeighting;
 import com.graphhopper.routing.weighting.Weighting;
 import com.graphhopper.storage.BaseGraph;
 import com.graphhopper.storage.EdgeIteratorStateReverseExtractor;
@@ -26,6 +19,11 @@ import com.graphhopper.util.EdgeIteratorState;
 import com.graphhopper.util.FetchMode;
 import com.graphhopper.util.PMap;
 import java.util.List;
+import nu.ndw.nls.geometry.bearing.BearingCalculator;
+import nu.ndw.nls.geometry.crs.CrsTransformer;
+import nu.ndw.nls.geometry.distance.FractionAndDistanceCalculator;
+import nu.ndw.nls.geometry.factories.GeometryFactoryWgs84;
+import nu.ndw.nls.geometry.mappers.DiameterToPolygonMapper;
 import nu.ndw.nls.routingmapmatcher.domain.MapMatcher;
 import nu.ndw.nls.routingmapmatcher.isochrone.IsochroneService;
 import nu.ndw.nls.routingmapmatcher.isochrone.algorithm.ShortestPathTreeFactory;
@@ -39,22 +37,16 @@ import nu.ndw.nls.routingmapmatcher.model.singlepoint.SinglePointLocation;
 import nu.ndw.nls.routingmapmatcher.model.singlepoint.SinglePointMatch;
 import nu.ndw.nls.routingmapmatcher.model.singlepoint.SinglePointMatch.CandidateMatch;
 import nu.ndw.nls.routingmapmatcher.network.NetworkGraphHopper;
-import nu.ndw.nls.routingmapmatcher.util.BearingCalculator;
-import nu.ndw.nls.routingmapmatcher.util.CrsTransformer;
 import nu.ndw.nls.routingmapmatcher.util.PointListUtil;
 import org.geotools.referencing.GeodeticCalculator;
-import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.LineString;
 import org.locationtech.jts.geom.Point;
 import org.locationtech.jts.geom.Polygon;
-import org.locationtech.jts.util.GeometricShapeFactory;
 
 public class SinglePointMapMatcher implements MapMatcher<SinglePointLocation, SinglePointMatch> {
 
     private static final int RADIUS_TO_DIAMETER = 2;
-
-    private static final int NUM_POINTS = 100;
     private static final double DISTANCE_THRESHOLD = 0.1;
     private static final double RELIABILITY_THRESHOLD = 0.5;
 
@@ -62,13 +54,24 @@ public class SinglePointMapMatcher implements MapMatcher<SinglePointLocation, Si
     private final IsochroneService isochroneService;
     private final PointMatchingService pointMatchingService;
     private final CrsTransformer crsTransformer;
-
+    private final DiameterToPolygonMapper diameterToPolygonMapper;
+    private final BearingCalculator bearingCalculator;
+    private final GeometryFactoryWgs84 geometryFactoryWgs84;
+    private final FractionAndDistanceCalculator fractionAndDistanceCalculator;
     private final EdgeIteratorStateReverseExtractor edgeIteratorStateReverseExtractor;
     private final NetworkGraphHopper network;
     private final Profile profile;
     private final PointListUtil pointListUtil;
 
-    public SinglePointMapMatcher(NetworkGraphHopper network, String profileName) {
+    public SinglePointMapMatcher(CrsTransformer crsTransformer, DiameterToPolygonMapper diameterToPolygonMapper,
+            BearingCalculator bearingCalculator, GeometryFactoryWgs84 geometryFactoryWgs84,
+            FractionAndDistanceCalculator fractionAndDistanceCalculator, NetworkGraphHopper network,
+            String profileName) {
+        this.crsTransformer = crsTransformer;
+        this.diameterToPolygonMapper = diameterToPolygonMapper;
+        this.bearingCalculator = bearingCalculator;
+        this.geometryFactoryWgs84 = geometryFactoryWgs84;
+        this.fractionAndDistanceCalculator = fractionAndDistanceCalculator;
         this.network = Preconditions.checkNotNull(network);
         this.profile = Preconditions.checkNotNull(network.getProfile(profileName));
         this.locationIndexTree = network.getLocationIndex();
@@ -79,11 +82,11 @@ public class SinglePointMapMatcher implements MapMatcher<SinglePointLocation, Si
         this.edgeIteratorStateReverseExtractor = new EdgeIteratorStateReverseExtractor();
         this.pointListUtil = new PointListUtil();
         this.isochroneService = new IsochroneService(encodingManager, baseGraph, edgeIteratorStateReverseExtractor,
-                new IsochroneMatchMapper(encodingManager, edgeIteratorStateReverseExtractor, pointListUtil),
+                new IsochroneMatchMapper(encodingManager, edgeIteratorStateReverseExtractor, pointListUtil,fractionAndDistanceCalculator),
                 new ShortestPathTreeFactory(weighting), this.locationIndexTree, profile);
-        BearingCalculator bearingCalculator = new BearingCalculator(geodeticCalculator);
-        this.pointMatchingService = new PointMatchingService(WGS84_GEOMETRY_FACTORY, bearingCalculator);
-        this.crsTransformer = new CrsTransformer();
+        this.pointMatchingService = new PointMatchingService(geometryFactoryWgs84, bearingCalculator,
+                fractionAndDistanceCalculator);
+
     }
 
     public SinglePointMatch match(SinglePointLocation singlePointLocation) {
@@ -93,7 +96,7 @@ public class SinglePointMapMatcher implements MapMatcher<SinglePointLocation, Si
         double inputRadius = singlePointLocation.getCutoffDistance();
         List<Snap> queryResults = getQueryResults(network, inputPoint, inputRadius, locationIndexTree,
                 new FiniteWeightFilter(matchWeighting));
-        Polygon circle = createCircle(inputPoint, RADIUS_TO_DIAMETER * inputRadius);
+        Polygon circle = diameterToPolygonMapper.mapToPolygonWgs84(inputPoint, RADIUS_TO_DIAMETER * inputRadius);
         List<MatchedPoint> matches = getMatchedPoints(singlePointLocation, queryResults, circle);
         if (matches.isEmpty()) {
             return createFailedMatch(singlePointLocation);
@@ -171,17 +174,6 @@ public class SinglePointMapMatcher implements MapMatcher<SinglePointLocation, Si
     private boolean intersects(Polygon circle, EdgeIteratorState edge) {
         LineString wayGeometry = pointListUtil.toLineString(edge.fetchWayGeometry(FetchMode.ALL));
         return circle.intersects(wayGeometry);
-    }
-
-    private Polygon createCircle(Point pointWgs84, double diameterInMeters) {
-        var shapeFactory = new GeometricShapeFactory(RD_NEW_GEOMETRY_FACTORY);
-        Point pointRd = (Point) crsTransformer.transformFromWgs84ToRdNew(pointWgs84);
-        shapeFactory.setCentre(new Coordinate(pointRd.getX(), pointRd.getY()));
-        shapeFactory.setNumPoints(NUM_POINTS);
-        shapeFactory.setWidth(diameterInMeters);
-        shapeFactory.setHeight(diameterInMeters);
-        Polygon ellipseRd = shapeFactory.createEllipse();
-        return (Polygon) crsTransformer.transformFromRdNewToWgs84(ellipseRd);
     }
 
     private List<MatchedPoint> calculateMatches(EdgeIteratorState edge, Polygon circle,

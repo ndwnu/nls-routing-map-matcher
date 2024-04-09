@@ -3,24 +3,27 @@ package nu.ndw.nls.routingmapmatcher.singlepoint;
 import static java.util.Comparator.comparing;
 import static org.assertj.core.api.Assertions.assertThat;
 
+import nu.ndw.nls.geometry.bearing.BearingCalculator;
+import nu.ndw.nls.geometry.distance.FractionAndDistanceCalculator;
+import nu.ndw.nls.geometry.factories.GeometryFactoryWgs84;
+import nu.ndw.nls.routingmapmatcher.TestConfig;
 import nu.ndw.nls.routingmapmatcher.model.EdgeIteratorTravelDirection;
 import nu.ndw.nls.routingmapmatcher.model.MatchedQueryResult;
 import nu.ndw.nls.routingmapmatcher.model.singlepoint.BearingFilter;
 import nu.ndw.nls.routingmapmatcher.model.singlepoint.MatchedPoint;
-import nu.ndw.nls.routingmapmatcher.util.BearingCalculator;
-import nu.ndw.nls.routingmapmatcher.util.GeometryConstants;
-import org.geotools.referencing.GeodeticCalculator;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.locationtech.jts.geom.Coordinate;
-import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.LineString;
 import org.locationtech.jts.geom.Point;
-import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 
-@ExtendWith(MockitoExtension.class)
-class PointMatchingServiceTest {
+@ExtendWith(SpringExtension.class)
+@ContextConfiguration(classes = {TestConfig.class})
+class PointMatchingServiceIT {
 
     private static final int ID = 1;
     private static final double SNAPPED_POINT_X = 5.426784436725146;
@@ -56,8 +59,12 @@ class PointMatchingServiceTest {
     private static final Coordinate ZIG_ZAG_COORDINATE_11 = new Coordinate(5.42670342, 52.17673579);
     private static final Coordinate ZIG_ZAG_COORDINATE_12 = new Coordinate(5.42669635, 52.17673473);
     private static final Coordinate ZIG_ZAG_COORDINATE_13 = new Coordinate(5.42665413, 52.17673958);
-
-    private final GeometryFactory geometryFactory = GeometryConstants.WGS84_GEOMETRY_FACTORY;
+    @Autowired
+    private GeometryFactoryWgs84 geometryFactoryWgs84;
+    @Autowired
+    private BearingCalculator bearingCalculator;
+    @Autowired
+    private FractionAndDistanceCalculator fractionAndDistanceCalculator;
 
     private Point inputPoint;
 
@@ -67,15 +74,15 @@ class PointMatchingServiceTest {
 
     @BeforeEach
     void setup() {
-        GeodeticCalculator geodeticCalculator = new GeodeticCalculator();
-        pointMatchingService = new PointMatchingService(geometryFactory, new BearingCalculator(geodeticCalculator));
+        pointMatchingService = new PointMatchingService(geometryFactoryWgs84, bearingCalculator,
+                fractionAndDistanceCalculator);
     }
 
     @Test
     void calculateMatches_with_no_bearing_should_produce_one_match() {
         LineString originalGeometry = createOriginalGeometryForStraightLine();
         createCutOffGeometryForStraightLine();
-        inputPoint = geometryFactory.createPoint(INPUT_POINT_COORDINATE);
+        inputPoint = geometryFactoryWgs84.createPoint(INPUT_POINT_COORDINATE);
         var request = MatchedQueryResult
                 .builder()
                 .matchedLinkId(ID)
@@ -101,7 +108,7 @@ class PointMatchingServiceTest {
     void calculateMatches_with_no_bearing_and_both_directions_should_produce_two_matches() {
         LineString originalGeometry = createOriginalGeometryForStraightLine();
         createCutOffGeometryForStraightLine();
-        inputPoint = geometryFactory.createPoint(INPUT_POINT_COORDINATE);
+        inputPoint = geometryFactoryWgs84.createPoint(INPUT_POINT_COORDINATE);
         var request = MatchedQueryResult
                 .builder()
                 .matchedLinkId(ID)
@@ -135,7 +142,7 @@ class PointMatchingServiceTest {
     void calculateMatches_with_matching_bearing_should_produce_one_match() {
         LineString originalGeometry = createOriginalGeometryForStraightLine();
         createCutOffGeometryForStraightLine();
-        inputPoint = geometryFactory.createPoint(INPUT_POINT_COORDINATE);
+        inputPoint = geometryFactoryWgs84.createPoint(INPUT_POINT_COORDINATE);
         var request = MatchedQueryResult
                 .builder()
                 .matchedLinkId(ID)
@@ -161,7 +168,7 @@ class PointMatchingServiceTest {
     @Test
     void calculateMatches_with_no_matching_bearing_should_produce_no_match() {
         createCutOffGeometryForStraightLine();
-        inputPoint = geometryFactory.createPoint(INPUT_POINT_COORDINATE);
+        inputPoint = geometryFactoryWgs84.createPoint(INPUT_POINT_COORDINATE);
         var request = MatchedQueryResult
                 .builder()
                 .matchedLinkId(ID)
@@ -179,7 +186,7 @@ class PointMatchingServiceTest {
     void calculateMatches_with_zig_zag_line_should_produce_three_matches() {
         createCutOffGeometryForZigzagLine();
         LineString originalGeometry = createOriginalGeometryForZigZagLine();
-        inputPoint = geometryFactory.createPoint(INPUT_POINT_COORDINATE);
+        inputPoint = geometryFactoryWgs84.createPoint(INPUT_POINT_COORDINATE);
         var request = MatchedQueryResult
                 .builder()
                 .matchedLinkId(ID)
@@ -218,7 +225,7 @@ class PointMatchingServiceTest {
                 ZIG_ZAG_COORDINATE_11,
                 ZIG_ZAG_COORDINATE_12
         };
-        cutoffGeometry = geometryFactory.createLineString(cutoffCoordinates);
+        cutoffGeometry = geometryFactoryWgs84.createLineString(cutoffCoordinates);
     }
 
     private LineString createOriginalGeometryForZigZagLine() {
@@ -236,7 +243,7 @@ class PointMatchingServiceTest {
                 ZIG_ZAG_COORDINATE_11,
                 ZIG_ZAG_COORDINATE_13
         };
-        return geometryFactory.createLineString(originalCoordinates);
+        return geometryFactoryWgs84.createLineString(originalCoordinates);
     }
 
     private void createCutOffGeometryForStraightLine() {
@@ -244,7 +251,7 @@ class PointMatchingServiceTest {
                 CUTOFF_COORDINATE_1,
                 CUTOFF_COORDINATE_2,
                 CUTOFF_COORDINATE_3};
-        cutoffGeometry = geometryFactory.createLineString(cutoffCoordinates);
+        cutoffGeometry = geometryFactoryWgs84.createLineString(cutoffCoordinates);
     }
 
     private LineString createOriginalGeometryForStraightLine() {
@@ -252,6 +259,6 @@ class PointMatchingServiceTest {
                 ORIGINAL_COORDINATE_1,
                 ORIGINAL_COORDINATE_2,
                 ORIGINAL_COORDINATE_3};
-        return geometryFactory.createLineString(originalCoordinates);
+        return geometryFactoryWgs84.createLineString(originalCoordinates);
     }
 }

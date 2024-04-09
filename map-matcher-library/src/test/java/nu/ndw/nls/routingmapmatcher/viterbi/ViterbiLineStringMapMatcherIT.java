@@ -9,32 +9,41 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import java.nio.charset.StandardCharsets;
 import java.util.Objects;
 import lombok.SneakyThrows;
+import nu.ndw.nls.geometry.factories.GeometryFactoryWgs84;
+import nu.ndw.nls.routingmapmatcher.TestConfig;
 import nu.ndw.nls.routingmapmatcher.model.MatchStatus;
 import nu.ndw.nls.routingmapmatcher.model.linestring.LineStringLocation;
 import nu.ndw.nls.routingmapmatcher.model.linestring.LineStringMatch;
 import nu.ndw.nls.routingmapmatcher.model.linestring.MatchedLink;
 import nu.ndw.nls.routingmapmatcher.testutil.TestNetworkProvider;
-import nu.ndw.nls.routingmapmatcher.util.GeometryConstants;
 import org.apache.commons.io.IOUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.locationtech.jts.geom.Coordinate;
-import org.locationtech.jts.geom.GeometryFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 
+@ExtendWith(SpringExtension.class)
+@ContextConfiguration(classes = {TestConfig.class})
 class ViterbiLineStringMapMatcherIT {
 
     private static final int END_FRACTION_1 = 1;
     private static final int START_FRACTION_0 = 0;
-    
+    @Autowired
+    private ViterbiLinestringMapMatcherFactory viterbiLinestringMapMatcherFactory;
+    @Autowired
+    private GeometryFactoryWgs84 geometryFactory;
     private ViterbiLineStringMapMatcher viterbiLineStringMapMatcher;
     private final ObjectMapper mapper = OBJECT_MAPPER;
-    private GeometryFactory geometryFactory;
+
 
     @SneakyThrows
     @BeforeEach
     void setup() {
-        viterbiLineStringMapMatcher = new ViterbiLineStringMapMatcher(TestNetworkProvider.getTestNetworkFromFile("/test-data/links.json"), CAR_FASTEST);
-        geometryFactory = GeometryConstants.WGS84_GEOMETRY_FACTORY;
+        viterbiLineStringMapMatcher = viterbiLinestringMapMatcherFactory.createMapMatcher(
+                TestNetworkProvider.getTestNetworkFromFile("/test-data/links.json"), CAR_FASTEST);
     }
 
     @SneakyThrows

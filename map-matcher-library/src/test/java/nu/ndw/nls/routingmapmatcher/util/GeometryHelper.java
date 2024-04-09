@@ -1,6 +1,7 @@
 package nu.ndw.nls.routingmapmatcher.util;
 
 import java.io.IOException;
+import nu.ndw.nls.geometry.factories.GeometryFactoryWgs84;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.LineString;
 import org.locationtech.jts.geom.Point;
@@ -9,7 +10,7 @@ import org.locationtech.jts.io.WKBReader;
 
 public class GeometryHelper {
 
-    private final WKBReader wkbReader = new WKBReader(GeometryConstants.WGS84_GEOMETRY_FACTORY);
+    private final WKBReader wkbReader = new WKBReader(new GeometryFactoryWgs84());
 
     public synchronized LineString convertToLinestring(byte[] geometryWkb) throws IOException {
         try {

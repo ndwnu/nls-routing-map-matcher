@@ -49,7 +49,7 @@ public class IsochroneService {
      * geometries with start and end fractions.
      *
      * @param startPoint The start point from which to start the isochrone search
-     * @param reversed   Boolean indicating reversed direction of travelling with respect to the original geometry
+     * @param reversed   Boolean indicating a reversed direction of travelling with respect to the original geometry
      * @param location   Base location containing isochrone specifications
      * @return A list of isochrone matches with the geometries cropped to the max distance. The geometry is aligned in
      * the direction of travelling. Start and en fraction are with respect to this alignment (positive negative)
@@ -65,7 +65,7 @@ public class IsochroneService {
      * geometries with start and end fractions.
      *
      * @param startPoint The start point from which to start the isochrone search
-     * @param reversed   Boolean indicating reversed direction of travelling with respect to the original geometry
+     * @param reversed   Boolean indicating a reversed direction of travelling with respect to the original geometry
      * @param location   Base location containing isochrone specifications
      * @return A list of isochrone matches with the geometries cropped to the max distance. The geometry is aligned in
      * the direction of travelling. Start and en fraction are with respect to this alignment (positive negative)
@@ -84,7 +84,7 @@ public class IsochroneService {
         Snap startSegment = locationIndexTree.findClosest(latitude, longitude,
                 edge -> edge.get(encodingManager.getIntEncodedValue(WAY_ID_KEY)) == matchedLinkId);
 
-        // Lookup will create virtual edges based on the snapped point, thereby cutting the segment in 2 line strings.
+        // Lookup will create virtual edges based on the snapped point, thereby cutting the segment in 2-line strings.
         // It also sets the closestNode of the matchedQueryResult to the virtual node ID. In this way, it creates a
         // start point for isochrone calculation based on the snapped point coordinates.
         QueryGraph queryGraph = QueryGraph.create(baseGraph, startSegment);
@@ -106,7 +106,7 @@ public class IsochroneService {
                 .sorted(comparing(IsoLabel::getDistance))
                 .map(isoLabel -> {
                     // Specify the maximum distance on which to crop the geometries.
-                    // In case of seconds, convert to meters based on the average speed of the iso label.
+                    // In the case of seconds, convert to meters based on the average speed of the iso label.
                     double maxDistance = IsochroneUnit.METERS == isochroneUnit ? isochroneValue
                             : calculateMaxDistance(queryGraph, isochroneValue, isoLabel, searchDirectionReversed);
                     return isochroneMatchMapper.mapToIsochroneMatch(isoLabel, maxDistance, queryGraph, startEdge);
@@ -116,7 +116,7 @@ public class IsochroneService {
 
     /**
      * This method calculates the max distance based on the time it takes to traverse an entire branch of road sections.
-     * It takes the encoded average speed of the road section. Used for time based isochrone searches.
+     * It takes the encoded average speed of the road section. Used for time-based isochrone searches.
      *
      * @param queryGraph           the query graph to get the average speed from the edge
      * @param maximumTimeInSeconds the maximum time in seconds

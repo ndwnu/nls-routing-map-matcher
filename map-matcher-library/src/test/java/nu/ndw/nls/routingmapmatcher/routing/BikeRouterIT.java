@@ -9,27 +9,38 @@ import java.util.List;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.SneakyThrows;
+import nu.ndw.nls.geometry.factories.GeometryFactoryRijksdriehoek;
+import nu.ndw.nls.geometry.factories.GeometryFactoryWgs84;
+import nu.ndw.nls.routingmapmatcher.TestConfig;
 import nu.ndw.nls.routingmapmatcher.exception.RoutingRequestException;
-import nu.ndw.nls.routingmapmatcher.mappers.MatchedLinkMapper;
 import nu.ndw.nls.routingmapmatcher.model.routing.RoutingRequest;
 import nu.ndw.nls.routingmapmatcher.network.annotations.EncodedValue;
 import nu.ndw.nls.routingmapmatcher.network.model.DirectionalDto;
 import nu.ndw.nls.routingmapmatcher.network.model.Link;
 import nu.ndw.nls.routingmapmatcher.network.model.LinkVehicleMapper;
 import nu.ndw.nls.routingmapmatcher.network.model.RoutingNetworkSettings;
-import nu.ndw.nls.routingmapmatcher.util.GeometryConstants;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.locationtech.jts.geom.Coordinate;
-import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.LineString;
 import org.locationtech.jts.geom.Point;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 
+@ExtendWith(SpringExtension.class)
+@ContextConfiguration(classes = {TestConfig.class})
 class BikeRouterIT {
 
     private static final Profile BIKE_PROFILE = new Profile("bike").setVehicle("bike");
-
+    @Autowired
+    private RouterFactory routerFactory;
+    @Autowired
+    private GeometryFactoryRijksdriehoek geometryFactoryRijksdriehoek;
+    @Autowired
+    private GeometryFactoryWgs84 geometryFactoryWgs84;
     private Router router;
-    private GeometryFactory geometryFactory;
+
 
     @Getter
     public static class BikeLink extends Link {
@@ -95,13 +106,14 @@ class BikeRouterIT {
     }
 
     private Point create1DPoint(double x) {
-        return geometryFactory.createPoint(new Coordinate(x, 0));
+        return geometryFactoryRijksdriehoek.createPoint(new Coordinate(x, 0));
     }
 
     private BikeLink createBikeLink(long index, long from, long to, Boolean bicycleAccessible) {
 
-        LineString lineString = geometryFactory.createLineString(new Coordinate[]{create1DPoint(from).getCoordinate(),
-                create1DPoint(to).getCoordinate()});
+        LineString lineString = geometryFactoryRijksdriehoek.createLineString(
+                new Coordinate[]{create1DPoint(from).getCoordinate(),
+                        create1DPoint(to).getCoordinate()});
 
         return BikeLink.bikeLinkBuilder()
                 .id(index)
@@ -120,7 +132,8 @@ class BikeRouterIT {
 
         List<LinkVehicleMapper<? extends Link>> vehicles = List.of(new BikeLinkBikeMapper(), new BikeLinkCarMapper());
 
-        geometryFactory = GeometryConstants.RD_NEW_GEOMETRY_FACTORY;
+        geometryFactoryRijksdriehoek = new GeometryFactoryRijksdriehoek();
+        GeometryFactoryWgs84 geometryFactoryWgs84 = new GeometryFactoryWgs84();
 
         List<BikeLink> links = List.of(
                 createBikeLink(1, 0, 10, true),
@@ -134,7 +147,8 @@ class BikeRouterIT {
                 .linkSupplier(links::iterator)
                 .build();
 
-        router = new Router(getNetworkService(vehicles).inMemory(routingNetworkSettings), new MatchedLinkMapper());
+        router = routerFactory.createMapMatcher(getNetworkService(vehicles).inMemory(routingNetworkSettings),
+                BIKE_PROFILE.getName());
     }
 
     @Test
@@ -145,7 +159,6 @@ class BikeRouterIT {
                 .routingProfile("bike")
                 .wayPoints(List.of(create1DPoint(1), create1DPoint(28)))
                 .build());
-
 
         assertEquals(1, result.getLegs().size());
         assertEquals(3, result.getLegs().get(0).getMatchedLinks().size());

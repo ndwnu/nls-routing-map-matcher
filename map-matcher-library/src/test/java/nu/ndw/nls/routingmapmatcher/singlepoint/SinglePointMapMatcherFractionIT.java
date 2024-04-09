@@ -11,30 +11,39 @@ import java.util.List;
 import java.util.Optional;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
+import nu.ndw.nls.geometry.factories.GeometryFactoryWgs84;
+import nu.ndw.nls.routingmapmatcher.TestConfig;
 import nu.ndw.nls.routingmapmatcher.model.singlepoint.SinglePointLocation;
 import nu.ndw.nls.routingmapmatcher.model.singlepoint.SinglePointMatch;
 import nu.ndw.nls.routingmapmatcher.model.singlepoint.SinglePointMatch.CandidateMatch;
 import nu.ndw.nls.routingmapmatcher.testutil.TestNetworkProvider.TestLink;
-import nu.ndw.nls.routingmapmatcher.util.GeometryConstants;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.locationtech.jts.geom.Coordinate;
-import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.LineString;
 import org.locationtech.jts.geom.Point;
 import org.locationtech.jts.io.WKTReader;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 @Slf4j
+@ExtendWith(SpringExtension.class)
+@ContextConfiguration(classes = {TestConfig.class})
 class SinglePointMapMatcherFractionIT {
 
-    private GeometryFactory geometryFactory;
+    @Autowired
+    private SinglePointMapMatcherFactory singlePointMapMatcherFactory;
+    @Autowired
+    private GeometryFactoryWgs84 geometryFactory;
     private SinglePointMapMatcher singlePointMapMatcher;
 
     @SneakyThrows
     @BeforeEach
     void setup() {
-        this.geometryFactory = GeometryConstants.WGS84_GEOMETRY_FACTORY;
-        this.singlePointMapMatcher = new SinglePointMapMatcher(getTestNetwork(createLinks()), CAR_FASTEST);
+        singlePointMapMatcher = singlePointMapMatcherFactory.createMapMatcher(getTestNetwork(createLinks()),
+                CAR_FASTEST);
     }
 
     /**
