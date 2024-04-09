@@ -1,9 +1,7 @@
 package nu.ndw.nls.routingmapmatcher.singlepoint;
 
 import static nu.ndw.nls.routingmapmatcher.model.singlepoint.BearingFilter.toGeometryFilter;
-import static nu.ndw.nls.routingmapmatcher.util.GeometryConstants.DIST_PLANE;
 
-import com.graphhopper.util.shapes.GHPoint;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -83,7 +81,8 @@ public class PointMatchingService {
 
     private MatchedPoint createMatchedPoint(Coordinate input, int matchedLinkId, LineString originalGeometry,
             boolean reversed, LineString aggregatedGeometry, BearingFilter bearingFilter, double cutoffDistance) {
-        ProjectionResult projectionResult = closestPointService.closestPoint(Arrays.asList(aggregatedGeometry.getCoordinates()), input);
+        ProjectionResult projectionResult = closestPointService.closestPoint(
+                Arrays.asList(aggregatedGeometry.getCoordinates()), input);
         double fraction = fractionAndDistanceCalculator
                 .calculateFractionAndDistance(originalGeometry, projectionResult.point()).getFraction();
 
@@ -94,8 +93,9 @@ public class PointMatchingService {
                 .snappedPoint(geometryFactory.createPoint(projectionResult.point()))
                 .fraction(reversed ? (1 - fraction) : fraction)
                 .distance(projectionResult.distance())
-                .reliability(calculateReliability(projectionResult.distance(), projectionResult.bearing(), bearingFilter,
-                        cutoffDistance))
+                .reliability(
+                        calculateReliability(projectionResult.distance(), projectionResult.bearing(), bearingFilter,
+                                cutoffDistance))
                 .bearing(projectionResult.bearing())
                 .build();
     }
