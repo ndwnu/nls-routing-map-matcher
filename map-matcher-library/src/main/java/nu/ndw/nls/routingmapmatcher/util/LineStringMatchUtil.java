@@ -79,8 +79,10 @@ public class LineStringMatchUtil {
         EdgeIteratorState startEdge = edges.get(0);
         EdgeIteratorState endEdge = edges.get(edges.size() - 1);
 
-        double startLinkFraction = PathUtil.determineStartLinkFraction(startEdge, queryGraph,fractionAndDistanceCalculator);
-        double endLinkFraction = PathUtil.determineEndLinkFraction(endEdge, queryGraph,fractionAndDistanceCalculator);
+        double startLinkFraction = PathUtil.determineStartLinkFraction(startEdge, queryGraph,
+                fractionAndDistanceCalculator);
+        double endLinkFraction = PathUtil.determineEndLinkFraction(endEdge, queryGraph,
+                fractionAndDistanceCalculator);
 
         List<MatchedLink> matchedLinks = matchedLinkMapper.map(
                 PathUtil.determineMatchedLinks(encodingManager, edges), startLinkFraction, endLinkFraction);

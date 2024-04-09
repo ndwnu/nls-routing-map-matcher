@@ -2,7 +2,6 @@ package nu.ndw.nls.routingmapmatcher.singlepoint;
 
 import lombok.RequiredArgsConstructor;
 import nu.ndw.nls.geometry.bearing.BearingCalculator;
-import nu.ndw.nls.geometry.crs.CrsTransformer;
 import nu.ndw.nls.geometry.distance.FractionAndDistanceCalculator;
 import nu.ndw.nls.geometry.factories.GeometryFactoryWgs84;
 import nu.ndw.nls.geometry.mappers.DiameterToPolygonMapper;
@@ -15,7 +14,6 @@ import org.springframework.stereotype.Component;
 public class SinglePointMapMatcherFactory implements MapMatcherFactory<SinglePointMapMatcher> {
 
     private final BearingCalculator bearingCalculator;
-    private final CrsTransformer crsTransformer;
     private final DiameterToPolygonMapper diameterToPolygonMapper;
     private final GeometryFactoryWgs84 geometryFactoryWgs84;
     private final FractionAndDistanceCalculator fractionAndDistanceCalculator;
@@ -23,7 +21,7 @@ public class SinglePointMapMatcherFactory implements MapMatcherFactory<SinglePoi
     @Override
     public SinglePointMapMatcher createMapMatcher(NetworkGraphHopper preInitializedNetwork, String profileName) {
 
-        return new SinglePointMapMatcher(crsTransformer, diameterToPolygonMapper, bearingCalculator,
+        return new SinglePointMapMatcher(diameterToPolygonMapper, bearingCalculator,
                 geometryFactoryWgs84, fractionAndDistanceCalculator, preInitializedNetwork, profileName);
     }
 }
