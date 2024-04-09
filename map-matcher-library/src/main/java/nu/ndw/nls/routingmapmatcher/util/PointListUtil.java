@@ -12,7 +12,7 @@ public class PointListUtil {
 
     private static final int MINIMUM_LINESTRING_SIZE = 2;
     private static final int LINESTRING_DIMENSIONS = 2;
-    private static GeometryFactory WGS84_GEOMETRY_FACTORY = new GeometryFactoryWgs84();
+    private static final GeometryFactory WGS84_GEOMETRY_FACTORY = new GeometryFactoryWgs84();
 
     // PointList.toLineString rounds to 6 digits. This can affect the route slightly, this method prevents that
     public LineString toLineString(PointList pointList) {

@@ -10,7 +10,6 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.SneakyThrows;
 import nu.ndw.nls.geometry.factories.GeometryFactoryRijksdriehoek;
-import nu.ndw.nls.geometry.factories.GeometryFactoryWgs84;
 import nu.ndw.nls.routingmapmatcher.TestConfig;
 import nu.ndw.nls.routingmapmatcher.exception.RoutingRequestException;
 import nu.ndw.nls.routingmapmatcher.model.routing.RoutingRequest;
@@ -37,8 +36,7 @@ class BikeRouterIT {
     private RouterFactory routerFactory;
     @Autowired
     private GeometryFactoryRijksdriehoek geometryFactoryRijksdriehoek;
-    @Autowired
-    private GeometryFactoryWgs84 geometryFactoryWgs84;
+
     private Router router;
 
 
@@ -131,9 +129,6 @@ class BikeRouterIT {
     private void setup(boolean allAccessible) {
 
         List<LinkVehicleMapper<? extends Link>> vehicles = List.of(new BikeLinkBikeMapper(), new BikeLinkCarMapper());
-
-        geometryFactoryRijksdriehoek = new GeometryFactoryRijksdriehoek();
-        GeometryFactoryWgs84 geometryFactoryWgs84 = new GeometryFactoryWgs84();
 
         List<BikeLink> links = List.of(
                 createBikeLink(1, 0, 10, true),
