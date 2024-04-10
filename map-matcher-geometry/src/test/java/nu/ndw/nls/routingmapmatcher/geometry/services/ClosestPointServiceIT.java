@@ -3,7 +3,7 @@ package nu.ndw.nls.routingmapmatcher.geometry.services;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.List;
-import nu.ndw.nls.routingmapmatcher.geometry.model.ProjectionResult;
+import nu.ndw.nls.routingmapmatcher.geometry.model.ClosestPointResult;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.locationtech.jts.geom.Coordinate;
@@ -19,7 +19,7 @@ class ClosestPointServiceIT {
 
     @Test
     void closestPoint_ok() {
-        ProjectionResult result = closestPointService.closestPoint(
+        ClosestPointResult result = closestPointService.closestPoint(
                 List.of(new Coordinate(52.366349, 4.877447), new Coordinate(52.364595, 4.878614)),
                 new Coordinate(52.364848, 4.878124));
         assertThat(result.distance()).isEqualTo(29.74587257816117);
