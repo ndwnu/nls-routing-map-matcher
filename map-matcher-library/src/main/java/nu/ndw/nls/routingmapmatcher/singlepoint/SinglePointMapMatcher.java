@@ -24,6 +24,7 @@ import nu.ndw.nls.geometry.distance.FractionAndDistanceCalculator;
 import nu.ndw.nls.geometry.factories.GeometryFactoryWgs84;
 import nu.ndw.nls.geometry.mappers.DiameterToPolygonMapper;
 import nu.ndw.nls.routingmapmatcher.domain.MapMatcher;
+import nu.ndw.nls.routingmapmatcher.geometry.services.ClosestPointService;
 import nu.ndw.nls.routingmapmatcher.isochrone.IsochroneService;
 import nu.ndw.nls.routingmapmatcher.isochrone.algorithm.ShortestPathTreeFactory;
 import nu.ndw.nls.routingmapmatcher.isochrone.mappers.IsochroneMatchMapper;
@@ -60,7 +61,7 @@ public class SinglePointMapMatcher implements MapMatcher<SinglePointLocation, Si
     public SinglePointMapMatcher(DiameterToPolygonMapper diameterToPolygonMapper,
             BearingCalculator bearingCalculator, GeometryFactoryWgs84 geometryFactoryWgs84,
             FractionAndDistanceCalculator fractionAndDistanceCalculator, NetworkGraphHopper network,
-            String profileName) {
+            String profileName, ClosestPointService closestPointService) {
         this.diameterToPolygonMapper = diameterToPolygonMapper;
         this.network = Preconditions.checkNotNull(network);
         this.profile = Preconditions.checkNotNull(network.getProfile(profileName));
@@ -76,7 +77,7 @@ public class SinglePointMapMatcher implements MapMatcher<SinglePointLocation, Si
                         fractionAndDistanceCalculator),
                 new ShortestPathTreeFactory(weighting), this.locationIndexTree, profile);
         this.pointMatchingService = new PointMatchingService(geometryFactoryWgs84, bearingCalculator,
-                fractionAndDistanceCalculator);
+                fractionAndDistanceCalculator,closestPointService);
 
     }
 
@@ -172,7 +173,7 @@ public class SinglePointMapMatcher implements MapMatcher<SinglePointLocation, Si
         LineString wayGeometry = pointListUtil.toLineString(edge.fetchWayGeometry(FetchMode.ALL));
         /*
            The geometry direction of the edge iterator wayGeometry does not necessarily reflect the direction of a
-           street or the original encoded geometry direction. It is just the direction of the exploration of the graph.
+           street or the original encoded geometry direction. It is just the traversal direction within the graph.
            GraphHopper sometimes reverses the geometry direction with respect to the original direction. To fix this,
            an internal attribute of the edge iterator state is used, indicating it has done so or not.
         */

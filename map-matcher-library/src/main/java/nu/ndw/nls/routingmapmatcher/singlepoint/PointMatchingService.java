@@ -1,9 +1,7 @@
 package nu.ndw.nls.routingmapmatcher.singlepoint;
 
 import static nu.ndw.nls.routingmapmatcher.model.singlepoint.BearingFilter.toGeometryFilter;
-import static nu.ndw.nls.routingmapmatcher.util.GeometryConstants.DIST_PLANE;
 
-import com.graphhopper.util.shapes.GHPoint;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -13,6 +11,8 @@ import lombok.extern.slf4j.Slf4j;
 import nu.ndw.nls.geometry.bearing.BearingCalculator;
 import nu.ndw.nls.geometry.constants.SRID;
 import nu.ndw.nls.geometry.distance.FractionAndDistanceCalculator;
+import nu.ndw.nls.routingmapmatcher.geometry.model.ClosestPointResult;
+import nu.ndw.nls.routingmapmatcher.geometry.services.ClosestPointService;
 import nu.ndw.nls.routingmapmatcher.model.EdgeIteratorTravelDirection;
 import nu.ndw.nls.routingmapmatcher.model.MatchedQueryResult;
 import nu.ndw.nls.routingmapmatcher.model.singlepoint.BearingFilter;
@@ -30,6 +30,7 @@ public class PointMatchingService {
     private final GeometryFactory geometryFactory;
     private final BearingCalculator bearingCalculator;
     private final FractionAndDistanceCalculator fractionAndDistanceCalculator;
+    private final ClosestPointService closestPointService;
 
     public List<MatchedPoint> calculateMatches(MatchedQueryResult matchedQueryResult) {
         List<MatchedPoint> matchedPoints = new ArrayList<>();
@@ -80,20 +81,22 @@ public class PointMatchingService {
 
     private MatchedPoint createMatchedPoint(Coordinate input, int matchedLinkId, LineString originalGeometry,
             boolean reversed, LineString aggregatedGeometry, BearingFilter bearingFilter, double cutoffDistance) {
-        ProjectionResult projectionResult = closestPoint(Arrays.asList(aggregatedGeometry.getCoordinates()), input);
+        ClosestPointResult projectionResult = closestPointService.closestPoint(
+                Arrays.asList(aggregatedGeometry.getCoordinates()), input);
         double fraction = fractionAndDistanceCalculator
-                .calculateFractionAndDistance(originalGeometry, projectionResult.point).getFraction();
+                .calculateFractionAndDistance(originalGeometry, projectionResult.point()).getFraction();
 
         return MatchedPoint
                 .builder()
                 .matchedLinkId(matchedLinkId)
                 .reversed(reversed)
-                .snappedPoint(geometryFactory.createPoint(projectionResult.point))
+                .snappedPoint(geometryFactory.createPoint(projectionResult.point()))
                 .fraction(reversed ? (1 - fraction) : fraction)
-                .distance(projectionResult.distance)
-                .reliability(calculateReliability(projectionResult.distance, projectionResult.bearing, bearingFilter,
-                        cutoffDistance))
-                .bearing(projectionResult.bearing)
+                .distance(projectionResult.distance())
+                .reliability(
+                        calculateReliability(projectionResult.distance(), projectionResult.bearing(), bearingFilter,
+                                cutoffDistance))
+                .bearing(projectionResult.bearing())
                 .build();
     }
 
@@ -139,44 +142,5 @@ public class PointMatchingService {
         return Math.max(MIN_RELIABILITY_SCORE, (1 - distancePenalty - bearingPenalty) * MAX_RELIABILITY_SCORE);
     }
 
-    private ProjectionResult closestPoint(List<Coordinate> lineString, Coordinate point) {
-        ProjectionResult closestProjectionResult = null;
-        for (int i = 1; i < lineString.size(); i++) {
-            Coordinate previous = lineString.get(i - 1);
-            Coordinate current = lineString.get(i);
 
-            var projectionResult = project(previous, current, point);
-            if (closestProjectionResult == null || projectionResult.distance < closestProjectionResult.distance) {
-                closestProjectionResult = projectionResult;
-            }
-        }
-        if (closestProjectionResult == null) {
-            throw new IllegalStateException("failed to project " + point + " on " + lineString);
-        }
-        return closestProjectionResult;
-    }
-
-    private ProjectionResult project(Coordinate a, Coordinate b, Coordinate r) {
-        double distanceToA = DIST_PLANE.calcDist(r.y, r.x, a.y, a.x);
-        double distanceToB = DIST_PLANE.calcDist(r.y, r.x, b.y, b.x);
-
-        GHPoint projection;
-        if (DIST_PLANE.validEdgeDistance(r.y, r.x, a.y, a.x, b.y, b.x)) {
-            projection = DIST_PLANE.calcCrossingPointToEdge(r.y, r.x, a.y, a.x, b.y, b.x);
-        } else if (distanceToA < distanceToB) {
-            projection = new GHPoint(a.y, a.x);
-        } else {
-            projection = new GHPoint(b.y, b.x);
-        }
-
-        return new ProjectionResult(
-                DIST_PLANE.calcDist(r.y, r.x, projection.lat, projection.lon),
-                bearingCalculator.calculateBearing(a, b,SRID.WGS84),
-                new Coordinate(projection.lon, projection.lat)
-        );
-    }
-
-    record ProjectionResult(double distance, double bearing, Coordinate point) {
-
-    }
 }
