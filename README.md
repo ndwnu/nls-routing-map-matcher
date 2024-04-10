@@ -17,6 +17,11 @@ This project is maintained by Nationaal Dataportaal Wegverkeer (NDW)
 * Pipelines are not designed to be used within GitHub;
 * GitHub wiki and issues aren't enabled.
 
+To mirror the repos use:
+```shell
+./sync-git-with-obfuscated-emails.sh
+```
+
 ## Design
 
 
