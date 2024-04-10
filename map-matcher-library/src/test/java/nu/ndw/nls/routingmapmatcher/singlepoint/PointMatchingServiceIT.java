@@ -7,7 +7,7 @@ import nu.ndw.nls.geometry.bearing.BearingCalculator;
 import nu.ndw.nls.geometry.distance.FractionAndDistanceCalculator;
 import nu.ndw.nls.geometry.factories.GeometryFactoryWgs84;
 import nu.ndw.nls.routingmapmatcher.TestConfig;
-import nu.ndw.nls.routingmapmatcher.geo.services.ClosestPointService;
+import nu.ndw.nls.routingmapmatcher.geometry.services.ClosestPointService;
 import nu.ndw.nls.routingmapmatcher.model.EdgeIteratorTravelDirection;
 import nu.ndw.nls.routingmapmatcher.model.MatchedQueryResult;
 import nu.ndw.nls.routingmapmatcher.model.singlepoint.BearingFilter;

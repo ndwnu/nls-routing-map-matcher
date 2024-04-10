@@ -31,7 +31,7 @@
         </dependency>
         <dependency>
             <groupId>nu.ndw.nls</groupId>
-            <artifactId>map-matcher-geo</artifactId>
+            <artifactId>routing-map-matcher-geometry</artifactId>
             <version>${project.version}</version>
         </dependency>
         <!-- JTS GEO-->
