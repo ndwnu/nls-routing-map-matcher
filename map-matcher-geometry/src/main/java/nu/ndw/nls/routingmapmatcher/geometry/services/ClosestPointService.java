@@ -6,21 +6,20 @@ import static com.graphhopper.util.DistancePlaneProjection.DIST_PLANE;
 import com.graphhopper.util.shapes.GHPoint;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
-
 import nu.ndw.nls.geometry.bearing.BearingCalculator;
 import nu.ndw.nls.geometry.constants.SRID;
-import nu.ndw.nls.routingmapmatcher.geometry.model.ProjectionResult;
+import nu.ndw.nls.routingmapmatcher.geometry.model.ClosestPointResult;
 import org.locationtech.jts.geom.Coordinate;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
-@Component
+@Service
 @RequiredArgsConstructor
 public class ClosestPointService {
 
     private final BearingCalculator bearingCalculator;
 
-    public ProjectionResult closestPoint(List<Coordinate> lineString, Coordinate point) {
-        ProjectionResult closestProjectionResult = null;
+    public ClosestPointResult closestPoint(List<Coordinate> lineString, Coordinate point) {
+        ClosestPointResult closestProjectionResult = null;
         for (int i = 1; i < lineString.size(); i++) {
             Coordinate previous = lineString.get(i - 1);
             Coordinate current = lineString.get(i);
@@ -36,7 +35,7 @@ public class ClosestPointService {
         return closestProjectionResult;
     }
 
-    private ProjectionResult project(Coordinate a, Coordinate b, Coordinate r) {
+    private ClosestPointResult project(Coordinate a, Coordinate b, Coordinate r) {
         double distanceToA = DIST_PLANE.calcDist(r.y, r.x, a.y, a.x);
         double distanceToB = DIST_PLANE.calcDist(r.y, r.x, b.y, b.x);
 
@@ -49,7 +48,7 @@ public class ClosestPointService {
             projection = new GHPoint(b.y, b.x);
         }
 
-        return new ProjectionResult(
+        return new ClosestPointResult(
                 DIST_PLANE.calcDist(r.y, r.x, projection.lat, projection.lon),
                 bearingCalculator.calculateBearing(a, b, SRID.WGS84),
                 new Coordinate(projection.lon, projection.lat)

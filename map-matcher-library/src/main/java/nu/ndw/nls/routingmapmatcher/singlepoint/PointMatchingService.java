@@ -11,7 +11,7 @@ import lombok.extern.slf4j.Slf4j;
 import nu.ndw.nls.geometry.bearing.BearingCalculator;
 import nu.ndw.nls.geometry.constants.SRID;
 import nu.ndw.nls.geometry.distance.FractionAndDistanceCalculator;
-import nu.ndw.nls.routingmapmatcher.geometry.model.ProjectionResult;
+import nu.ndw.nls.routingmapmatcher.geometry.model.ClosestPointResult;
 import nu.ndw.nls.routingmapmatcher.geometry.services.ClosestPointService;
 import nu.ndw.nls.routingmapmatcher.model.EdgeIteratorTravelDirection;
 import nu.ndw.nls.routingmapmatcher.model.MatchedQueryResult;
@@ -81,7 +81,7 @@ public class PointMatchingService {
 
     private MatchedPoint createMatchedPoint(Coordinate input, int matchedLinkId, LineString originalGeometry,
             boolean reversed, LineString aggregatedGeometry, BearingFilter bearingFilter, double cutoffDistance) {
-        ProjectionResult projectionResult = closestPointService.closestPoint(
+        ClosestPointResult projectionResult = closestPointService.closestPoint(
                 Arrays.asList(aggregatedGeometry.getCoordinates()), input);
         double fraction = fractionAndDistanceCalculator
                 .calculateFractionAndDistance(originalGeometry, projectionResult.point()).getFraction();
