@@ -1,4 +1,4 @@
-package nu.ndw.nls.routingmapmatcher.geo.services;
+package nu.ndw.nls.routingmapmatcher.geometry.services;
 
 
 import static com.graphhopper.util.DistancePlaneProjection.DIST_PLANE;
@@ -9,7 +9,7 @@ import lombok.RequiredArgsConstructor;
 
 import nu.ndw.nls.geometry.bearing.BearingCalculator;
 import nu.ndw.nls.geometry.constants.SRID;
-import nu.ndw.nls.routingmapmatcher.geo.model.ProjectionResult;
+import nu.ndw.nls.routingmapmatcher.geometry.model.ProjectionResult;
 import org.locationtech.jts.geom.Coordinate;
 import org.springframework.stereotype.Component;
 

@@ -6,7 +6,7 @@ import nu.ndw.nls.geometry.distance.FractionAndDistanceCalculator;
 import nu.ndw.nls.geometry.factories.GeometryFactoryWgs84;
 import nu.ndw.nls.geometry.mappers.DiameterToPolygonMapper;
 import nu.ndw.nls.routingmapmatcher.domain.MapMatcherFactory;
-import nu.ndw.nls.routingmapmatcher.geo.services.ClosestPointService;
+import nu.ndw.nls.routingmapmatcher.geometry.services.ClosestPointService;
 import nu.ndw.nls.routingmapmatcher.network.NetworkGraphHopper;
 import org.springframework.stereotype.Component;
 

@@ -1,9 +1,9 @@
-package nu.ndw.nls.routingmapmatcher.geo.services;
+package nu.ndw.nls.routingmapmatcher.geometry.services;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.List;
-import nu.ndw.nls.routingmapmatcher.geo.model.ProjectionResult;
+import nu.ndw.nls.routingmapmatcher.geometry.model.ProjectionResult;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.locationtech.jts.geom.Coordinate;

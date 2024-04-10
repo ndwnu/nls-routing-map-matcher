@@ -1,4 +1,4 @@
-package nu.ndw.nls.routingmapmatcher.geo.services;
+package nu.ndw.nls.routingmapmatcher.geometry.services;
 
 import nu.ndw.nls.geometry.GeometryConfiguration;
 import org.springframework.context.annotation.ComponentScan;

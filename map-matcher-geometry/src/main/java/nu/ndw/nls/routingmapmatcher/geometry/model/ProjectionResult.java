@@ -1,4 +1,4 @@
-package nu.ndw.nls.routingmapmatcher.geo.model;
+package nu.ndw.nls.routingmapmatcher.geometry.model;
 
 import org.locationtech.jts.geom.Coordinate;
 
