@@ -7,6 +7,7 @@ import nu.ndw.nls.geometry.bearing.BearingCalculator;
 import nu.ndw.nls.geometry.distance.FractionAndDistanceCalculator;
 import nu.ndw.nls.geometry.factories.GeometryFactoryWgs84;
 import nu.ndw.nls.routingmapmatcher.TestConfig;
+import nu.ndw.nls.routingmapmatcher.geometry.services.ClosestPointService;
 import nu.ndw.nls.routingmapmatcher.model.EdgeIteratorTravelDirection;
 import nu.ndw.nls.routingmapmatcher.model.MatchedQueryResult;
 import nu.ndw.nls.routingmapmatcher.model.singlepoint.BearingFilter;
@@ -65,6 +66,8 @@ class PointMatchingServiceIT {
     private BearingCalculator bearingCalculator;
     @Autowired
     private FractionAndDistanceCalculator fractionAndDistanceCalculator;
+    @Autowired
+    private ClosestPointService closestPointService;
 
     private Point inputPoint;
 
@@ -75,7 +78,7 @@ class PointMatchingServiceIT {
     @BeforeEach
     void setup() {
         pointMatchingService = new PointMatchingService(geometryFactoryWgs84, bearingCalculator,
-                fractionAndDistanceCalculator);
+                fractionAndDistanceCalculator,closestPointService);
     }
 
     @Test
