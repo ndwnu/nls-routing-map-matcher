@@ -40,7 +40,7 @@
         <maven-surefire-plugin.version>3.2.5</maven-surefire-plugin.version>
         <sonar-maven-plugin.version>3.9.1.2184</sonar-maven-plugin.version>
         <sonar.projectName>nls-routing-map-matcher</sonar.projectName>
-        <nls-geometry.version>1.0.3</nls-geometry.version>
+        <nls-geometry.version>1.0.5</nls-geometry.version>
         <kryo5.version>5.5.0</kryo5.version>
     </properties>
     <repositories>
