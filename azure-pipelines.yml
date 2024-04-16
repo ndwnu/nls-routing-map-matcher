@@ -6,7 +6,7 @@ resources:
     - repository: nls-pipeline-templates
       type: git
       name: NLS/nls-pipeline-templates
-      ref: feature/70576-use-nls-github-user
+      ref: main
 
 extends:
   template: azure-pipelines-java.yml@nls-pipeline-templates
