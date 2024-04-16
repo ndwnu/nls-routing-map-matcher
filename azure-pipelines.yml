@@ -6,7 +6,7 @@ resources:
     - repository: nls-pipeline-templates
       type: git
       name: NLS/nls-pipeline-templates
-      ref: main
+      ref: feature/70576-use-nls-github-user
 
 extends:
   template: azure-pipelines-java.yml@nls-pipeline-templates
@@ -15,4 +15,5 @@ extends:
     mavenReleaseGoal: deploy
     sonarOptionalCoverageExclusions: '**/config/**'
     sonarOptionalExclusions: '**/graphhopper/isochrone/ShortestPathTree.java,**/graphhopper/routing/PathRouter.java'
+    pushToGitHub: true
 
