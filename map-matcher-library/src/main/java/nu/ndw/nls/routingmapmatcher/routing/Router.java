@@ -88,12 +88,14 @@ public class Router {
     }
 
     private RoutingResponse setFractionsAndMatchedLinks(RoutingResponseBuilder routingResponseBuilder,
-            GHRequest ghRequest) {
-
+            GHRequest ghRequest) throws RoutingException {
         List<RoutingLegResponse> routingLegResponse = new ArrayList<>();
 
         for (Path path : networkGraphHopper.calcPaths(ghRequest)) {
             List<EdgeIteratorState> edges = path.calcEdges();
+            if (edges.isEmpty()) {
+                throw new RoutingException("Unexpected: path has no edges");
+            }
             double startFraction = PathUtil.determineStartLinkFraction(edges.get(0),
                     QueryGraphExtractor.extractQueryGraph(path),fractionAndDistanceCalculator);
             double endFraction = PathUtil.determineEndLinkFraction(edges.get(edges.size() - 1),
