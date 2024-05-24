@@ -1,6 +1,7 @@
 package nu.ndw.nls.routingmapmatcher.isochrone.mappers;
 
 import static nu.ndw.nls.routingmapmatcher.isochrone.IsochroneTestHelper.createIsoLabel;
+import static nu.ndw.nls.routingmapmatcher.isochrone.IsochroneTestHelper.createIsoLabelWithNonRootParent;
 import static nu.ndw.nls.routingmapmatcher.network.model.Link.WAY_ID_KEY;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
@@ -41,6 +42,7 @@ class IsochroneMatchMapperTest {
     private static final Coordinate COORDINATE_2 = new Coordinate(5.4293175, 52.1750401);
     private static final Coordinate COORDINATE_3 = new Coordinate(5.430860, 52.174151);
     private static final int MATCHED_LINK_ID_ONE = 1;
+    private static final int PARENT_LINK_ID = 2;
 
     @Mock
     private QueryGraph queryGraph;
@@ -51,6 +53,9 @@ class IsochroneMatchMapperTest {
 
     @Mock
     private EdgeIteratorState currentEdge;
+
+    @Mock
+    private EdgeIteratorState parentEdge;
 
     @Mock
     private EdgeIteratorState startEdge;
@@ -70,7 +75,6 @@ class IsochroneMatchMapperTest {
 
     private IsochroneMatchMapper isochroneMatchMapper;
 
-    private IsoLabel isoLabel;
 
     @BeforeEach
     void setup() {
@@ -89,8 +93,26 @@ class IsochroneMatchMapperTest {
     }
 
     @Test
+    void mapToIsochroneMatch_ok_parent() {
+        IsoLabel isoLabel = createIsoLabelWithNonRootParent(0, 0);
+        setupFixture(false, 0, isoLabel);
+        when(pointListUtil.toLineString(pointList)).thenReturn(isoLabelWayGeometry);
+        when(queryGraph.getEdgeIteratorState(isoLabel.getParent().getEdge(), isoLabel.getParent().getNode()))
+                .thenReturn(parentEdge);
+        when(parentEdge.get(intEncodedValue)).thenReturn(PARENT_LINK_ID);
+        IsochroneMatch result = isochroneMatchMapper.mapToIsochroneMatch(isoLabel, MAX_DISTANCE, queryGraph, startEdge);
+        assertThat(result.getMatchedLinkId()).isEqualTo(MATCHED_LINK_ID_ONE);
+        assertThat(result.getStartFraction()).isEqualTo(0);
+        assertThat(result.getEndFraction()).isEqualTo(1.0);
+        assertThat(result.isReversed()).isFalse();
+        assertThat(result.getGeometry()).isEqualTo(isoLabelWayGeometry);
+        assertThat(result.getParentLinkId()).isEqualTo(PARENT_LINK_ID);
+    }
+
+    @Test
     void mapToIsochroneMatch_ok_startSegment() {
-        setupFixtureStartSegment(false, 0);
+        IsoLabel isoLabel = createIsoLabel(0, 0);
+        setupFixtureStartSegment(false, isoLabel);
         IsochroneMatch result = isochroneMatchMapper.mapToIsochroneMatch(isoLabel, MAX_DISTANCE, queryGraph, startEdge);
         assertThat(result.getMatchedLinkId()).isEqualTo(MATCHED_LINK_ID_ONE);
         assertThat(result.getStartFraction()).isEqualTo(0);
@@ -101,7 +123,8 @@ class IsochroneMatchMapperTest {
 
     @Test
     void mapToIsochroneMatch_ok_startSegment_reversed() {
-        setupFixtureStartSegment(true, 0);
+        IsoLabel isoLabel = createIsoLabel(0, 0);
+        setupFixtureStartSegment(true, isoLabel);
         IsochroneMatch result = isochroneMatchMapper.mapToIsochroneMatch(isoLabel, MAX_DISTANCE, queryGraph, startEdge);
         assertThat(result.getMatchedLinkId()).isEqualTo(MATCHED_LINK_ID_ONE);
         assertThat(result.getStartFraction()).isEqualTo(0.3662389403187084);
@@ -112,8 +135,9 @@ class IsochroneMatchMapperTest {
 
     @Test
     void mapToIsochroneMatch_ok_startSegment_croppedGeometry() {
+        IsoLabel isoLabel = createIsoLabel(250.30366999283603, 0);
         Geometry originalGeometry = isoLabelWayGeometry.copy();
-        setupFixtureStartSegment(false, 250.30366999283603);
+        setupFixtureStartSegment(false, isoLabel);
         IsochroneMatch result = isochroneMatchMapper.mapToIsochroneMatch(isoLabel, MAX_DISTANCE, queryGraph, startEdge);
         assertThat(result.getMatchedLinkId()).isEqualTo(MATCHED_LINK_ID_ONE);
         assertThat(result.getStartFraction()).isEqualTo(0.0);
@@ -127,7 +151,8 @@ class IsochroneMatchMapperTest {
     @Test
     void mapToIsochroneMatch_ok_croppedGeometry() {
         Geometry originalGeometry = isoLabelWayGeometry.copy();
-        setupFixture(false, 250.30366999283603, 2);
+        IsoLabel isoLabel = createIsoLabel(250.30366999283603, 0);
+        setupFixture(false, 2, isoLabel);
         when(pointListUtil.toLineString(pointList)).thenReturn(isoLabelWayGeometry);
         IsochroneMatch result = isochroneMatchMapper.mapToIsochroneMatch(isoLabel, MAX_DISTANCE, queryGraph, startEdge);
         assertThat(result.getMatchedLinkId()).isEqualTo(MATCHED_LINK_ID_ONE);
@@ -139,16 +164,15 @@ class IsochroneMatchMapperTest {
         assertThat(lengthInMeters).isCloseTo(MAX_DISTANCE, Percentage.withPercentage(0.0001));
     }
 
-    private void setupFixtureStartSegment(boolean reversed, double distance) {
+    private void setupFixtureStartSegment(boolean reversed, IsoLabel isoLabel) {
         // If reversed EdgeIterator returns reversed geometry
         LineString wayGeometry = reversed ? isoLabelWayGeometry.reverse() : isoLabelWayGeometry;
-        setupFixture(reversed, distance, MATCHED_LINK_ID_ONE);
+        setupFixture(reversed, MATCHED_LINK_ID_ONE, isoLabel);
         when(startEdge.fetchWayGeometry(FetchMode.ALL)).thenReturn(pointList);
         when(pointListUtil.toLineString(pointList)).thenReturn(wayGeometry, startSegmentWayGeometry);
     }
 
-    private void setupFixture(boolean reversed, double distance, int startSegmentId) {
-        isoLabel = createIsoLabel(distance, 0);
+    private void setupFixture(boolean reversed, int startSegmentId, IsoLabel isoLabel) {
         when(queryGraph.getEdgeIteratorState(isoLabel.getEdge(), isoLabel.getNode())).thenReturn(currentEdge);
         when(edgeIteratorStateReverseExtractor.hasReversed(currentEdge)).thenReturn(reversed, false);
         when(encodingManager.getIntEncodedValue(WAY_ID_KEY)).thenReturn(intEncodedValue);

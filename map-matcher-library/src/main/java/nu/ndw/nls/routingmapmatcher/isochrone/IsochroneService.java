@@ -32,7 +32,7 @@ import org.locationtech.jts.geom.Point;
 @RequiredArgsConstructor
 public class IsochroneService {
 
-    private static final int ROOT_PARENT = -1;
+
     private static final int METERS = 1000;
     private static final int SECONDS_PER_HOUR = 3600;
     private static final int MILLISECONDS = 1000;
@@ -97,7 +97,7 @@ public class IsochroneService {
         boolean searchDirectionReversed = reversed != reverseFlow;
         EdgeIteratorState startEdge = startSegment.getClosestEdge();
         return isoLabels.stream()
-                .filter(isoLabel -> isoLabel.getEdge() != ROOT_PARENT)
+                .filter(isoLabel -> ! isoLabel.isRoot())
                 // With bidirectional start segments, the search goes two ways for both down and upstream isochrones.
                 // The branches that are starting in the wrong direction of travelling (as determined by the nearest
                 // match) are filtered out.
@@ -172,7 +172,7 @@ public class IsochroneService {
             if (isochroneMatchMapper.isStartSegment(roadSectionId, startEdge)) {
                 isCorrect = edgeIteratorStateReverseExtractor.hasReversed(currentEdge) == reverse;
             }
-            if (isoLabel.getParent().getEdge() != ROOT_PARENT) {
+            if (!isoLabel.parentIsRoot()) {
                 return isSegmentFromStartSegmentInCorrectDirection(reverse, isoLabel.getParent(), startEdge,
                         queryGraph);
             }
