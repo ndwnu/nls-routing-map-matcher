@@ -38,7 +38,7 @@ public class IsochroneMatchMapper {
         // alignment of the geometry (can be backward for bidirectional edges or for upstream isochrone searches).
         boolean reversed = edgeIteratorStateReverseExtractor.hasReversed(currentEdge);
         IntEncodedValue idEnc = encodingManager.getIntEncodedValue(WAY_ID_KEY);
-        int roadSectionId = currentEdge.get(idEnc);
+        int matchedLinkId = currentEdge.get(idEnc);
         double totalDistanceTravelled = isoLabel.getDistance();
         // This is the entire way geometry, except for the start segment, which is split up at the start point.
         LineString isoLabelWayGeometry = pointListUtil.toLineString(currentEdge.fetchWayGeometry(FetchMode.ALL));
@@ -47,7 +47,7 @@ public class IsochroneMatchMapper {
         // directions as indicated by the edgeDirection.
         // Here the fractions are calculated based on the entire start-segment geometry with respect to the partial
         // edges.
-        boolean isStartSegment = isStartSegment(roadSectionId, startEdge);
+        boolean isStartSegment = isStartSegment(matchedLinkId, startEdge);
         LineString fullGeometry = isStartSegment
                 ? getStartSegmentWayGeometryInTravelDirection(reversed, startEdge) : isoLabelWayGeometry;
 
@@ -64,13 +64,26 @@ public class IsochroneMatchMapper {
                 ? fractionAndDistanceCalculator.calculateFractionAndDistance(fullGeometry,
                 partialGeometry.getEndPoint().getCoordinate()).getFraction() : 1.0;
 
-        return IsochroneMatch.builder()
-                .matchedLinkId(roadSectionId)
+        return IsochroneMatch
+                .builder()
+                .matchedLinkId(matchedLinkId)
                 .startFraction(startFraction)
                 .endFraction(endFraction)
                 .reversed(reversed)
+                .parentLinkId(getParentLinkId(isoLabel, queryGraph))
                 .geometry(partialGeometry)
                 .build();
+    }
+
+    private Integer getParentLinkId(IsoLabel isoLabel, QueryGraph queryGraph) {
+        if (!isoLabel.parentIsRoot()) {
+            IntEncodedValue idEnc = encodingManager.getIntEncodedValue(WAY_ID_KEY);
+            EdgeIteratorState parentEdge = queryGraph.getEdgeIteratorState(isoLabel.getParent().getEdge(),
+                    isoLabel.getParent().getNode());
+            return parentEdge.get(idEnc);
+        } else {
+            return null;
+        }
     }
 
     public boolean isStartSegment(int roadSectionId, EdgeIteratorState startEdge) {
