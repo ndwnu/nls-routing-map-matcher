@@ -12,7 +12,7 @@ import org.locationtech.jts.geom.LineString;
 @EqualsAndHashCode
 @ToString
 public class IsochroneMatch {
-
+    private final Integer parentLinkId;
     private final int matchedLinkId;
     @ToString.Exclude
     private final LineString geometry;
