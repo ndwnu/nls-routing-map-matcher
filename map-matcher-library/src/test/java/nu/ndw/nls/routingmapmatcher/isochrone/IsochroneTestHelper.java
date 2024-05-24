@@ -1,6 +1,5 @@
 package nu.ndw.nls.routingmapmatcher.isochrone;
 
-import lombok.SneakyThrows;
 import nu.ndw.nls.routingmapmatcher.isochrone.algorithm.IsoLabel;
 
 public final class IsochroneTestHelper {
@@ -21,7 +20,6 @@ public final class IsochroneTestHelper {
         return new IsoLabel(edgeId, adjNode, weight, time, distance, parent);
     }
 
-    @SneakyThrows
     public static IsoLabel createIsoLabel(double distance, long time) {
         int edgeId = 1;
         int adjNode = 2;
@@ -30,7 +28,6 @@ public final class IsochroneTestHelper {
         return new IsoLabel(edgeId, adjNode, weight, time, distance, parent);
     }
 
-    @SneakyThrows
     public static IsoLabel createIsoLabel(double distance, long time, int edgeId, int adjNode, double weight) {
         return new IsoLabel(edgeId, adjNode, weight, time, distance, null);
     }
