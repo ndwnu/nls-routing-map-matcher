@@ -7,7 +7,7 @@ import lombok.Setter;
 @Setter
 public class IsoLabel {
 
-    private static final int PARENT = -1;
+    private static final int ROOT_ID = -1;
 
     private boolean deleted;
     private int node;
@@ -18,11 +18,11 @@ public class IsoLabel {
     private IsoLabel parent;
 
     public boolean isRoot() {
-        return PARENT == edge;
+        return ROOT_ID == edge;
     }
 
     public boolean parentIsRoot() {
-        return PARENT == parent.edge;
+        return ROOT_ID == parent.edge;
     }
 
     public IsoLabel(int node, int edge, double weight, long time, double distance, IsoLabel parent) {
