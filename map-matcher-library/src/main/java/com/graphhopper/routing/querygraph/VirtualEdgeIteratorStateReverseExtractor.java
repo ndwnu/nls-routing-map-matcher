@@ -13,13 +13,16 @@ import lombok.SneakyThrows;
  * attribute of the edge iterator state is used indicating it has done so or not. Since this attribute is package
  * private the same package structure is used.
  * The class is for handling specific VirtualEdgeIteratorState and VirtualEdgeIterator implementations
- * The VirtualEdgeIterator is package private so this class has to be in com.graphhopper.routing.querygraph to access it.
+ * The VirtualEdgeIterator is package private so this class has to be in com.graphhopper.routing.querygraph
+ * to access it.
  *
  * @see <a href="https://discuss.graphhopper.com/t/edge-direction-problem/6530">Edge direction problem</a>
  * @see <a href="https://discuss.graphhopper.com/t/understanding-edge-directions/1414">Understanding edge directions</a>
  */
 public class VirtualEdgeIteratorStateReverseExtractor {
-
+    private VirtualEdgeIteratorStateReverseExtractor(){
+        //static class
+    }
     @SneakyThrows
     public static boolean hasReversed(EdgeIteratorState closestEdge) {
         if (closestEdge instanceof VirtualEdgeIteratorState virtualEdgeIteratorState) {
@@ -28,7 +31,8 @@ public class VirtualEdgeIteratorStateReverseExtractor {
             return extractReversedFromVirtualEdge(extractEdgeIteratorStateFromVirtualEdgeIterator(virtualEdgeIterator));
         }else {
             throw new IllegalArgumentException(
-                    "This method can only be called with an EdgeIterable,VirtualEdgeIteratorState or VirtualEdgeIterator"
+                    "This method can only be called with an EdgeIterable,VirtualEdgeIteratorState "
+                            + "or VirtualEdgeIterator"
                             + "instance of EdgeIteratorState");
 
         }
