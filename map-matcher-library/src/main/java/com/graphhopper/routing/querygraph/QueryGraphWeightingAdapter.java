@@ -29,7 +29,7 @@ import com.graphhopper.util.EdgeIteratorState;
  * {@link Weighting} we want to use with this class. Otherwise turn costs at virtual nodes and/or including virtual
  * edges will not be calculated correctly.
  */
-public class QueryGraphWeightingAdapter extends QueryGraphWeighting implements Weighting {
+public class QueryGraphWeightingAdapter extends QueryGraphWeighting {
 
     private final boolean reverseFlow;
     private final EdgeIteratorStateReverseExtractor edgeIteratorStateReverseExtractor;
