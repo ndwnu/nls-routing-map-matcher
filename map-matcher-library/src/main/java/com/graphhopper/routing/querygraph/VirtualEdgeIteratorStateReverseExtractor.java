@@ -19,7 +19,7 @@ import lombok.SneakyThrows;
  * @see <a href="https://discuss.graphhopper.com/t/edge-direction-problem/6530">Edge direction problem</a>
  * @see <a href="https://discuss.graphhopper.com/t/understanding-edge-directions/1414">Understanding edge directions</a>
  */
-public class VirtualEdgeIteratorStateReverseExtractor {
+public final class VirtualEdgeIteratorStateReverseExtractor {
     private VirtualEdgeIteratorStateReverseExtractor(){
         //static class
     }
