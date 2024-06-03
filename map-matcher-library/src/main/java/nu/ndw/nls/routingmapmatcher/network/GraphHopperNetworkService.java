@@ -52,7 +52,6 @@ public class GraphHopperNetworkService {
      */
     public <T extends Link> NetworkGraphHopper inMemory(RoutingNetworkSettings<T> networkSettings) {
         NetworkGraphHopper graphHopper = new NetworkGraphHopper(networkSettings);
-
         configureGraphHopper(networkSettings.getLinkType(), networkSettings.getProfiles(), graphHopper);
         // defines for each vehicle the values of the above, deducted from the network and other logic
         graphHopper.setVehicleTagParserFactory(getVehicleTagParserFactory(networkSettings));

@@ -1,8 +1,10 @@
 package nu.ndw.nls.routingmapmatcher.isochrone.algorithm;
 
 import com.graphhopper.routing.querygraph.QueryGraph;
+import com.graphhopper.routing.querygraph.QueryGraphWeightingAdapter;
 import com.graphhopper.routing.util.TraversalMode;
 import com.graphhopper.routing.weighting.Weighting;
+import com.graphhopper.storage.EdgeIteratorStateReverseExtractor;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import nu.ndw.nls.routingmapmatcher.model.IsochroneUnit;
@@ -21,8 +23,12 @@ public class ShortestPathTreeFactory {
             IsochroneUnit isochroneUnit,
             boolean reverseFlow
     ) {
+
+        Weighting baseWeighting = weighting == null ? this.defaultWeighting : weighting;
+        Weighting queryGraphWeighting = QueryGraphWeightingAdapter.fromQueryGraph(baseWeighting, queryGraph,
+                new EdgeIteratorStateReverseExtractor(),reverseFlow);
         IsochroneByTimeDistanceAndWeight isochrone = new IsochroneByTimeDistanceAndWeight(queryGraph,
-                weighting == null ? this.defaultWeighting : weighting, reverseFlow,
+                queryGraphWeighting, reverseFlow,
                 traversalMode);
         if (isochroneUnit == IsochroneUnit.METERS) {
             isochrone.setDistanceLimit(isochroneValue);

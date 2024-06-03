@@ -2,6 +2,8 @@ package nu.ndw.nls.routingmapmatcher.network.init.vehicle;
 
 import com.graphhopper.routing.ev.BooleanEncodedValue;
 import com.graphhopper.routing.ev.DecimalEncodedValue;
+import com.graphhopper.routing.ev.SimpleBooleanEncodedValue;
+import com.graphhopper.routing.ev.TurnRestriction;
 import com.graphhopper.routing.ev.VehicleAccess;
 import com.graphhopper.routing.ev.VehicleSpeed;
 import com.graphhopper.routing.util.VehicleEncodedValues;
@@ -17,8 +19,9 @@ public class CustomVehicleEncodedValuesFactory implements VehicleEncodedValuesFa
     @Override
     public VehicleEncodedValues createVehicleEncodedValues(String name, PMap properties) {
         BooleanEncodedValue accessEnc = VehicleAccess.create(name);
+        BooleanEncodedValue turnEnc =  new SimpleBooleanEncodedValue(TurnRestriction.key(name), true);
         DecimalEncodedValue averageSpeedEnc = VehicleSpeed.create(name, DEFAULT_SPEED_BITS, DEFAULT_SPEED_BITS, true);
-        return new VehicleEncodedValues(name, accessEnc, averageSpeedEnc, null, null);
+        return new VehicleEncodedValues(name, accessEnc, averageSpeedEnc, null, turnEnc);
     }
 
 }
