@@ -1,9 +1,8 @@
 package com.graphhopper.storage;
 
-import com.graphhopper.routing.querygraph.VirtualEdgeIteratorState;
+import com.graphhopper.routing.querygraph.VirtualEdgeIteratorStateReverseExtractor;
 import com.graphhopper.storage.BaseGraph.EdgeIteratorStateImpl;
 import com.graphhopper.util.EdgeIteratorState;
-import java.lang.reflect.Field;
 import lombok.SneakyThrows;
 
 /**
@@ -22,24 +21,12 @@ public final class EdgeIteratorStateReverseExtractor {
 
     @SneakyThrows
     public boolean hasReversed(EdgeIteratorState closestEdge) {
-        if (closestEdge instanceof VirtualEdgeIteratorState virtualEdgeIteratorState) {
-            return extractReversedFromVirtualEdge(virtualEdgeIteratorState);
-        } else if (closestEdge instanceof EdgeIteratorStateImpl edgeIterable) {
+
+        if (closestEdge instanceof EdgeIteratorStateImpl edgeIterable) {
             return edgeIterable.reverse;
         } else {
-            throw new IllegalArgumentException(
-                    "This method can only be called with an EdgeIterable or VirtualEdgeIteratorState"
-                            + "instance of EdgeIteratorState");
+            return VirtualEdgeIteratorStateReverseExtractor.hasReversed(closestEdge);
 
         }
-
-
-    }
-
-    private static boolean extractReversedFromVirtualEdge(VirtualEdgeIteratorState closestEdge)
-            throws NoSuchFieldException, IllegalAccessException {
-        Field field = closestEdge.getClass().getDeclaredField("reverse"); //NoSuchFieldException
-        field.setAccessible(true);
-        return (boolean) field.get(closestEdge);
     }
 }
