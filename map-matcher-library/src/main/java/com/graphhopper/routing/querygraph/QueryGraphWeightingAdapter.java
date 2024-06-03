@@ -19,9 +19,9 @@
 package com.graphhopper.routing.querygraph;
 
 import com.carrotsearch.hppc.IntArrayList;
+import com.graphhopper.routing.weighting.QueryGraphWeighting;
 import com.graphhopper.routing.weighting.Weighting;
 import com.graphhopper.storage.EdgeIteratorStateReverseExtractor;
-import com.graphhopper.util.EdgeIterator;
 import com.graphhopper.util.EdgeIteratorState;
 
 /**
@@ -29,29 +29,19 @@ import com.graphhopper.util.EdgeIteratorState;
  * {@link Weighting} we want to use with this class. Otherwise turn costs at virtual nodes and/or including virtual
  * edges will not be calculated correctly.
  */
-public class QueryGraphWeightingAdapter implements Weighting {
+public class QueryGraphWeightingAdapter extends QueryGraphWeighting implements Weighting {
 
-    private final Weighting weighting;
-    private final int firstVirtualNodeId;
-    private final int firstVirtualEdgeId;
-    private final IntArrayList closestEdges;
     private final boolean reverseFlow;
     private final EdgeIteratorStateReverseExtractor edgeIteratorStateReverseExtractor;
+    private final int firstVirtualEdgeId;
 
     public QueryGraphWeightingAdapter(Weighting weighting, int firstVirtualNodeId, int firstVirtualEdgeId,
             IntArrayList closestEdges, EdgeIteratorStateReverseExtractor edgeIteratorStateReverseExtractor,
             boolean reverseFlow) {
-        this.weighting = weighting;
-        this.firstVirtualNodeId = firstVirtualNodeId;
-        this.firstVirtualEdgeId = firstVirtualEdgeId;
-        this.closestEdges = closestEdges;
+        super(weighting, firstVirtualNodeId, firstVirtualEdgeId, closestEdges);
         this.reverseFlow = reverseFlow;
         this.edgeIteratorStateReverseExtractor = edgeIteratorStateReverseExtractor;
-    }
-
-    @Override
-    public double getMinWeight(double distance) {
-        return weighting.getMinWeight(distance);
+        this.firstVirtualEdgeId = firstVirtualEdgeId;
     }
 
     @Override
@@ -63,75 +53,11 @@ public class QueryGraphWeightingAdapter implements Weighting {
                 && edgeIteratorStateReverseExtractor.hasReversed(edgeState) != reverseFlow) {
             return Double.POSITIVE_INFINITY;
         }
-        return weighting.calcEdgeWeight(edgeState, reverse);
-    }
-
-    @Override
-    public double calcTurnWeight(int inEdge, int viaNode, int outEdge) {
-        if (!EdgeIterator.Edge.isValid(inEdge) || !EdgeIterator.Edge.isValid(outEdge)) {
-            return 0;
-        }
-        if (isVirtualNode(viaNode)) {
-            if (isUTurn(inEdge, outEdge)) {
-                // do not allow u-turns at virtual nodes, otherwise the route depends on whether or not there are
-                // virtual via nodes, see #1672. note since we are turning between virtual edges here we need to compare
-                // the *virtual* edge ids (the orig edge would always be the same for all virtual edges at a virtual
-                // node), see #1593
-                return Double.POSITIVE_INFINITY;
-            } else {
-                return 0;
-            }
-        }
-        // to calculate the actual turn costs or detect u-turns we need to look at the original edge of each virtual
-        // edge, see #1593
-        if (isVirtualEdge(inEdge)) {
-            inEdge = getOriginalEdge(inEdge);
-        }
-        if (isVirtualEdge(outEdge)) {
-            outEdge = getOriginalEdge(outEdge);
-        }
-        return weighting.calcTurnWeight(inEdge, viaNode, outEdge);
-    }
-
-    private boolean isUTurn(int inEdge, int outEdge) {
-        return inEdge == outEdge;
-    }
-
-    @Override
-    public long calcEdgeMillis(EdgeIteratorState edgeState, boolean reverse) {
-        return weighting.calcEdgeMillis(edgeState, reverse);
-    }
-
-    @Override
-    public long calcTurnMillis(int inEdge, int viaNode, int outEdge) {
-        return (long) (1000 * calcTurnWeight(inEdge, viaNode, outEdge));
-    }
-
-    @Override
-    public boolean hasTurnCosts() {
-        return weighting.hasTurnCosts();
-    }
-
-    @Override
-    public String getName() {
-        return weighting.getName();
-    }
-
-    @Override
-    public String toString() {
-        return getName();
-    }
-
-    private int getOriginalEdge(int edge) {
-        return closestEdges.get((edge - firstVirtualEdgeId) / 2);
-    }
-
-    private boolean isVirtualNode(int node) {
-        return node >= firstVirtualNodeId;
+        return super.calcEdgeWeight(edgeState, reverse);
     }
 
     private boolean isVirtualEdge(int edge) {
-        return edge >= firstVirtualEdgeId;
+        return edge >= this.firstVirtualEdgeId;
     }
 
     public static QueryGraphWeightingAdapter fromQueryGraph(Weighting baseWeighting, QueryGraph queryGraph,
