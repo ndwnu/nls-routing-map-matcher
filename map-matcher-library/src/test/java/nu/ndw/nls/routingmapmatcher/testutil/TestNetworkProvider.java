@@ -67,8 +67,16 @@ public class TestNetworkProvider {
     }
 
     public static final String CAR_FASTEST = "car_fastest";
+    public static final String CAR_FASTEST_NO_U_TURNS = "car_fastest_no_u_turns";
     public static List<Profile> TEST_PROFILES = List.of(
-            new Profile(CAR_FASTEST).setVehicle("car"),
+            new Profile(CAR_FASTEST)
+                    .setVehicle("car")
+                    ,
+
+            new Profile(CAR_FASTEST_NO_U_TURNS)
+                    .setVehicle("car")
+                    .setTurnCosts(true),
+
             new Profile("car_shortest")
                     .setVehicle("car")
                     .setCustomModel(new CustomModel().setDistanceInfluence(WEIGHTING_SHORTEST_DISTANCE_INFLUENCE))

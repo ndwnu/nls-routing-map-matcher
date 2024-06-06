@@ -83,14 +83,14 @@ public class IsochroneService {
         // Get the start segment for the isochrone calculation.
         Snap startSegment = locationIndexTree.findClosest(latitude, longitude,
                 edge -> edge.get(encodingManager.getIntEncodedValue(WAY_ID_KEY)) == matchedLinkId);
-
         // Lookup will create virtual edges based on the snapped point, thereby cutting the segment in 2-line strings.
         // It also sets the closestNode of the matchedQueryResult to the virtual node ID. In this way, it creates a
         // start point for isochrone calculation based on the snapped point coordinates.
         QueryGraph queryGraph = QueryGraph.create(baseGraph, startSegment);
+        boolean searchDirectionIsReversed = reversed != reverseFlow;
         IsochroneByTimeDistanceAndWeight isochrone = shortestPathTreeFactory
                 .createShortestPathTreeByTimeDistanceAndWeight(null, queryGraph, TraversalMode.EDGE_BASED,
-                        isochroneValue, isochroneUnit, reverseFlow);
+                        isochroneValue, isochroneUnit, searchDirectionIsReversed);
         // Here the closestNode is the virtual node ID created by the queryGraph.lookup.
         List<IsoLabel> isoLabels = new ArrayList<>();
         isochrone.search(startSegment.getClosestNode(), isoLabels::add);
@@ -98,11 +98,6 @@ public class IsochroneService {
         EdgeIteratorState startEdge = startSegment.getClosestEdge();
         return isoLabels.stream()
                 .filter(isoLabel -> ! isoLabel.isRoot())
-                // With bidirectional start segments, the search goes two ways for both down and upstream isochrones.
-                // The branches that are starting in the wrong direction of travelling (as determined by the nearest
-                // match) are filtered out.
-                .filter(isoLabel -> isSegmentFromStartSegmentInCorrectDirection(searchDirectionReversed, isoLabel,
-                        startEdge, queryGraph))
                 .sorted(comparing(IsoLabel::getDistance))
                 .map(isoLabel -> {
                     // Specify the maximum distance on which to crop the geometries.
@@ -148,35 +143,4 @@ public class IsochroneService {
         return currentEdge.get(vehicleSpeedDecimalEncodedValue);
     }
 
-    /**
-     * This method recursively goes through the parent list to find the start segment. It then determines if the start
-     * segment is in the correct direction for the upstream or downstream query.
-     *
-     * @param reverse    Indicating the correct direction
-     * @param isoLabel   The label to be checked
-     * @param startEdge  Start edge to find
-     * @param queryGraph The context from which to get the currentEdge
-     * @return boolean indicating the correct direction
-     */
-    private boolean isSegmentFromStartSegmentInCorrectDirection(boolean reverse, IsoLabel isoLabel,
-            EdgeIteratorState startEdge, QueryGraph queryGraph) {
-        // If the start segment is not bidirectional, the search returns the right results.
-        EdgeIteratorTravelDirection edgeIteratorTravelDirection = determineEdgeDirection(startEdge, encodingManager,
-                profile.getVehicle());
-        if (EdgeIteratorTravelDirection.BOTH_DIRECTIONS != edgeIteratorTravelDirection) {
-            return true;
-        } else {
-            boolean isCorrect = true;
-            EdgeIteratorState currentEdge = queryGraph.getEdgeIteratorState(isoLabel.getEdge(), isoLabel.getNode());
-            int roadSectionId = currentEdge.get(encodingManager.getIntEncodedValue(WAY_ID_KEY));
-            if (isochroneMatchMapper.isStartSegment(roadSectionId, startEdge)) {
-                isCorrect = edgeIteratorStateReverseExtractor.hasReversed(currentEdge) == reverse;
-            }
-            if (!isoLabel.parentIsRoot()) {
-                return isSegmentFromStartSegmentInCorrectDirection(reverse, isoLabel.getParent(), startEdge,
-                        queryGraph);
-            }
-            return isCorrect;
-        }
-    }
 }
