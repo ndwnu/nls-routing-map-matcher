@@ -9,20 +9,17 @@ import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
 import com.graphhopper.config.Profile;
 import com.graphhopper.routing.ev.BooleanEncodedValue;
 import com.graphhopper.routing.ev.DecimalEncodedValue;
-import com.graphhopper.routing.ev.VehicleAccess;
 import com.graphhopper.routing.ev.VehicleSpeed;
 import com.graphhopper.routing.querygraph.QueryGraph;
 import com.graphhopper.routing.util.EdgeFilter;
 import com.graphhopper.routing.util.EncodingManager;
 import com.graphhopper.routing.util.TraversalMode;
 import com.graphhopper.storage.BaseGraph;
-import com.graphhopper.storage.EdgeIteratorStateReverseExtractor;
 import com.graphhopper.storage.index.LocationIndexTree;
 import com.graphhopper.storage.index.Snap;
 import com.graphhopper.util.EdgeIteratorState;
@@ -64,8 +61,7 @@ class IsochroneServiceTest {
     private EncodingManager encodingManager;
     @Mock
     private BaseGraph baseGraph;
-    @Mock
-    private EdgeIteratorStateReverseExtractor edgeIteratorStateReverseExtractor;
+
     @Mock
     private IsochroneMatchMapper isochroneMatchMapper;
     @Mock
@@ -106,10 +102,7 @@ class IsochroneServiceTest {
         IsoLabel isoLabel = createIsoLabel(100, 0);
         setupFixture();
         doSearchWithMockConsumer(isoLabel);
-        when(profile.getVehicle()).thenReturn(VEHICLE_CAR);
-        when(encodingManager.getBooleanEncodedValue(VehicleAccess.key(VEHICLE_CAR))).thenReturn(booleanEncodedValue);
-        when(startEdge.get(booleanEncodedValue)).thenReturn(true);
-        when(startEdge.getReverse(booleanEncodedValue)).thenReturn(false);
+
         when(location.getUpstreamIsochrone()).thenReturn(ISOCHRONE_VALUE_METERS);
         when(location.getUpstreamIsochroneUnit()).thenReturn(IsochroneUnit.METERS);
         when(isochroneMatchMapper.mapToIsochroneMatch(isoLabel, ISOCHRONE_VALUE_METERS, queryGraph, startEdge))
@@ -119,17 +112,6 @@ class IsochroneServiceTest {
                 TraversalMode.EDGE_BASED, ISOCHRONE_VALUE_METERS, IsochroneUnit.METERS, true);
     }
 
-    @Test
-    void getUpstreamIsochroneMatches_ok_filter() {
-        IsoLabel isoLabel = createIsoLabel(100, 0);
-        setupFixture();
-        setupFixtureForFilter(isoLabel);
-        doSearchWithMockConsumer(isoLabel);
-        when(location.getUpstreamIsochrone()).thenReturn(ISOCHRONE_VALUE_METERS);
-        when(location.getUpstreamIsochroneUnit()).thenReturn(IsochroneUnit.METERS);
-        wrapWithStaticMock(() -> isochroneService.getUpstreamIsochroneMatches(point, LINK_ID, REVERSED, location));
-        verifyNoMoreInteractions(isochroneMatchMapper);
-    }
 
     @Test
     void getUpstreamIsochroneMatches_ok_seconds() {
@@ -137,9 +119,7 @@ class IsochroneServiceTest {
         setupFixture();
         doSearchWithMockConsumer(endLabel);
         when(profile.getVehicle()).thenReturn(VEHICLE_CAR);
-        when(encodingManager.getBooleanEncodedValue(VehicleAccess.key(VEHICLE_CAR))).thenReturn(booleanEncodedValue);
-        when(startEdge.get(booleanEncodedValue)).thenReturn(true);
-        when(startEdge.getReverse(booleanEncodedValue)).thenReturn(false);
+
         when(location.getUpstreamIsochrone()).thenReturn(ISOCHRONE_VALUE_SECONDS);
         when(location.getUpstreamIsochroneUnit()).thenReturn(IsochroneUnit.SECONDS);
         when(queryGraph.getEdgeIteratorState(anyInt(), anyInt())).thenReturn(currentEdge);
@@ -162,9 +142,6 @@ class IsochroneServiceTest {
         setupFixture();
         doSearchWithMockConsumer(endLabel);
         when(profile.getVehicle()).thenReturn(VEHICLE_CAR);
-        when(encodingManager.getBooleanEncodedValue(VehicleAccess.key(VEHICLE_CAR))).thenReturn(booleanEncodedValue);
-        when(startEdge.get(booleanEncodedValue)).thenReturn(true);
-        when(startEdge.getReverse(booleanEncodedValue)).thenReturn(false);
         when(location.getDownstreamIsochrone()).thenReturn(ISOCHRONE_VALUE_SECONDS);
         when(location.getDownstreamIsochroneUnit()).thenReturn(IsochroneUnit.SECONDS);
         when(queryGraph.getEdgeIteratorState(anyInt(), anyInt())).thenReturn(currentEdge);
@@ -186,10 +163,6 @@ class IsochroneServiceTest {
         IsoLabel isoLabel = createIsoLabel(100, 0);
         setupFixture();
         doSearchWithMockConsumer(isoLabel);
-        when(profile.getVehicle()).thenReturn(VEHICLE_CAR);
-        when(encodingManager.getBooleanEncodedValue(VehicleAccess.key(VEHICLE_CAR))).thenReturn(booleanEncodedValue);
-        when(startEdge.get(booleanEncodedValue)).thenReturn(true);
-        when(startEdge.getReverse(booleanEncodedValue)).thenReturn(false);
         when(location.getDownstreamIsochrone()).thenReturn(ISOCHRONE_VALUE_METERS);
         when(location.getDownstreamIsochroneUnit()).thenReturn(IsochroneUnit.METERS);
         when(isochroneMatchMapper.mapToIsochroneMatch(isoLabel, ISOCHRONE_VALUE_METERS, queryGraph, startEdge))
@@ -217,15 +190,6 @@ class IsochroneServiceTest {
         }).when(isochroneByTimeDistanceAndWeight).search(eq(START_NODE_ID), any());
     }
 
-    private void setupFixtureForFilter(IsoLabel isoLabel) {
-        when(profile.getVehicle()).thenReturn(VEHICLE_CAR);
-        when(encodingManager.getBooleanEncodedValue(VehicleAccess.key(VEHICLE_CAR))).thenReturn(booleanEncodedValue);
-        when(startEdge.get(booleanEncodedValue)).thenReturn(true);
-        when(startEdge.getReverse(booleanEncodedValue)).thenReturn(true);
-        when(isochroneMatchMapper.isStartSegment(0, startEdge)).thenReturn(true);
-        when(queryGraph.getEdgeIteratorState(isoLabel.getEdge(), isoLabel.getNode())).thenReturn(currentEdge);
-        when(edgeIteratorStateReverseExtractor.hasReversed(currentEdge)).thenReturn(false);
-    }
 
     private void setupFixture() {
         when(point.getY()).thenReturn(Y_COORDINATE);

@@ -29,9 +29,8 @@ class CustomVehicleEncodedValuesFactoryTest {
         assertEquals("vehicle_name", result.getName());
         assertEquals("vehicle_name_access", result.getAccessEnc().getName());
         assertEquals("vehicle_name_average_speed", result.getAverageSpeedEnc().getName());
-        assertTrue(result.getAverageSpeedEnc().isStoreTwoDirections());
-        assertNull(result.getPriorityEnc());
-        assertNull(result.getTurnRestrictionEnc());
+        assertEquals("vehicle_name_turn_restriction", result.getTurnRestrictionEnc().getName());
+
     }
 
 }
