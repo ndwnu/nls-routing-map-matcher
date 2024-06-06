@@ -31,15 +31,15 @@ import com.graphhopper.util.EdgeIteratorState;
  */
 public class QueryGraphWeightingAdapter extends QueryGraphWeighting {
 
-    private final boolean reverseFlow;
+    private final boolean isSearchDirectionReversed;
     private final EdgeIteratorStateReverseExtractor edgeIteratorStateReverseExtractor;
     private final int firstVirtualEdgeId;
 
     public QueryGraphWeightingAdapter(Weighting weighting, int firstVirtualNodeId, int firstVirtualEdgeId,
             IntArrayList closestEdges, EdgeIteratorStateReverseExtractor edgeIteratorStateReverseExtractor,
-            boolean reverseFlow) {
+            boolean isSearchDirectionReversed) {
         super(weighting, firstVirtualNodeId, firstVirtualEdgeId, closestEdges);
-        this.reverseFlow = reverseFlow;
+        this.isSearchDirectionReversed = isSearchDirectionReversed;
         this.edgeIteratorStateReverseExtractor = edgeIteratorStateReverseExtractor;
         this.firstVirtualEdgeId = firstVirtualEdgeId;
     }
@@ -50,7 +50,7 @@ public class QueryGraphWeightingAdapter extends QueryGraphWeighting {
         // The branches that are starting in the wrong direction of travelling (as determined by the nearest
         // match) are filtered out.
         if (isVirtualEdge(edgeState.getEdge())
-                && edgeIteratorStateReverseExtractor.hasReversed(edgeState) != reverseFlow) {
+                && edgeIteratorStateReverseExtractor.hasReversed(edgeState) != isSearchDirectionReversed) {
             return Double.POSITIVE_INFINITY;
         }
         return super.calcEdgeWeight(edgeState, reverse);
