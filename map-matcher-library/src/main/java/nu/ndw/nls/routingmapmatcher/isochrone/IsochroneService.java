@@ -83,14 +83,14 @@ public class IsochroneService {
         // Get the start segment for the isochrone calculation.
         Snap startSegment = locationIndexTree.findClosest(latitude, longitude,
                 edge -> edge.get(encodingManager.getIntEncodedValue(WAY_ID_KEY)) == matchedLinkId);
-
         // Lookup will create virtual edges based on the snapped point, thereby cutting the segment in 2-line strings.
         // It also sets the closestNode of the matchedQueryResult to the virtual node ID. In this way, it creates a
         // start point for isochrone calculation based on the snapped point coordinates.
         QueryGraph queryGraph = QueryGraph.create(baseGraph, startSegment);
+        boolean searchDirectionIsReversed = reversed != reverseFlow;
         IsochroneByTimeDistanceAndWeight isochrone = shortestPathTreeFactory
                 .createShortestPathTreeByTimeDistanceAndWeight(null, queryGraph, TraversalMode.EDGE_BASED,
-                        isochroneValue, isochroneUnit, reverseFlow);
+                        isochroneValue, isochroneUnit, searchDirectionIsReversed);
         // Here the closestNode is the virtual node ID created by the queryGraph.lookup.
         List<IsoLabel> isoLabels = new ArrayList<>();
         isochrone.search(startSegment.getClosestNode(), isoLabels::add);
