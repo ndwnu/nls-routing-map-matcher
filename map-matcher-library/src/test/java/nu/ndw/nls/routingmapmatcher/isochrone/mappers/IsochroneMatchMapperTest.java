@@ -100,13 +100,15 @@ class IsochroneMatchMapperTest {
         when(queryGraph.getEdgeIteratorState(isoLabel.getParent().getEdge(), isoLabel.getParent().getNode()))
                 .thenReturn(parentEdge);
         when(parentEdge.get(intEncodedValue)).thenReturn(PARENT_LINK_ID);
+        when(edgeIteratorStateReverseExtractor.hasReversed(parentEdge)).thenReturn(false);
         IsochroneMatch result = isochroneMatchMapper.mapToIsochroneMatch(isoLabel, MAX_DISTANCE, queryGraph, startEdge);
         assertThat(result.getMatchedLinkId()).isEqualTo(MATCHED_LINK_ID_ONE);
         assertThat(result.getStartFraction()).isEqualTo(0);
         assertThat(result.getEndFraction()).isEqualTo(1.0);
         assertThat(result.isReversed()).isFalse();
         assertThat(result.getGeometry()).isEqualTo(isoLabelWayGeometry);
-        assertThat(result.getParentLinkId()).isEqualTo(PARENT_LINK_ID);
+        assertThat(result.getParentLink().getLinkId()).isEqualTo(PARENT_LINK_ID);
+        assertThat(result.getParentLink().isReversed()).isFalse();
     }
 
     @Test
