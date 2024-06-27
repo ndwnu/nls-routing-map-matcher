@@ -71,12 +71,12 @@ public class IsochroneMatchMapper {
                 .startFraction(startFraction)
                 .endFraction(endFraction)
                 .reversed(reversed)
-                .parentLink(getParentLink(isoLabel, queryGraph))
+                .parentLink(createParentLink(isoLabel, queryGraph))
                 .geometry(partialGeometry)
                 .build();
     }
 
-    private IsochroneParentLink getParentLink(IsoLabel isoLabel, QueryGraph queryGraph) {
+    private IsochroneParentLink createParentLink(IsoLabel isoLabel, QueryGraph queryGraph) {
         if (!isoLabel.parentIsRoot()) {
             IntEncodedValue idEnc = encodingManager.getIntEncodedValue(WAY_ID_KEY);
             EdgeIteratorState parentEdge = queryGraph.getEdgeIteratorState(isoLabel.getParent().getEdge(),
