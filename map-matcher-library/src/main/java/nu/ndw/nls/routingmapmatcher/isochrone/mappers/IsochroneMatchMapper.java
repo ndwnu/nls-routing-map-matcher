@@ -13,6 +13,7 @@ import lombok.RequiredArgsConstructor;
 import nu.ndw.nls.geometry.distance.FractionAndDistanceCalculator;
 import nu.ndw.nls.routingmapmatcher.isochrone.algorithm.IsoLabel;
 import nu.ndw.nls.routingmapmatcher.model.IsochroneMatch;
+import nu.ndw.nls.routingmapmatcher.model.IsochroneParentLink;
 import nu.ndw.nls.routingmapmatcher.util.PointListUtil;
 import org.locationtech.jts.geom.LineString;
 
@@ -70,17 +71,22 @@ public class IsochroneMatchMapper {
                 .startFraction(startFraction)
                 .endFraction(endFraction)
                 .reversed(reversed)
-                .parentLinkId(getParentLinkId(isoLabel, queryGraph))
+                .parentLink(createParentLink(isoLabel, queryGraph))
                 .geometry(partialGeometry)
                 .build();
     }
 
-    private Integer getParentLinkId(IsoLabel isoLabel, QueryGraph queryGraph) {
+    private IsochroneParentLink createParentLink(IsoLabel isoLabel, QueryGraph queryGraph) {
         if (!isoLabel.parentIsRoot()) {
             IntEncodedValue idEnc = encodingManager.getIntEncodedValue(WAY_ID_KEY);
             EdgeIteratorState parentEdge = queryGraph.getEdgeIteratorState(isoLabel.getParent().getEdge(),
                     isoLabel.getParent().getNode());
-            return parentEdge.get(idEnc);
+            boolean reversed = edgeIteratorStateReverseExtractor.hasReversed(parentEdge);
+            return IsochroneParentLink
+                    .builder()
+                    .linkId(parentEdge.get(idEnc))
+                    .reversed(reversed)
+                    .build();
         } else {
             return null;
         }
