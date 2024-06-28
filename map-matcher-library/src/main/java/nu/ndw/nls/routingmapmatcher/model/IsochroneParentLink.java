@@ -10,6 +10,7 @@ import lombok.ToString;
 @EqualsAndHashCode
 @ToString
 public class IsochroneParentLink {
-    private final Integer linkId;
-    private boolean reversed;
+
+    private final int linkId;
+    private final boolean reversed;
 }
