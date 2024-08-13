@@ -17,8 +17,8 @@ extends:
   template: azure-pipelines-java.yml@nls-pipeline-templates
   parameters:
     isVersionedProject: true
+    jdkVersion: 1.21
     mavenReleaseGoal: deploy
     sonarOptionalCoverageExclusions: '**/config/**'
     sonarOptionalExclusions: '**/graphhopper/isochrone/ShortestPathTree.java,**/graphhopper/routing/PathRouter.java'
     pushToGitHub: true
-
