@@ -17,7 +17,6 @@ import com.graphhopper.storage.index.Snap;
 import com.graphhopper.util.EdgeIteratorState;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import nu.ndw.nls.routingmapmatcher.isochrone.algorithm.IsoLabel;
 import nu.ndw.nls.routingmapmatcher.isochrone.algorithm.IsochroneByTimeDistanceAndWeight;
@@ -106,7 +105,7 @@ public class IsochroneService {
                             : calculateMaxDistance(queryGraph, isochroneValue, isoLabel, searchDirectionReversed);
                     return isochroneMatchMapper.mapToIsochroneMatch(isoLabel, maxDistance, queryGraph, startEdge);
                 })
-                .collect(Collectors.toList());
+                .toList();
     }
 
     /**
