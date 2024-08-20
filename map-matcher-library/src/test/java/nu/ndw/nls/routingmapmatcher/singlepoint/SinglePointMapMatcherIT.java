@@ -267,7 +267,7 @@ public class SinglePointMapMatcherIT {
 
     private List<CandidateMatch> getNearestCandidateMatches(List<CandidateMatch> candidateMatches) {
         double cutoffDistance = candidateMatches.getFirst().getDistance() + DISTANCE_ROUNDING_ERROR;
-        return candidateMatches.stream().filter(cm -> cm.getDistance() < cutoffDistance).collect(Collectors.toList());
+        return candidateMatches.stream().filter(cm -> cm.getDistance() < cutoffDistance).toList();
     }
 
     private void assertThatUpstreamAndDownstreamAreNull(List<CandidateMatch> candidateMatches) {
