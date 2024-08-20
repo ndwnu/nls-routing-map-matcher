@@ -96,9 +96,9 @@ public class Router {
             if (edges.isEmpty()) {
                 throw new RoutingException("Unexpected: path has no edges");
             }
-            double startFraction = PathUtil.determineStartLinkFraction(edges.get(0),
+            double startFraction = PathUtil.determineStartLinkFraction(edges.getFirst(),
                     QueryGraphExtractor.extractQueryGraph(path),fractionAndDistanceCalculator);
-            double endFraction = PathUtil.determineEndLinkFraction(edges.get(edges.size() - 1),
+            double endFraction = PathUtil.determineEndLinkFraction(edges.getLast(),
                     QueryGraphExtractor.extractQueryGraph(path),fractionAndDistanceCalculator);
             List<MatchedEdgeLink> matchedEdgeLinks = PathUtil.determineMatchedLinks(
                     networkGraphHopper.getEncodingManager(),

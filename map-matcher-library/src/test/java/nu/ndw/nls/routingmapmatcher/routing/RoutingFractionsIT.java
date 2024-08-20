@@ -105,9 +105,9 @@ class RoutingFractionsIT {
                 .build());
 
         assertEquals(1, resultA.getLegs().size());
-        RoutingLegResponse routingLegResponseA = resultA.getLegs().get(0);
+        RoutingLegResponse routingLegResponseA = resultA.getLegs().getFirst();
         assertEquals(1, routingLegResponseA.getMatchedLinks().size());
-        MatchedLink matchedLinkA = routingLegResponseA.getMatchedLinks().get(0);
+        MatchedLink matchedLinkA = routingLegResponseA.getMatchedLinks().getFirst();
         assertEquals(6405185, matchedLinkA.getLinkId());
         assertTrue(matchedLinkA.isReversed());
         assertEquals(0.07063478982795716, matchedLinkA.getStartFraction());
@@ -120,10 +120,10 @@ class RoutingFractionsIT {
                 .build());
 
         assertEquals(1, resultB.getLegs().size());
-        RoutingLegResponse routingLegResponseB = resultB.getLegs().get(0);
+        RoutingLegResponse routingLegResponseB = resultB.getLegs().getFirst();
         List<MatchedLink> matchedLinks = routingLegResponseB.getMatchedLinks();
         assertEquals(1, matchedLinks.size());
-        MatchedLink matchedLinkB = matchedLinks.get(0);
+        MatchedLink matchedLinkB = matchedLinks.getFirst();
         assertEquals(6405185, matchedLinkB.getLinkId());
         assertFalse(matchedLinkB.isReversed());
         assertEquals(0.21711626527479014, matchedLinkB.getStartFraction());
