@@ -119,7 +119,7 @@ class SinglePointMapMatcherFixUTurnsIT {
         SinglePointLocation singlePoint = this.createSinglePoint(1, 4.3781143, 52.0425856);
         SinglePointMatch match = this.singlePointMapMatcher.match(singlePoint);
         assertEquals(1, match.getCandidateMatches().size());
-        CandidateMatch candidate = match.getCandidateMatches().get(0);
+        CandidateMatch candidate = match.getCandidateMatches().getFirst();
         //should have 4 sections not 8
         assertThat(candidate.getUpstream()).hasSize(4);
 

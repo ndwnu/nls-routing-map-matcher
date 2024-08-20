@@ -156,7 +156,7 @@ class BikeRouterIT {
                 .build());
 
         assertEquals(1, result.getLegs().size());
-        assertEquals(3, result.getLegs().get(0).getMatchedLinks().size());
+        assertEquals(3, result.getLegs().getFirst().getMatchedLinks().size());
     }
 
     @Test

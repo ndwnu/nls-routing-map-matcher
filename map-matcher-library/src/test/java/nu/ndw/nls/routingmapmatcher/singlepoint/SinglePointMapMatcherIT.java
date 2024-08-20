@@ -75,7 +75,7 @@ public class SinglePointMapMatcherIT {
         assertThat(candidateMatches, hasSize(1));
         assertThatUpstreamAndDownstreamAreNull(candidateMatches);
         assertThat(getSnappedPoints(candidateMatches), hasSize(1));
-        assertThat(singlePointMatch.getCandidateMatches().get(0).getFraction(), closeTo(expectedFraction, 0.01));
+        assertThat(singlePointMatch.getCandidateMatches().getFirst().getFraction(), closeTo(expectedFraction, 0.01));
     }
 
     @SneakyThrows
@@ -245,7 +245,7 @@ public class SinglePointMapMatcherIT {
         assertThat(getSnappedPoints(candidateMatches), hasSize(1));
         assertThat(singlePointMatch.getReliability(), is(92.4716649970769));
 
-        SinglePointMatch.CandidateMatch candidateMatch = singlePointMatch.getCandidateMatches().get(0);
+        SinglePointMatch.CandidateMatch candidateMatch = singlePointMatch.getCandidateMatches().getFirst();
         assertThat(candidateMatch.getMatchedLinkId(), is(3666958));
 
         // TODO upstream and downstream shouldn't contain matched segment itself?
@@ -266,7 +266,7 @@ public class SinglePointMapMatcherIT {
     }
 
     private List<CandidateMatch> getNearestCandidateMatches(List<CandidateMatch> candidateMatches) {
-        double cutoffDistance = candidateMatches.get(0).getDistance() + DISTANCE_ROUNDING_ERROR;
+        double cutoffDistance = candidateMatches.getFirst().getDistance() + DISTANCE_ROUNDING_ERROR;
         return candidateMatches.stream().filter(cm -> cm.getDistance() < cutoffDistance).collect(Collectors.toList());
     }
 

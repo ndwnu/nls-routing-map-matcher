@@ -100,7 +100,7 @@ public class SinglePointMapMatcher implements MapMatcher<SinglePointLocation, Si
         return SinglePointMatch
                 .builder()
                 .id(singlePointLocation.getId())
-                .reliability(candidateMatches.get(0).getReliability())
+                .reliability(candidateMatches.getFirst().getReliability())
                 .candidateMatches(candidateMatches)
                 .status(MatchStatus.MATCH)
                 .build();
@@ -148,7 +148,7 @@ public class SinglePointMapMatcher implements MapMatcher<SinglePointLocation, Si
     }
 
     private List<MatchedPoint> getShortest(List<MatchedPoint> sorted) {
-        double cutoffValue = sorted.get(0).getDistance() + DISTANCE_THRESHOLD;
+        double cutoffValue = sorted.getFirst().getDistance() + DISTANCE_THRESHOLD;
         return sorted
                 .stream()
                 .filter(matchedPoint -> matchedPoint.getDistance() < cutoffValue)
@@ -156,7 +156,7 @@ public class SinglePointMapMatcher implements MapMatcher<SinglePointLocation, Si
     }
 
     private List<MatchedPoint> getMostReliable(List<MatchedPoint> sorted) {
-        double cutoffValue = sorted.get(0).getReliability() - RELIABILITY_THRESHOLD;
+        double cutoffValue = sorted.getFirst().getReliability() - RELIABILITY_THRESHOLD;
         return sorted
                 .stream()
                 .filter(matchedPoint -> matchedPoint.getReliability() > cutoffValue)
