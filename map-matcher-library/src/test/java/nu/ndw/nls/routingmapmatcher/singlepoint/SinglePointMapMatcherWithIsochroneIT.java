@@ -71,9 +71,9 @@ public class SinglePointMapMatcherWithIsochroneIT {
                 .build();
         SinglePointMatch result = singlePointMapMatcher.match(request);
         assertThat(result.getCandidateMatches(), hasSize(ID));
-        CandidateMatch match = result.getCandidateMatches().get(0);
+        CandidateMatch match = result.getCandidateMatches().getFirst();
         assertThat(match.getDownstream(), hasSize(5));
-        var startPoint = match.getDownstream().get(0);
+        var startPoint = match.getDownstream().getFirst();
         assertThat(startPoint.getStartFraction(), closeTo(match.getFraction(), 0.000001));
         assertThat(startPoint.getEndFraction(), is(1.0));
         assertFalse(startPoint.isReversed());
@@ -97,9 +97,9 @@ public class SinglePointMapMatcherWithIsochroneIT {
                 .build();
         SinglePointMatch result = singlePointMapMatcher.match(request);
         assertThat(result.getCandidateMatches(), hasSize(ID));
-        CandidateMatch match = result.getCandidateMatches().get(0);
+        CandidateMatch match = result.getCandidateMatches().getFirst();
         assertThat(match.getDownstream(), hasSize(14));
-        var startPoint = match.getDownstream().get(0);
+        var startPoint = match.getDownstream().getFirst();
         assertThat(startPoint.getStartFraction(), closeTo(match.getFraction(), 0.000001));
         assertThat(startPoint.getEndFraction(), is(1.0));
         assertFalse(startPoint.isReversed());
@@ -123,9 +123,9 @@ public class SinglePointMapMatcherWithIsochroneIT {
                 .build();
         SinglePointMatch result = singlePointMapMatcher.match(request);
         assertThat(result.getCandidateMatches(), hasSize(ID));
-        CandidateMatch match = result.getCandidateMatches().get(0);
+        CandidateMatch match = result.getCandidateMatches().getFirst();
         assertThat(match.getUpstream(), hasSize(5));
-        var startPoint = match.getUpstream().get(0);
+        var startPoint = match.getUpstream().getFirst();
         assertThat(startPoint.getStartFraction(), closeTo(1 - match.getFraction(), 0.000001));
         assertThat(startPoint.getEndFraction(), is(1.0));
         assertTrue(startPoint.isReversed());
@@ -149,9 +149,9 @@ public class SinglePointMapMatcherWithIsochroneIT {
                 .build();
         SinglePointMatch result = singlePointMapMatcher.match(request);
         assertThat(result.getCandidateMatches(), hasSize(ID));
-        CandidateMatch match = result.getCandidateMatches().get(0);
+        CandidateMatch match = result.getCandidateMatches().getFirst();
         assertThat(match.getUpstream(), hasSize(11));
-        var startPoint = match.getUpstream().get(0);
+        var startPoint = match.getUpstream().getFirst();
         assertThat(startPoint.getStartFraction(), closeTo(1 - match.getFraction(), 0.000001));
         assertThat(startPoint.getEndFraction(), is(1.0));
         assertTrue(startPoint.isReversed());

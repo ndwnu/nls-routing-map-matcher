@@ -76,8 +76,8 @@ public class LineStringMatchUtil {
             throw new RoutingMapMatcherException("Unexpected: path has no edges");
         }
 
-        EdgeIteratorState startEdge = edges.get(0);
-        EdgeIteratorState endEdge = edges.get(edges.size() - 1);
+        EdgeIteratorState startEdge = edges.getFirst();
+        EdgeIteratorState endEdge = edges.getLast();
 
         double startLinkFraction = PathUtil.determineStartLinkFraction(startEdge, queryGraph,
                 fractionAndDistanceCalculator);
@@ -88,12 +88,12 @@ public class LineStringMatchUtil {
                 PathUtil.determineMatchedLinks(encodingManager, edges), startLinkFraction, endLinkFraction);
 
         Point startPoint = pointListUtil.toLineString(startEdge.fetchWayGeometry(FetchMode.ALL)).getStartPoint();
-        MatchedLink startLink = matchedLinks.get(0);
+        MatchedLink startLink = matchedLinks.getFirst();
         List<IsochroneMatch> upstream = lineStringLocation.getUpstreamIsochroneUnit() != null ?
                 isochroneService.getUpstreamIsochroneMatches(startPoint, startLink.getLinkId(), startLink.isReversed(),
                         lineStringLocation) : null;
         Point endPoint = pointListUtil.toLineString(endEdge.fetchWayGeometry(FetchMode.ALL)).getEndPoint();
-        MatchedLink endLink = matchedLinks.get(matchedLinks.size() - 1);
+        MatchedLink endLink = matchedLinks.getLast();
         List<IsochroneMatch> downstream = lineStringLocation.getDownstreamIsochroneUnit() != null ?
                 isochroneService.getDownstreamIsochroneMatches(endPoint, endLink.getLinkId(), endLink.isReversed(),
                         lineStringLocation) : null;
