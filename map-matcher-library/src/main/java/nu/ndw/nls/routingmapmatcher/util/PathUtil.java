@@ -34,7 +34,7 @@ public final class PathUtil {
         for (EdgeIteratorState edge : edges) {
             int matchedLinkId = edge.get(encodingManager.getIntEncodedValue(WAY_ID_KEY));
             if (matchedEdgeLinks.isEmpty() ||
-                    matchedEdgeLinks.get(matchedEdgeLinks.size() - 1).getLinkId() != matchedLinkId) {
+                    matchedEdgeLinks.getLast().getLinkId() != matchedLinkId) {
                 matchedEdgeLinks.add(MatchedEdgeLink.builder()
                         .linkId(matchedLinkId)
                         .reversed(EDGE_ITERATOR_STATE_REVERSE_EXTRACTOR.hasReversed(edge))
@@ -107,9 +107,9 @@ public final class PathUtil {
 
     private static EdgeIteratorState findOriginalEdge(EdgeIteratorState edge, QueryGraph queryGraph) {
         EdgeIteratorState originalEdge;
-        if (edge instanceof VirtualEdgeIteratorState) {
+        if (edge instanceof VirtualEdgeIteratorState state) {
             originalEdge = queryGraph.getEdgeIteratorStateForKey(
-                    ((VirtualEdgeIteratorState) edge).getOriginalEdgeKey());
+                    state.getOriginalEdgeKey());
         } else {
             originalEdge = edge;
         }

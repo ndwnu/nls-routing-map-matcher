@@ -128,7 +128,7 @@ class SinglePointMapMatcherFractionIT {
         SinglePointLocation singlePoint = this.createSinglePoint(123, 0, 1);
         SinglePointMatch match = this.singlePointMapMatcher.match(singlePoint);
 
-        CandidateMatch candidateMatch = match.getCandidateMatches().get(0);
+        CandidateMatch candidateMatch = match.getCandidateMatches().getFirst();
         assertEquals(0, candidateMatch.getMatchedLinkId());
         assertEquals(0.5, candidateMatch.getFraction(), 0.001);
     }
@@ -138,7 +138,7 @@ class SinglePointMapMatcherFractionIT {
         SinglePointLocation singlePoint = this.createSinglePoint(123, 0, 2);
         SinglePointMatch match = this.singlePointMapMatcher.match(singlePoint);
 
-        CandidateMatch candidateMatch = match.getCandidateMatches().get(0);
+        CandidateMatch candidateMatch = match.getCandidateMatches().getFirst();
         assertEquals(0, candidateMatch.getMatchedLinkId());
         assertEquals(1, candidateMatch.getFraction(), 0.001);
     }
@@ -148,7 +148,7 @@ class SinglePointMapMatcherFractionIT {
         SinglePointLocation singlePoint = this.createSinglePoint(123, 0, 0);
         SinglePointMatch match = this.singlePointMapMatcher.match(singlePoint);
         assertThat(match.getCandidateMatches()).hasSize(2);
-        CandidateMatch candidateMatch1 = match.getCandidateMatches().get(0);
+        CandidateMatch candidateMatch1 = match.getCandidateMatches().getFirst();
         assertEquals(0, candidateMatch1.getMatchedLinkId());
         assertEquals(0, candidateMatch1.getBearing());
         assertEquals(0, candidateMatch1.getFraction(), 0.001);
@@ -163,7 +163,7 @@ class SinglePointMapMatcherFractionIT {
         SinglePointLocation singlePoint = this.createSinglePoint(123, 6, 0);
         SinglePointMatch match = this.singlePointMapMatcher.match(singlePoint);
 
-        CandidateMatch candidateMatch = match.getCandidateMatches().get(0);
+        CandidateMatch candidateMatch = match.getCandidateMatches().getFirst();
         assertEquals(2, candidateMatch.getMatchedLinkId());
         assertEquals(1, candidateMatch.getFraction(), 0.001);
     }
@@ -173,7 +173,7 @@ class SinglePointMapMatcherFractionIT {
         SinglePointLocation singlePoint = this.createSinglePoint(123, 4, 0);
         SinglePointMatch match = this.singlePointMapMatcher.match(singlePoint);
 
-        CandidateMatch candidateMatch = match.getCandidateMatches().get(0);
+        CandidateMatch candidateMatch = match.getCandidateMatches().getFirst();
         assertEquals(2, candidateMatch.getMatchedLinkId());
         assertEquals(0.5, candidateMatch.getFraction(), 0.001);
     }
@@ -183,7 +183,7 @@ class SinglePointMapMatcherFractionIT {
         SinglePointLocation singlePoint = this.createSinglePoint(123, 3, 0);
         SinglePointMatch match = this.singlePointMapMatcher.match(singlePoint);
 
-        CandidateMatch candidateMatch = match.getCandidateMatches().get(0);
+        CandidateMatch candidateMatch = match.getCandidateMatches().getFirst();
         assertEquals(2, candidateMatch.getMatchedLinkId());
         assertEquals(0.25, candidateMatch.getFraction(), 0.001);
     }

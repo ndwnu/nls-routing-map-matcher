@@ -96,8 +96,8 @@ class PointMatchingServiceIT {
                 .build();
         var matches = pointMatchingService.calculateMatches(request);
         assertThat(matches).hasSize(1);
-        assertThat(matches.get(0).getMatchedLinkId()).isEqualTo(ID);
-        var match = matches.get(0);
+        assertThat(matches.getFirst().getMatchedLinkId()).isEqualTo(ID);
+        var match = matches.getFirst();
         assertThat(match.getMatchedLinkId()).isEqualTo(ID);
         assertThat(match.getSnappedPoint().getX()).isEqualTo(SNAPPED_POINT_X);
         assertThat(match.getSnappedPoint().getY()).isEqualTo(SNAPPED_POINT_Y);
@@ -122,8 +122,8 @@ class PointMatchingServiceIT {
                 .build();
         var matches = pointMatchingService.calculateMatches(request);
         assertThat(matches).hasSize(2);
-        assertThat(matches.get(0).getMatchedLinkId()).isEqualTo(ID);
-        var matchOne = matches.get(0);
+        assertThat(matches.getFirst().getMatchedLinkId()).isEqualTo(ID);
+        var matchOne = matches.getFirst();
         assertThat(matchOne.getMatchedLinkId()).isEqualTo(ID);
         assertThat(matchOne.getSnappedPoint().getX()).isEqualTo(SNAPPED_POINT_X);
         assertThat(matchOne.getSnappedPoint().getY()).isEqualTo(SNAPPED_POINT_Y);
@@ -157,8 +157,8 @@ class PointMatchingServiceIT {
                 .build();
         var matches = pointMatchingService.calculateMatches(request);
         assertThat(matches).hasSize(1);
-        assertThat(matches.get(0).getMatchedLinkId()).isEqualTo(ID);
-        var matchOne = matches.get(0);
+        assertThat(matches.getFirst().getMatchedLinkId()).isEqualTo(ID);
+        var matchOne = matches.getFirst();
         assertThat(matchOne.getMatchedLinkId()).isEqualTo(ID);
         assertThat(matchOne.getSnappedPoint().getX()).isEqualTo(SNAPPED_POINT_X);
         assertThat(matchOne.getSnappedPoint().getY()).isEqualTo(SNAPPED_POINT_Y);
@@ -204,7 +204,7 @@ class PointMatchingServiceIT {
                 .sorted(comparing(MatchedPoint::getDistance))
                 .toList();
         assertThat(matches).hasSize(3);
-        var closestMatch = matches.get(0);
+        var closestMatch = matches.getFirst();
         assertThat(closestMatch.getMatchedLinkId()).isEqualTo(ID);
         assertThat(closestMatch.getSnappedPoint().getX()).isEqualTo(SNAPPED_POINT_X_ZIG_ZAG);
         assertThat(closestMatch.getSnappedPoint().getY()).isEqualTo(SNAPPED_POINT_Y_ZIG_ZAG);
