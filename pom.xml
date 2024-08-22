@@ -32,7 +32,7 @@
         <janino.version>3.1.12</janino.version>
         <jts-core.version>1.19.0</jts-core.version>
         <guava.version>33.2.0-jre</guava.version>
-        <hamcrest.version>2.2</hamcrest.version>
+        <hamcrest.version>3.0</hamcrest.version>
         <jacoco.version>0.8.12</jacoco.version>
         <geotools.version>30.2</geotools.version>
         <jts2geojson.version>0.18.1</jts2geojson.version>
