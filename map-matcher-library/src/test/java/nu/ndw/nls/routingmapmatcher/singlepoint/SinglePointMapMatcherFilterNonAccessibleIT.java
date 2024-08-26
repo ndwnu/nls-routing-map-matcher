@@ -1,6 +1,6 @@
 package nu.ndw.nls.routingmapmatcher.singlepoint;
 
-import static nu.ndw.nls.routingmapmatcher.testutil.TestNetworkProvider.CAR_FASTEST;
+import static nu.ndw.nls.routingmapmatcher.testutil.TestNetworkProvider.CAR;
 import static nu.ndw.nls.routingmapmatcher.testutil.TestNetworkProvider.getTestNetwork;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -42,7 +42,7 @@ class SinglePointMapMatcherFilterNonAccessibleIT {
     @BeforeEach
     void setup() {
         singlePointMapMatcher = singlePointMapMatcherFactory.createMapMatcher(getTestNetwork(createLinks()),
-                CAR_FASTEST);
+                CAR);
     }
 
     /**

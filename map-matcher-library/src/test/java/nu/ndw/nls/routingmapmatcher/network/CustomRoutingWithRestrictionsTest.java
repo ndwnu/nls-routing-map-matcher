@@ -1,5 +1,6 @@
 package nu.ndw.nls.routingmapmatcher.network;
 
+import static nu.ndw.nls.routingmapmatcher.testutil.TestNetworkProvider.CAR;
 import static nu.ndw.nls.routingmapmatcher.testutil.TestNetworkProvider.HGV_ACCESSIBLE_KEY;
 import static nu.ndw.nls.routingmapmatcher.testutil.TestNetworkProvider.getTestNetwork;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -23,8 +24,6 @@ import org.locationtech.jts.geom.impl.CoordinateArraySequence;
 
 @Slf4j
 public class CustomRoutingWithRestrictionsTest {
-
-    private static final String CAR_FASTEST = "car_fastest";
 
     private static final Coordinate START_NODE = new Coordinate(5.108409, 52.081079);
     private static final Coordinate NODE_A = new Coordinate(5.1099461, 52.0794303);
@@ -100,7 +99,7 @@ public class CustomRoutingWithRestrictionsTest {
 
     private static GHRequest getRequest(GHPoint from, GHPoint to) {
         return new GHRequest()
-                .setProfile(CAR_FASTEST)
+                .setProfile(CAR)
                 .addPoint(from)
                 .addPoint(to);
     }

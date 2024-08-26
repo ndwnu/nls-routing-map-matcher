@@ -18,6 +18,7 @@ import com.graphhopper.routing.weighting.Weighting;
 import com.graphhopper.storage.BaseGraph;
 import com.graphhopper.storage.index.LocationIndexTree;
 import com.graphhopper.storage.index.Snap;
+import com.graphhopper.util.CustomModel;
 import com.graphhopper.util.PMap;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -30,6 +31,7 @@ import nu.ndw.nls.routingmapmatcher.model.MatchStatus;
 import nu.ndw.nls.routingmapmatcher.model.linestring.LineStringLocation;
 import nu.ndw.nls.routingmapmatcher.model.linestring.LineStringMatch;
 import nu.ndw.nls.routingmapmatcher.network.NetworkGraphHopper;
+import nu.ndw.nls.routingmapmatcher.util.Constants;
 import nu.ndw.nls.routingmapmatcher.util.LineStringMatchUtil;
 import nu.ndw.nls.routingmapmatcher.util.LineStringScoreUtil;
 import org.locationtech.jts.geom.Point;
@@ -62,7 +64,12 @@ public class StartToEndMapMatcher implements MapMatcher<LineStringLocation, Line
         this.locationIndexTree = networkGraphHopper.getLocationIndex();
         this.lineStringMatchUtil = new LineStringMatchUtil(networkGraphHopper, profile, fractionAndDistanceCalculator);
         this.lineStringScoreUtil = new LineStringScoreUtil(fractionAndDistanceCalculator);
-        this.weighting = networkGraphHopper.createWeighting(profile, new PMap());
+        this.weighting = networkGraphHopper.createWeighting(profile, createShortestDistanceHints());
+    }
+
+    private PMap createShortestDistanceHints() {
+        return new PMap()
+                .putObject(CustomModel.KEY, Constants.SHORTEST_CUSTOM_MODEL);
     }
 
     public LineStringMatch match(LineStringLocation lineStringLocation) {

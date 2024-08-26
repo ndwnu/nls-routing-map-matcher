@@ -31,7 +31,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 @ContextConfiguration(classes = {TestConfig.class})
 class BikeRouterIT {
 
-    private static final Profile BIKE_PROFILE = new Profile("bike").setVehicle("bike");
+    private static final Profile BIKE_PROFILE = new Profile("bike");
     @Autowired
     private RouterFactory routerFactory;
     @Autowired

@@ -1,6 +1,6 @@
 package nu.ndw.nls.routingmapmatcher.starttoend;
 
-import static nu.ndw.nls.routingmapmatcher.testutil.TestNetworkProvider.CAR_FASTEST;
+import static nu.ndw.nls.routingmapmatcher.testutil.TestNetworkProvider.CAR;
 import static nu.ndw.nls.routingmapmatcher.testutil.TestNetworkProvider.OBJECT_MAPPER;
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -43,7 +43,7 @@ class StartToEndMapMatcherIT {
     @BeforeEach
     void setup() {
         this.startToEndMapMatcher = startToEndMapMatcherFactory.createMapMatcher(
-                TestNetworkProvider.getTestNetworkFromFile("/test-data/links.json"), CAR_FASTEST);
+                TestNetworkProvider.getTestNetworkFromFile("/test-data/links.json"), CAR);
     }
 
     @SneakyThrows
