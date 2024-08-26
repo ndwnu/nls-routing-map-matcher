@@ -35,8 +35,8 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 class RoutingFractionsIT {
 
     private static final String VEHICLE = "car";
-    private static final String PROFILE_NAME = "profile";
-    private static final Profile PROFILE = new Profile(PROFILE_NAME).setVehicle(VEHICLE);
+    private static final String PROFILE_NAME = "car";
+    private static final Profile PROFILE = new Profile(VEHICLE);
     private static final String NETWORK_NAME = "test_network";
     @Autowired
     private RouterFactory routerFactory;

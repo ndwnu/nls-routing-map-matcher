@@ -4,7 +4,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.graphhopper.config.Profile;
-import com.graphhopper.util.CustomModel;
+import com.graphhopper.config.TurnCostsConfig;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
@@ -33,7 +33,9 @@ import nu.ndw.nls.routingmapmatcher.network.init.annotation.parserfactories.Enco
 import nu.ndw.nls.routingmapmatcher.network.init.annotation.parserfactories.EncodedIntegerMapperFactory;
 import nu.ndw.nls.routingmapmatcher.network.init.annotation.parserfactories.EncodedLongMapperFactory;
 import nu.ndw.nls.routingmapmatcher.network.init.annotation.parserfactories.EncodedStringMapperFactory;
-import nu.ndw.nls.routingmapmatcher.network.init.vehicle.CustomVehicleEncodedValuesFactory;
+import nu.ndw.nls.routingmapmatcher.network.mappers.CustomModelMapper;
+import nu.ndw.nls.routingmapmatcher.network.mappers.ProfileAccessAndSpeedAttributesMapper;
+import nu.ndw.nls.routingmapmatcher.network.mappers.SpeedAndAccessAttributeMapper;
 import nu.ndw.nls.routingmapmatcher.network.model.DirectionalDto;
 import nu.ndw.nls.routingmapmatcher.network.model.Link;
 import nu.ndw.nls.routingmapmatcher.network.model.LinkVehicleMapper;
@@ -41,21 +43,48 @@ import nu.ndw.nls.routingmapmatcher.network.model.RoutingNetworkSettings;
 import nu.ndw.nls.routingmapmatcher.viterbi.LineStringLocationDeserializer;
 import nu.ndw.nls.routingmapmatcher.viterbi.LinkDeserializer;
 import org.apache.commons.io.IOUtils;
+import org.jetbrains.annotations.NotNull;
 import org.locationtech.jts.geom.LineString;
 
 public class TestNetworkProvider {
 
-    private static final double WEIGHTING_SHORTEST_DISTANCE_INFLUENCE = 10_000D;
     public static final ObjectMapper OBJECT_MAPPER;
     private static final SimpleModule SIMPLE_MODULE;
     public static final String HGV_ACCESSIBLE_KEY = "hgv_accessible";
+    public static final String CAR = "car";
+    public static final String CAR_NO_U_TURNS = "car_no_u_turns";
+    public static List<Profile> TEST_PROFILES = List.of(
+            new Profile(CAR)
+            ,
+            new Profile(CAR_NO_U_TURNS)
+                    .setTurnCostsConfig(new TurnCostsConfig(List.of("motor_vehicle"))
+                            .setUTurnCosts(TurnCostsConfig.INFINITE_U_TURN_COSTS))
+    );
 
-    public static GraphHopperNetworkService getNetworkService(List<LinkVehicleMapper<? extends Link>> vehicleProviders) {
+    public static GraphHopperNetworkService getNetworkService(
+            List<LinkVehicleMapper<? extends Link>> vehicleProviders) {
         return new GraphHopperNetworkService(
-                getLinkVehicleProvider(vehicleProviders), getParserFactories(), getEncoderFactories(),
-                getVehicleEncodedValuesFactory(), getEncodedValuesMapper());
+                getLinkVehicleProvider(vehicleProviders)
+                , getEncoderFactories(), getEncodedValuesMapper(),
+                getParserFactories(), getCustomModelMapper(),
+                getProfileAccessAndSpeedAttributesMapper());
     }
-    public static final GraphHopperNetworkService NETWORK_SERVICE = getNetworkService(List.of(new TestLinkCarMapper()));
+
+    @NotNull
+    private static ProfileAccessAndSpeedAttributesMapper getProfileAccessAndSpeedAttributesMapper() {
+        return new ProfileAccessAndSpeedAttributesMapper(
+                new SpeedAndAccessAttributeMapper());
+    }
+
+    @NotNull
+    private static CustomModelMapper getCustomModelMapper() {
+        return new CustomModelMapper(
+                new SpeedAndAccessAttributeMapper());
+    }
+
+    public static final GraphHopperNetworkService NETWORK_SERVICE = getNetworkService(
+            List.of(new TestLinkCarMapper(CAR),
+                    new TestLinkCarMapper(CAR_NO_U_TURNS)));
 
     static {
         SIMPLE_MODULE = new SimpleModule();
@@ -66,26 +95,12 @@ public class TestNetworkProvider {
         OBJECT_MAPPER.registerModule(SIMPLE_MODULE);
     }
 
-    public static final String CAR_FASTEST = "car_fastest";
-    public static final String CAR_FASTEST_NO_U_TURNS = "car_fastest_no_u_turns";
-    public static List<Profile> TEST_PROFILES = List.of(
-            new Profile(CAR_FASTEST)
-                    .setVehicle("car")
-                    ,
-
-            new Profile(CAR_FASTEST_NO_U_TURNS)
-                    .setVehicle("car")
-                    .setTurnCosts(true),
-
-            new Profile("car_shortest")
-                    .setVehicle("car")
-                    .setCustomModel(new CustomModel().setDistanceInfluence(WEIGHTING_SHORTEST_DISTANCE_INFLUENCE))
-    );
 
     public static List<TestLink> getTestLinks(String path) throws IOException {
         InputStream resourceAsStream = TestNetworkProvider.class.getResourceAsStream(path);
         String linksJson = IOUtils.toString(Objects.requireNonNull(resourceAsStream), StandardCharsets.UTF_8);
-        return OBJECT_MAPPER.readValue(linksJson, new TypeReference<>() {});
+        return OBJECT_MAPPER.readValue(linksJson, new TypeReference<>() {
+        });
     }
 
     public static NetworkGraphHopper getTestNetwork(List<TestLink> links) {
@@ -132,13 +147,11 @@ public class TestNetworkProvider {
         ));
     }
 
-    private static CustomVehicleEncodedValuesFactory getVehicleEncodedValuesFactory() {
-        return new CustomVehicleEncodedValuesFactory();
-    }
 
     private static LinkVehicleMapperProvider getLinkVehicleProvider(List<LinkVehicleMapper<? extends Link>> vehicles) {
         return new LinkVehicleMapperProvider(vehicles);
     }
+
 
     @Getter
     public static class TestLink extends Link {
@@ -162,6 +175,10 @@ public class TestNetworkProvider {
     }
 
     public static class TestLinkCarMapper extends LinkVehicleMapper<TestLink> {
+
+        public TestLinkCarMapper(String profileName) {
+            super(profileName, TestLink.class);
+        }
 
         public TestLinkCarMapper() {
             super("car", TestLink.class);

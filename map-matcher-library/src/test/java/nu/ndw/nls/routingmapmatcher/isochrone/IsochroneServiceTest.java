@@ -118,7 +118,7 @@ class IsochroneServiceTest {
         IsoLabel endLabel = createIsoLabel(200, 10800, 1, 2, 10800);
         setupFixture();
         doSearchWithMockConsumer(endLabel);
-        when(profile.getVehicle()).thenReturn(VEHICLE_CAR);
+        when(profile.getName()).thenReturn(VEHICLE_CAR);
 
         when(location.getUpstreamIsochrone()).thenReturn(ISOCHRONE_VALUE_SECONDS);
         when(location.getUpstreamIsochroneUnit()).thenReturn(IsochroneUnit.SECONDS);
@@ -141,7 +141,7 @@ class IsochroneServiceTest {
         IsoLabel endLabel = createIsoLabel(200, 10800, 1, 2, 10800);
         setupFixture();
         doSearchWithMockConsumer(endLabel);
-        when(profile.getVehicle()).thenReturn(VEHICLE_CAR);
+        when(profile.getName()).thenReturn(VEHICLE_CAR);
         when(location.getDownstreamIsochrone()).thenReturn(ISOCHRONE_VALUE_SECONDS);
         when(location.getDownstreamIsochroneUnit()).thenReturn(IsochroneUnit.SECONDS);
         when(queryGraph.getEdgeIteratorState(anyInt(), anyInt())).thenReturn(currentEdge);

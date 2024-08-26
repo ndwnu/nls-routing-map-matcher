@@ -1,5 +1,6 @@
 package nu.ndw.nls.routingmapmatcher.routing;
 
+import static nu.ndw.nls.routingmapmatcher.testutil.TestNetworkProvider.CAR;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.List;
@@ -35,7 +36,7 @@ class RouterIT {
     @SneakyThrows
     private void setupNetwork() {
         router = routerFactory.createMapMatcher(TestNetworkProvider.getTestNetworkFromFile("/test-data/links.json"),
-                "car");
+                CAR);
     }
 
     @SneakyThrows
@@ -46,7 +47,7 @@ class RouterIT {
         Point end = geometryFactory.createPoint(new Coordinate(5.428436, 52.175901));
         List<Point> wayPoints = List.of(start, end);
         var result = router.route(RoutingRequest.builder()
-                .routingProfile("car_fastest")
+                .routingProfile(CAR)
                 .wayPoints(wayPoints)
                 .build());
         assertSuccess(result, new Coordinate[]{new Coordinate(5.430483, 52.177693),
@@ -61,7 +62,7 @@ class RouterIT {
         Point end = geometryFactory.createPoint(new Coordinate(5.428436, 52.175901));
         List<Point> wayPoints = List.of(start, end);
         var result = router.route(RoutingRequest.builder()
-                .routingProfile("car_fastest")
+                .routingProfile(CAR)
                 .wayPoints(wayPoints)
                 .simplifyResponseGeometry(false)
                 .build());

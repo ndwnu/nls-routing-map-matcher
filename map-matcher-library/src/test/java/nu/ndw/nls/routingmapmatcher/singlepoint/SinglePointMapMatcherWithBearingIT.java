@@ -1,6 +1,6 @@
 package nu.ndw.nls.routingmapmatcher.singlepoint;
 
-import static nu.ndw.nls.routingmapmatcher.testutil.TestNetworkProvider.CAR_FASTEST;
+import static nu.ndw.nls.routingmapmatcher.testutil.TestNetworkProvider.CAR;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 
@@ -41,7 +41,7 @@ public class SinglePointMapMatcherWithBearingIT {
     @SneakyThrows
     private void setupNetwork() {
         singlePointMapMatcher = singlePointMapMatcherFactory.createMapMatcher(
-                TestNetworkProvider.getTestNetworkFromFile(LINKS_RESOURCE), CAR_FASTEST);
+                TestNetworkProvider.getTestNetworkFromFile(LINKS_RESOURCE), CAR);
     }
 
     @BeforeAll

@@ -2,7 +2,6 @@ package nu.ndw.nls.routingmapmatcher.isochrone;
 
 import static java.util.Comparator.comparing;
 import static nu.ndw.nls.routingmapmatcher.network.model.Link.WAY_ID_KEY;
-import static nu.ndw.nls.routingmapmatcher.util.PathUtil.determineEdgeDirection;
 
 import com.graphhopper.config.Profile;
 import com.graphhopper.routing.ev.DecimalEncodedValue;
@@ -22,7 +21,6 @@ import nu.ndw.nls.routingmapmatcher.isochrone.algorithm.IsoLabel;
 import nu.ndw.nls.routingmapmatcher.isochrone.algorithm.IsochroneByTimeDistanceAndWeight;
 import nu.ndw.nls.routingmapmatcher.isochrone.algorithm.ShortestPathTreeFactory;
 import nu.ndw.nls.routingmapmatcher.isochrone.mappers.IsochroneMatchMapper;
-import nu.ndw.nls.routingmapmatcher.model.EdgeIteratorTravelDirection;
 import nu.ndw.nls.routingmapmatcher.model.IsochroneMatch;
 import nu.ndw.nls.routingmapmatcher.model.IsochroneUnit;
 import nu.ndw.nls.routingmapmatcher.model.base.BaseLocation;
@@ -96,7 +94,7 @@ public class IsochroneService {
         boolean searchDirectionReversed = reversed != reverseFlow;
         EdgeIteratorState startEdge = startSegment.getClosestEdge();
         return isoLabels.stream()
-                .filter(isoLabel -> ! isoLabel.isRoot())
+                .filter(isoLabel -> !isoLabel.isRoot())
                 .sorted(comparing(IsoLabel::getDistance))
                 .map(isoLabel -> {
                     // Specify the maximum distance on which to crop the geometries.
@@ -135,7 +133,7 @@ public class IsochroneService {
 
     private double getAverageSpeedFromEdge(EdgeIteratorState currentEdge, boolean useSpeedFromReversedDirection) {
         DecimalEncodedValue vehicleSpeedDecimalEncodedValue = encodingManager.getDecimalEncodedValue(
-                VehicleSpeed.key(profile.getVehicle()));
+                VehicleSpeed.key(profile.getName()));
         if (useSpeedFromReversedDirection) {
             return currentEdge.getReverse(vehicleSpeedDecimalEncodedValue);
         }
