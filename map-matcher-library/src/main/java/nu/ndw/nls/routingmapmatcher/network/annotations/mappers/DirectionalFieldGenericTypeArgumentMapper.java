@@ -5,6 +5,7 @@ import java.lang.reflect.ParameterizedType;
 import nu.ndw.nls.routingmapmatcher.network.model.DirectionalDto;
 import nu.ndw.nls.routingmapmatcher.network.model.Link;
 import org.springframework.stereotype.Component;
+import org.springframework.util.ReflectionUtils;
 
 /**
  * Retrieves the generic type argument from a field of type {@link DirectionalDto}
@@ -23,10 +24,9 @@ public class DirectionalFieldGenericTypeArgumentMapper {
     public <T extends Link> Class<?> map(Class<T> annotatedClassType, String fieldName) {
 
         Field directionalField;
-
         try {
-            directionalField = annotatedClassType.getDeclaredField(fieldName);
-        } catch (NoSuchFieldException e) {
+            directionalField = ReflectionUtils.findField(annotatedClassType, fieldName);
+        } catch (Exception e) {
             throw new IllegalStateException("Direction field by name " + fieldName + " should exist!", e);
         }
 
