@@ -14,7 +14,6 @@ class DirectionalFieldGenericTypeArgumentMapperTest {
     private final DirectionalFieldGenericTypeArgumentMapper directionalFieldGenericTypeArgumentMapper =
             new DirectionalFieldGenericTypeArgumentMapper();
 
-
     @Getter
     @Setter
     private static class TestDto extends Link {
@@ -33,7 +32,4 @@ class DirectionalFieldGenericTypeArgumentMapperTest {
         assertEquals(String.class, directionalFieldGenericTypeArgumentMapper.map(TestDto.class, "stringField"));
         assertEquals(Integer.class, directionalFieldGenericTypeArgumentMapper.map(TestDto.class, "integerField"));
     }
-
-
-
 }
