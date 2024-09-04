@@ -39,7 +39,6 @@ class BikeRouterIT {
 
     private Router router;
 
-
     @Getter
     public static class BikeLink extends Link {
 
@@ -48,14 +47,13 @@ class BikeRouterIT {
                 double reverseSpeedInKilometersPerHour, double distanceInMeters, LineString geometry,
                 Boolean bicycleAccessible) {
             super(id, fromNodeId, toNodeId, distanceInMeters,
-                    geometry);
+                    geometry, null);
             this.bicycleAccessible = bicycleAccessible;
             this.speed = DirectionalDto.<Double>builder()
                     .forward(speedInKilometersPerHour)
                     .reverse(reverseSpeedInKilometersPerHour)
                     .build();
         }
-
 
         @EncodedValue(key = "bicycle_accessible")
         private final Boolean bicycleAccessible;
@@ -80,7 +78,6 @@ class BikeRouterIT {
         public DirectionalDto<Double> getSpeed(BikeLink link) {
             return DirectionalDto.<Double>builder().forward(0.0).reverse(0.0).build();
         }
-
     }
 
     public static class BikeLinkBikeMapper extends LinkVehicleMapper<BikeLink> {
@@ -173,6 +170,4 @@ class BikeRouterIT {
         assertEquals("Invalid routing request: Connection between locations not found",
                 routingRequestException.getMessage());
     }
-
-
 }

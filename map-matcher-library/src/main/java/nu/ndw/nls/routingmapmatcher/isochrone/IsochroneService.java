@@ -101,7 +101,8 @@ public class IsochroneService {
                     // In the case of seconds, convert to meters based on the average speed of the iso label.
                     double maxDistance = IsochroneUnit.METERS == isochroneUnit ? isochroneValue
                             : calculateMaxDistance(queryGraph, isochroneValue, isoLabel, searchDirectionReversed);
-                    return isochroneMatchMapper.mapToIsochroneMatch(isoLabel, maxDistance, queryGraph, startEdge);
+                    return isochroneMatchMapper.mapToIsochroneMatch(isoLabel, maxDistance, queryGraph, startEdge,
+                            reverseFlow);
                 })
                 .toList();
     }

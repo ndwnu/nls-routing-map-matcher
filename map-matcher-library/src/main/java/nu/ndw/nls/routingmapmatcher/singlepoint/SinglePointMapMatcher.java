@@ -1,8 +1,8 @@
 package nu.ndw.nls.routingmapmatcher.singlepoint;
 
 import static nu.ndw.nls.routingmapmatcher.model.singlepoint.MatchFilter.ALL;
+import static nu.ndw.nls.routingmapmatcher.network.model.Link.REVERSED_LINK_ID;
 import static nu.ndw.nls.routingmapmatcher.network.model.Link.WAY_ID_KEY;
-import static nu.ndw.nls.routingmapmatcher.util.Constants.SHORTEST_CUSTOM_MODEL;
 import static nu.ndw.nls.routingmapmatcher.util.MatchUtil.getQueryResults;
 import static nu.ndw.nls.routingmapmatcher.util.PathUtil.determineEdgeDirection;
 
@@ -124,8 +124,8 @@ public class SinglePointMapMatcher implements MapMatcher<SinglePointLocation, Si
 
         return CandidateMatch
                 .builder()
-                .matchedLinkId(matchedPoint.getMatchedLinkId())
-                .reversed(matchedPoint.isReversed())
+                .matchedLinkId(matchedPoint.getLinkIdInDirection())
+                .reversed(matchedPoint.isReversed() && !matchedPoint.hasReversedLinkId())
                 .upstream(upstream)
                 .downstream(downstream)
                 .snappedPoint(matchedPoint.getSnappedPoint())
@@ -143,7 +143,7 @@ public class SinglePointMapMatcher implements MapMatcher<SinglePointLocation, Si
                 .filter(e -> intersects(circle, e))
                 .flatMap(e -> calculateMatches(e, circle, singlePointLocation)
                         .stream())
-                .sorted(singlePointLocation.getMatchSort().getSort())
+                .sorted(singlePointLocation.getMatchSort().getSort().thenComparing(MatchedPoint::getLinkIdInDirection))
                 .toList();
         if (sorted.isEmpty() || singlePointLocation.getMatchFilter() == ALL) {
             return sorted;
@@ -191,8 +191,10 @@ public class SinglePointMapMatcher implements MapMatcher<SinglePointLocation, Si
         EdgeIteratorTravelDirection travelDirection = determineEdgeDirection(edge, network.getEncodingManager(),
                 profile.getName());
         int matchedLinkId = edge.get(network.getEncodingManager().getIntEncodedValue(WAY_ID_KEY));
+        int matchedReversedLinkId = edge.get(network.getEncodingManager().getIntEncodedValue(REVERSED_LINK_ID));
         var matchedQueryResult = MatchedQueryResult.builder()
                 .matchedLinkId(matchedLinkId)
+                .matchedReversedLinkId(matchedReversedLinkId)
                 .inputPoint(singlePointLocation.getPoint())
                 .cutoffDistance(singlePointLocation.getCutoffDistance())
                 .bearingFilter(singlePointLocation.getBearingFilter())

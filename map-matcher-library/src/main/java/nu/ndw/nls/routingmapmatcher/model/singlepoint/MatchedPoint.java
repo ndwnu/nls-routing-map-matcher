@@ -13,10 +13,19 @@ import org.locationtech.jts.geom.Point;
 public class MatchedPoint {
 
     private final int matchedLinkId;
+    private final int matchedReversedLinkId;
     private final boolean reversed;
     private final Point snappedPoint;
     private final double fraction;
     private final double distance;
     private final double bearing;
     private final double reliability;
+
+    public int getLinkIdInDirection() {
+        return isReversed() && hasReversedLinkId() ? getMatchedReversedLinkId() : getMatchedLinkId();
+    }
+
+    public boolean hasReversedLinkId() {
+        return getMatchedReversedLinkId() > 0;
+    }
 }
