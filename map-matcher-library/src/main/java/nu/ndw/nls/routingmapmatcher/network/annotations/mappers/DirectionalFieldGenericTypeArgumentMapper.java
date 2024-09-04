@@ -2,6 +2,7 @@ package nu.ndw.nls.routingmapmatcher.network.annotations.mappers;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
+import java.util.Optional;
 import nu.ndw.nls.routingmapmatcher.network.model.DirectionalDto;
 import nu.ndw.nls.routingmapmatcher.network.model.Link;
 import org.springframework.stereotype.Component;
@@ -22,15 +23,13 @@ public class DirectionalFieldGenericTypeArgumentMapper {
      * @return {@link Class } which is the generic type argument of {@link DirectionalDto}
      */
     public <T extends Link> Class<?> map(Class<T> annotatedClassType, String fieldName) {
-
-        Field directionalField;
-        try {
-            directionalField = ReflectionUtils.findField(annotatedClassType, fieldName);
-        } catch (Exception e) {
-            throw new IllegalStateException("Direction field by name " + fieldName + " should exist!", e);
-        }
+        Field directionalField = getDirectionalField(annotatedClassType, fieldName);
 
         return (Class<?>) ((ParameterizedType) directionalField.getGenericType()).getActualTypeArguments()[0];
     }
 
+    private <T extends Link> Field getDirectionalField(Class<T> clazz, String fieldName) {
+        return Optional.ofNullable(ReflectionUtils.findField(clazz, fieldName))
+                .orElseThrow(() -> new IllegalArgumentException("No such field %s in %s".formatted(fieldName, clazz)));
+    }
 }

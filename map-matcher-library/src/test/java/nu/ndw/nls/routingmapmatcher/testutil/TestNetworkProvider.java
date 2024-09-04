@@ -152,7 +152,6 @@ public class TestNetworkProvider {
         return new LinkVehicleMapperProvider(vehicles);
     }
 
-
     @Getter
     public static class TestLink extends Link {
 
@@ -165,9 +164,9 @@ public class TestNetworkProvider {
         @Builder
         protected TestLink(long id, long fromNodeId, long toNodeId, double speedInKilometersPerHour,
                 double reverseSpeedInKilometersPerHour, Boolean hgvAccessible, double distanceInMeters,
-                LineString geometry) {
+                LineString geometry, Long linkIdReversed) {
             super(id, fromNodeId, toNodeId, distanceInMeters,
-                    geometry);
+                    geometry, linkIdReversed);
             this.speedInKilometersPerHour = speedInKilometersPerHour;
             this.reverseSpeedInKilometersPerHour = reverseSpeedInKilometersPerHour;
             this.hgvAccessible = Optional.ofNullable(hgvAccessible).orElse(true);
@@ -199,7 +198,5 @@ public class TestNetworkProvider {
                     .reverse(link.getReverseSpeedInKilometersPerHour())
                     .build();
         }
-
     }
-
 }
