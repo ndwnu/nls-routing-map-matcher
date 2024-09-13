@@ -21,7 +21,6 @@ class EncodedValuesMapperTest {
     private final EncodedValuesMapper encodedValuesMapper = new EncodedValuesMapper(new AnnotationMapper(),
             new DirectionalFieldGenericTypeArgumentMapper());
 
-
     @Getter
     public static class MyLink extends Link {
 
@@ -29,11 +28,10 @@ class EncodedValuesMapperTest {
         protected MyLink(long id, long fromNodeId, long toNodeId, double distanceInMeters, LineString geometry,
                 Boolean booleanField, DirectionalDto<Integer> directionalInteger) {
             super(id, fromNodeId, toNodeId, distanceInMeters,
-                    geometry);
+                    geometry, null);
             this.booleanField = booleanField;
             this.directionalInteger = directionalInteger;
         }
-
 
         @EncodedValue(key = "booleanField")
         private final Boolean booleanField;
@@ -74,8 +72,6 @@ class EncodedValuesMapperTest {
         assertNull(id.valueReverseSupplier());
         assertEquals(1L, id.valueSupplier().apply(myLinkInstance));
 
-
-
         EncodedValueDto<MyLink, Boolean> booleanField = map.get(Boolean.class, "booleanField");
         assertEquals("booleanField", booleanField.key());
         assertEquals( Boolean.class, booleanField.valueType());
@@ -84,7 +80,6 @@ class EncodedValuesMapperTest {
         assertNotNull(booleanField.valueSupplier());
         assertNull(booleanField.valueReverseSupplier());
         assertTrue(booleanField.valueSupplier().apply(myLinkInstance));
-
 
         EncodedValueDto<MyLink, Integer> directionalIntegerField = map.get(Integer.class, "directionalInteger");
         assertEquals("directionalInteger", directionalIntegerField.key());
@@ -95,6 +90,5 @@ class EncodedValuesMapperTest {
         assertNotNull(directionalIntegerField.valueReverseSupplier());
         assertEquals(10, directionalIntegerField.valueSupplier().apply(myLinkInstance));
         assertEquals(20, directionalIntegerField.valueReverseSupplier().apply(myLinkInstance));
-
     }
 }

@@ -105,13 +105,13 @@ class IsochroneServiceTest {
 
         when(location.getUpstreamIsochrone()).thenReturn(ISOCHRONE_VALUE_METERS);
         when(location.getUpstreamIsochroneUnit()).thenReturn(IsochroneUnit.METERS);
-        when(isochroneMatchMapper.mapToIsochroneMatch(isoLabel, ISOCHRONE_VALUE_METERS, queryGraph, startEdge))
+        when(isochroneMatchMapper.mapToIsochroneMatch(isoLabel, ISOCHRONE_VALUE_METERS, queryGraph, startEdge,
+                true))
                 .thenReturn(IsochroneMatch.builder().build());
         wrapWithStaticMock(() -> isochroneService.getUpstreamIsochroneMatches(point, LINK_ID, REVERSED, location));
         verify(shortestPathTreeFactory).createShortestPathTreeByTimeDistanceAndWeight(null, queryGraph,
                 TraversalMode.EDGE_BASED, ISOCHRONE_VALUE_METERS, IsochroneUnit.METERS, true);
     }
-
 
     @Test
     void getUpstreamIsochroneMatches_ok_seconds() {
@@ -128,7 +128,7 @@ class IsochroneServiceTest {
         when(currentEdge.getReverse(decimalEncodedValue)).thenReturn(REVERSE_SPEED);
         wrapWithStaticMock(() -> isochroneService.getUpstreamIsochroneMatches(point, LINK_ID, REVERSED, location));
         verify(isochroneMatchMapper).mapToIsochroneMatch(eq(endLabel), maxDistanceArgumentCaptor.capture(),
-                eq(queryGraph), eq(startEdge));
+                eq(queryGraph), eq(startEdge), eq(true));
         verify(shortestPathTreeFactory).createShortestPathTreeByTimeDistanceAndWeight(null, queryGraph,
                 TraversalMode.EDGE_BASED, ISOCHRONE_VALUE_SECONDS, IsochroneUnit.SECONDS, true);
         Double maxDistance = maxDistanceArgumentCaptor.getValue();
@@ -150,7 +150,7 @@ class IsochroneServiceTest {
         when(currentEdge.get(decimalEncodedValue)).thenReturn(SPEED);
         wrapWithStaticMock(() -> isochroneService.getDownstreamIsochroneMatches(point, LINK_ID, REVERSED, location));
         verify(isochroneMatchMapper).mapToIsochroneMatch(eq(endLabel), maxDistanceArgumentCaptor.capture(),
-                eq(queryGraph), eq(startEdge));
+                eq(queryGraph), eq(startEdge), eq(false));
         verify(shortestPathTreeFactory).createShortestPathTreeByTimeDistanceAndWeight(null, queryGraph,
                 TraversalMode.EDGE_BASED, ISOCHRONE_VALUE_SECONDS, IsochroneUnit.SECONDS, false);
         Double maxDistance = maxDistanceArgumentCaptor.getValue();
@@ -165,7 +165,8 @@ class IsochroneServiceTest {
         doSearchWithMockConsumer(isoLabel);
         when(location.getDownstreamIsochrone()).thenReturn(ISOCHRONE_VALUE_METERS);
         when(location.getDownstreamIsochroneUnit()).thenReturn(IsochroneUnit.METERS);
-        when(isochroneMatchMapper.mapToIsochroneMatch(isoLabel, ISOCHRONE_VALUE_METERS, queryGraph, startEdge))
+        when(isochroneMatchMapper.mapToIsochroneMatch(isoLabel, ISOCHRONE_VALUE_METERS, queryGraph, startEdge,
+                false))
                 .thenReturn(IsochroneMatch.builder().build());
         wrapWithStaticMock(() -> isochroneService.getDownstreamIsochroneMatches(point, LINK_ID, REVERSED, location));
         verify(shortestPathTreeFactory).createShortestPathTreeByTimeDistanceAndWeight(null, queryGraph,
@@ -189,7 +190,6 @@ class IsochroneServiceTest {
             return null;
         }).when(isochroneByTimeDistanceAndWeight).search(eq(START_NODE_ID), any());
     }
-
 
     private void setupFixture() {
         when(point.getY()).thenReturn(Y_COORDINATE);

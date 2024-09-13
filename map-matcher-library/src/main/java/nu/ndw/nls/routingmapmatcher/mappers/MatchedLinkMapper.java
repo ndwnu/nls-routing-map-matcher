@@ -9,8 +9,8 @@ import org.springframework.stereotype.Component;
 /**
  * {@link MatchedLinkMapper} maps a {@link List} of {@link MatchedEdgeLink} that describes a Leg/Path into a
  * {@link List of {@link MatchedLink}. The start fraction of the leg is applied to the first link and the end fraction
- * is applied to the last link. All other fractions are either 0 for start and 1 for end as they are fully routed
- * from start to end.
+ * is applied to the last link. All other fractions are either 0 for start and 1 for end as they are fully routed from
+ * start to end.
  */
 @Component
 public class MatchedLinkMapper {
@@ -22,7 +22,7 @@ public class MatchedLinkMapper {
     public List<MatchedLink> map(List<MatchedEdgeLink> matchedEdgeLinks, double firstStartFraction,
             double lastEndFraction) {
 
-        final int indexLast = matchedEdgeLinks.size()-1;
+        final int indexLast = matchedEdgeLinks.size() - 1;
 
         int i = 0;
         List<MatchedLink> matchedLinks = new ArrayList<>();
@@ -54,5 +54,4 @@ public class MatchedLinkMapper {
 
         return matchedLinks;
     }
-
 }

@@ -23,6 +23,7 @@ public class MatchedQueryResult {
 
     private final Point inputPoint;
     private final int matchedLinkId;
+    private final int matchedReversedLinkId;
     private final BearingFilter bearingFilter;
     private final LineString originalGeometry;
     private final EdgeIteratorTravelDirection travelDirection;
