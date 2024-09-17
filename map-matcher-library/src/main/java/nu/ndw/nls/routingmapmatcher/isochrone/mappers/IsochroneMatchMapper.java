@@ -80,22 +80,22 @@ public class IsochroneMatchMapper {
     }
 
     private IsochroneParentLink createParentLink(IsoLabel isoLabel, QueryGraph queryGraph, boolean reverseFlow) {
-        if (!isoLabel.parentIsRoot()) {
-            EdgeIteratorState parentEdge = queryGraph.getEdgeIteratorState(isoLabel.getParent().getEdge(),
-                    isoLabel.getParent().getNode());
-            boolean reversed = edgeIteratorStateReverseExtractor.hasReversed(parentEdge);
-            int linkId = (reversed != reverseFlow) && hasReversedLinkId(parentEdge)
-                    ? getReversedLinkId(parentEdge)
-                    : getLinkId(parentEdge);
-            boolean reallyReversed = (reversed != reverseFlow) && !hasReversedLinkId(parentEdge);
-            return IsochroneParentLink
-                    .builder()
-                    .linkId(linkId)
-                    .reversed(reallyReversed)
-                    .build();
-        } else {
+        if (isoLabel.parentIsRoot()) {
             return null;
         }
+
+        EdgeIteratorState parentEdge = queryGraph.getEdgeIteratorState(isoLabel.getParent().getEdge(),
+                isoLabel.getParent().getNode());
+        boolean reversed = edgeIteratorStateReverseExtractor.hasReversed(parentEdge);
+        int linkId = (reversed != reverseFlow) && hasReversedLinkId(parentEdge)
+                ? getReversedLinkId(parentEdge)
+                : getLinkId(parentEdge);
+        boolean reallyReversed = (reversed != reverseFlow) && !hasReversedLinkId(parentEdge);
+        return IsochroneParentLink
+                .builder()
+                .linkId(linkId)
+                .reversed(reallyReversed)
+                .build();
     }
 
     private int getLinkId(EdgeIteratorState edge) {
