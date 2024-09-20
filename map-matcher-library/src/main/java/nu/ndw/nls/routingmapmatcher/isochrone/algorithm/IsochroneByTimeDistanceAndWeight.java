@@ -21,9 +21,9 @@ public class IsochroneByTimeDistanceAndWeight extends AbstractShortestPathTree {
     private double limit = -1;
     private ExploreType exploreType = ExploreType.TIME;
 
-    public IsochroneByTimeDistanceAndWeight(Graph g, Weighting weighting, boolean reverseFlow,
+    public IsochroneByTimeDistanceAndWeight(Graph g, Weighting weighting, boolean upstream, boolean startingDirectionReversed,
             TraversalMode traversalMode) {
-        super(g, weighting, reverseFlow, traversalMode);
+        super(g, weighting, upstream, startingDirectionReversed, traversalMode);
 
     }
 

@@ -30,7 +30,7 @@ public class IsochroneMatchMapper {
      * start and end fractions.
      *
      * @param isoLabel    the iso label to map
-     * @param reverseFlow
+     * @param reverseFlow whether the isochrone path is upstream (true) or downstream (false)
      * @return an instance of IsochroneMatch
      */
     public IsochroneMatch mapToIsochroneMatch(IsoLabel isoLabel, double maxDistance, QueryGraph queryGraph,
@@ -72,7 +72,7 @@ public class IsochroneMatchMapper {
                 .matchedLinkId(matchedLinkId)
                 .startFraction(startFraction)
                 .endFraction(endFraction)
-                .reversed((reversed != reverseFlow) && hasReversedLinkId(currentEdge) ? !reversed : reversed)
+                .reversed(reeallyReversed)
                 .parentLink(createParentLink(isoLabel, queryGraph, reverseFlow))
                 .geometry(partialGeometry)
                 .build();
@@ -86,10 +86,11 @@ public class IsochroneMatchMapper {
             int linkId = (reversed != reverseFlow) && hasReversedLinkId(parentEdge)
                     ? getReversedLinkId(parentEdge)
                     : getLinkId(parentEdge);
+            boolean reallyReversed = (reversed != reverseFlow) && hasReversedLinkId(parentEdge) ? !reversed : reversed;
             return IsochroneParentLink
                     .builder()
                     .linkId(linkId)
-                    .reversed((reversed != reverseFlow) && hasReversedLinkId(parentEdge) ? !reversed : reversed)
+                    .reversed(reallyReversed)
                     .build();
         } else {
             return null;

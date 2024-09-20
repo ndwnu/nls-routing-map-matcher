@@ -21,14 +21,15 @@ public class ShortestPathTreeFactory {
             TraversalMode traversalMode,
             double isochroneValue,
             IsochroneUnit isochroneUnit,
-            boolean isSearchDirectionReversed
+            boolean upstream,
+            boolean startingDirectionReversed
     ) {
 
         Weighting baseWeighting = weighting == null ? this.defaultWeighting : weighting;
         Weighting queryGraphWeighting = QueryGraphWeightingAdapter.fromQueryGraph(baseWeighting, queryGraph,
-                new EdgeIteratorStateReverseExtractor(),isSearchDirectionReversed);
+                new EdgeIteratorStateReverseExtractor(), upstream);
         IsochroneByTimeDistanceAndWeight isochrone = new IsochroneByTimeDistanceAndWeight(queryGraph,
-                queryGraphWeighting, isSearchDirectionReversed,
+                queryGraphWeighting, upstream, startingDirectionReversed,
                 traversalMode);
         if (isochroneUnit == IsochroneUnit.METERS) {
             isochrone.setDistanceLimit(isochroneValue);
