@@ -27,13 +27,15 @@ public abstract class AbstractShortestPathTree extends AbstractRoutingAlgorithm 
     private final PriorityQueue<IsoLabel> queueByWeighting;
     private int visitedNodes;
 
-    private final boolean reverseFlow;
+    private final boolean upstream;
+    private final boolean startingDirectionReversed;
 
-    public AbstractShortestPathTree(Graph g, Weighting weighting, boolean reverseFlow, TraversalMode traversalMode) {
+    public AbstractShortestPathTree(Graph g, Weighting weighting, boolean upstream, boolean startingDirectionReversed, TraversalMode traversalMode) {
         super(g, weighting, traversalMode);
         queueByWeighting = new PriorityQueue<>(INITIAL_CAPACITY, comparingDouble(IsoLabel::getWeight));
         fromMap = new GHIntObjectHashMap<>(INITIAL_CAPACITY);
-        this.reverseFlow = reverseFlow;
+        this.upstream = upstream;
+        this.startingDirectionReversed = startingDirectionReversed;
     }
 
     @Override
@@ -64,16 +66,16 @@ public abstract class AbstractShortestPathTree extends AbstractRoutingAlgorithm 
                 }
 
                 double nextWeight =
-                        GHUtility.calcWeightWithTurnWeight(weighting, iter, reverseFlow, currentLabel.getEdge())
+                        GHUtility.calcWeightWithTurnWeight(weighting, iter, upstream != startingDirectionReversed, currentLabel.getEdge())
                                 + currentLabel.getWeight();
                 if (Double.isInfinite(nextWeight)) {
                     continue;
                 }
 
                 double nextDistance = iter.getDistance() + currentLabel.getDistance();
-                long nextTime = GHUtility.calcMillisWithTurnMillis(weighting, iter, reverseFlow, currentLabel.getEdge())
+                long nextTime = GHUtility.calcMillisWithTurnMillis(weighting, iter, upstream != startingDirectionReversed, currentLabel.getEdge())
                         + currentLabel.getTime();
-                int nextTraversalId = traversalMode.createTraversalId(iter, reverseFlow);
+                int nextTraversalId = traversalMode.createTraversalId(iter, upstream != startingDirectionReversed);
                 IsoLabel label = fromMap.get(nextTraversalId);
                 if (label == null) {
                     label = new IsoLabel(iter.getAdjNode(), iter.getEdge(), nextWeight, nextTime, nextDistance,
