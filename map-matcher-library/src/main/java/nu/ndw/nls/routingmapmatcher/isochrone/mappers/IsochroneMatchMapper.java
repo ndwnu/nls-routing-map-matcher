@@ -65,14 +65,20 @@ public class IsochroneMatchMapper {
                 ? fractionAndDistanceCalculator.calculateFractionAndDistance(fullGeometry,
                 partialGeometry.getEndPoint().getCoordinate()).getFraction() : 1.0;
 
+        // Invert values for upstream.
+        double correctedStartFraction = reverseFlow ? (1 - endFraction) : startFraction;
+        double correctedEndFraction = reverseFlow ? (1 - startFraction) : endFraction;
+        boolean correctedReversed = (reversed != reverseFlow) && !hasReversedLinkId(currentEdge);
+        LineString correctedGeometry = reverseFlow ? partialGeometry.reverse() : partialGeometry;
+
         return IsochroneMatch
                 .builder()
                 .matchedLinkId(matchedLinkId)
-                .startFraction(reverseFlow ? (1 - endFraction) : startFraction)
-                .endFraction(reverseFlow ? (1 - startFraction) : endFraction)
-                .reversed((reversed != reverseFlow) && !hasReversedLinkId(currentEdge))
+                .startFraction(correctedStartFraction)
+                .endFraction(correctedEndFraction)
+                .reversed(correctedReversed)
                 .parentLink(createParentLink(isoLabel, queryGraph, reverseFlow))
-                .geometry(reverseFlow ? partialGeometry.reverse() : partialGeometry)
+                .geometry(correctedGeometry)
                 .build();
     }
 
