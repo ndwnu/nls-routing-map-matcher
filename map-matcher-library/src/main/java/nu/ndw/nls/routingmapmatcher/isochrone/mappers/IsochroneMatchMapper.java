@@ -39,9 +39,7 @@ public class IsochroneMatchMapper {
         // Here, the reversed boolean indicates the direction of travelling along the edge with respect to the original
         // alignment of the geometry (can be backward for bidirectional edges or for upstream isochrone searches).
         boolean reversed = edgeIteratorStateReverseExtractor.hasReversed(currentEdge);
-        int matchedLinkId = (reversed != reverseFlow) && hasReversedLinkId(currentEdge)
-                ? getReversedLinkId(currentEdge)
-                : getLinkId(currentEdge);
+        int matchedLinkId = getLinkIdInDirection(currentEdge, reversed, reverseFlow);
         double totalDistanceTravelled = isoLabel.getDistance();
         // This is the entire way geometry, except for the start segment, which is split up at the start point.
         LineString isoLabelWayGeometry = pointListUtil.toLineString(currentEdge.fetchWayGeometry(FetchMode.ALL));
@@ -67,13 +65,12 @@ public class IsochroneMatchMapper {
                 ? fractionAndDistanceCalculator.calculateFractionAndDistance(fullGeometry,
                 partialGeometry.getEndPoint().getCoordinate()).getFraction() : 1.0;
 
-        boolean reallyReversed = (reversed != reverseFlow) && !hasReversedLinkId(currentEdge);
         return IsochroneMatch
                 .builder()
                 .matchedLinkId(matchedLinkId)
-                .startFraction(reverseFlow ? 1 - endFraction : startFraction)
-                .endFraction(reverseFlow ? 1 - startFraction : endFraction)
-                .reversed(reallyReversed)
+                .startFraction(reverseFlow ? (1 - endFraction) : startFraction)
+                .endFraction(reverseFlow ? (1 - startFraction) : endFraction)
+                .reversed((reversed != reverseFlow) && !hasReversedLinkId(currentEdge))
                 .parentLink(createParentLink(isoLabel, queryGraph, reverseFlow))
                 .geometry(reverseFlow ? partialGeometry.reverse() : partialGeometry)
                 .build();
@@ -87,14 +84,11 @@ public class IsochroneMatchMapper {
         EdgeIteratorState parentEdge = queryGraph.getEdgeIteratorState(isoLabel.getParent().getEdge(),
                 isoLabel.getParent().getNode());
         boolean reversed = edgeIteratorStateReverseExtractor.hasReversed(parentEdge);
-        int linkId = (reversed != reverseFlow) && hasReversedLinkId(parentEdge)
-                ? getReversedLinkId(parentEdge)
-                : getLinkId(parentEdge);
-        boolean reallyReversed = (reversed != reverseFlow) && !hasReversedLinkId(parentEdge);
+        int linkId = getLinkIdInDirection(parentEdge, reversed, reverseFlow);
         return IsochroneParentLink
                 .builder()
                 .linkId(linkId)
-                .reversed(reallyReversed)
+                .reversed((reversed != reverseFlow) && !hasReversedLinkId(parentEdge))
                 .build();
     }
 
@@ -110,11 +104,15 @@ public class IsochroneMatchMapper {
         return getReversedLinkId(edge) > 0;
     }
 
-    private boolean isStartSegment(int roadSectionId, EdgeIteratorState startEdge, boolean reverseFlow) {
-        boolean reversed = edgeIteratorStateReverseExtractor.hasReversed(startEdge);
-        int startSegmentId = (reversed != reverseFlow) && hasReversedLinkId(startEdge)
+    private int getLinkIdInDirection(EdgeIteratorState startEdge, boolean reversed, boolean reverseFlow) {
+        return (reversed != reverseFlow) && hasReversedLinkId(startEdge)
                 ? getReversedLinkId(startEdge)
                 : getLinkId(startEdge);
+    }
+
+    private boolean isStartSegment(int roadSectionId, EdgeIteratorState startEdge, boolean reverseFlow) {
+        boolean reversed = edgeIteratorStateReverseExtractor.hasReversed(startEdge);
+        int startSegmentId = getLinkIdInDirection(startEdge, reversed, reverseFlow);
         return roadSectionId == startSegmentId;
     }
 
