@@ -53,6 +53,7 @@ public class CreateGeoJsonFromLinksUtil {
         links.forEach(l -> {
             Map<String, Object> properties = new HashMap<>();
             properties.put("id", l.getId());
+            properties.put("linkIdReversed", l.getLinkIdReversed());
             properties.put("fromNodeId", l.getFromNodeId());
             properties.put("toNodeId", l.getToNodeId());
             properties.put("speedInKilometersPerHour", l.getSpeedInKilometersPerHour());
@@ -71,7 +72,7 @@ public class CreateGeoJsonFromLinksUtil {
 
     @SneakyThrows
     void testIntersection() {
-        final var shapeFactory = createGeometricShapeFactory();
+        var shapeFactory = createGeometricShapeFactory();
         Polygon circleA = shapeFactory.createEllipse();
         GeoJSONWriter writerCircle = new GeoJSONWriter();
         var circleGeometry = writerCircle.write(circleA);

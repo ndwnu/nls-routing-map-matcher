@@ -1,4 +1,3 @@
-/*
 package nu.ndw.nls.routingmapmatcher.isochrone;
 
 import static nu.ndw.nls.routingmapmatcher.isochrone.IsochroneTestHelper.createIsoLabel;
@@ -111,7 +110,7 @@ class IsochroneServiceTest {
                 .thenReturn(IsochroneMatch.builder().build());
         wrapWithStaticMock(() -> isochroneService.getUpstreamIsochroneMatches(point, LINK_ID, REVERSED, location));
         verify(shortestPathTreeFactory).createShortestPathTreeByTimeDistanceAndWeight(null, queryGraph,
-                TraversalMode.EDGE_BASED, ISOCHRONE_VALUE_METERS, IsochroneUnit.METERS, true);
+                TraversalMode.EDGE_BASED, ISOCHRONE_VALUE_METERS, IsochroneUnit.METERS, true, REVERSED);
     }
 
     @Test
@@ -131,7 +130,7 @@ class IsochroneServiceTest {
         verify(isochroneMatchMapper).mapToIsochroneMatch(eq(endLabel), maxDistanceArgumentCaptor.capture(),
                 eq(queryGraph), eq(startEdge), eq(true));
         verify(shortestPathTreeFactory).createShortestPathTreeByTimeDistanceAndWeight(null, queryGraph,
-                TraversalMode.EDGE_BASED, ISOCHRONE_VALUE_SECONDS, IsochroneUnit.SECONDS, true);
+                TraversalMode.EDGE_BASED, ISOCHRONE_VALUE_SECONDS, IsochroneUnit.SECONDS, true, REVERSED);
         Double maxDistance = maxDistanceArgumentCaptor.getValue();
         // The max distance based on 8 seconds will be around 200 - ((10.8-8) * 13.89 meters/second) ~ 161.1 meters
         assertThat(maxDistance).isCloseTo(161.1, Percentage.withPercentage(0.1));
@@ -153,7 +152,7 @@ class IsochroneServiceTest {
         verify(isochroneMatchMapper).mapToIsochroneMatch(eq(endLabel), maxDistanceArgumentCaptor.capture(),
                 eq(queryGraph), eq(startEdge), eq(false));
         verify(shortestPathTreeFactory).createShortestPathTreeByTimeDistanceAndWeight(null, queryGraph,
-                TraversalMode.EDGE_BASED, ISOCHRONE_VALUE_SECONDS, IsochroneUnit.SECONDS, false);
+                TraversalMode.EDGE_BASED, ISOCHRONE_VALUE_SECONDS, IsochroneUnit.SECONDS, false, REVERSED);
         Double maxDistance = maxDistanceArgumentCaptor.getValue();
         // The max distance based on 8 seconds will be around 200 - ((10.8-8) * 27.77 meters/second) ~ 122.2 meters
         assertThat(maxDistance).isCloseTo(122.2, Percentage.withPercentage(0.1));
@@ -171,7 +170,7 @@ class IsochroneServiceTest {
                 .thenReturn(IsochroneMatch.builder().build());
         wrapWithStaticMock(() -> isochroneService.getDownstreamIsochroneMatches(point, LINK_ID, REVERSED, location));
         verify(shortestPathTreeFactory).createShortestPathTreeByTimeDistanceAndWeight(null, queryGraph,
-                TraversalMode.EDGE_BASED, ISOCHRONE_VALUE_METERS, IsochroneUnit.METERS, false);
+                TraversalMode.EDGE_BASED, ISOCHRONE_VALUE_METERS, IsochroneUnit.METERS, false, REVERSED);
     }
 
     private void wrapWithStaticMock(Runnable function) {
@@ -184,7 +183,7 @@ class IsochroneServiceTest {
     private void doSearchWithMockConsumer(IsoLabel isoLabel) {
         when(startSegment.getClosestEdge()).thenReturn(startEdge);
         when(shortestPathTreeFactory.createShortestPathTreeByTimeDistanceAndWeight(any(), any(), any(), anyDouble(),
-                any(), anyBoolean())).thenReturn(isochroneByTimeDistanceAndWeight);
+                any(), anyBoolean(), anyBoolean())).thenReturn(isochroneByTimeDistanceAndWeight);
         doAnswer(ans -> {
             Consumer<IsoLabel> callback = ans.getArgument(1, Consumer.class);
             callback.accept(isoLabel);
@@ -200,4 +199,3 @@ class IsochroneServiceTest {
         when(startSegment.getClosestNode()).thenReturn(START_NODE_ID);
     }
 }
-*/

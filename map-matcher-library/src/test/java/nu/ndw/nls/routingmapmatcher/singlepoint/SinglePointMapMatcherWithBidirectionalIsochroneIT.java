@@ -2,8 +2,6 @@ package nu.ndw.nls.routingmapmatcher.singlepoint;
 
 import static nu.ndw.nls.routingmapmatcher.testutil.TestNetworkProvider.CAR;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.data.Offset.offset;
-import static org.junit.jupiter.api.Assertions.assertFalse;
 
 import lombok.SneakyThrows;
 import nu.ndw.nls.geometry.factories.GeometryFactoryWgs84;
@@ -27,13 +25,13 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = {TestConfig.class})
-public class SinglePointMapMatcherWithIsochroneIT {
+public class SinglePointMapMatcherWithBidirectionalIsochroneIT {
 
     private static final String LINKS_RESOURCE = "/test-data/links_bidirectional.json";
-    private static final Coordinate START_POINT = new Coordinate(5.4267250, 52.1767242);
-    private static final int ISOCHRONE_METERS = 200;
-    private static final int ISOCHRONE_SECONDS = 20;
-    private static final BearingFilter BEARING_FILTER = new BearingFilter(140, 10);
+    private static final Coordinate START_POINT = new Coordinate(5.4303030, 52.1804201);
+    private static final int ISOCHRONE_METERS = 100;
+    private static final BearingFilter BEARING_FILTER_FORWARD = new BearingFilter(105, 10);
+    private static final BearingFilter BEARING_FILTER_REVERSE = new BearingFilter(285, 10);
     private static final int CUTOFF_DISTANCE = 20;
     private static final int ID = 1;
 
@@ -53,7 +51,7 @@ public class SinglePointMapMatcherWithIsochroneIT {
 
     @SneakyThrows
     @Test
-    void match_ok_downstreamIsochroneMeters() {
+    void match_ok_bidirectionalForwardDownstream() {
         setupNetwork();
         Point point = geometryFactory.createPoint(START_POINT);
         var request = SinglePointLocation
@@ -64,48 +62,22 @@ public class SinglePointMapMatcherWithIsochroneIT {
                 .matchFilter(MatchFilter.FIRST)
                 .downstreamIsochrone(ISOCHRONE_METERS)
                 .downstreamIsochroneUnit(IsochroneUnit.METERS)
-                .bearingFilter(BEARING_FILTER)
+                .bearingFilter(BEARING_FILTER_FORWARD)
                 .cutoffDistance(CUTOFF_DISTANCE)
                 .build();
         SinglePointMatch result = singlePointMapMatcher.match(request);
         assertThat(result.getCandidateMatches()).hasSize(1);
         CandidateMatch match = result.getCandidateMatches().getFirst();
-        assertThat(match.getDownstream()).hasSize(5);
-        IsochroneMatch startPoint = match.getDownstream().getFirst();
-        assertThat(startPoint.getStartFraction()).isCloseTo(match.getFraction(), offset(0.000001));
-        assertThat(startPoint.getEndFraction()).isEqualTo(1.0);
-        assertFalse(startPoint.isReversed());
+        assertThat(match.getDownstream()).hasSize(4);
+        // Here, we expect the one-way segments not to be matched, because they are in the wrong driving direction.
+        assertThat(match.getDownstream()).map(IsochroneMatch::getMatchedLinkId)
+                .containsExactly(6405235, 6405226, 6405225, 6405227);
+        assertThat(match.getDownstream()).noneMatch(IsochroneMatch::isReversed);
     }
 
     @SneakyThrows
     @Test
-    void match_ok_downstreamIsochroneSeconds() {
-        setupNetwork();
-        Point point = geometryFactory.createPoint(START_POINT);
-        var request = SinglePointLocation
-                .builder()
-                .id(ID)
-                .point(point)
-                .matchSort(MatchSort.SHORTEST_DISTANCE)
-                .matchFilter(MatchFilter.FIRST)
-                .downstreamIsochrone(ISOCHRONE_SECONDS)
-                .downstreamIsochroneUnit(IsochroneUnit.SECONDS)
-                .bearingFilter(BEARING_FILTER)
-                .cutoffDistance(CUTOFF_DISTANCE)
-                .build();
-        SinglePointMatch result = singlePointMapMatcher.match(request);
-        assertThat(result.getCandidateMatches()).hasSize(1);
-        CandidateMatch match = result.getCandidateMatches().getFirst();
-        assertThat(match.getDownstream()).hasSize(14);
-        IsochroneMatch startPoint = match.getDownstream().getFirst();
-        assertThat(startPoint.getStartFraction()).isCloseTo(match.getFraction(), offset(0.000001));
-        assertThat(startPoint.getEndFraction()).isEqualTo(1.0);
-        assertFalse(startPoint.isReversed());
-    }
-
-    @SneakyThrows
-    @Test
-    void match_ok_upstreamIsochroneMeters() {
+    void match_ok_bidirectionalReverseUpstream() {
         setupNetwork();
         Point point = geometryFactory.createPoint(START_POINT);
         var request = SinglePointLocation
@@ -116,22 +88,22 @@ public class SinglePointMapMatcherWithIsochroneIT {
                 .matchFilter(MatchFilter.FIRST)
                 .upstreamIsochrone(ISOCHRONE_METERS)
                 .upstreamIsochroneUnit(IsochroneUnit.METERS)
-                .bearingFilter(BEARING_FILTER)
+                .bearingFilter(BEARING_FILTER_REVERSE)
                 .cutoffDistance(CUTOFF_DISTANCE)
                 .build();
         SinglePointMatch result = singlePointMapMatcher.match(request);
         assertThat(result.getCandidateMatches()).hasSize(1);
         CandidateMatch match = result.getCandidateMatches().getFirst();
-        assertThat(match.getUpstream()).hasSize(5);
-        IsochroneMatch startPoint = match.getUpstream().getFirst();
-        assertThat(startPoint.getStartFraction()).isEqualTo(0.0);
-        assertThat(startPoint.getEndFraction()).isCloseTo(match.getFraction(), offset(0.000001));
-        assertFalse(startPoint.isReversed());
+        assertThat(match.getUpstream()).hasSize(6);
+        // Here, we expect the one-way segments to be matched, because they are in the correct driving direction.
+        assertThat(match.getUpstream()).map(IsochroneMatch::getMatchedLinkId)
+                .containsExactly(6405234, 6405225, 6405239, 6405224, 6405226, 6405238);
+        assertThat(match.getUpstream()).noneMatch(IsochroneMatch::isReversed);
     }
 
     @SneakyThrows
     @Test
-    void match_ok_upstreamIsochroneSeconds() {
+    void match_ok_bidirectionalReverseDownstream() {
         setupNetwork();
         Point point = geometryFactory.createPoint(START_POINT);
         var request = SinglePointLocation
@@ -140,18 +112,43 @@ public class SinglePointMapMatcherWithIsochroneIT {
                 .point(point)
                 .matchSort(MatchSort.SHORTEST_DISTANCE)
                 .matchFilter(MatchFilter.FIRST)
-                .upstreamIsochrone(ISOCHRONE_SECONDS)
-                .upstreamIsochroneUnit(IsochroneUnit.SECONDS)
-                .bearingFilter(BEARING_FILTER)
+                .downstreamIsochrone(ISOCHRONE_METERS)
+                .downstreamIsochroneUnit(IsochroneUnit.METERS)
+                .bearingFilter(BEARING_FILTER_REVERSE)
                 .cutoffDistance(CUTOFF_DISTANCE)
                 .build();
         SinglePointMatch result = singlePointMapMatcher.match(request);
         assertThat(result.getCandidateMatches()).hasSize(1);
         CandidateMatch match = result.getCandidateMatches().getFirst();
-        assertThat(match.getUpstream()).hasSize(11);
-        IsochroneMatch startPoint = match.getUpstream().getFirst();
-        assertThat(startPoint.getStartFraction()).isEqualTo(0.0);
-        assertThat(startPoint.getEndFraction()).isCloseTo(match.getFraction(), offset(0.000001));
-        assertFalse(startPoint.isReversed());
+        assertThat(match.getDownstream()).hasSize(7);
+        assertThat(match.getDownstream()).map(IsochroneMatch::getMatchedLinkId)
+                .containsExactly(6405234, 6405240, 6405251, 6405241, 6405247, 6405250, 6405252);
+        assertThat(match.getDownstream()).noneMatch(IsochroneMatch::isReversed);
+    }
+
+    @SneakyThrows
+    @Test
+    void match_ok_bidirectionalForwardUpstream() {
+        setupNetwork();
+        Point point = geometryFactory.createPoint(START_POINT);
+        var request = SinglePointLocation
+                .builder()
+                .id(ID)
+                .point(point)
+                .matchSort(MatchSort.SHORTEST_DISTANCE)
+                .matchFilter(MatchFilter.FIRST)
+                .upstreamIsochrone(ISOCHRONE_METERS)
+                .upstreamIsochroneUnit(IsochroneUnit.METERS)
+                .bearingFilter(BEARING_FILTER_FORWARD)
+                .cutoffDistance(CUTOFF_DISTANCE)
+                .build();
+        SinglePointMatch result = singlePointMapMatcher.match(request);
+        assertThat(result.getCandidateMatches()).hasSize(1);
+        CandidateMatch match = result.getCandidateMatches().getFirst();
+        assertThat(match.getUpstream()).hasSize(7);
+        // These are the same 7 segments as in bidirectionalReverseDownstream, but each their reverse link ID.
+        assertThat(match.getUpstream()).map(IsochroneMatch::getMatchedLinkId)
+                .containsExactly(6405235, 6405247, 6405250, 6405246, 6405240, 6405251, 6405249);
+        assertThat(match.getUpstream()).noneMatch(IsochroneMatch::isReversed);
     }
 }
