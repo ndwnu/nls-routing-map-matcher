@@ -8,6 +8,7 @@ import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -51,7 +52,7 @@ public class CreateGeoJsonFromLinksUtil {
         });
         List<Feature> featuresJson = new ArrayList<>();
         links.forEach(l -> {
-            Map<String, Object> properties = new HashMap<>();
+            Map<String, Object> properties = new LinkedHashMap<>();
             properties.put("id", l.getId());
             properties.put("linkIdReversed", l.getLinkIdReversed());
             properties.put("fromNodeId", l.getFromNodeId());
@@ -97,8 +98,9 @@ public class CreateGeoJsonFromLinksUtil {
         var geoms = links.stream()
                 .filter(l -> circleA.intersects(l.getGeometry()))
                 .map(l -> {
-                    Map<String, Object> properties = new HashMap<>();
+                    Map<String, Object> properties = new LinkedHashMap<>();
                     properties.put("id", l.getId());
+                    properties.put("linkIdReversed", l.getLinkIdReversed());
                     properties.put("fromNodeId", l.getFromNodeId());
                     properties.put("toNodeId", l.getToNodeId());
                     properties.put("speedInKilometersPerHour", l.getSpeedInKilometersPerHour());
