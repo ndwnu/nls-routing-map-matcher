@@ -19,7 +19,7 @@ public class Link extends ReaderWay {
     private final LineString geometry;
 
     @EncodedValue(key = REVERSED_LINK_ID, bits = 31)
-    private final Long linkIdReversed;
+    private final long linkIdReversed;
 
     protected Link(long id, long fromNodeId, long toNodeId, double distanceInMeters, LineString geometry) {
         this(id, fromNodeId, toNodeId, distanceInMeters, geometry, null);

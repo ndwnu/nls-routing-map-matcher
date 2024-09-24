@@ -67,12 +67,13 @@ public class IsochroneMatchMapper {
                 ? fractionAndDistanceCalculator.calculateFractionAndDistance(fullGeometry,
                 partialGeometry.getEndPoint().getCoordinate()).getFraction() : 1.0;
 
+        boolean reallyReversed = (reversed != reverseFlow) && hasReversedLinkId(currentEdge) ? !reversed : reversed;
         return IsochroneMatch
                 .builder()
                 .matchedLinkId(matchedLinkId)
                 .startFraction(startFraction)
                 .endFraction(endFraction)
-                .reversed(reeallyReversed)
+                .reversed(reallyReversed)
                 .parentLink(createParentLink(isoLabel, queryGraph, reverseFlow))
                 .geometry(partialGeometry)
                 .build();
