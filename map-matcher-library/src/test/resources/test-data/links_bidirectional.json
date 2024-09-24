@@ -1,0 +1,3422 @@
+[
+  {
+    "id": 3666076,
+    "linkIdReversed": null,
+    "fromNodeId": 596829,
+    "toNodeId": 3873575,
+    "speedInKilometersPerHour": 80,
+    "reverseSpeedInKilometersPerHour": 0,
+    "distanceInMeters": 49.372,
+    "geometry": "AQIAAAACAAAA/67PnPW5FUDRWzy85xZKQAzqW+Z0uRVATSzwFd0WSkA="
+  },
+  {
+    "id": 3666077,
+    "linkIdReversed": null,
+    "fromNodeId": 3873575,
+    "toNodeId": 3873576,
+    "speedInKilometersPerHour": 80,
+    "reverseSpeedInKilometersPerHour": 0,
+    "distanceInMeters": 49.372,
+    "geometry": "AQIAAAAEAAAADOpb5nS5FUBNLPAV3RZKQC47xD9suRVAZohjXdwWSkCVY7K4/7gVQDMXuDzWFkpAkE/Iztu4FUCB6EmZ1BZKQA=="
+  },
+  {
+    "id": 3666078,
+    "linkIdReversed": null,
+    "fromNodeId": 3873576,
+    "toNodeId": 3873577,
+    "speedInKilometersPerHour": 80,
+    "reverseSpeedInKilometersPerHour": 0,
+    "distanceInMeters": 49.372,
+    "geometry": "AQIAAAAEAAAAkE/Iztu4FUCB6EmZ1BZKQAIs8uuHuBVASFLSw9AWSkBvS+SCM7gVQFslWBzOFkpAaY6s/DK4FUBbJVgczhZKQA=="
+  },
+  {
+    "id": 3666079,
+    "linkIdReversed": null,
+    "fromNodeId": 3873577,
+    "toNodeId": 3873578,
+    "speedInKilometersPerHour": 80,
+    "reverseSpeedInKilometersPerHour": 0,
+    "distanceInMeters": 49.372,
+    "geometry": "AQIAAAADAAAAaY6s/DK4FUBbJVgczhZKQL+c2a7QtxVAtaSjHMwWSkCdY0D2ercVQCdMGM3KFkpA"
+  },
+  {
+    "id": 3666080,
+    "linkIdReversed": null,
+    "fromNodeId": 3873578,
+    "toNodeId": 3873579,
+    "speedInKilometersPerHour": 80,
+    "reverseSpeedInKilometersPerHour": 0,
+    "distanceInMeters": 49.372,
+    "geometry": "AQIAAAAEAAAAnWNA9nq3FUAnTBjNyhZKQEJ23sZmtxVA1PGYgcoWSkAh5pKq7bYVQCLDKt7IFkpAM6mhDcC2FUBwYHKjyBZKQA=="
+  },
+  {
+    "id": 3666081,
+    "linkIdReversed": null,
+    "fromNodeId": 3873579,
+    "toNodeId": 3873580,
+    "speedInKilometersPerHour": 80,
+    "reverseSpeedInKilometersPerHour": 0,
+    "distanceInMeters": 49.372,
+    "geometry": "AQIAAAADAAAAM6mhDcC2FUBwYHKjyBZKQLE08KMathVAdlH0wMcWSkA02T9PA7YVQKbVkLjHFkpA"
+  },
+  {
+    "id": 3666082,
+    "linkIdReversed": null,
+    "fromNodeId": 3873580,
+    "toNodeId": 3873581,
+    "speedInKilometersPerHour": 80,
+    "reverseSpeedInKilometersPerHour": 0,
+    "distanceInMeters": 49.372,
+    "geometry": "AQIAAAADAAAANNk/TwO2FUCm1ZC4xxZKQMk7hzJUtRVA83LYfccWSkAwTKYKRrUVQMTuO4bHFkpA"
+  },
+  {
+    "id": 3666083,
+    "linkIdReversed": null,
+    "fromNodeId": 3873581,
+    "toNodeId": 3873582,
+    "speedInKilometersPerHour": 80,
+    "reverseSpeedInKilometersPerHour": 0,
+    "distanceInMeters": 49.372,
+    "geometry": "AQIAAAAEAAAAMEymCka1FUDE7juGxxZKQIV3uYjvtBVAdlH0wMcWSkBkIToEjrQVQKWhRiHJFkpAv9TPm4q0FUBGmQ0yyRZKQA=="
+  },
+  {
+    "id": 3666084,
+    "linkIdReversed": null,
+    "fromNodeId": 3873582,
+    "toNodeId": 3873583,
+    "speedInKilometersPerHour": 80,
+    "reverseSpeedInKilometersPerHour": 0,
+    "distanceInMeters": 49.372,
+    "geometry": "AQIAAAADAAAAv9TPm4q0FUBGmQ0yyRZKQIeKcf4mtBVAzgAXZMsWSkAsDJHT17MVQHk+A+rNFkpA"
+  },
+  {
+    "id": 3666085,
+    "linkIdReversed": null,
+    "fromNodeId": 3873583,
+    "toNodeId": 3873584,
+    "speedInKilometersPerHour": 80,
+    "reverseSpeedInKilometersPerHour": 0,
+    "distanceInMeters": 49.372,
+    "geometry": "AQIAAAAEAAAALAyR09ezFUB5PgPqzRZKQONV1jbFsxVAH/MBgc4WSkA4gem0brMVQKzj+KHSFkpAHFw65jyzFUDyJyob1hZKQA=="
+  },
+  {
+    "id": 3666086,
+    "linkIdReversed": null,
+    "fromNodeId": 3873584,
+    "toNodeId": 596830,
+    "speedInKilometersPerHour": 80,
+    "reverseSpeedInKilometersPerHour": 0,
+    "distanceInMeters": 49.372,
+    "geometry": "AQIAAAACAAAAHFw65jyzFUDyJyob1hZKQC43GOqwshVAfEj43t8WSkA="
+  },
+  {
+    "id": 3666087,
+    "linkIdReversed": null,
+    "fromNodeId": 596829,
+    "toNodeId": 3873585,
+    "speedInKilometersPerHour": 80,
+    "reverseSpeedInKilometersPerHour": 0,
+    "distanceInMeters": 46.171,
+    "geometry": "AQIAAAACAAAA/67PnPW5FUDRWzy85xZKQLzqAfOQuRVASG+4j9wWSkA="
+  },
+  {
+    "id": 3666088,
+    "linkIdReversed": null,
+    "fromNodeId": 3873585,
+    "toNodeId": 3873586,
+    "speedInKilometersPerHour": 80,
+    "reverseSpeedInKilometersPerHour": 0,
+    "distanceInMeters": 46.171,
+    "geometry": "AQIAAAACAAAAvOoB85C5FUBIb7iP3BZKQPsEUIwsuRVA7gbRWtEWSkA="
+  },
+  {
+    "id": 3666089,
+    "linkIdReversed": null,
+    "fromNodeId": 3873586,
+    "toNodeId": 3873587,
+    "speedInKilometersPerHour": 80,
+    "reverseSpeedInKilometersPerHour": 0,
+    "distanceInMeters": 46.171,
+    "geometry": "AQIAAAACAAAA+wRQjCy5FUDuBtFa0RZKQLhAguLHuBVAZRpNLsYWSkA="
+  },
+  {
+    "id": 3666090,
+    "linkIdReversed": null,
+    "fromNodeId": 3873587,
+    "toNodeId": 3873588,
+    "speedInKilometersPerHour": 80,
+    "reverseSpeedInKilometersPerHour": 0,
+    "distanceInMeters": 46.171,
+    "geometry": "AQIAAAACAAAAuECC4se4FUBlGk0uxhZKQPda0HtjuBVADLJl+boWSkA="
+  },
+  {
+    "id": 3666091,
+    "linkIdReversed": null,
+    "fromNodeId": 3873588,
+    "toNodeId": 3873589,
+    "speedInKilometersPerHour": 80,
+    "reverseSpeedInKilometersPerHour": 0,
+    "distanceInMeters": 46.171,
+    "geometry": "AQIAAAADAAAA91rQe2O4FUAMsmX5uhZKQP1MvW4RuBVAyT1d3bEWSkCu2cpL/rcVQFNBRdWvFkpA"
+  },
+  {
+    "id": 3666092,
+    "linkIdReversed": null,
+    "fromNodeId": 3873589,
+    "toNodeId": 3873590,
+    "speedInKilometersPerHour": 80,
+    "reverseSpeedInKilometersPerHour": 0,
+    "distanceInMeters": 46.171,
+    "geometry": "AQIAAAACAAAArtnKS/63FUBTQUXVrxZKQE5k5gKXtxVAC0RPyqQWSkA="
+  },
+  {
+    "id": 3666093,
+    "linkIdReversed": null,
+    "fromNodeId": 3873590,
+    "toNodeId": 596831,
+    "speedInKilometersPerHour": 80,
+    "reverseSpeedInKilometersPerHour": 0,
+    "distanceInMeters": 46.171,
+    "geometry": "AQIAAAACAAAATmTmApe3FUALRE/KpBZKQO7uAbovtxVAw0ZZv5kWSkA="
+  },
+  {
+    "id": 3666094,
+    "linkIdReversed": null,
+    "fromNodeId": 596832,
+    "toNodeId": 3873591,
+    "speedInKilometersPerHour": 80,
+    "reverseSpeedInKilometersPerHour": 0,
+    "distanceInMeters": 38.814,
+    "geometry": "AQIAAAACAAAAFAmmmlm7FUC+E7NeDBdKQE2DonkAuxVAqyNHOgMXSkA="
+  },
+  {
+    "id": 3666095,
+    "linkIdReversed": null,
+    "fromNodeId": 3873591,
+    "toNodeId": 3873592,
+    "speedInKilometersPerHour": 80,
+    "reverseSpeedInKilometersPerHour": 0,
+    "distanceInMeters": 38.814,
+    "geometry": "AQIAAAACAAAATYOieQC7FUCrI0c6AxdKQArcupunuhVAyLd3DfoWSkA="
+  },
+  {
+    "id": 3666096,
+    "linkIdReversed": null,
+    "fromNodeId": 3873592,
+    "toNodeId": 3873593,
+    "speedInKilometersPerHour": 80,
+    "reverseSpeedInKilometersPerHour": 0,
+    "distanceInMeters": 38.814,
+    "geometry": "AQIAAAACAAAACty6m6e6FUDIt3cN+hZKQENWt3pOuhVAtMcL6fAWSkA="
+  },
+  {
+    "id": 3666097,
+    "linkIdReversed": null,
+    "fromNodeId": 3873593,
+    "toNodeId": 596829,
+    "speedInKilometersPerHour": 80,
+    "reverseSpeedInKilometersPerHour": 0,
+    "distanceInMeters": 38.814,
+    "geometry": "AQIAAAACAAAAQ1a3ek66FUC0xwvp8BZKQP+uz5z1uRVA0Vs8vOcWSkA="
+  },
+  {
+    "id": 3666098,
+    "linkIdReversed": null,
+    "fromNodeId": 596833,
+    "toNodeId": 3873594,
+    "speedInKilometersPerHour": 80,
+    "reverseSpeedInKilometersPerHour": 0,
+    "distanceInMeters": 43.905,
+    "geometry": "AQIAAAACAAAAyCO4kbK1FUB1dcdimxZKQHrIlA9BtRVATDPd66QWSkA="
+  },
+  {
+    "id": 3666099,
+    "linkIdReversed": null,
+    "fromNodeId": 3873594,
+    "toNodeId": 3873595,
+    "speedInKilometersPerHour": 80,
+    "reverseSpeedInKilometersPerHour": 0,
+    "distanceInMeters": 43.905,
+    "geometry": "AQIAAAADAAAAesiUD0G1FUBMM93rpBZKQJboLLMItRVAgNjSo6kWSkC5xfzc0LQVQJVkHY6uFkpA"
+  },
+  {
+    "id": 3666100,
+    "linkIdReversed": null,
+    "fromNodeId": 3873595,
+    "toNodeId": 3873596,
+    "speedInKilometersPerHour": 80,
+    "reverseSpeedInKilometersPerHour": 0,
+    "distanceInMeters": 43.905,
+    "geometry": "AQIAAAACAAAAucX83NC0FUCVZB2OrhZKQIYb8PlhtBVATgmISbgWSkA="
+  },
+  {
+    "id": 3666101,
+    "linkIdReversed": null,
+    "fromNodeId": 3873596,
+    "toNodeId": 3873597,
+    "speedInKilometersPerHour": 80,
+    "reverseSpeedInKilometersPerHour": 0,
+    "distanceInMeters": 43.905,
+    "geometry": "AQIAAAACAAAAhhvw+WG0FUBOCYhJuBZKQNdP/1nzsxVACK7yBMIWSkA="
+  },
+  {
+    "id": 3666102,
+    "linkIdReversed": null,
+    "fromNodeId": 3873597,
+    "toNodeId": 3873598,
+    "speedInKilometersPerHour": 80,
+    "reverseSpeedInKilometersPerHour": 0,
+    "distanceInMeters": 43.905,
+    "geometry": "AQIAAAADAAAA10//WfOzFUAIrvIEwhZKQJM5lnfVsxVAJF8JpMQWSkDBVgkWh7MVQNO9TurLFkpA"
+  },
+  {
+    "id": 3666103,
+    "linkIdReversed": null,
+    "fromNodeId": 3873598,
+    "toNodeId": 3873599,
+    "speedInKilometersPerHour": 80,
+    "reverseSpeedInKilometersPerHour": 0,
+    "distanceInMeters": 43.905,
+    "geometry": "AQIAAAACAAAAwVYJFoezFUDTvU7qyxZKQDm2niEcsxVAEEHV6NUWSkA="
+  },
+  {
+    "id": 3666104,
+    "linkIdReversed": null,
+    "fromNodeId": 3873599,
+    "toNodeId": 596830,
+    "speedInKilometersPerHour": 80,
+    "reverseSpeedInKilometersPerHour": 0,
+    "distanceInMeters": 43.905,
+    "geometry": "AQIAAAACAAAAObaeIRyzFUAQQdXo1RZKQC43GOqwshVAfEj43t8WSkA="
+  },
+  {
+    "id": 3666105,
+    "linkIdReversed": null,
+    "fromNodeId": 596830,
+    "toNodeId": 3873600,
+    "speedInKilometersPerHour": 80,
+    "reverseSpeedInKilometersPerHour": 0,
+    "distanceInMeters": 41.702,
+    "geometry": "AQIAAAACAAAALjcY6rCyFUB8SPje3xZKQLjNVIhHshVAAKyOHOkWSkA="
+  },
+  {
+    "id": 3666106,
+    "linkIdReversed": null,
+    "fromNodeId": 3873600,
+    "toNodeId": 3873601,
+    "speedInKilometersPerHour": 80,
+    "reverseSpeedInKilometersPerHour": 0,
+    "distanceInMeters": 41.702,
+    "geometry": "AQIAAAACAAAAuM1UiEeyFUAArI4c6RZKQMRCrWnesRVAhA8lWvIWSkA="
+  },
+  {
+    "id": 3666107,
+    "linkIdReversed": null,
+    "fromNodeId": 3873601,
+    "toNodeId": 3873602,
+    "speedInKilometersPerHour": 80,
+    "reverseSpeedInKilometersPerHour": 0,
+    "distanceInMeters": 41.702,
+    "geometry": "AQIAAAADAAAAxEKtad6xFUCEDyVa8hZKQDz59NiWsRVA+G9enPgWSkDWdD3RdbEVQKlqgqj7FkpA"
+  },
+  {
+    "id": 3666108,
+    "linkIdReversed": null,
+    "fromNodeId": 3873602,
+    "toNodeId": 3873603,
+    "speedInKilometersPerHour": 80,
+    "reverseSpeedInKilometersPerHour": 0,
+    "distanceInMeters": 41.702,
+    "geometry": "AQIAAAACAAAA1nQ90XWxFUCpaoKo+xZKQIF5yJQPsRVAPzkKEAUXSkA="
+  },
+  {
+    "id": 3666109,
+    "linkIdReversed": null,
+    "fromNodeId": 3873603,
+    "toNodeId": 596834,
+    "speedInKilometersPerHour": 80,
+    "reverseSpeedInKilometersPerHour": 0,
+    "distanceInMeters": 41.702,
+    "geometry": "AQIAAAACAAAAgXnIlA+xFUA/OQoQBRdKQKmfNxWpsBVApYP1fw4XSkA="
+  },
+  {
+    "id": 3666110,
+    "linkIdReversed": null,
+    "fromNodeId": 596835,
+    "toNodeId": 3873604,
+    "speedInKilometersPerHour": 80,
+    "reverseSpeedInKilometersPerHour": 0,
+    "distanceInMeters": 49.328,
+    "geometry": "AQIAAAACAAAAQIhkyLG1FUBh+l5DcBZKQNSYEHNJtRVAPgeWI2QWSkA="
+  },
+  {
+    "id": 3666111,
+    "linkIdReversed": null,
+    "fromNodeId": 3873604,
+    "toNodeId": 3873605,
+    "speedInKilometersPerHour": 80,
+    "reverseSpeedInKilometersPerHour": 0,
+    "distanceInMeters": 49.328,
+    "geometry": "AQIAAAACAAAA1JgQc0m1FUA+B5YjZBZKQOyH2GDhtBVAGhTNA1gWSkA="
+  },
+  {
+    "id": 3666112,
+    "linkIdReversed": null,
+    "fromNodeId": 3873605,
+    "toNodeId": 3873606,
+    "speedInKilometersPerHour": 80,
+    "reverseSpeedInKilometersPerHour": 0,
+    "distanceInMeters": 49.328,
+    "geometry": "AQIAAAADAAAA7IfYYOG0FUAaFM0DWBZKQGlSCrq9tBVAjiPW4lMWSkDKMVncf7QVQKTGhJhLFkpA"
+  },
+  {
+    "id": 3666113,
+    "linkIdReversed": null,
+    "fromNodeId": 3873606,
+    "toNodeId": 3873607,
+    "speedInKilometersPerHour": 80,
+    "reverseSpeedInKilometersPerHour": 0,
+    "distanceInMeters": 49.328,
+    "geometry": "AQIAAAACAAAAyjFZ3H+0FUCkxoSYSxZKQE4oRMAhtBVAS5Ln+j4WSkA="
+  },
+  {
+    "id": 3666114,
+    "linkIdReversed": null,
+    "fromNodeId": 3873607,
+    "toNodeId": 596836,
+    "speedInKilometersPerHour": 80,
+    "reverseSpeedInKilometersPerHour": 0,
+    "distanceInMeters": 49.328,
+    "geometry": "AQIAAAADAAAATihEwCG0FUBLkuf6PhZKQMb7cfvlsxVAtI8V/DYWSkCCAu/k07MVQL0cdt8xFkpA"
+  },
+  {
+    "id": 3666115,
+    "linkIdReversed": null,
+    "fromNodeId": 596835,
+    "toNodeId": 3873608,
+    "speedInKilometersPerHour": 79,
+    "reverseSpeedInKilometersPerHour": 0,
+    "distanceInMeters": 49.247,
+    "geometry": "AQIAAAAEAAAAQIhkyLG1FUBh+l5DcBZKQEaXN4drtRVA56ij42oWSkA17PfEOrUVQDxrt11oFkpAhetRuB61FUChZHJqZxZKQA=="
+  },
+  {
+    "id": 3666116,
+    "linkIdReversed": null,
+    "fromNodeId": 3873608,
+    "toNodeId": 3873609,
+    "speedInKilometersPerHour": 79,
+    "reverseSpeedInKilometersPerHour": 0,
+    "distanceInMeters": 49.247,
+    "geometry": "AQIAAAAFAAAAhetRuB61FUChZHJqZxZKQHRd+MH5tBVA5IdKI2YWSkDnVgirsbQVQN7KEp1lFkpABFq6gm20FUBV+3Q8ZhZKQLrA5bFmtBVAN+LJbmYWSkA="
+  },
+  {
+    "id": 3666117,
+    "linkIdReversed": null,
+    "fromNodeId": 3873609,
+    "toNodeId": 3873610,
+    "speedInKilometersPerHour": 79,
+    "reverseSpeedInKilometersPerHour": 0,
+    "distanceInMeters": 49.247,
+    "geometry": "AQIAAAAFAAAAusDlsWa0FUA34sluZhZKQFmis8witBVAPGu3XWgWSkB8nGnC9rMVQFgczvxqFkpA/yPTodOzFUD3qwDfbRZKQMx+3enOsxVAbtxifm4WSkA="
+  },
+  {
+    "id": 3666118,
+    "linkIdReversed": null,
+    "fromNodeId": 3873610,
+    "toNodeId": 3873611,
+    "speedInKilometersPerHour": 79,
+    "reverseSpeedInKilometersPerHour": 0,
+    "distanceInMeters": 49.247,
+    "geometry": "AQIAAAAEAAAAzH7d6c6zFUBu3GJ+bhZKQJ5cUyCzsxVAxouFIXIWSkC1FmahnbMVQMms3uF2FkpAcTrJVpezFUAyk6gXfBZKQA=="
+  },
+  {
+    "id": 3666119,
+    "linkIdReversed": null,
+    "fromNodeId": 3873611,
+    "toNodeId": 3873612,
+    "speedInKilometersPerHour": 79,
+    "reverseSpeedInKilometersPerHour": 0,
+    "distanceInMeters": 49.247,
+    "geometry": "AQIAAAAGAAAAcTrJVpezFUAyk6gXfBZKQO5brROXsxVAhe0nY3wWSkALKqp+pbMVQP8+48KBFkpA9G+X/bqzFUAJUb6ghRZKQBvV6UDWsxVAGVQbnIgWSkDzxklh3rMVQJCEfTuJFkpA"
+  },
+  {
+    "id": 3666120,
+    "linkIdReversed": null,
+    "fromNodeId": 3873612,
+    "toNodeId": 3873613,
+    "speedInKilometersPerHour": 79,
+    "reverseSpeedInKilometersPerHour": 0,
+    "distanceInMeters": 49.247,
+    "geometry": "AQIAAAAFAAAA88ZJYd6zFUCQhH07iRZKQIF2hxQDtBVA7iQi/IsWSkDRQCybObQVQJliDoKOFkpAPNnNjH60FUAKou4DkBZKQFPNrKWAtBVA2h1SDJAWSkA="
+  },
+  {
+    "id": 3666121,
+    "linkIdReversed": null,
+    "fromNodeId": 3873613,
+    "toNodeId": 3873614,
+    "speedInKilometersPerHour": 79,
+    "reverseSpeedInKilometersPerHour": 0,
+    "distanceInMeters": 49.247,
+    "geometry": "AQIAAAAEAAAAU82spYC0FUDaHVIMkBZKQHqJsUy/tBVAgNJQo5AWSkDgZBu4A7UVQIfD0sCPFkpAhSUeUDa1FUBStkjajRZKQA=="
+  },
+  {
+    "id": 3666122,
+    "linkIdReversed": null,
+    "fromNodeId": 3873614,
+    "toNodeId": 596837,
+    "speedInKilometersPerHour": 79,
+    "reverseSpeedInKilometersPerHour": 0,
+    "distanceInMeters": 49.247,
+    "geometry": "AQIAAAAEAAAAhSUeUDa1FUBStkjajRZKQG5OJQNAtRVAXmQCfo0WSkDUY1sGnLUVQDKwjuOHFkpAbarukc21FUBFgxQ8hRZKQA=="
+  },
+  {
+    "id": 3666123,
+    "linkIdReversed": null,
+    "fromNodeId": 596838,
+    "toNodeId": 596835,
+    "speedInKilometersPerHour": 80,
+    "reverseSpeedInKilometersPerHour": 0,
+    "distanceInMeters": 37.896,
+    "geometry": "AQIAAAACAAAAzas6qwW2FUCkbmdfeRZKQECIZMixtRVAYfpeQ3AWSkA="
+  },
+  {
+    "id": 3666124,
+    "linkIdReversed": null,
+    "fromNodeId": 596839,
+    "toNodeId": 3873615,
+    "speedInKilometersPerHour": 95,
+    "reverseSpeedInKilometersPerHour": 0,
+    "distanceInMeters": 46.586,
+    "geometry": "AQIAAAACAAAA3lZ6bTa2FUCaXIyBdRZKQI8YPbfQtRVAoPzdO2oWSkA="
+  },
+  {
+    "id": 3666125,
+    "linkIdReversed": null,
+    "fromNodeId": 3873615,
+    "toNodeId": 3873616,
+    "speedInKilometersPerHour": 95,
+    "reverseSpeedInKilometersPerHour": 0,
+    "distanceInMeters": 46.586,
+    "geometry": "AQIAAAACAAAAjxg9t9C1FUCg/N07ahZKQEDa/wBrtRVAppwv9l4WSkA="
+  },
+  {
+    "id": 3666126,
+    "linkIdReversed": null,
+    "fromNodeId": 3873616,
+    "toNodeId": 3873617,
+    "speedInKilometersPerHour": 95,
+    "reverseSpeedInKilometersPerHour": 0,
+    "distanceInMeters": 46.586,
+    "geometry": "AQIAAAACAAAAQNr/AGu1FUCmnC/2XhZKQG+9pgcFtRVArDyBsFMWSkA="
+  },
+  {
+    "id": 3666127,
+    "linkIdReversed": null,
+    "fromNodeId": 3873617,
+    "toNodeId": 3873618,
+    "speedInKilometersPerHour": 95,
+    "reverseSpeedInKilometersPerHour": 0,
+    "distanceInMeters": 46.586,
+    "geometry": "AQIAAAACAAAAb72mBwW1FUCsPIGwUxZKQCB/aVGftBVAsdzSakgWSkA="
+  },
+  {
+    "id": 3666128,
+    "linkIdReversed": null,
+    "fromNodeId": 3873618,
+    "toNodeId": 3873619,
+    "speedInKilometersPerHour": 95,
+    "reverseSpeedInKilometersPerHour": 0,
+    "distanceInMeters": 46.586,
+    "geometry": "AQIAAAACAAAAIH9pUZ+0FUCx3NJqSBZKQNFALJs5tBVAt3wkJT0WSkA="
+  },
+  {
+    "id": 3666129,
+    "linkIdReversed": null,
+    "fromNodeId": 3873619,
+    "toNodeId": 596836,
+    "speedInKilometersPerHour": 95,
+    "reverseSpeedInKilometersPerHour": 0,
+    "distanceInMeters": 46.586,
+    "geometry": "AQIAAAACAAAA0UAsmzm0FUC3fCQlPRZKQIIC7+TTsxVAvRx23zEWSkA="
+  },
+  {
+    "id": 3666130,
+    "linkIdReversed": null,
+    "fromNodeId": 596836,
+    "toNodeId": 3873620,
+    "speedInKilometersPerHour": 95,
+    "reverseSpeedInKilometersPerHour": 0,
+    "distanceInMeters": 42.122,
+    "geometry": "AQIAAAACAAAAggLv5NOzFUC9HHbfMRZKQCeEDrqEsxVAKII4DycWSkA="
+  },
+  {
+    "id": 3666131,
+    "linkIdReversed": null,
+    "fromNodeId": 3873620,
+    "toNodeId": 3873621,
+    "speedInKilometersPerHour": 95,
+    "reverseSpeedInKilometersPerHour": 0,
+    "distanceInMeters": 42.122,
+    "geometry": "AQIAAAADAAAAJ4QOuoSzFUAogjgPJxZKQJkrg2qDsxVARZvj3CYWSkD67evAObMVQIF8CRUcFkpA"
+  },
+  {
+    "id": 3666132,
+    "linkIdReversed": null,
+    "fromNodeId": 3873621,
+    "toNodeId": 3873622,
+    "speedInKilometersPerHour": 95,
+    "reverseSpeedInKilometersPerHour": 0,
+    "distanceInMeters": 42.122,
+    "geometry": "AQIAAAADAAAA+u3rwDmzFUCBfAkVHBZKQN7lIr4TsxVAJET5ghYWSkD7P4f58rIVQMgL6fAQFkpA"
+  },
+  {
+    "id": 3666204,
+    "linkIdReversed": null,
+    "fromNodeId": 596855,
+    "toNodeId": 3873665,
+    "speedInKilometersPerHour": 95,
+    "reverseSpeedInKilometersPerHour": 0,
+    "distanceInMeters": 40.223,
+    "geometry": "AQIAAAACAAAASfQyiuW2FUDeIcUAiRZKQJSl1vuNthVAJH1aRX8WSkA="
+  },
+  {
+    "id": 3666205,
+    "linkIdReversed": null,
+    "fromNodeId": 3873665,
+    "toNodeId": 596839,
+    "speedInKilometersPerHour": 95,
+    "reverseSpeedInKilometersPerHour": 0,
+    "distanceInMeters": 40.223,
+    "geometry": "AQIAAAACAAAAlKXW+422FUAkfVpFfxZKQN5Wem02thVAmlyMgXUWSkA="
+  },
+  {
+    "id": 3666210,
+    "linkIdReversed": null,
+    "fromNodeId": 3873669,
+    "toNodeId": 3873670,
+    "speedInKilometersPerHour": 95,
+    "reverseSpeedInKilometersPerHour": 0,
+    "distanceInMeters": 47.912,
+    "geometry": "AQIAAAACAAAAjzhkA+myFUDSNCiaBxZKQPUwtDo5sxVAnNzvUBQWSkA="
+  },
+  {
+    "id": 3666211,
+    "linkIdReversed": null,
+    "fromNodeId": 3873670,
+    "toNodeId": 3873671,
+    "speedInKilometersPerHour": 95,
+    "reverseSpeedInKilometersPerHour": 0,
+    "distanceInMeters": 47.912,
+    "geometry": "AQIAAAADAAAA9TC0OjmzFUCc3O9QFBZKQC2T4Xg+sxVA9fOmIhUWSkBrYKsEi7MVQPUQje4gFkpA"
+  },
+  {
+    "id": 3666212,
+    "linkIdReversed": null,
+    "fromNodeId": 3873671,
+    "toNodeId": 3873672,
+    "speedInKilometersPerHour": 95,
+    "reverseSpeedInKilometersPerHour": 0,
+    "distanceInMeters": 47.912,
+    "geometry": "AQIAAAADAAAAa2CrBIuzFUD1EI3uIBZKQFWmmIOgsxVAKerMPSQWSkBaETXR57MVQOl/uRYtFkpA"
+  },
+  {
+    "id": 3666213,
+    "linkIdReversed": null,
+    "fromNodeId": 3873672,
+    "toNodeId": 3873673,
+    "speedInKilometersPerHour": 95,
+    "reverseSpeedInKilometersPerHour": 0,
+    "distanceInMeters": 47.912,
+    "geometry": "AQIAAAADAAAAWhE10eezFUDpf7kWLRZKQGRz1TxHtBVA6Zyf4jgWSkB2qnzPSLQVQMuD9BQ5FkpA"
+  },
+  {
+    "id": 3666214,
+    "linkIdReversed": null,
+    "fromNodeId": 3873673,
+    "toNodeId": 3873674,
+    "speedInKilometersPerHour": 95,
+    "reverseSpeedInKilometersPerHour": 0,
+    "distanceInMeters": 47.912,
+    "geometry": "AQIAAAACAAAAdqp8z0i0FUDLg/QUORZKQOwTQDGytBVASMK+nUQWSkA="
+  },
+  {
+    "id": 3666215,
+    "linkIdReversed": null,
+    "fromNodeId": 3873674,
+    "toNodeId": 3873675,
+    "speedInKilometersPerHour": 95,
+    "reverseSpeedInKilometersPerHour": 0,
+    "distanceInMeters": 47.912,
+    "geometry": "AQIAAAACAAAA7BNAMbK0FUBIwr6dRBZKQOCe508btRVAlXzsLlAWSkA="
+  },
+  {
+    "id": 3666216,
+    "linkIdReversed": null,
+    "fromNodeId": 3873675,
+    "toNodeId": 3873676,
+    "speedInKilometersPerHour": 95,
+    "reverseSpeedInKilometersPerHour": 0,
+    "distanceInMeters": 47.912,
+    "geometry": "AQIAAAACAAAA4J7nTxu1FUCVfOwuUBZKQNQpj26EtRVA4zYawFsWSkA="
+  },
+  {
+    "id": 3666217,
+    "linkIdReversed": null,
+    "fromNodeId": 3873676,
+    "toNodeId": 3873677,
+    "speedInKilometersPerHour": 95,
+    "reverseSpeedInKilometersPerHour": 0,
+    "distanceInMeters": 47.912,
+    "geometry": "AQIAAAACAAAA1CmPboS1FUDjNhrAWxZKQEuTUtDttRVAMPFHUWcWSkA="
+  },
+  {
+    "id": 3666218,
+    "linkIdReversed": null,
+    "fromNodeId": 3873677,
+    "toNodeId": 596857,
+    "speedInKilometersPerHour": 95,
+    "reverseSpeedInKilometersPerHour": 0,
+    "distanceInMeters": 47.912,
+    "geometry": "AQIAAAACAAAAS5NS0O21FUAw8UdRZxZKQD8e+u5WthVAfqt14nIWSkA="
+  },
+  {
+    "id": 3666220,
+    "linkIdReversed": null,
+    "fromNodeId": 596857,
+    "toNodeId": 3873678,
+    "speedInKilometersPerHour": 95,
+    "reverseSpeedInKilometersPerHour": 0,
+    "distanceInMeters": 40.157,
+    "geometry": "AQIAAAACAAAAPx767la2FUB+q3XichZKQH0IqkavthVAZ9R8lXwWSkA="
+  },
+  {
+    "id": 3666221,
+    "linkIdReversed": null,
+    "fromNodeId": 3873678,
+    "toNodeId": 596859,
+    "speedInKilometersPerHour": 95,
+    "reverseSpeedInKilometersPerHour": 0,
+    "distanceInMeters": 40.157,
+    "geometry": "AQIAAAACAAAAfQiqRq+2FUBn1HyVfBZKQLvyWZ4HtxVAgIEgQIYWSkA="
+  },
+  {
+    "id": 3666222,
+    "linkIdReversed": null,
+    "fromNodeId": 596860,
+    "toNodeId": 3873679,
+    "speedInKilometersPerHour": 80,
+    "reverseSpeedInKilometersPerHour": 0,
+    "distanceInMeters": 47.076,
+    "geometry": "AQIAAAADAAAAwW7YtiizFUBIMUCiCRZKQFvSUQ5msxVAfsNEgxQWSkDdzVMdcrMVQHLhQEgWFkpA"
+  },
+  {
+    "id": 3666223,
+    "linkIdReversed": null,
+    "fromNodeId": 3873679,
+    "toNodeId": 596861,
+    "speedInKilometersPerHour": 80,
+    "reverseSpeedInKilometersPerHour": 0,
+    "distanceInMeters": 47.076,
+    "geometry": "AQIAAAADAAAA3c1THXKzFUBy4UBIFhZKQIJxcOmYsxVADwnf+xsWSkAbuAN1yrMVQMVYpl8iFkpA"
+  },
+  {
+    "id": 3666224,
+    "linkIdReversed": null,
+    "fromNodeId": 596860,
+    "toNodeId": 3873680,
+    "speedInKilometersPerHour": 80,
+    "reverseSpeedInKilometersPerHour": 0,
+    "distanceInMeters": 46.237,
+    "geometry": "AQIAAAADAAAAwW7YtiizFUBIMUCiCRZKQII3pFGBsxVAweYcPBMWSkAQrRVtjrMVQAGiYMYUFkpA"
+  },
+  {
+    "id": 3666225,
+    "linkIdReversed": null,
+    "fromNodeId": 3873680,
+    "toNodeId": 3873681,
+    "speedInKilometersPerHour": 80,
+    "reverseSpeedInKilometersPerHour": 0,
+    "distanceInMeters": 46.237,
+    "geometry": "AQIAAAAEAAAAEK0VbY6zFUABomDGFBZKQC2Y+KOosxVAU5RL4xcWSkBOet/42rMVQEoH6/8cFkpApMfvbfqzFUD2RNeFHxZKQA=="
+  },
+  {
+    "id": 3666226,
+    "linkIdReversed": null,
+    "fromNodeId": 3873681,
+    "toNodeId": 3873682,
+    "speedInKilometersPerHour": 80,
+    "reverseSpeedInKilometersPerHour": 0,
+    "distanceInMeters": 46.237,
+    "geometry": "AQIAAAAEAAAApMfvbfqzFUD2RNeFHxZKQDf6mA8ItBVAorYNoyAWSkAs9MEyNrQVQHHK3HwjFkpAGohlM4e0FUA/qmG/JxZKQA=="
+  },
+  {
+    "id": 3666227,
+    "linkIdReversed": null,
+    "fromNodeId": 3873682,
+    "toNodeId": 3873683,
+    "speedInKilometersPerHour": 80,
+    "reverseSpeedInKilometersPerHour": 0,
+    "distanceInMeters": 46.237,
+    "geometry": "AQIAAAAEAAAAGohlM4e0FUA/qmG/JxZKQP7zNGCQtBVAdOs1PSgWSkCzJasi3LQVQEm8PJ0rFkpAycfuAiW1FUChn6nXLRZKQA=="
+  },
+  {
+    "id": 3666228,
+    "linkIdReversed": null,
+    "fromNodeId": 3873683,
+    "toNodeId": 3873684,
+    "speedInKilometersPerHour": 80,
+    "reverseSpeedInKilometersPerHour": 0,
+    "distanceInMeters": 46.237,
+    "geometry": "AQIAAAAEAAAAycfuAiW1FUChn6nXLRZKQNo4Yi0+tRVAKjv9oC4WSkC37BD/sLUVQM+7saAwFkpAldV0PdG1FUCCHmrbMBZKQA=="
+  },
+  {
+    "id": 3666229,
+    "linkIdReversed": null,
+    "fromNodeId": 3873684,
+    "toNodeId": 3873685,
+    "speedInKilometersPerHour": 80,
+    "reverseSpeedInKilometersPerHour": 0,
+    "distanceInMeters": 46.237,
+    "geometry": "AQIAAAADAAAAldV0PdG1FUCCHmrbMBZKQEWEfxE0thVAOj5anDEWSkARqtTsgbYVQBwlr84xFkpA"
+  },
+  {
+    "id": 3666230,
+    "linkIdReversed": null,
+    "fromNodeId": 3873685,
+    "toNodeId": 3873686,
+    "speedInKilometersPerHour": 80,
+    "reverseSpeedInKilometersPerHour": 0,
+    "distanceInMeters": 46.237,
+    "geometry": "AQIAAAADAAAAEarU7IG2FUAcJa/OMRZKQOhmf6DcthVA/gsEATIWSkAQXVDfMrcVQF4UPfAxFkpA"
+  },
+  {
+    "id": 3666231,
+    "linkIdReversed": null,
+    "fromNodeId": 3873686,
+    "toNodeId": 3873687,
+    "speedInKilometersPerHour": 80,
+    "reverseSpeedInKilometersPerHour": 0,
+    "distanceInMeters": 46.237,
+    "geometry": "AQIAAAACAAAAEF1Q3zK3FUBeFD3wMRZKQJHu5xTktxVATKlLxjEWSkA="
+  },
+  {
+    "id": 3666232,
+    "linkIdReversed": null,
+    "fromNodeId": 3873687,
+    "toNodeId": 3873688,
+    "speedInKilometersPerHour": 80,
+    "reverseSpeedInKilometersPerHour": 0,
+    "distanceInMeters": 46.237,
+    "geometry": "AQIAAAADAAAAke7nFOS3FUBMqUvGMRZKQEyo4PCCuBVAOj5anDEWSkATgH9KlbgVQJlGk4sxFkpA"
+  },
+  {
+    "id": 3666233,
+    "linkIdReversed": null,
+    "fromNodeId": 3873688,
+    "toNodeId": 3873689,
+    "speedInKilometersPerHour": 80,
+    "reverseSpeedInKilometersPerHour": 0,
+    "distanceInMeters": 46.237,
+    "geometry": "AQIAAAADAAAAE4B/SpW4FUCZRpOLMRZKQMKiIk4nuRVAww34/DAWSkCPVN/5RbkVQBGrP8IwFkpA"
+  },
+  {
+    "id": 3666234,
+    "linkIdReversed": null,
+    "fromNodeId": 3873689,
+    "toNodeId": 3873690,
+    "speedInKilometersPerHour": 80,
+    "reverseSpeedInKilometersPerHour": 0,
+    "distanceInMeters": 46.237,
+    "geometry": "AQIAAAADAAAAj1Tf+UW5FUARqz/CMBZKQKUTCaaauRVAmnrdIjAWSkB90LNZ9bkVQH2VfOwuFkpA"
+  },
+  {
+    "id": 3666235,
+    "linkIdReversed": null,
+    "fromNodeId": 3873690,
+    "toNodeId": 3873691,
+    "speedInKilometersPerHour": 80,
+    "reverseSpeedInKilometersPerHour": 0,
+    "distanceInMeters": 46.237,
+    "geometry": "AQIAAAAEAAAAfdCzWfW5FUB9lXzsLhZKQBDmdi/3uRVArBkZ5C4WSkDLDvEPW7oVQMDsnjwsFkpACr/Uz5u6FUAabOo8KhZKQA=="
+  },
+  {
+    "id": 3666236,
+    "linkIdReversed": null,
+    "fromNodeId": 3873691,
+    "toNodeId": 596862,
+    "speedInKilometersPerHour": 80,
+    "reverseSpeedInKilometersPerHour": 0,
+    "distanceInMeters": 46.237,
+    "geometry": "AQIAAAADAAAACr/Uz5u6FUAabOo8KhZKQDEHQUeruhVA5SoWvykWSkCXkA96NrsVQLK5ap4jFkpA"
+  },
+  {
+    "id": 3666240,
+    "linkIdReversed": null,
+    "fromNodeId": 596861,
+    "toNodeId": 3873694,
+    "speedInKilometersPerHour": 80,
+    "reverseSpeedInKilometersPerHour": 0,
+    "distanceInMeters": 49.058,
+    "geometry": "AQIAAAADAAAAG7gDdcqzFUDFWKZfIhZKQOj6PhwktBVAAdwsXiwWSkAbvRqgNLQVQAZlGk0uFkpA"
+  },
+  {
+    "id": 3666241,
+    "linkIdReversed": null,
+    "fromNodeId": 3873694,
+    "toNodeId": 3873695,
+    "speedInKilometersPerHour": 80,
+    "reverseSpeedInKilometersPerHour": 0,
+    "distanceInMeters": 49.058,
+    "geometry": "AQIAAAADAAAAG70aoDS0FUAGZRpNLhZKQGQ+INCZtBVAGO3xQjoWSkDylqsfm7QVQFncf2Q6FkpA"
+  },
+  {
+    "id": 3666242,
+    "linkIdReversed": null,
+    "fromNodeId": 3873695,
+    "toNodeId": 3873696,
+    "speedInKilometersPerHour": 80,
+    "reverseSpeedInKilometersPerHour": 0,
+    "distanceInMeters": 49.058,
+    "geometry": "AQIAAAACAAAA8parH5u0FUBZ3H9kOhZKQIWxhSAHtRVAKXXJOEYWSkA="
+  },
+  {
+    "id": 3666243,
+    "linkIdReversed": null,
+    "fromNodeId": 3873696,
+    "toNodeId": 3873697,
+    "speedInKilometersPerHour": 80,
+    "reverseSpeedInKilometersPerHour": 0,
+    "distanceInMeters": 49.058,
+    "geometry": "AQIAAAACAAAAhbGFIAe1FUApdck4RhZKQBjMXyFztRVA+g0TDVIWSkA="
+  },
+  {
+    "id": 3666244,
+    "linkIdReversed": null,
+    "fromNodeId": 3873697,
+    "toNodeId": 596864,
+    "speedInKilometersPerHour": 80,
+    "reverseSpeedInKilometersPerHour": 0,
+    "distanceInMeters": 49.058,
+    "geometry": "AQIAAAACAAAAGMxfIXO1FUD6DRMNUhZKQKzmOSLftRVAyqZc4V0WSkA="
+  },
+  {
+    "id": 3666245,
+    "linkIdReversed": null,
+    "fromNodeId": 596862,
+    "toNodeId": 3873698,
+    "speedInKilometersPerHour": 80,
+    "reverseSpeedInKilometersPerHour": 0,
+    "distanceInMeters": 40.191,
+    "geometry": "AQIAAAACAAAAl5APeja7FUCyuWqeIxZKQNqOqbuyuxVAhjlBmxwWSkA="
+  },
+  {
+    "id": 3666256,
+    "linkIdReversed": null,
+    "fromNodeId": 3873704,
+    "toNodeId": 596870,
+    "speedInKilometersPerHour": 80,
+    "reverseSpeedInKilometersPerHour": 0,
+    "distanceInMeters": 39.714,
+    "geometry": "AQIAAAACAAAAJNbiUwC8FUDU824sKBZKQAJGlzeHuxVAoGtfQC8WSkA="
+  },
+  {
+    "id": 3666943,
+    "linkIdReversed": null,
+    "fromNodeId": 596831,
+    "toNodeId": 3874089,
+    "speedInKilometersPerHour": 80,
+    "reverseSpeedInKilometersPerHour": 0,
+    "distanceInMeters": 27.238,
+    "geometry": "AQIAAAACAAAA7u4Bui+3FUDDRlm/mRZKQNdppKXythVAnYNnQpMWSkA="
+  },
+  {
+    "id": 3666944,
+    "linkIdReversed": null,
+    "fromNodeId": 3874089,
+    "toNodeId": 597005,
+    "speedInKilometersPerHour": 80,
+    "reverseSpeedInKilometersPerHour": 0,
+    "distanceInMeters": 27.238,
+    "geometry": "AQIAAAACAAAA12mkpfK2FUCdg2dCkxZKQMHkRpG1thVApkQSvYwWSkA="
+  },
+  {
+    "id": 3666945,
+    "linkIdReversed": null,
+    "fromNodeId": 596833,
+    "toNodeId": 3874090,
+    "speedInKilometersPerHour": 80,
+    "reverseSpeedInKilometersPerHour": 0,
+    "distanceInMeters": 45.233,
+    "geometry": "AQIAAAAFAAAAyCO4kbK1FUB1dcdimxZKQIrKhjWVtRVAK/nYXaAWSkD2evfHe7UVQE1nJ4OjFkpAURGnk2y1FUAce/ZcphZKQLKBdLFptRVAJ/VlaacWSkA="
+  },
+  {
+    "id": 3666946,
+    "linkIdReversed": null,
+    "fromNodeId": 3874090,
+    "toNodeId": 3874091,
+    "speedInKilometersPerHour": 80,
+    "reverseSpeedInKilometersPerHour": 0,
+    "distanceInMeters": 45.233,
+    "geometry": "AQIAAAAHAAAAsoF0sWm1FUAn9WVppxZKQHkfR3NktRVAuwopP6kWSkBAvRk1X7UVQJyJ6UKsFkpAV7H4TWG1FUCsjEY+rxZKQBPyQc9mtRVACi3r/rEWSkDr46HvbrUVQDOMu0G0FkpA/BpJgnC1FUC2ateEtBZKQA=="
+  },
+  {
+    "id": 3666947,
+    "linkIdReversed": null,
+    "fromNodeId": 3874091,
+    "toNodeId": 3874092,
+    "speedInKilometersPerHour": 80,
+    "reverseSpeedInKilometersPerHour": 0,
+    "distanceInMeters": 45.233,
+    "geometry": "AQIAAAAHAAAA/BpJgnC1FUC2ateEtBZKQPw3L058tRVA2AxwQbYWSkDJzAUuj7UVQDatFAK5FkpAQGt+/KW1FUDcLckBuxZKQBh6xOi5tRVAC34bYrwWSkCV1XQ90bUVQHu9++O9FkpAHY6u0t21FUCT5SSUvhZKQA=="
+  },
+  {
+    "id": 3666948,
+    "linkIdReversed": null,
+    "fromNodeId": 3874092,
+    "toNodeId": 3874093,
+    "speedInKilometersPerHour": 80,
+    "reverseSpeedInKilometersPerHour": 0,
+    "distanceInMeters": 45.233,
+    "geometry": "AQIAAAAGAAAAHY6u0t21FUCT5SSUvhZKQDSfc7frtRVAG4F4Xb8WSkAXRQ98DLYVQAniPJzAFkpAF9aNd0e2FUA4Mo/8wRZKQAYTfxR1thVAeSEdHsIWSkCIDoEjgbYVQKmluRXCFkpA"
+  },
+  {
+    "id": 3666949,
+    "linkIdReversed": null,
+    "fromNodeId": 3874093,
+    "toNodeId": 3874094,
+    "speedInKilometersPerHour": 80,
+    "reverseSpeedInKilometersPerHour": 0,
+    "distanceInMeters": 45.233,
+    "geometry": "AQIAAAAGAAAAiA6BI4G2FUCppbkVwhZKQGA6rdugthVAODKP/MEWSkBrC89LxbYVQFCOAkTBFkpAOPdXj/u2FUBdcAZ/vxZKQK+ytiketxVA7DAm/b0WSkBavFgYIrcVQJnWprG9FkpA"
+  },
+  {
+    "id": 3666950,
+    "linkIdReversed": null,
+    "fromNodeId": 3874094,
+    "toNodeId": 3874095,
+    "speedInKilometersPerHour": 80,
+    "reverseSpeedInKilometersPerHour": 0,
+    "distanceInMeters": 45.233,
+    "geometry": "AQIAAAAFAAAAWrxYGCK3FUCZ1qaxvRZKQIfe4uE9txVAlE25wrsWSkBO02cHXLcVQDDw3Hu4FkpAdji6Sne3FUDrq6sCtRZKQNEINq5/txVAwkzbv7IWSkA="
+  },
+  {
+    "id": 3666951,
+    "linkIdReversed": null,
+    "fromNodeId": 3874095,
+    "toNodeId": 3874096,
+    "speedInKilometersPerHour": 80,
+    "reverseSpeedInKilometersPerHour": 0,
+    "distanceInMeters": 45.233,
+    "geometry": "AQIAAAAGAAAA0Qg2rn+3FUDCTNu/shZKQJ2AJsKGtxVAHcwmwLAWSkBIisiwircVQNHKvcCsFkpAoz1eSIe3FUA4LA38qBZKQFPnUfF/txVApUqUvaUWSkBIbeLkfrcVQJPfopOlFkpA"
+  },
+  {
+    "id": 3666952,
+    "linkIdReversed": null,
+    "fromNodeId": 3874096,
+    "toNodeId": 596831,
+    "speedInKilometersPerHour": 80,
+    "reverseSpeedInKilometersPerHour": 0,
+    "distanceInMeters": 45.233,
+    "geometry": "AQIAAAADAAAASG3i5H63FUCT36KTpRZKQMsRMpBntxVAZvfkYaEWSkDu7gG6L7cVQMNGWb+ZFkpA"
+  },
+  {
+    "id": 3666953,
+    "linkIdReversed": null,
+    "fromNodeId": 597005,
+    "toNodeId": 3874097,
+    "speedInKilometersPerHour": 80,
+    "reverseSpeedInKilometersPerHour": 0,
+    "distanceInMeters": 40.098,
+    "geometry": "AQIAAAACAAAAweRGkbW2FUCmRBK9jBZKQAbZsnxdthVAjZduEoMWSkA="
+  },
+  {
+    "id": 3666954,
+    "linkIdReversed": null,
+    "fromNodeId": 3874097,
+    "toNodeId": 596838,
+    "speedInKilometersPerHour": 80,
+    "reverseSpeedInKilometersPerHour": 0,
+    "distanceInMeters": 40.098,
+    "geometry": "AQIAAAACAAAABtmyfF22FUCNl24SgxZKQM2rOqsFthVApG5nX3kWSkA="
+  },
+  {
+    "id": 3666955,
+    "linkIdReversed": null,
+    "fromNodeId": 597006,
+    "toNodeId": 3874098,
+    "speedInKilometersPerHour": 80,
+    "reverseSpeedInKilometersPerHour": 0,
+    "distanceInMeters": 43.907,
+    "geometry": "AQIAAAACAAAAxY7GoX63FUDcSxqjdRZKQGX8+4wLtxVAQpYFE38WSkA="
+  },
+  {
+    "id": 3666956,
+    "linkIdReversed": null,
+    "fromNodeId": 3874098,
+    "toNodeId": 3874099,
+    "speedInKilometersPerHour": 80,
+    "reverseSpeedInKilometersPerHour": 0,
+    "distanceInMeters": 43.907,
+    "geometry": "AQIAAAACAAAAZfz7jAu3FUBClgUTfxZKQIhITbuYthVAqODwgogWSkA="
+  },
+  {
+    "id": 3666957,
+    "linkIdReversed": null,
+    "fromNodeId": 3874099,
+    "toNodeId": 3874100,
+    "speedInKilometersPerHour": 80,
+    "reverseSpeedInKilometersPerHour": 0,
+    "distanceInMeters": 43.907,
+    "geometry": "AQIAAAACAAAAiEhNu5i2FUCo4PCCiBZKQCi2gqYlthVADyvc8pEWSkA="
+  },
+  {
+    "id": 3666958,
+    "linkIdReversed": null,
+    "fromNodeId": 3874100,
+    "toNodeId": 596833,
+    "speedInKilometersPerHour": 80,
+    "reverseSpeedInKilometersPerHour": 0,
+    "distanceInMeters": 43.907,
+    "geometry": "AQIAAAACAAAAKLaCpiW2FUAPK9zykRZKQMgjuJGytRVAdXXHYpsWSkA="
+  },
+  {
+    "id": 3666959,
+    "linkIdReversed": null,
+    "fromNodeId": 597007,
+    "toNodeId": 3874101,
+    "speedInKilometersPerHour": 80,
+    "reverseSpeedInKilometersPerHour": 0,
+    "distanceInMeters": 46.609,
+    "geometry": "AQIAAAACAAAAD0WBPpG3FUDhQh7BjRZKQOFh2jf3txVA26LMBpkWSkA="
+  },
+  {
+    "id": 3666960,
+    "linkIdReversed": null,
+    "fromNodeId": 3874101,
+    "toNodeId": 3874102,
+    "speedInKilometersPerHour": 80,
+    "reverseSpeedInKilometersPerHour": 0,
+    "distanceInMeters": 46.609,
+    "geometry": "AQIAAAACAAAA4WHaN/e3FUDboswGmRZKQLN+MzFduBVA1gJ7TKQWSkA="
+  },
+  {
+    "id": 3666961,
+    "linkIdReversed": null,
+    "fromNodeId": 3874102,
+    "toNodeId": 3874103,
+    "speedInKilometersPerHour": 80,
+    "reverseSpeedInKilometersPerHour": 0,
+    "distanceInMeters": 46.609,
+    "geometry": "AQIAAAADAAAAs34zMV24FUDWAntMpBZKQFGf5A6buBVAIJxPHasWSkAHeqhtw7gVQP/mxYmvFkpA"
+  },
+  {
+    "id": 3666962,
+    "linkIdReversed": null,
+    "fromNodeId": 3874103,
+    "toNodeId": 3874104,
+    "speedInKilometersPerHour": 80,
+    "reverseSpeedInKilometersPerHour": 0,
+    "distanceInMeters": 46.609,
+    "geometry": "AQIAAAACAAAAB3qobcO4FUD/5sWJrxZKQN9TOe0puRVAKcsQx7oWSkA="
+  },
+  {
+    "id": 3666963,
+    "linkIdReversed": null,
+    "fromNodeId": 3874104,
+    "toNodeId": 3874105,
+    "speedInKilometersPerHour": 80,
+    "reverseSpeedInKilometersPerHour": 0,
+    "distanceInMeters": 46.609,
+    "geometry": "AQIAAAACAAAA31M57Sm5FUApyxDHuhZKQDkM5q+QuRVAU69bBMYWSkA="
+  },
+  {
+    "id": 3666964,
+    "linkIdReversed": null,
+    "fromNodeId": 3874105,
+    "toNodeId": 3874106,
+    "speedInKilometersPerHour": 80,
+    "reverseSpeedInKilometersPerHour": 0,
+    "distanceInMeters": 46.609,
+    "geometry": "AQIAAAACAAAAOQzmr5C5FUBTr1sExhZKQBDmdi/3uRVAfZOmQdEWSkA="
+  },
+  {
+    "id": 3666965,
+    "linkIdReversed": null,
+    "fromNodeId": 3874106,
+    "toNodeId": 597008,
+    "speedInKilometersPerHour": 80,
+    "reverseSpeedInKilometersPerHour": 0,
+    "distanceInMeters": 46.609,
+    "geometry": "AQIAAAACAAAAEOZ2L/e5FUB9k6ZB0RZKQOi/B69duhVAp3fxftwWSkA="
+  },
+  {
+    "id": 3666966,
+    "linkIdReversed": null,
+    "fromNodeId": 597007,
+    "toNodeId": 3874107,
+    "speedInKilometersPerHour": 80,
+    "reverseSpeedInKilometersPerHour": 0,
+    "distanceInMeters": 48.088,
+    "geometry": "AQIAAAAEAAAAD0WBPpG3FUDhQh7BjRZKQOy+Y3jstxVA5WN3gZIWSkDE6o8wDLgVQMYWghyUFkpArU1jey24FUDRkPEolRZKQA=="
+  },
+  {
+    "id": 3666967,
+    "linkIdReversed": null,
+    "fromNodeId": 3874107,
+    "toNodeId": 3874108,
+    "speedInKilometersPerHour": 80,
+    "reverseSpeedInKilometersPerHour": 0,
+    "distanceInMeters": 48.088,
+    "geometry": "AQIAAAAGAAAArU1jey24FUDRkPEolRZKQJwzorQ3uBVA9WbUfJUWSkA1XU90XbgVQO91Ul+WFkpA1GAaho+4FUCzQ/zDlhZKQJXSM73EuBVA73VSX5YWSkDObi2T4bgVQKfJjLeVFkpA"
+  },
+  {
+    "id": 3666968,
+    "linkIdReversed": null,
+    "fromNodeId": 3874108,
+    "toNodeId": 3874109,
+    "speedInKilometersPerHour": 80,
+    "reverseSpeedInKilometersPerHour": 0,
+    "distanceInMeters": 48.088,
+    "geometry": "AQIAAAAHAAAAzm4tk+G4FUCnyYy3lRZKQPxW68TluBVANlZinpUWSkCxMa8jDrkVQAgGED6UFkpALqpFRDG5FUAmUwWjkhZKQFYPmIdMuRVA9wKzQpEWSkARiq2gabkVQEzFxryOFkpA+7K0U3O5FUAv4GWGjRZKQA=="
+  },
+  {
+    "id": 3666969,
+    "linkIdReversed": null,
+    "fromNodeId": 3874109,
+    "toNodeId": 3874110,
+    "speedInKilometersPerHour": 80,
+    "reverseSpeedInKilometersPerHour": 0,
+    "distanceInMeters": 48.088,
+    "geometry": "AQIAAAAFAAAA+7K0U3O5FUAv4GWGjRZKQIkoJm+AuRVAfbH34osWSkCU3GETmbkVQKMjufyHFkpAIlLTLqa5FUAi4Xt/gxZKQCJS0y6muRVAvoOfOIAWSkA="
+  },
+  {
+    "id": 3666970,
+    "linkIdReversed": null,
+    "fromNodeId": 3874110,
+    "toNodeId": 3874111,
+    "speedInKilometersPerHour": 80,
+    "reverseSpeedInKilometersPerHour": 0,
+    "distanceInMeters": 48.088,
+    "geometry": "AQIAAAAFAAAAIlLTLqa5FUC+g584gBZKQCJS0y6muRVAJbGk3H0WSkAGhNbDl7kVQKRuZ195FkpAAI3SpX+5FUAXfnA+dRZKQHi3skRnuRVA43DmV3MWSkA="
+  },
+  {
+    "id": 3666971,
+    "linkIdReversed": null,
+    "fromNodeId": 3874111,
+    "toNodeId": 3874112,
+    "speedInKilometersPerHour": 80,
+    "reverseSpeedInKilometersPerHour": 0,
+    "distanceInMeters": 48.088,
+    "geometry": "AQIAAAAFAAAAeLeyRGe5FUDjcOZXcxZKQHh95qxPuRVAT1sjgnEWSkCm1CXjGLkVQC3t1FxuFkpAEhH+RdC4FUDVCWgibBZKQOUoQBTMuBVABI4EGmwWSkA="
+  },
+  {
+    "id": 3666972,
+    "linkIdReversed": null,
+    "fromNodeId": 3874112,
+    "toNodeId": 3874113,
+    "speedInKilometersPerHour": 80,
+    "reverseSpeedInKilometersPerHour": 0,
+    "distanceInMeters": 48.088,
+    "geometry": "AQIAAAAEAAAA5ShAFMy4FUAEjgQabBZKQHTTZpyGuBVAEDy+vWsWSkBdMSO8PbgVQApLPKBsFkpAR+aRPxi4FUD3qwDfbRZKQA=="
+  },
+  {
+    "id": 3666973,
+    "linkIdReversed": null,
+    "fromNodeId": 3874113,
+    "toNodeId": 597006,
+    "speedInKilometersPerHour": 80,
+    "reverseSpeedInKilometersPerHour": 0,
+    "distanceInMeters": 48.088,
+    "geometry": "AQIAAAAEAAAAR+aRPxi4FUD3qwDfbRZKQEEMdO0LuBVAvHmqQ24WSkD4xDpVvrcVQMaLhSFyFkpAxY7GoX63FUDcSxqjdRZKQA=="
+  },
+  {
+    "id": 3666974,
+    "linkIdReversed": null,
+    "fromNodeId": 597009,
+    "toNodeId": 597007,
+    "speedInKilometersPerHour": 80,
+    "reverseSpeedInKilometersPerHour": 0,
+    "distanceInMeters": 43.971,
+    "geometry": "AQIAAAACAAAA+WhxxjC3FUAujzUjgxZKQA9FgT6RtxVA4UIewY0WSkA="
+  },
+  {
+    "id": 3666975,
+    "linkIdReversed": null,
+    "fromNodeId": 596870,
+    "toNodeId": 3874114,
+    "speedInKilometersPerHour": 80,
+    "reverseSpeedInKilometersPerHour": 0,
+    "distanceInMeters": 47.707,
+    "geometry": "AQIAAAACAAAAAkaXN4e7FUCga19ALxZKQJc5XRYTuxVABoIAGToWSkA="
+  },
+  {
+    "id": 3666976,
+    "linkIdReversed": null,
+    "fromNodeId": 3874114,
+    "toNodeId": 3874115,
+    "speedInKilometersPerHour": 80,
+    "reverseSpeedInKilometersPerHour": 0,
+    "distanceInMeters": 47.707,
+    "geometry": "AQIAAAAEAAAAlzldFhO7FUAGggAZOhZKQFMj9DP1uhVANJ4I4jwWSkA9npYfuLoVQCUgJuFCFkpAh/2eWKe6FUDRXRJnRRZKQA=="
+  },
+  {
+    "id": 3666977,
+    "linkIdReversed": null,
+    "fromNodeId": 3874115,
+    "toNodeId": 3874116,
+    "speedInKilometersPerHour": 80,
+    "reverseSpeedInKilometersPerHour": 0,
+    "distanceInMeters": 47.707,
+    "geometry": "AQIAAAADAAAAh/2eWKe6FUDRXRJnRRZKQLU3+MJkuhVAflTDfk8WSkDXiGAcXLoVQGuBPSZSFkpA"
+  },
+  {
+    "id": 3666978,
+    "linkIdReversed": null,
+    "fromNodeId": 3874116,
+    "toNodeId": 3874117,
+    "speedInKilometersPerHour": 80,
+    "reverseSpeedInKilometersPerHour": 0,
+    "distanceInMeters": 47.707,
+    "geometry": "AQIAAAADAAAA14hgHFy6FUBrgT0mUhZKQNF0djI4uhVA0Jfe/lwWSkCkjLgANLoVQM8vStBfFkpA"
+  },
+  {
+    "id": 3666979,
+    "linkIdReversed": null,
+    "fromNodeId": 3874117,
+    "toNodeId": 3874118,
+    "speedInKilometersPerHour": 80,
+    "reverseSpeedInKilometersPerHour": 0,
+    "distanceInMeters": 47.707,
+    "geometry": "AQIAAAADAAAApIy4ADS6FUDPL0rQXxZKQGsNpfYiuhVAWBzO/GoWSkC1iZP7HboVQIY41sVtFkpA"
+  },
+  {
+    "id": 3666980,
+    "linkIdReversed": null,
+    "fromNodeId": 3874118,
+    "toNodeId": 3874119,
+    "speedInKilometersPerHour": 80,
+    "reverseSpeedInKilometersPerHour": 0,
+    "distanceInMeters": 47.707,
+    "geometry": "AQIAAAADAAAAtYmT+x26FUCGONbFbRZKQBbdek0PuhVATb9EvHUWSkBPIsK/CLoVQD5BYrt7FkpA"
+  },
+  {
+    "id": 3666981,
+    "linkIdReversed": null,
+    "fromNodeId": 3874119,
+    "toNodeId": 3874120,
+    "speedInKilometersPerHour": 80,
+    "reverseSpeedInKilometersPerHour": 0,
+    "distanceInMeters": 47.707,
+    "geometry": "AQIAAAACAAAATyLCvwi6FUA+QWK7exZKQKT7OQX5uRVAxcVRuYkWSkA="
+  },
+  {
+    "id": 3666982,
+    "linkIdReversed": null,
+    "fromNodeId": 3874120,
+    "toNodeId": 3874121,
+    "speedInKilometersPerHour": 80,
+    "reverseSpeedInKilometersPerHour": 0,
+    "distanceInMeters": 47.707,
+    "geometry": "AQIAAAADAAAApPs5Bfm5FUDFxVG5iRZKQDj0Fg/vuRVAJlMFo5IWSkAWhsjp67kVQE1KQbeXFkpA"
+  },
+  {
+    "id": 3666983,
+    "linkIdReversed": null,
+    "fromNodeId": 3874121,
+    "toNodeId": 3874122,
+    "speedInKilometersPerHour": 80,
+    "reverseSpeedInKilometersPerHour": 0,
+    "distanceInMeters": 47.707,
+    "geometry": "AQIAAAACAAAAFobI6eu5FUBNSkG3lxZKQLu1TIbjuRVAdsb3xaUWSkA="
+  },
+  {
+    "id": 3666984,
+    "linkIdReversed": null,
+    "fromNodeId": 3874122,
+    "toNodeId": 3874123,
+    "speedInKilometersPerHour": 80,
+    "reverseSpeedInKilometersPerHour": 0,
+    "distanceInMeters": 47.707,
+    "geometry": "AQIAAAAEAAAAu7VMhuO5FUB2xvfFpRZKQCegibDhuRVAx7ji4qgWSkCqfqXz4bkVQHpsy4CzFkpALV3BNuK5FUDOxkrMsxZKQA=="
+  },
+  {
+    "id": 3666985,
+    "linkIdReversed": null,
+    "fromNodeId": 3874123,
+    "toNodeId": 3874124,
+    "speedInKilometersPerHour": 80,
+    "reverseSpeedInKilometersPerHour": 0,
+    "distanceInMeters": 47.707,
+    "geometry": "AQIAAAADAAAALV3BNuK5FUDOxkrMsxZKQC16pwLuuRVADp90IsEWSkDBj2rY77kVQCbHndLBFkpA"
+  },
+  {
+    "id": 3666986,
+    "linkIdReversed": null,
+    "fromNodeId": 3874124,
+    "toNodeId": 3874125,
+    "speedInKilometersPerHour": 80,
+    "reverseSpeedInKilometersPerHour": 0,
+    "distanceInMeters": 47.707,
+    "geometry": "AQIAAAADAAAAwY9q2O+5FUAmx53SwRZKQFqcMcwJuhVAjBGJQssWSkCNXg1QGroVQLr5RnTPFkpA"
+  },
+  {
+    "id": 3666987,
+    "linkIdReversed": null,
+    "fromNodeId": 3874125,
+    "toNodeId": 597008,
+    "speedInKilometersPerHour": 80,
+    "reverseSpeedInKilometersPerHour": 0,
+    "distanceInMeters": 47.707,
+    "geometry": "AQIAAAADAAAAjV4NUBq6FUC6+UZ0zxZKQNcUyOwsuhVAjZYDPdQWSkDovwevXboVQKd38X7cFkpA"
+  },
+  {
+    "id": 3666988,
+    "linkIdReversed": null,
+    "fromNodeId": 597008,
+    "toNodeId": 3874126,
+    "speedInKilometersPerHour": 80,
+    "reverseSpeedInKilometersPerHour": 0,
+    "distanceInMeters": 44.067,
+    "geometry": "AQIAAAACAAAA6L8Hr126FUCnd/F+3BZKQIF6M2q+uhVAKqc9JecWSkA="
+  },
+  {
+    "id": 3666989,
+    "linkIdReversed": null,
+    "fromNodeId": 3874126,
+    "toNodeId": 3874127,
+    "speedInKilometersPerHour": 80,
+    "reverseSpeedInKilometersPerHour": 0,
+    "distanceInMeters": 44.067,
+    "geometry": "AQIAAAACAAAAgXozar66FUAqpz0l5xZKQJ0Te2gfuxVA3lomw/EWSkA="
+  },
+  {
+    "id": 3666990,
+    "linkIdReversed": null,
+    "fromNodeId": 3874127,
+    "toNodeId": 3874128,
+    "speedInKilometersPerHour": 80,
+    "reverseSpeedInKilometersPerHour": 0,
+    "distanceInMeters": 44.067,
+    "geometry": "AQIAAAADAAAAnRN7aB+7FUDeWibD8RZKQEGasWg6uxVA7l2DvvQWSkCz74rgf7sVQGGKcmn8FkpA"
+  },
+  {
+    "id": 3666991,
+    "linkIdReversed": null,
+    "fromNodeId": 3874128,
+    "toNodeId": 3874129,
+    "speedInKilometersPerHour": 80,
+    "reverseSpeedInKilometersPerHour": 0,
+    "distanceInMeters": 44.067,
+    "geometry": "AQIAAAADAAAAs++K4H+7FUBhinJp/BZKQKddTDPduxVAwePbuwYXSkBG7X4V4LsVQOW5vg8HF0pA"
+  },
+  {
+    "id": 3666996,
+    "linkIdReversed": null,
+    "fromNodeId": 596870,
+    "toNodeId": 3874133,
+    "speedInKilometersPerHour": 80,
+    "reverseSpeedInKilometersPerHour": 0,
+    "distanceInMeters": 45.066,
+    "geometry": "AQIAAAACAAAAAkaXN4e7FUCga19ALxZKQNBhvrwAuxVAW0QUkzcWSkA="
+  },
+  {
+    "id": 3666997,
+    "linkIdReversed": null,
+    "fromNodeId": 3874133,
+    "toNodeId": 3874134,
+    "speedInKilometersPerHour": 80,
+    "reverseSpeedInKilometersPerHour": 0,
+    "distanceInMeters": 45.066,
+    "geometry": "AQIAAAACAAAA0GG+vAC7FUBbRBSTNxZKQJ595UF6uhVAFR3J5T8WSkA="
+  },
+  {
+    "id": 3666998,
+    "linkIdReversed": null,
+    "fromNodeId": 3874134,
+    "toNodeId": 3874135,
+    "speedInKilometersPerHour": 80,
+    "reverseSpeedInKilometersPerHour": 0,
+    "distanceInMeters": 45.066,
+    "geometry": "AQIAAAADAAAAnn3lQXq6FUAVHcnlPxZKQFpnfF9cuhVAea7vw0EWSkALKT+p9rkVQFLUmXtIFkpA"
+  },
+  {
+    "id": 3666999,
+    "linkIdReversed": null,
+    "fromNodeId": 3874135,
+    "toNodeId": 3874136,
+    "speedInKilometersPerHour": 80,
+    "reverseSpeedInKilometersPerHour": 0,
+    "distanceInMeters": 45.066,
+    "geometry": "AQIAAAACAAAACyk/qfa5FUBS1Jl7SBZKQH2R0JZzuRVAMIMxIlEWSkA="
+  },
+  {
+    "id": 3667000,
+    "linkIdReversed": null,
+    "fromNodeId": 3874136,
+    "toNodeId": 3874137,
+    "speedInKilometersPerHour": 80,
+    "reverseSpeedInKilometersPerHour": 0,
+    "distanceInMeters": 45.066,
+    "geometry": "AQIAAAADAAAAfZHQlnO5FUAwgzEiURZKQEWeJF0zuRVALudSXFUWSkABMQkX8rgVQE8hV+pZFkpA"
+  },
+  {
+    "id": 3667001,
+    "linkIdReversed": null,
+    "fromNodeId": 3874137,
+    "toNodeId": 3874138,
+    "speedInKilometersPerHour": 80,
+    "reverseSpeedInKilometersPerHour": 0,
+    "distanceInMeters": 45.066,
+    "geometry": "AQIAAAACAAAAATEJF/K4FUBPIVfqWRZKQBMpzeZxuBVA3zKny2IWSkA="
+  },
+  {
+    "id": 3667002,
+    "linkIdReversed": null,
+    "fromNodeId": 3874138,
+    "toNodeId": 3874139,
+    "speedInKilometersPerHour": 80,
+    "reverseSpeedInKilometersPerHour": 0,
+    "distanceInMeters": 45.066,
+    "geometry": "AQIAAAADAAAAEynN5nG4FUDfMqfLYhZKQH+8V61MuBVAK2haYmUWSkDhYdo397cVQNUJaCJsFkpA"
+  },
+  {
+    "id": 3667003,
+    "linkIdReversed": null,
+    "fromNodeId": 3874139,
+    "toNodeId": 597006,
+    "speedInKilometersPerHour": 80,
+    "reverseSpeedInKilometersPerHour": 0,
+    "distanceInMeters": 45.066,
+    "geometry": "AQIAAAACAAAA4WHaN/e3FUDVCWgibBZKQMWOxqF+txVA3Esao3UWSkA="
+  },
+  {
+    "id": 3667004,
+    "linkIdReversed": null,
+    "fromNodeId": 597011,
+    "toNodeId": 3874140,
+    "speedInKilometersPerHour": 80,
+    "reverseSpeedInKilometersPerHour": 0,
+    "distanceInMeters": 46.115,
+    "geometry": "AQIAAAADAAAAQSrFjsaxFUDmllZD4hZKQBMqOLwgshVAxsTm49oWSkBMxjGSPbIVQNmXbDzYFkpA"
+  },
+  {
+    "id": 3667005,
+    "linkIdReversed": null,
+    "fromNodeId": 3874140,
+    "toNodeId": 3874141,
+    "speedInKilometersPerHour": 80,
+    "reverseSpeedInKilometersPerHour": 0,
+    "distanceInMeters": 46.115,
+    "geometry": "AQIAAAACAAAATMYxkj2yFUDZl2w82BZKQJshVRSvshVACMvY0M0WSkA="
+  },
+  {
+    "id": 3667006,
+    "linkIdReversed": null,
+    "fromNodeId": 3874141,
+    "toNodeId": 3874142,
+    "speedInKilometersPerHour": 80,
+    "reverseSpeedInKilometersPerHour": 0,
+    "distanceInMeters": 46.115,
+    "geometry": "AQIAAAADAAAAmyFVFK+yFUAIy9jQzRZKQAw9YvTcshVA2uIan8kWSkBbJO1GH7MVQJYGflTDFkpA"
+  },
+  {
+    "id": 3667007,
+    "linkIdReversed": null,
+    "fromNodeId": 3874142,
+    "toNodeId": 3874143,
+    "speedInKilometersPerHour": 80,
+    "reverseSpeedInKilometersPerHour": 0,
+    "distanceInMeters": 46.115,
+    "geometry": "AQIAAAACAAAAWyTtRh+zFUCWBn5UwxZKQJOLMbCOsxVAhEpcx7gWSkA="
+  },
+  {
+    "id": 3667008,
+    "linkIdReversed": null,
+    "fromNodeId": 3874143,
+    "toNodeId": 3874144,
+    "speedInKilometersPerHour": 80,
+    "reverseSpeedInKilometersPerHour": 0,
+    "distanceInMeters": 46.115,
+    "geometry": "AQIAAAADAAAAk4sxsI6zFUCESlzHuBZKQCfbwB2osxVAGvz9YrYWSkDcKR2s/7MVQOIBZVOuFkpA"
+  },
+  {
+    "id": 3667009,
+    "linkIdReversed": null,
+    "fromNodeId": 3874144,
+    "toNodeId": 3874145,
+    "speedInKilometersPerHour": 80,
+    "reverseSpeedInKilometersPerHour": 0,
+    "distanceInMeters": 46.115,
+    "geometry": "AQIAAAACAAAA3CkdrP+zFUDiAWVTrhZKQKimJOtwtBVAETXR56MWSkA="
+  },
+  {
+    "id": 3667010,
+    "linkIdReversed": null,
+    "fromNodeId": 3874145,
+    "toNodeId": 3874146,
+    "speedInKilometersPerHour": 80,
+    "reverseSpeedInKilometersPerHour": 0,
+    "distanceInMeters": 46.115,
+    "geometry": "AQIAAAADAAAAqKYk63C0FUARNdHnoxZKQAMlBRbAtBVAYtaLoZwWSkCAnZs247QVQLHbZ5WZFkpA"
+  },
+  {
+    "id": 3667011,
+    "linkIdReversed": null,
+    "fromNodeId": 3874146,
+    "toNodeId": 3874147,
+    "speedInKilometersPerHour": 80,
+    "reverseSpeedInKilometersPerHour": 0,
+    "distanceInMeters": 46.115,
+    "geometry": "AQIAAAACAAAAgJ2bNuO0FUCx22eVmRZKQPYjRWRYtRVAk3GMZI8WSkA="
+  },
+  {
+    "id": 3667012,
+    "linkIdReversed": null,
+    "fromNodeId": 3874147,
+    "toNodeId": 596837,
+    "speedInKilometersPerHour": 80,
+    "reverseSpeedInKilometersPerHour": 0,
+    "distanceInMeters": 46.115,
+    "geometry": "AQIAAAACAAAA9iNFZFi1FUCTcYxkjxZKQG2q7pHNtRVARYMUPIUWSkA="
+  },
+  {
+    "id": 3667013,
+    "linkIdReversed": null,
+    "fromNodeId": 597011,
+    "toNodeId": 3874148,
+    "speedInKilometersPerHour": 80,
+    "reverseSpeedInKilometersPerHour": 0,
+    "distanceInMeters": 45.877,
+    "geometry": "AQIAAAACAAAAQSrFjsaxFUDmllZD4hZKQJBLHHkgshVAyGDFqdYWSkA="
+  },
+  {
+    "id": 3667014,
+    "linkIdReversed": null,
+    "fromNodeId": 3874148,
+    "toNodeId": 3874149,
+    "speedInKilometersPerHour": 80,
+    "reverseSpeedInKilometersPerHour": 0,
+    "distanceInMeters": 45.877,
+    "geometry": "AQIAAAADAAAAkEsceSCyFUDIYMWp1hZKQIo8SbpmshVAJuSDns0WSkAS9YJPc7IVQCdMGM3KFkpA"
+  },
+  {
+    "id": 3667015,
+    "linkIdReversed": null,
+    "fromNodeId": 3874149,
+    "toNodeId": 3874150,
+    "speedInKilometersPerHour": 80,
+    "reverseSpeedInKilometersPerHour": 0,
+    "distanceInMeters": 45.877,
+    "geometry": "AQIAAAADAAAAEvWCT3OyFUAnTBjNyhZKQKZh+IiYshVAPe/GgsIWSkDCL/XzprIVQHu9++O9FkpA"
+  },
+  {
+    "id": 3667016,
+    "linkIdReversed": null,
+    "fromNodeId": 3874150,
+    "toNodeId": 597012,
+    "speedInKilometersPerHour": 80,
+    "reverseSpeedInKilometersPerHour": 0,
+    "distanceInMeters": 45.877,
+    "geometry": "AQIAAAACAAAAwi/186ayFUB7vfvjvRZKQPvo1JXPshVAHcwmwLAWSkA="
+  },
+  {
+    "id": 3667020,
+    "linkIdReversed": null,
+    "fromNodeId": 3874153,
+    "toNodeId": 3874154,
+    "speedInKilometersPerHour": 80,
+    "reverseSpeedInKilometersPerHour": 0,
+    "distanceInMeters": 44.597,
+    "geometry": "AQIAAAACAAAA2PFfIAiwFUD1vBsLChdKQAXfNH12sBVA6L0xBAAXSkA="
+  },
+  {
+    "id": 3667021,
+    "linkIdReversed": null,
+    "fromNodeId": 3874154,
+    "toNodeId": 3874155,
+    "speedInKilometersPerHour": 80,
+    "reverseSpeedInKilometersPerHour": 0,
+    "distanceInMeters": 44.597,
+    "geometry": "AQIAAAADAAAABd80fXawFUDovTEEABdKQHDOiNLesBVA4Xt/g/YWSkAyzAna5LAVQNu+R/31FkpA"
+  },
+  {
+    "id": 3667022,
+    "linkIdReversed": null,
+    "fromNodeId": 3874155,
+    "toNodeId": 3874156,
+    "speedInKilometersPerHour": 80,
+    "reverseSpeedInKilometersPerHour": 0,
+    "distanceInMeters": 44.597,
+    "geometry": "AQIAAAACAAAAMswJ2uSwFUDbvkf99RZKQPiL2ZJVsRVA4CpPIOwWSkA="
+  },
+  {
+    "id": 3667023,
+    "linkIdReversed": null,
+    "fromNodeId": 3874156,
+    "toNodeId": 597011,
+    "speedInKilometersPerHour": 80,
+    "reverseSpeedInKilometersPerHour": 0,
+    "distanceInMeters": 44.597,
+    "geometry": "AQIAAAACAAAA+IvZklWxFUDgKk8g7BZKQEEqxY7GsRVA5pZWQ+IWSkA="
+  },
+  {
+    "id": 3667024,
+    "linkIdReversed": null,
+    "fromNodeId": 596837,
+    "toNodeId": 3874157,
+    "speedInKilometersPerHour": 80,
+    "reverseSpeedInKilometersPerHour": 0,
+    "distanceInMeters": 42.732,
+    "geometry": "AQIAAAACAAAAbarukc21FUBFgxQ8hRZKQM08uaZAthVAFHr9SXwWSkA="
+  },
+  {
+    "id": 3667025,
+    "linkIdReversed": null,
+    "fromNodeId": 3874157,
+    "toNodeId": 3874158,
+    "speedInKilometersPerHour": 80,
+    "reverseSpeedInKilometersPerHour": 0,
+    "distanceInMeters": 42.732,
+    "geometry": "AQIAAAACAAAAzTy5pkC2FUAUev1JfBZKQKrwZ3izthVAEvWCT3MWSkA="
+  },
+  {
+    "id": 3667026,
+    "linkIdReversed": null,
+    "fromNodeId": 3874158,
+    "toNodeId": 3874159,
+    "speedInKilometersPerHour": 80,
+    "reverseSpeedInKilometersPerHour": 0,
+    "distanceInMeters": 42.732,
+    "geometry": "AQIAAAACAAAAqvBneLO2FUAS9YJPcxZKQAqDMo0mtxVA4etrXWoWSkA="
+  },
+  {
+    "id": 3667027,
+    "linkIdReversed": null,
+    "fromNodeId": 3874159,
+    "toNodeId": 597014,
+    "speedInKilometersPerHour": 80,
+    "reverseSpeedInKilometersPerHour": 0,
+    "distanceInMeters": 42.732,
+    "geometry": "AQIAAAACAAAACoMyjSa3FUDh62tdahZKQOc24V6ZtxVA4GbxYmEWSkA="
+  },
+  {
+    "id": 3667034,
+    "linkIdReversed": null,
+    "fromNodeId": 3874165,
+    "toNodeId": 3874166,
+    "speedInKilometersPerHour": 115,
+    "reverseSpeedInKilometersPerHour": 0,
+    "distanceInMeters": 49.601,
+    "geometry": "AQIAAAACAAAAbHak+s6vFUAfoWZIFRdKQKq3BrZKsBVANqypLAoXSkA="
+  },
+  {
+    "id": 3667035,
+    "linkIdReversed": null,
+    "fromNodeId": 3874166,
+    "toNodeId": 3874167,
+    "speedInKilometersPerHour": 115,
+    "reverseSpeedInKilometersPerHour": 0,
+    "distanceInMeters": 49.601,
+    "geometry": "AQIAAAACAAAAqrcGtkqwFUA2rKksChdKQGvXhLTGsBVAHjNQGf8WSkA="
+  },
+  {
+    "id": 3667036,
+    "linkIdReversed": null,
+    "fromNodeId": 3874167,
+    "toNodeId": 3874168,
+    "speedInKilometersPerHour": 115,
+    "reverseSpeedInKilometersPerHour": 0,
+    "distanceInMeters": 49.601,
+    "geometry": "AQIAAAACAAAAa9eEtMawFUAeM1AZ/xZKQKgY529CsRVABrr2BfQWSkA="
+  },
+  {
+    "id": 3667037,
+    "linkIdReversed": null,
+    "fromNodeId": 3874168,
+    "toNodeId": 3874169,
+    "speedInKilometersPerHour": 115,
+    "reverseSpeedInKilometersPerHour": 0,
+    "distanceInMeters": 49.601,
+    "geometry": "AQIAAAADAAAAqBjnb0KxFUAGuvYF9BZKQPIIbqRssRVAbRtGQfAWSkDmWUkrvrEVQO5AnfLoFkpA"
+  },
+  {
+    "id": 3667038,
+    "linkIdReversed": null,
+    "fromNodeId": 3874169,
+    "toNodeId": 3874170,
+    "speedInKilometersPerHour": 115,
+    "reverseSpeedInKilometersPerHour": 0,
+    "distanceInMeters": 49.601,
+    "geometry": "AQIAAAACAAAA5llJK76xFUDuQJ3y6BZKQCSbq+Y5shVABkzg1t0WSkA="
+  },
+  {
+    "id": 3667039,
+    "linkIdReversed": null,
+    "fromNodeId": 3874170,
+    "toNodeId": 3874171,
+    "speedInKilometersPerHour": 115,
+    "reverseSpeedInKilometersPerHour": 0,
+    "distanceInMeters": 49.601,
+    "geometry": "AQIAAAACAAAAJJur5jmyFUAGTODW3RZKQGLcDaK1shVA7dKGw9IWSkA="
+  },
+  {
+    "id": 3667040,
+    "linkIdReversed": null,
+    "fromNodeId": 3874171,
+    "toNodeId": 3874172,
+    "speedInKilometersPerHour": 115,
+    "reverseSpeedInKilometersPerHour": 0,
+    "distanceInMeters": 49.601,
+    "geometry": "AQIAAAACAAAAYtwNorWyFUDt0obD0hZKQJ8dcF0xsxVABd7Jp8cWSkA="
+  },
+  {
+    "id": 3667041,
+    "linkIdReversed": null,
+    "fromNodeId": 3874172,
+    "toNodeId": 3874173,
+    "speedInKilometersPerHour": 115,
+    "reverseSpeedInKilometersPerHour": 0,
+    "distanceInMeters": 49.601,
+    "geometry": "AQIAAAACAAAAnx1wXTGzFUAF3smnxxZKQN1e0hitsxVA7WRwlLwWSkA="
+  },
+  {
+    "id": 3667042,
+    "linkIdReversed": null,
+    "fromNodeId": 3874173,
+    "toNodeId": 3874174,
+    "speedInKilometersPerHour": 115,
+    "reverseSpeedInKilometersPerHour": 0,
+    "distanceInMeters": 49.601,
+    "geometry": "AQIAAAACAAAA3V7SGK2zFUDtZHCUvBZKQJjBGJEotBVABHCzeLEWSkA="
+  },
+  {
+    "id": 3667043,
+    "linkIdReversed": null,
+    "fromNodeId": 3874174,
+    "toNodeId": 3874175,
+    "speedInKilometersPerHour": 115,
+    "reverseSpeedInKilometersPerHour": 0,
+    "distanceInMeters": 49.601,
+    "geometry": "AQIAAAACAAAAmMEYkSi0FUAEcLN4sRZKQNYCe0yktBVA7PZZZaYWSkA="
+  },
+  {
+    "id": 3667044,
+    "linkIdReversed": null,
+    "fromNodeId": 3874175,
+    "toNodeId": 3874176,
+    "speedInKilometersPerHour": 115,
+    "reverseSpeedInKilometersPerHour": 0,
+    "distanceInMeters": 49.601,
+    "geometry": "AQIAAAADAAAA1gJ7TKS0FUDs9lllphZKQDsYsU8AtRVA0xVsI54WSkAfvkwUIbUVQKX5Y1qbFkpA"
+  },
+  {
+    "id": 3667045,
+    "linkIdReversed": null,
+    "fromNodeId": 3874176,
+    "toNodeId": 3874177,
+    "speedInKilometersPerHour": 115,
+    "reverseSpeedInKilometersPerHour": 0,
+    "distanceInMeters": 49.601,
+    "geometry": "AQIAAAACAAAAH75MFCG1FUCl+WNamxZKQAcJUb6gtRVAD18mipAWSkA="
+  },
+  {
+    "id": 3667046,
+    "linkIdReversed": null,
+    "fromNodeId": 3874177,
+    "toNodeId": 3874178,
+    "speedInKilometersPerHour": 115,
+    "reverseSpeedInKilometersPerHour": 0,
+    "distanceInMeters": 49.601,
+    "geometry": "AQIAAAADAAAABwlRvqC1FUAPXyaKkBZKQLyuX7AbthVAPpKSHoYWSkByMnGrILYVQHrE6LmFFkpA"
+  },
+  {
+    "id": 3667047,
+    "linkIdReversed": null,
+    "fromNodeId": 3874178,
+    "toNodeId": 3874179,
+    "speedInKilometersPerHour": 115,
+    "reverseSpeedInKilometersPerHour": 0,
+    "distanceInMeters": 49.601,
+    "geometry": "AQIAAAACAAAAcjJxqyC2FUB6xOi5hRZKQIhlM4ekthVAOIQqNXsWSkA="
+  },
+  {
+    "id": 3667048,
+    "linkIdReversed": null,
+    "fromNodeId": 3874179,
+    "toNodeId": 3874180,
+    "speedInKilometersPerHour": 115,
+    "reverseSpeedInKilometersPerHour": 0,
+    "distanceInMeters": 49.601,
+    "geometry": "AQIAAAADAAAAiGUzh6S2FUA4hCo1exZKQEloy7kUtxVAB3sTQ3IWSkCkVS3pKLcVQMa/z7hwFkpA"
+  },
+  {
+    "id": 3667049,
+    "linkIdReversed": null,
+    "fromNodeId": 3874180,
+    "toNodeId": 3874181,
+    "speedInKilometersPerHour": 115,
+    "reverseSpeedInKilometersPerHour": 0,
+    "distanceInMeters": 49.601,
+    "geometry": "AQIAAAACAAAApFUt6Si3FUDGv8+4cBZKQNz2PeqvtxVAB14td2YWSkA="
+  },
+  {
+    "id": 3667050,
+    "linkIdReversed": null,
+    "fromNodeId": 3874181,
+    "toNodeId": 3874182,
+    "speedInKilometersPerHour": 115,
+    "reverseSpeedInKilometersPerHour": 0,
+    "distanceInMeters": 49.601,
+    "geometry": "AQIAAAADAAAA3PY96q+3FUAHXi13ZhZKQA4tsp3vtxVAk8mpnWEWSkA2Bp0QOrgVQPpeQ3BcFkpA"
+  },
+  {
+    "id": 3667051,
+    "linkIdReversed": null,
+    "fromNodeId": 3874182,
+    "toNodeId": 3874183,
+    "speedInKilometersPerHour": 115,
+    "reverseSpeedInKilometersPerHour": 0,
+    "distanceInMeters": 49.601,
+    "geometry": "AQIAAAACAAAANgadEDq4FUD6XkNwXBZKQKzGEtbGuBVA0Eaum1IWSkA="
+  },
+  {
+    "id": 3667052,
+    "linkIdReversed": null,
+    "fromNodeId": 3874183,
+    "toNodeId": 3874184,
+    "speedInKilometersPerHour": 115,
+    "reverseSpeedInKilometersPerHour": 0,
+    "distanceInMeters": 49.601,
+    "geometry": "AQIAAAADAAAArMYS1sa4FUDQRq6bUhZKQCgK9Ik8uRVAh+EjYkoWSkClZaTeU7kVQHaqfM9IFkpA"
+  },
+  {
+    "id": 3667053,
+    "linkIdReversed": null,
+    "fromNodeId": 3874184,
+    "toNodeId": 3874185,
+    "speedInKilometersPerHour": 115,
+    "reverseSpeedInKilometersPerHour": 0,
+    "distanceInMeters": 49.601,
+    "geometry": "AQIAAAACAAAApWWk3lO5FUB2qnzPSBZKQLA73XniuRVALXk8LT8WSkA="
+  },
+  {
+    "id": 3667054,
+    "linkIdReversed": null,
+    "fromNodeId": 3874185,
+    "toNodeId": 597016,
+    "speedInKilometersPerHour": 115,
+    "reverseSpeedInKilometersPerHour": 0,
+    "distanceInMeters": 49.601,
+    "geometry": "AQIAAAACAAAAsDvdeeK5FUAteTwtPxZKQLoRFhVxuhVAFMyYgjUWSkA="
+  },
+  {
+    "id": 3667060,
+    "linkIdReversed": null,
+    "fromNodeId": 597016,
+    "toNodeId": 3874189,
+    "speedInKilometersPerHour": 115,
+    "reverseSpeedInKilometersPerHour": 0,
+    "distanceInMeters": 45.102,
+    "geometry": "AQIAAAACAAAAuhEWFXG6FUAUzJiCNRZKQHWRQln4uhVA++qqQC0WSkA="
+  },
+  {
+    "id": 3667061,
+    "linkIdReversed": null,
+    "fromNodeId": 3874189,
+    "toNodeId": 3874190,
+    "speedInKilometersPerHour": 115,
+    "reverseSpeedInKilometersPerHour": 0,
+    "distanceInMeters": 45.102,
+    "geometry": "AQIAAAADAAAAdZFCWfi6FUD76qpALRZKQEeRtYZSuxVAP6phvycWSkC4rMJmgLsVQIIBhA8lFkpA"
+  },
+  {
+    "id": 3667062,
+    "linkIdReversed": null,
+    "fromNodeId": 3874190,
+    "toNodeId": 3874191,
+    "speedInKilometersPerHour": 115,
+    "reverseSpeedInKilometersPerHour": 0,
+    "distanceInMeters": 45.102,
+    "geometry": "AQIAAAACAAAAuKzCZoC7FUCCAYQPJRZKQIogzsMJvBVASgfr/xwWSkA="
+  },
+  {
+    "id": 3667067,
+    "linkIdReversed": null,
+    "fromNodeId": 597020,
+    "toNodeId": 3874195,
+    "speedInKilometersPerHour": 80,
+    "reverseSpeedInKilometersPerHour": 0,
+    "distanceInMeters": 32.463,
+    "geometry": "AQIAAAACAAAARKM7iJ25FUDOcAM+PxZKQPRRRlwAuhVAv9U6cTkWSkA="
+  },
+  {
+    "id": 3667068,
+    "linkIdReversed": null,
+    "fromNodeId": 3874195,
+    "toNodeId": 597016,
+    "speedInKilometersPerHour": 80,
+    "reverseSpeedInKilometersPerHour": 0,
+    "distanceInMeters": 32.463,
+    "geometry": "AQIAAAADAAAA9FFGXAC6FUC/1TpxORZKQCFX6lkQuhVAJc/1fTgWSkC6ERYVcboVQBTMmII1FkpA"
+  },
+  {
+    "id": 3667070,
+    "linkIdReversed": null,
+    "fromNodeId": 596859,
+    "toNodeId": 3874196,
+    "speedInKilometersPerHour": 95,
+    "reverseSpeedInKilometersPerHour": 0,
+    "distanceInMeters": 48.725,
+    "geometry": "AQIAAAACAAAAu/JZnge3FUCAgSBAhhZKQMC0qE9ytxVAryKjA5IWSkA="
+  },
+  {
+    "id": 3667071,
+    "linkIdReversed": null,
+    "fromNodeId": 3874196,
+    "toNodeId": 3874197,
+    "speedInKilometersPerHour": 95,
+    "reverseSpeedInKilometersPerHour": 0,
+    "distanceInMeters": 48.725,
+    "geometry": "AQIAAAACAAAAwLSoT3K3FUCvIqMDkhZKQMV29wDdtxVArz+Jz50WSkA="
+  },
+  {
+    "id": 3667072,
+    "linkIdReversed": null,
+    "fromNodeId": 3874197,
+    "toNodeId": 3874198,
+    "speedInKilometersPerHour": 95,
+    "reverseSpeedInKilometersPerHour": 0,
+    "distanceInMeters": 48.725,
+    "geometry": "AQIAAAACAAAAxXb3AN23FUCvP4nPnRZKQMk4RrJHuBVA3+ALk6kWSkA="
+  },
+  {
+    "id": 3667073,
+    "linkIdReversed": null,
+    "fromNodeId": 3874198,
+    "toNodeId": 3874199,
+    "speedInKilometersPerHour": 95,
+    "reverseSpeedInKilometersPerHour": 0,
+    "distanceInMeters": 48.725,
+    "geometry": "AQIAAAADAAAAyThGske4FUDf4AuTqRZKQMPvplt2uBVAd0tywK4WSkDUt8zpsrgVQA6Cjla1FkpA"
+  },
+  {
+    "id": 3667074,
+    "linkIdReversed": null,
+    "fromNodeId": 3874199,
+    "toNodeId": 3874200,
+    "speedInKilometersPerHour": 95,
+    "reverseSpeedInKilometersPerHour": 0,
+    "distanceInMeters": 48.725,
+    "geometry": "AQIAAAACAAAA1LfM6bK4FUAOgo5WtRZKQOTziqceuRVAnStKCcEWSkA="
+  },
+  {
+    "id": 3667075,
+    "linkIdReversed": null,
+    "fromNodeId": 3874200,
+    "toNodeId": 3874201,
+    "speedInKilometersPerHour": 95,
+    "reverseSpeedInKilometersPerHour": 0,
+    "distanceInMeters": 48.725,
+    "geometry": "AQIAAAACAAAA5POKpx65FUCdK0oJwRZKQHgOZaiKuRVA/FBpxMwWSkA="
+  },
+  {
+    "id": 3667076,
+    "linkIdReversed": null,
+    "fromNodeId": 3874201,
+    "toNodeId": 3874202,
+    "speedInKilometersPerHour": 95,
+    "reverseSpeedInKilometersPerHour": 0,
+    "distanceInMeters": 48.725,
+    "geometry": "AQIAAAACAAAAeA5lqIq5FUD8UGnEzBZKQIhKI2b2uRVAi/okd9gWSkA="
+  },
+  {
+    "id": 3667077,
+    "linkIdReversed": null,
+    "fromNodeId": 3874202,
+    "toNodeId": 3874203,
+    "speedInKilometersPerHour": 95,
+    "reverseSpeedInKilometersPerHour": 0,
+    "distanceInMeters": 48.725,
+    "geometry": "AQIAAAACAAAAiEojZva5FUCL+iR32BZKQBtl/WZiuhVA6x9EMuQWSkA="
+  },
+  {
+    "id": 3667078,
+    "linkIdReversed": null,
+    "fromNodeId": 3874203,
+    "toNodeId": 3874204,
+    "speedInKilometersPerHour": 95,
+    "reverseSpeedInKilometersPerHour": 0,
+    "distanceInMeters": 48.725,
+    "geometry": "AQIAAAACAAAAG2X9ZmK6FUDrH0Qy5BZKQCuhuyTOuhVAecn/5O8WSkA="
+  },
+  {
+    "id": 3667079,
+    "linkIdReversed": null,
+    "fromNodeId": 3874204,
+    "toNodeId": 3874205,
+    "speedInKilometersPerHour": 95,
+    "reverseSpeedInKilometersPerHour": 0,
+    "distanceInMeters": 48.725,
+    "geometry": "AQIAAAACAAAAK6G7JM66FUB5yf/k7xZKQDzdeeI5uxVACHO7l/sWSkA="
+  },
+  {
+    "id": 3667080,
+    "linkIdReversed": null,
+    "fromNodeId": 3874205,
+    "toNodeId": 3874206,
+    "speedInKilometersPerHour": 95,
+    "reverseSpeedInKilometersPerHour": 0,
+    "distanceInMeters": 48.725,
+    "geometry": "AQIAAAACAAAAPN154jm7FUAIc7uX+xZKQM/3U+OluxVAZ5jaUgcXSkA="
+  },
+  {
+    "id": 3667081,
+    "linkIdReversed": null,
+    "fromNodeId": 3874206,
+    "toNodeId": 3874207,
+    "speedInKilometersPerHour": 95,
+    "reverseSpeedInKilometersPerHour": 0,
+    "distanceInMeters": 48.725,
+    "geometry": "AQIAAAACAAAAz/dT46W7FUBnmNpSBxdKQN8zEqERvBVA9kGWBRMXSkA="
+  },
+  {
+    "id": 3667119,
+    "linkIdReversed": null,
+    "fromNodeId": 597014,
+    "toNodeId": 3874238,
+    "speedInKilometersPerHour": 80,
+    "reverseSpeedInKilometersPerHour": 0,
+    "distanceInMeters": 48.283,
+    "geometry": "AQIAAAAEAAAA5zbhXpm3FUDgZvFiYRZKQDyE8dO4txVA14hgHFwWSkD4/gbt1bcVQGL03EJXFkpAU8+CUN63FUCCdRw/VBZKQA=="
+  },
+  {
+    "id": 3667120,
+    "linkIdReversed": null,
+    "fromNodeId": 3874238,
+    "toNodeId": 3874239,
+    "speedInKilometersPerHour": 80,
+    "reverseSpeedInKilometersPerHour": 0,
+    "distanceInMeters": 48.283,
+    "geometry": "AQIAAAAHAAAAU8+CUN63FUCCdRw/VBZKQIC3QILitxVAETY8vVIWSkCun/6z5rcVQIRFRZxOFkpADhDM0eO3FUAsYthhTBZKQLn8h/TbtxVARfKVQEoWSkA8vr1r0LcVQKZiY15HFkpA+OEgIcq3FUAMXB5rRhZKQA=="
+  },
+  {
+    "id": 3667121,
+    "linkIdReversed": null,
+    "fromNodeId": 3874239,
+    "toNodeId": 3874240,
+    "speedInKilometersPerHour": 80,
+    "reverseSpeedInKilometersPerHour": 0,
+    "distanceInMeters": 48.283,
+    "geometry": "AQIAAAAGAAAA+OEgIcq3FUAMXB5rRhZKQKPO3EPCtxVAv/IgPUUWSkD4im69prcVQPDeUWNCFkpA/vDz34O3FUCSPq2iPxZKQLq9pDFatxVAq85qgT0WSkBljXqIRrcVQJOmQdE8FkpA"
+  },
+  {
+    "id": 3667122,
+    "linkIdReversed": null,
+    "fromNodeId": 3874240,
+    "toNodeId": 3874241,
+    "speedInKilometersPerHour": 80,
+    "reverseSpeedInKilometersPerHour": 0,
+    "distanceInMeters": 48.283,
+    "geometry": "AQIAAAAGAAAAZY16iEa3FUCTpkHRPBZKQLWM1HsqtxVA+Z/83TsWSkBxPJ8B9bYVQNAM4gM7FkpApG38icq2FUCPHVTiOhZKQFt9dVWgthVAQYAMHTsWSkDBjZQtkrYVQJTai2g7FkpA"
+  },
+  {
+    "id": 3667123,
+    "linkIdReversed": null,
+    "fromNodeId": 3874241,
+    "toNodeId": 3874242,
+    "speedInKilometersPerHour": 80,
+    "reverseSpeedInKilometersPerHour": 0,
+    "distanceInMeters": 48.283,
+    "geometry": "AQIAAAAGAAAAwY2ULZK2FUCU2otoOxZKQJ/leXB3thVAO4+K/zsWSkBypgnbT7YVQOcAwRw9FkpAq7GEtTG2FUDaHr3hPhZKQJojK78MthVAc/G3PUEWSkBLsDic+bUVQMYX7fFCFkpA"
+  },
+  {
+    "id": 3667124,
+    "linkIdReversed": null,
+    "fromNodeId": 3874242,
+    "toNodeId": 3874243,
+    "speedInKilometersPerHour": 80,
+    "reverseSpeedInKilometersPerHour": 0,
+    "distanceInMeters": 48.283,
+    "geometry": "AQIAAAAGAAAAS7A4nPm1FUDGF+3xQhZKQGdEaW/wtRVAHy+kw0MWSkAS91j60LUVQClBf6FHFkpAXFZhM8C1FUB0QuigSxZKQC9uowG8tRVAhEVFnE4WSkAvbqMBvLUVQLOVl/xPFkpA"
+  },
+  {
+    "id": 3667125,
+    "linkIdReversed": null,
+    "fromNodeId": 3874243,
+    "toNodeId": 596864,
+    "speedInKilometersPerHour": 80,
+    "reverseSpeedInKilometersPerHour": 0,
+    "distanceInMeters": 48.283,
+    "geometry": "AQIAAAAFAAAAL26jAby1FUCzlZf8TxZKQKyPh767tRVAp7OTwVEWSkDl8bT8wLUVQECGjh1UFkpAj/tW68S1FUAn9tA+VhZKQKzmOSLftRVAyqZc4V0WSkA="
+  },
+  {
+    "id": 3667126,
+    "linkIdReversed": null,
+    "fromNodeId": 597014,
+    "toNodeId": 3874244,
+    "speedInKilometersPerHour": 80,
+    "reverseSpeedInKilometersPerHour": 0,
+    "distanceInMeters": 44.443,
+    "geometry": "AQIAAAADAAAA5zbhXpm3FUDgZvFiYRZKQOzbSUT4txVAN8XjoloWSkDEB3b8F7gVQJFEL6NYFkpA"
+  },
+  {
+    "id": 3667127,
+    "linkIdReversed": null,
+    "fromNodeId": 3874244,
+    "toNodeId": 3874245,
+    "speedInKilometersPerHour": 80,
+    "reverseSpeedInKilometersPerHour": 0,
+    "distanceInMeters": 44.443,
+    "geometry": "AQIAAAACAAAAxAd2/Be4FUCRRC+jWBZKQFdcHJWbuBVAp+fdWFAWSkA="
+  },
+  {
+    "id": 3667128,
+    "linkIdReversed": null,
+    "fromNodeId": 3874245,
+    "toNodeId": 3874246,
+    "speedInKilometersPerHour": 80,
+    "reverseSpeedInKilometersPerHour": 0,
+    "distanceInMeters": 44.443,
+    "geometry": "AQIAAAADAAAAV1wclZu4FUCn591YUBZKQBIR/kXQuBVAo5I6AU0WSkDTvOMUHbkVQNujN9xHFkpA"
+  },
+  {
+    "id": 3667129,
+    "linkIdReversed": null,
+    "fromNodeId": 3874246,
+    "toNodeId": 597020,
+    "speedInKilometersPerHour": 80,
+    "reverseSpeedInKilometersPerHour": 0,
+    "distanceInMeters": 44.443,
+    "geometry": "AQIAAAACAAAA07zjFB25FUDbozfcRxZKQESjO4iduRVAznADPj8WSkA="
+  },
+  {
+    "id": 3667130,
+    "linkIdReversed": null,
+    "fromNodeId": 597029,
+    "toNodeId": 3874247,
+    "speedInKilometersPerHour": 95,
+    "reverseSpeedInKilometersPerHour": 0,
+    "distanceInMeters": 41.673,
+    "geometry": "AQIAAAACAAAAYygn2lW4FUARHm0csRZKQP0S8db5txVABB+DFacWSkA="
+  },
+  {
+    "id": 3667131,
+    "linkIdReversed": null,
+    "fromNodeId": 3874247,
+    "toNodeId": 3874248,
+    "speedInKilometersPerHour": 95,
+    "reverseSpeedInKilometersPerHour": 0,
+    "distanceInMeters": 41.673,
+    "geometry": "AQIAAAACAAAA/RLx1vm3FUAEH4MVpxZKQBUfn5CdtxVA9x+ZDp0WSkA="
+  },
+  {
+    "id": 3667132,
+    "linkIdReversed": null,
+    "fromNodeId": 3874248,
+    "toNodeId": 3874249,
+    "speedInKilometersPerHour": 95,
+    "reverseSpeedInKilometersPerHour": 0,
+    "distanceInMeters": 41.673,
+    "geometry": "AQIAAAACAAAAFR+fkJ23FUD3H5kOnRZKQK8JaY1BtxVA6iCvB5MWSkA="
+  },
+  {
+    "id": 3667133,
+    "linkIdReversed": null,
+    "fromNodeId": 3874249,
+    "toNodeId": 596855,
+    "speedInKilometersPerHour": 95,
+    "reverseSpeedInKilometersPerHour": 0,
+    "distanceInMeters": 41.673,
+    "geometry": "AQIAAAACAAAArwlpjUG3FUDqIK8HkxZKQEn0MorlthVA3iHFAIkWSkA="
+  },
+  {
+    "id": 3667134,
+    "linkIdReversed": null,
+    "fromNodeId": 596864,
+    "toNodeId": 3874250,
+    "speedInKilometersPerHour": 80,
+    "reverseSpeedInKilometersPerHour": 0,
+    "distanceInMeters": 36.710,
+    "geometry": "AQIAAAACAAAArOY5It+1FUDKplzhXRZKQAZlGk0uthVA+69z02YWSkA="
+  },
+  {
+    "id": 3667135,
+    "linkIdReversed": null,
+    "fromNodeId": 3874250,
+    "toNodeId": 597030,
+    "speedInKilometersPerHour": 80,
+    "reverseSpeedInKilometersPerHour": 0,
+    "distanceInMeters": 36.710,
+    "geometry": "AQIAAAACAAAABmUaTS62FUD7r3PTZhZKQOPBFrt9thVAXD0nvW8WSkA="
+  },
+  {
+    "id": 3667136,
+    "linkIdReversed": null,
+    "fromNodeId": 597030,
+    "toNodeId": 3874251,
+    "speedInKilometersPerHour": 80,
+    "reverseSpeedInKilometersPerHour": 0,
+    "distanceInMeters": 40.380,
+    "geometry": "AQIAAAACAAAA48EWu322FUBcPSe9bxZKQC0mNh/XthVARWYucHkWSkA="
+  },
+  {
+    "id": 3667137,
+    "linkIdReversed": null,
+    "fromNodeId": 3874251,
+    "toNodeId": 597009,
+    "speedInKilometersPerHour": 80,
+    "reverseSpeedInKilometersPerHour": 0,
+    "distanceInMeters": 40.380,
+    "geometry": "AQIAAAACAAAALSY2H9e2FUBFZi5weRZKQPloccYwtxVALo81I4MWSkA="
+  },
+  {
+    "id": 3669263,
+    "linkIdReversed": null,
+    "fromNodeId": 3875465,
+    "toNodeId": 3875466,
+    "speedInKilometersPerHour": 115,
+    "reverseSpeedInKilometersPerHour": 0,
+    "distanceInMeters": 49.501,
+    "geometry": "AQIAAAADAAAAXf5D+u27FUAp6sw9JBZKQCoaa39nuxVAT3l0IywWSkB6Nqs+V7sVQOl/uRYtFkpA"
+  },
+  {
+    "id": 3669264,
+    "linkIdReversed": null,
+    "fromNodeId": 3875466,
+    "toNodeId": 3875467,
+    "speedInKilometersPerHour": 115,
+    "reverseSpeedInKilometersPerHour": 0,
+    "distanceInMeters": 49.501,
+    "geometry": "AQIAAAACAAAAejarPle7FUDpf7kWLRZKQCAKZkzBuhVAGonQCDYWSkA="
+  },
+  {
+    "id": 3669265,
+    "linkIdReversed": null,
+    "fromNodeId": 3875467,
+    "toNodeId": 3875468,
+    "speedInKilometersPerHour": 115,
+    "reverseSpeedInKilometersPerHour": 0,
+    "distanceInMeters": 49.501,
+    "geometry": "AQIAAAADAAAAIApmTMG6FUAaidAINhZKQNdrelBQuhVA8656wDwWSkBa8+MvLboVQF392CQ/FkpA"
+  },
+  {
+    "id": 3669266,
+    "linkIdReversed": null,
+    "fromNodeId": 3875468,
+    "toNodeId": 3875469,
+    "speedInKilometersPerHour": 115,
+    "reverseSpeedInKilometersPerHour": 0,
+    "distanceInMeters": 49.501,
+    "geometry": "AQIAAAACAAAAWvPjLy26FUBd/dgkPxZKQNL7xteeuRVApS4Zx0gWSkA="
+  },
+  {
+    "id": 3669267,
+    "linkIdReversed": null,
+    "fromNodeId": 3875469,
+    "toNodeId": 3875470,
+    "speedInKilometersPerHour": 115,
+    "reverseSpeedInKilometersPerHour": 0,
+    "distanceInMeters": 49.501,
+    "geometry": "AQIAAAADAAAA0vvG1565FUClLhnHSBZKQORnI9dNuRVAkfP+P04WSkDTn/1IEbkVQL7bvHFSFkpA"
+  },
+  {
+    "id": 3669268,
+    "linkIdReversed": null,
+    "fromNodeId": 3875470,
+    "toNodeId": 3875471,
+    "speedInKilometersPerHour": 115,
+    "reverseSpeedInKilometersPerHour": 0,
+    "distanceInMeters": 49.501,
+    "geometry": "AQIAAAACAAAA05/9SBG5FUC+27xxUhZKQNoAbECEuBVASPyKNVwWSkA="
+  },
+  {
+    "id": 3669269,
+    "linkIdReversed": null,
+    "fromNodeId": 3875471,
+    "toNodeId": 3875472,
+    "speedInKilometersPerHour": 115,
+    "reverseSpeedInKilometersPerHour": 0,
+    "distanceInMeters": 49.501,
+    "geometry": "AQIAAAADAAAA2gBsQIS4FUBI/Io1XBZKQP0v16IFuBVAZ5qw/WQWSkBp/S0B+LcVQKKYvAFmFkpA"
+  },
+  {
+    "id": 3669270,
+    "linkIdReversed": null,
+    "fromNodeId": 3875472,
+    "toNodeId": 3875473,
+    "speedInKilometersPerHour": 115,
+    "reverseSpeedInKilometersPerHour": 0,
+    "distanceInMeters": 49.501,
+    "geometry": "AQIAAAACAAAAaf0tAfi3FUCimLwBZhZKQKnAyTZwtxVAwQKYMnAWSkA="
+  },
+  {
+    "id": 3669271,
+    "linkIdReversed": null,
+    "fromNodeId": 3875473,
+    "toNodeId": 3875474,
+    "speedInKilometersPerHour": 115,
+    "reverseSpeedInKilometersPerHour": 0,
+    "distanceInMeters": 49.501,
+    "geometry": "AQIAAAADAAAAqcDJNnC3FUDBApgycBZKQPOOU3QktxVAjq7S3XUWSkB33PC76bYVQFDgnXx6FkpA"
+  },
+  {
+    "id": 3669272,
+    "linkIdReversed": null,
+    "fromNodeId": 3875474,
+    "toNodeId": 3875475,
+    "speedInKilometersPerHour": 115,
+    "reverseSpeedInKilometersPerHour": 0,
+    "distanceInMeters": 49.501,
+    "geometry": "AQIAAAACAAAAd9zwu+m2FUBQ4J18ehZKQFvs9lllthVA8iiV8IQWSkA="
+  },
+  {
+    "id": 3669273,
+    "linkIdReversed": null,
+    "fromNodeId": 3875475,
+    "toNodeId": 3875476,
+    "speedInKilometersPerHour": 115,
+    "reverseSpeedInKilometersPerHour": 0,
+    "distanceInMeters": 49.501,
+    "geometry": "AQIAAAADAAAAW+z2WWW2FUDyKJXwhBZKQKuxhLUxthVA3iHFAIkWSkBiaksd5LUVQHVY4ZaPFkpA"
+  },
+  {
+    "id": 3669274,
+    "linkIdReversed": null,
+    "fromNodeId": 3875476,
+    "toNodeId": 3875477,
+    "speedInKilometersPerHour": 115,
+    "reverseSpeedInKilometersPerHour": 0,
+    "distanceInMeters": 49.501,
+    "geometry": "AQIAAAACAAAAYmpLHeS1FUB1WOGWjxZKQH/cfvlktRVACvMeZ5oWSkA="
+  },
+  {
+    "id": 3669275,
+    "linkIdReversed": null,
+    "fromNodeId": 3875477,
+    "toNodeId": 3875478,
+    "speedInKilometersPerHour": 115,
+    "reverseSpeedInKilometersPerHour": 0,
+    "distanceInMeters": 49.501,
+    "geometry": "AQIAAAADAAAAf9x++WS1FUAK8x5nmhZKQAIqHEEqtRVAwHYwYp8WSkAwZHWr57QVQOF86lilFkpA"
+  },
+  {
+    "id": 3669276,
+    "linkIdReversed": null,
+    "fromNodeId": 3875478,
+    "toNodeId": 3875479,
+    "speedInKilometersPerHour": 115,
+    "reverseSpeedInKilometersPerHour": 0,
+    "distanceInMeters": 49.501,
+    "geometry": "AQIAAAACAAAAMGR1q+e0FUDhfOpYpRZKQHUBLzNstBVA+fVDbLAWSkA="
+  },
+  {
+    "id": 3669277,
+    "linkIdReversed": null,
+    "fromNodeId": 3875479,
+    "toNodeId": 3875480,
+    "speedInKilometersPerHour": 115,
+    "reverseSpeedInKilometersPerHour": 0,
+    "distanceInMeters": 49.501,
+    "geometry": "AQIAAAACAAAAdQEvM2y0FUD59UNssBZKQLqe6LrwsxVAEW+df7sWSkA="
+  },
+  {
+    "id": 3669278,
+    "linkIdReversed": null,
+    "fromNodeId": 3875480,
+    "toNodeId": 3875481,
+    "speedInKilometersPerHour": 115,
+    "reverseSpeedInKilometersPerHour": 0,
+    "distanceInMeters": 49.501,
+    "geometry": "AQIAAAACAAAAup7ouvCzFUARb51/uxZKQAA8okJ1sxVAWWyTisYWSkA="
+  },
+  {
+    "id": 3669279,
+    "linkIdReversed": null,
+    "fromNodeId": 3875481,
+    "toNodeId": 3875482,
+    "speedInKilometersPerHour": 115,
+    "reverseSpeedInKilometersPerHour": 0,
+    "distanceInMeters": 49.501,
+    "geometry": "AQIAAAACAAAAADyiQnWzFUBZbJOKxhZKQEXZW8r5shVAceXsndEWSkA="
+  },
+  {
+    "id": 3669280,
+    "linkIdReversed": null,
+    "fromNodeId": 3875482,
+    "toNodeId": 3875483,
+    "speedInKilometersPerHour": 115,
+    "reverseSpeedInKilometersPerHour": 0,
+    "distanceInMeters": 49.501,
+    "geometry": "AQIAAAACAAAARdlbyvmyFUBx5eyd0RZKQIp2FVJ+shVAiV5GsdwWSkA="
+  },
+  {
+    "id": 3669281,
+    "linkIdReversed": null,
+    "fromNodeId": 3875483,
+    "toNodeId": 3875484,
+    "speedInKilometersPerHour": 115,
+    "reverseSpeedInKilometersPerHour": 0,
+    "distanceInMeters": 49.501,
+    "geometry": "AQIAAAACAAAAinYVUn6yFUCJXkax3BZKQM8Tz9kCshVAodefxOcWSkA="
+  },
+  {
+    "id": 3669282,
+    "linkIdReversed": null,
+    "fromNodeId": 3875484,
+    "toNodeId": 3875485,
+    "speedInKilometersPerHour": 115,
+    "reverseSpeedInKilometersPerHour": 0,
+    "distanceInMeters": 49.501,
+    "geometry": "AQIAAAADAAAAzxPP2QKyFUCh15/E5xZKQLn98smKsRVAlnoWhPIWSkAUsYhhh7EVQOnUlc/yFkpA"
+  },
+  {
+    "id": 3669283,
+    "linkIdReversed": null,
+    "fromNodeId": 3875485,
+    "toNodeId": 3875486,
+    "speedInKilometersPerHour": 115,
+    "reverseSpeedInKilometersPerHour": 0,
+    "distanceInMeters": 49.501,
+    "geometry": "AQIAAAACAAAAFLGIYYexFUDp1JXP8hZKQNwsXiwMsRVA0clS6/0WSkA="
+  },
+  {
+    "id": 3669284,
+    "linkIdReversed": null,
+    "fromNodeId": 3875486,
+    "toNodeId": 3875487,
+    "speedInKilometersPerHour": 115,
+    "reverseSpeedInKilometersPerHour": 0,
+    "distanceInMeters": 49.501,
+    "geometry": "AQIAAAACAAAA3CxeLAyxFUDRyVLr/RZKQCeHTzqRsBVA6kKs/ggXSkA="
+  },
+  {
+    "id": 3669285,
+    "linkIdReversed": null,
+    "fromNodeId": 3875487,
+    "toNodeId": 3875488,
+    "speedInKilometersPerHour": 115,
+    "reverseSpeedInKilometersPerHour": 0,
+    "distanceInMeters": 49.501,
+    "geometry": "AQIAAAACAAAAJ4dPOpGwFUDqQqz+CBdKQO8CJQUWsBVA0jdpGhQXSkA="
+  },
+  {
+    "id": 3675765,
+    "linkIdReversed": null,
+    "fromNodeId": 599091,
+    "toNodeId": 3878366,
+    "speedInKilometersPerHour": 80,
+    "reverseSpeedInKilometersPerHour": 0,
+    "distanceInMeters": 46.103,
+    "geometry": "AQIAAAADAAAAFw6EZAGzFUBUGcbdIBZKQC5x5IHIshVAEqW9wRcWSkBnmUUotrIVQB+7C5QUFkpA"
+  },
+  {
+    "id": 3675766,
+    "linkIdReversed": null,
+    "fromNodeId": 3878366,
+    "toNodeId": 3878367,
+    "speedInKilometersPerHour": 80,
+    "reverseSpeedInKilometersPerHour": 0,
+    "distanceInMeters": 46.103,
+    "geometry": "AQIAAAADAAAAZ5lFKLayFUAfuwuUFBZKQGglrfiGshVAptHkYgwWSkBtqBjnb7IVQNjxXyAIFkpA"
+  },
+  {
+    "id": 3675771,
+    "linkIdReversed": null,
+    "fromNodeId": 599093,
+    "toNodeId": 3878371,
+    "speedInKilometersPerHour": 80,
+    "reverseSpeedInKilometersPerHour": 0,
+    "distanceInMeters": 47.679,
+    "geometry": "AQIAAAADAAAA9Pv+zYuzFUCeJjPeVhZKQGbAWUqWsxVAWJHRAUkWSkBmwFlKlrMVQEYm4NdIFkpA"
+  },
+  {
+    "id": 3675772,
+    "linkIdReversed": null,
+    "fromNodeId": 3878371,
+    "toNodeId": 3878372,
+    "speedInKilometersPerHour": 80,
+    "reverseSpeedInKilometersPerHour": 0,
+    "distanceInMeters": 47.679,
+    "geometry": "AQIAAAAEAAAAZsBZSpazFUBGJuDXSBZKQPrVHCCYsxVAYVJ8fEIWSkDSjbCoiLMVQEGADB07FkpASfJc34ezFUBfmbfqOhZKQA=="
+  },
+  {
+    "id": 3675773,
+    "linkIdReversed": null,
+    "fromNodeId": 3878372,
+    "toNodeId": 3878373,
+    "speedInKilometersPerHour": 80,
+    "reverseSpeedInKilometersPerHour": 0,
+    "distanceInMeters": 47.679,
+    "geometry": "AQIAAAADAAAASfJc34ezFUBfmbfqOhZKQLDllettsxVA5XtGIjQWSkDS/DGtTbMVQO888ZwtFkpA"
+  },
+  {
+    "id": 3675774,
+    "linkIdReversed": null,
+    "fromNodeId": 3878373,
+    "toNodeId": 599091,
+    "speedInKilometersPerHour": 80,
+    "reverseSpeedInKilometersPerHour": 0,
+    "distanceInMeters": 47.679,
+    "geometry": "AQIAAAADAAAA0vwxrU2zFUDvPPGcLRZKQESHwJFAsxVA0ova/SoWSkAXDoRkAbMVQFQZxt0gFkpA"
+  },
+  {
+    "id": 3684607,
+    "linkIdReversed": 3684616,
+    "fromNodeId": 601546,
+    "toNodeId": 3882053,
+    "speedInKilometersPerHour": 45,
+    "reverseSpeedInKilometersPerHour": 45,
+    "distanceInMeters": 48.952,
+    "geometry": "AQIAAAACAAAAjswjfzCwFUAc6ndhaxZKQAvuBzwwsBVAObh0zHkWSkA="
+  },
+  {
+    "id": 3684608,
+    "linkIdReversed": 3684615,
+    "fromNodeId": 3882053,
+    "toNodeId": 3882054,
+    "speedInKilometersPerHour": 45,
+    "reverseSpeedInKilometersPerHour": 45,
+    "distanceInMeters": 48.952,
+    "geometry": "AQIAAAADAAAAC+4HPDCwFUA5uHTMeRZKQAvuBzwwsBVA198SgH8WSkCOzCN/MLAVQFWGcTeIFkpA"
+  },
+  {
+    "id": 3684609,
+    "linkIdReversed": 3684614,
+    "fromNodeId": 3882054,
+    "toNodeId": 3882055,
+    "speedInKilometersPerHour": 45,
+    "reverseSpeedInKilometersPerHour": 45,
+    "distanceInMeters": 48.952,
+    "geometry": "AQIAAAADAAAAjswjfzCwFUBVhnE3iBZKQJSJWwUxsBVA3nL1Y5MWSkCDUrRyL7AVQHFUbqKWFkpA"
+  },
+  {
+    "id": 3684909,
+    "linkIdReversed": 3684916,
+    "fromNodeId": 601607,
+    "toNodeId": 3882193,
+    "speedInKilometersPerHour": 45,
+    "reverseSpeedInKilometersPerHour": 45,
+    "distanceInMeters": 38.414,
+    "geometry": "AQIAAAAEAAAARL+2fvqvFUCSPq2iPxZKQAb3Ax4YsBVA9s/TgEEWSkDSi9r9KrAVQB8vpMNDFkpAWycuxyuwFUDs2t5uSRZKQA=="
+  },
+  {
+    "id": 3684910,
+    "linkIdReversed": 3684915,
+    "fromNodeId": 3882193,
+    "toNodeId": 3882194,
+    "speedInKilometersPerHour": 45,
+    "reverseSpeedInKilometersPerHour": 45,
+    "distanceInMeters": 38.414,
+    "geometry": "AQIAAAADAAAAWycuxyuwFUDs2t5uSRZKQOPCgZAssBVAv0NRoE8WSkBsXtVZLbAVQIcyVMVUFkpA"
+  },
+  {
+    "id": 3684911,
+    "linkIdReversed": 3684914,
+    "fromNodeId": 3882194,
+    "toNodeId": 3882195,
+    "speedInKilometersPerHour": 45,
+    "reverseSpeedInKilometersPerHour": 45,
+    "distanceInMeters": 38.414,
+    "geometry": "AQIAAAACAAAAbF7VWS2wFUCHMlTFVBZKQH2VfOwusBVAUg5mE2AWSkA="
+  },
+  {
+    "id": 3684912,
+    "linkIdReversed": 3684913,
+    "fromNodeId": 3882195,
+    "toNodeId": 601546,
+    "speedInKilometersPerHour": 45,
+    "reverseSpeedInKilometersPerHour": 45,
+    "distanceInMeters": 38.414,
+    "geometry": "AQIAAAACAAAAfZV87C6wFUBSDmYTYBZKQI7MI38wsBVAHOp3YWsWSkA="
+  },
+  {
+    "id": 3684922,
+    "linkIdReversed": 3684921,
+    "fromNodeId": 601607,
+    "toNodeId": 601609,
+    "speedInKilometersPerHour": 30,
+    "reverseSpeedInKilometersPerHour": 30,
+    "distanceInMeters": 39.066,
+    "geometry": "AQIAAAACAAAARL+2fvqvFUCSPq2iPxZKQOkLIef9rxVA5XtGIjQWSkA="
+  },
+  {
+    "id": 3685165,
+    "linkIdReversed": 3685168,
+    "fromNodeId": 3882328,
+    "toNodeId": 3882329,
+    "speedInKilometersPerHour": 14,
+    "reverseSpeedInKilometersPerHour": 14,
+    "distanceInMeters": 41.260,
+    "geometry": "AQIAAAACAAAA+kLIef+vFUD+ne3RGxZKQHKndLD+rxVA8gwa+icWSkA="
+  },
+  {
+    "id": 3685166,
+    "linkIdReversed": 3685167,
+    "fromNodeId": 3882329,
+    "toNodeId": 601609,
+    "speedInKilometersPerHour": 14,
+    "reverseSpeedInKilometersPerHour": 14,
+    "distanceInMeters": 41.260,
+    "geometry": "AQIAAAACAAAAcqd0sP6vFUDyDBr6JxZKQOkLIef9rxVA5XtGIjQWSkA="
+  },
+  {
+    "id": 3686216,
+    "linkIdReversed": null,
+    "fromNodeId": 596834,
+    "toNodeId": 3882835,
+    "speedInKilometersPerHour": 80,
+    "reverseSpeedInKilometersPerHour": 0,
+    "distanceInMeters": 47.267,
+    "geometry": "AQIAAAACAAAAqZ83FamwFUClg/V/DhdKQFVq9kArsBVA4gZ8fhgXSkA="
+  },
+  {
+    "id": 3686217,
+    "linkIdReversed": null,
+    "fromNodeId": 3882835,
+    "toNodeId": 3882836,
+    "speedInKilometersPerHour": 80,
+    "reverseSpeedInKilometersPerHour": 0,
+    "distanceInMeters": 47.267,
+    "geometry": "AQIAAAACAAAAVWr2QCuwFUDiBnx+GBdKQAE1tWytrxVA7gVmhSIXSkA="
+  },
+  {
+    "id": 3686220,
+    "linkIdReversed": null,
+    "fromNodeId": 597012,
+    "toNodeId": 3882838,
+    "speedInKilometersPerHour": 80,
+    "reverseSpeedInKilometersPerHour": 0,
+    "distanceInMeters": 44.171,
+    "geometry": "AQIAAAACAAAA++jUlc+yFUAdzCbAsBZKQLwgIjXtshVA4rA08KMWSkA="
+  },
+  {
+    "id": 3686221,
+    "linkIdReversed": null,
+    "fromNodeId": 3882838,
+    "toNodeId": 3882839,
+    "speedInKilometersPerHour": 80,
+    "reverseSpeedInKilometersPerHour": 0,
+    "distanceInMeters": 44.171,
+    "geometry": "AQIAAAACAAAAvCAiNe2yFUDisDTwoxZKQPt5U5EKsxVAp5VCIJcWSkA="
+  },
+  {
+    "id": 3686222,
+    "linkIdReversed": null,
+    "fromNodeId": 3882839,
+    "toNodeId": 3882840,
+    "speedInKilometersPerHour": 80,
+    "reverseSpeedInKilometersPerHour": 0,
+    "distanceInMeters": 44.171,
+    "geometry": "AQIAAAADAAAA+3lTkQqzFUCnlUIglxZKQPuWOV0WsxVAryKjA5IWSkDpfHiWILMVQMuCiT+KFkpA"
+  },
+  {
+    "id": 3686223,
+    "linkIdReversed": null,
+    "fromNodeId": 3882840,
+    "toNodeId": 3882841,
+    "speedInKilometersPerHour": 80,
+    "reverseSpeedInKilometersPerHour": 0,
+    "distanceInMeters": 44.171,
+    "geometry": "AQIAAAADAAAA6Xx4liCzFUDLgok/ihZKQGxblNkgsxVAipP7HYoWSkALJZNTO7MVQMDrM2d9FkpA"
+  },
+  {
+    "id": 3686224,
+    "linkIdReversed": null,
+    "fromNodeId": 3882841,
+    "toNodeId": 3882842,
+    "speedInKilometersPerHour": 80,
+    "reverseSpeedInKilometersPerHour": 0,
+    "distanceInMeters": 44.171,
+    "geometry": "AQIAAAACAAAACyWTUzuzFUDA6zNnfRZKQLCryVNWsxVAtVTejnAWSkA="
+  },
+  {
+    "id": 3686225,
+    "linkIdReversed": null,
+    "fromNodeId": 3882842,
+    "toNodeId": 3882843,
+    "speedInKilometersPerHour": 80,
+    "reverseSpeedInKilometersPerHour": 0,
+    "distanceInMeters": 44.171,
+    "geometry": "AQIAAAACAAAAsKvJU1azFUC1VN6OcBZKQNJT5BBxsxVAqb2ItmMWSkA="
+  },
+  {
+    "id": 3686226,
+    "linkIdReversed": null,
+    "fromNodeId": 3882843,
+    "toNodeId": 599093,
+    "speedInKilometersPerHour": 80,
+    "reverseSpeedInKilometersPerHour": 0,
+    "distanceInMeters": 44.171,
+    "geometry": "AQIAAAACAAAA0lPkEHGzFUCpvYi2YxZKQPT7/s2LsxVAniYz3lYWSkA="
+  },
+  {
+    "id": 6369279,
+    "linkIdReversed": 6369288,
+    "fromNodeId": 5442740,
+    "toNodeId": 5442741,
+    "speedInKilometersPerHour": 45,
+    "reverseSpeedInKilometersPerHour": 45,
+    "distanceInMeters": 47.430,
+    "geometry": "AQIAAAACAAAAexNDcjKxFUBmu0IfLBdKQAiOy7ipsRVAVP8gkiEXSkA="
+  },
+  {
+    "id": 6369280,
+    "linkIdReversed": 6369287,
+    "fromNodeId": 5442741,
+    "toNodeId": 5442742,
+    "speedInKilometersPerHour": 45,
+    "reverseSpeedInKilometersPerHour": 45,
+    "distanceInMeters": 47.430,
+    "geometry": "AQIAAAACAAAACI7LuKmxFUBU/yCSIRdKQBnnb0IhshVAEr9iDRcXSkA="
+  },
+  {
+    "id": 6369281,
+    "linkIdReversed": 6369286,
+    "fromNodeId": 5442742,
+    "toNodeId": 5442743,
+    "speedInKilometersPerHour": 45,
+    "reverseSpeedInKilometersPerHour": 45,
+    "distanceInMeters": 47.430,
+    "geometry": "AQIAAAAEAAAAGedvQiGyFUASv2INFxdKQCTyXUpdshVAOGVuvhEXSkBANPPkmrIVQO1jBb8NF0pAlUc3wqKyFUBYGvhRDRdKQA=="
+  },
+  {
+    "id": 6369282,
+    "linkIdReversed": 6369285,
+    "fromNodeId": 5442743,
+    "toNodeId": 5442744,
+    "speedInKilometersPerHour": 45,
+    "reverseSpeedInKilometersPerHour": 45,
+    "distanceInMeters": 47.430,
+    "geometry": "AQIAAAAEAAAAlUc3wqKyFUBYGvhRDRdKQBe30QDeshVAlrTiGwoXSkAL68a7I7MVQMegE0IHF0pAwaikTkCzFUA+BcB4BhdKQA=="
+  },
+  {
+    "id": 6369283,
+    "linkIdReversed": 6369284,
+    "fromNodeId": 5442744,
+    "toNodeId": 1117050,
+    "speedInKilometersPerHour": 45,
+    "reverseSpeedInKilometersPerHour": 45,
+    "distanceInMeters": 47.430,
+    "geometry": "AQIAAAADAAAAwaikTkCzFUA+BcB4BhdKQFUyAFRxsxVA4DDRIAUXSkAyA5Xx77MVQPnAjv8CF0pA"
+  },
+  {
+    "id": 6405115,
+    "linkIdReversed": null,
+    "fromNodeId": 1121748,
+    "toNodeId": 5467882,
+    "speedInKilometersPerHour": 45,
+    "reverseSpeedInKilometersPerHour": 0,
+    "distanceInMeters": 37.625,
+    "geometry": "AQIAAAADAAAAuTgqN1G7FUAydOygEhdKQPg1kgThuhVA4gZ8fhgXSkCunL0z2roVQNZYwtoYF0pA"
+  },
+  {
+    "id": 6405116,
+    "linkIdReversed": null,
+    "fromNodeId": 5467882,
+    "toNodeId": 5467883,
+    "speedInKilometersPerHour": 45,
+    "reverseSpeedInKilometersPerHour": 0,
+    "distanceInMeters": 37.625,
+    "geometry": "AQIAAAADAAAArpy9M9q6FUDWWMLaGBdKQNycSgaAuhVAGmmpvB0XSkA900uMZboVQMyXF2AfF0pA"
+  },
+  {
+    "id": 6405117,
+    "linkIdReversed": null,
+    "fromNodeId": 5467883,
+    "toNodeId": 5467884,
+    "speedInKilometersPerHour": 45,
+    "reverseSpeedInKilometersPerHour": 0,
+    "distanceInMeters": 37.625,
+    "geometry": "AQIAAAAEAAAAPdNLjGW6FUDMlxdgHxdKQKSpnsw/uhVAZmoSvCEXSkC7KeW1EroVQILn3sMlF0pAsJKP3QW6FUB1BduIJxdKQA=="
+  },
+  {
+    "id": 6405118,
+    "linkIdReversed": null,
+    "fromNodeId": 5467884,
+    "toNodeId": 1121749,
+    "speedInKilometersPerHour": 45,
+    "reverseSpeedInKilometersPerHour": 0,
+    "distanceInMeters": 37.625,
+    "geometry": "AQIAAAAEAAAAsJKP3QW6FUB1BduIJxdKQGuZDMfzuRVAf0sA/ikXSkCkwW1t4bkVQNf6IqEtF0pAn+dPG9W5FUCl2qfjMRdKQA=="
+  },
+  {
+    "id": 6405120,
+    "linkIdReversed": null,
+    "fromNodeId": 5467885,
+    "toNodeId": 1121748,
+    "speedInKilometersPerHour": 45,
+    "reverseSpeedInKilometersPerHour": 0,
+    "distanceInMeters": 47.431,
+    "geometry": "AQIAAAACAAAAlkOLbOe7FUDdYKjDChdKQLk4KjdRuxVAMnTsoBIXSkA="
+  },
+  {
+    "id": 6405165,
+    "linkIdReversed": 6405170,
+    "fromNodeId": 1117049,
+    "toNodeId": 5467903,
+    "speedInKilometersPerHour": 30,
+    "reverseSpeedInKilometersPerHour": 30,
+    "distanceInMeters": 34.732,
+    "geometry": "AQIAAAACAAAAfh6jPPOyFUBLW1zjMxdKQHHjFvNzsxVALqpFRDEXSkA="
+  },
+  {
+    "id": 6405166,
+    "linkIdReversed": 6405169,
+    "fromNodeId": 5467903,
+    "toNodeId": 5467904,
+    "speedInKilometersPerHour": 30,
+    "reverseSpeedInKilometersPerHour": 30,
+    "distanceInMeters": 34.732,
+    "geometry": "AQIAAAACAAAAceMW83OzFUAuqkVEMRdKQOLJbmb0sxVAQX3LnC4XSkA="
+  },
+  {
+    "id": 6405167,
+    "linkIdReversed": 6405168,
+    "fromNodeId": 5467904,
+    "toNodeId": 1121765,
+    "speedInKilometersPerHour": 30,
+    "reverseSpeedInKilometersPerHour": 30,
+    "distanceInMeters": 34.732,
+    "geometry": "AQIAAAACAAAA4sluZvSzFUBBfcucLhdKQNaO4hx1tBVAJcy0/SsXSkA="
+  },
+  {
+    "id": 6405178,
+    "linkIdReversed": 6405177,
+    "fromNodeId": 1121765,
+    "toNodeId": 5467911,
+    "speedInKilometersPerHour": 30,
+    "reverseSpeedInKilometersPerHour": 30,
+    "distanceInMeters": 35.069,
+    "geometry": "AQIAAAACAAAA1o7iHHW0FUAlzLT9KxdKQF5pGan3tBVASgosgCkXSkA="
+  },
+  {
+    "id": 6405179,
+    "linkIdReversed": 6405176,
+    "fromNodeId": 5467911,
+    "toNodeId": 5467912,
+    "speedInKilometersPerHour": 30,
+    "reverseSpeedInKilometersPerHour": 30,
+    "distanceInMeters": 35.069,
+    "geometry": "AQIAAAACAAAAXmkZqfe0FUBKCiyAKRdKQGJlNPJ5tRVAb0ijAicXSkA="
+  },
+  {
+    "id": 6405180,
+    "linkIdReversed": 6405175,
+    "fromNodeId": 5467912,
+    "toNodeId": 1121766,
+    "speedInKilometersPerHour": 30,
+    "reverseSpeedInKilometersPerHour": 30,
+    "distanceInMeters": 35.069,
+    "geometry": "AQIAAAADAAAAYmU08nm1FUBvSKMCJxdKQKAVGLK6tRVAgufewyUXSkDkgjP4+7UVQFOXjGMkF0pA"
+  },
+  {
+    "id": 6405182,
+    "linkIdReversed": 6405181,
+    "fromNodeId": 1121765,
+    "toNodeId": 1121767,
+    "speedInKilometersPerHour": 45,
+    "reverseSpeedInKilometersPerHour": 45,
+    "distanceInMeters": 24.561,
+    "geometry": "AQIAAAACAAAA1o7iHHW0FUAlzLT9KxdKQNALdy6MtBVAUUzeADMXSkA="
+  },
+  {
+    "id": 6405186,
+    "linkIdReversed": 6405185,
+    "fromNodeId": 1117050,
+    "toNodeId": 5467915,
+    "speedInKilometersPerHour": 45,
+    "reverseSpeedInKilometersPerHour": 45,
+    "distanceInMeters": 47.824,
+    "geometry": "AQIAAAACAAAAMgOV8e+zFUD5wI7/AhdKQJLn+j4ctBVAXW+bqRAXSkA="
+  },
+  {
+    "id": 6405187,
+    "linkIdReversed": 6405184,
+    "fromNodeId": 5467915,
+    "toNodeId": 5467916,
+    "speedInKilometersPerHour": 45,
+    "reverseSpeedInKilometersPerHour": 45,
+    "distanceInMeters": 47.824,
+    "geometry": "AQIAAAACAAAAkuf6Phy0FUBdb5upEBdKQHaqfM9ItBVAwR2oUx4XSkA="
+  },
+  {
+    "id": 6405188,
+    "linkIdReversed": 6405183,
+    "fromNodeId": 5467916,
+    "toNodeId": 1121765,
+    "speedInKilometersPerHour": 45,
+    "reverseSpeedInKilometersPerHour": 45,
+    "distanceInMeters": 47.824,
+    "geometry": "AQIAAAACAAAAdqp8z0i0FUDBHahTHhdKQNaO4hx1tBVAJcy0/SsXSkA="
+  },
+  {
+    "id": 6405218,
+    "linkIdReversed": 6405233,
+    "fromNodeId": 1117050,
+    "toNodeId": 5467931,
+    "speedInKilometersPerHour": 30,
+    "reverseSpeedInKilometersPerHour": 30,
+    "distanceInMeters": 47.281,
+    "geometry": "AQIAAAACAAAAMgOV8e+zFUD5wI7/AhdKQF6ezhWltBVARl7WxAIXSkA="
+  },
+  {
+    "id": 6405219,
+    "linkIdReversed": 6405232,
+    "fromNodeId": 5467931,
+    "toNodeId": 5467932,
+    "speedInKilometersPerHour": 30,
+    "reverseSpeedInKilometersPerHour": 30,
+    "distanceInMeters": 47.281,
+    "geometry": "AQIAAAADAAAAXp7OFaW0FUBGXtbEAhdKQCV2bW+3tBVAduJyvAIXSkAIW+z2WbUVQC4CY30DF0pA"
+  },
+  {
+    "id": 6405220,
+    "linkIdReversed": 6405231,
+    "fromNodeId": 5467932,
+    "toNodeId": 5467933,
+    "speedInKilometersPerHour": 30,
+    "reverseSpeedInKilometersPerHour": 30,
+    "distanceInMeters": 47.281,
+    "geometry": "AQIAAAACAAAACFvs9lm1FUAuAmN9AxdKQLEXCtgOthVAV5V9VwQXSkA="
+  },
+  {
+    "id": 6405221,
+    "linkIdReversed": 6405230,
+    "fromNodeId": 5467933,
+    "toNodeId": 5467934,
+    "speedInKilometersPerHour": 30,
+    "reverseSpeedInKilometersPerHour": 30,
+    "distanceInMeters": 47.281,
+    "geometry": "AQIAAAACAAAAsRcK2A62FUBXlX1XBBdKQFrUJ7nDthVAgCiYMQUXSkA="
+  },
+  {
+    "id": 6405222,
+    "linkIdReversed": 6405229,
+    "fromNodeId": 5467934,
+    "toNodeId": 5467935,
+    "speedInKilometersPerHour": 30,
+    "reverseSpeedInKilometersPerHour": 30,
+    "distanceInMeters": 47.281,
+    "geometry": "AQIAAAACAAAAWtQnucO2FUCAKJgxBRdKQASRRZp4txVAqruyCwYXSkA="
+  },
+  {
+    "id": 6405223,
+    "linkIdReversed": 6405228,
+    "fromNodeId": 5467935,
+    "toNodeId": 5467936,
+    "speedInKilometersPerHour": 30,
+    "reverseSpeedInKilometersPerHour": 30,
+    "distanceInMeters": 47.281,
+    "geometry": "AQIAAAACAAAABJFFmni3FUCqu7ILBhdKQK1NY3stuBVAAtNp3QYXSkA="
+  },
+  {
+    "id": 6405224,
+    "linkIdReversed": 6405227,
+    "fromNodeId": 5467936,
+    "toNodeId": 5467937,
+    "speedInKilometersPerHour": 30,
+    "reverseSpeedInKilometersPerHour": 30,
+    "distanceInMeters": 47.281,
+    "geometry": "AQIAAAADAAAArU1jey24FUAC02ndBhdKQLgGtkqwuBVAeQPMfAcXSkCmQ6fn3bgVQFu21hcJF0pA"
+  },
+  {
+    "id": 6405225,
+    "linkIdReversed": 6405226,
+    "fromNodeId": 5467937,
+    "toNodeId": 1121779,
+    "speedInKilometersPerHour": 30,
+    "reverseSpeedInKilometersPerHour": 30,
+    "distanceInMeters": 47.281,
+    "geometry": "AQIAAAAGAAAApkOn5924FUBbttYXCRdKQKwA323euBVAKzI6IAkXSkA01v7O9rgVQPNUh9wMF0pA39+gvfq4FUAWw9UBEBdKQFGHFW75uBVAu0OKARIXSkD7c9GQ8bgVQDyGx34WF0pA"
+  },
+  {
+    "id": 6405235,
+    "linkIdReversed": 6405234,
+    "fromNodeId": 1121780,
+    "toNodeId": 1121779,
+    "speedInKilometersPerHour": 30,
+    "reverseSpeedInKilometersPerHour": 30,
+    "distanceInMeters": 47.993,
+    "geometry": "AQIAAAACAAAAdCUC1T+4FUCTNeohGhdKQPtz0ZDxuBVAPIbHfhYXSkA="
+  },
+  {
+    "id": 6405237,
+    "linkIdReversed": null,
+    "fromNodeId": 5467945,
+    "toNodeId": 5467946,
+    "speedInKilometersPerHour": 24,
+    "reverseSpeedInKilometersPerHour": 0,
+    "distanceInMeters": 47.913,
+    "geometry": "AQIAAAADAAAA3sfRHFm5FUCetdsuNBdKQErP9BJjuRVAMXpuoSsXSkD12JYBZ7kVQHU5JSAmF0pA"
+  },
+  {
+    "id": 6405238,
+    "linkIdReversed": null,
+    "fromNodeId": 5467946,
+    "toNodeId": 5467947,
+    "speedInKilometersPerHour": 24,
+    "reverseSpeedInKilometersPerHour": 0,
+    "distanceInMeters": 47.913,
+    "geometry": "AQIAAAAEAAAA9diWAWe5FUB1OSUgJhdKQJolAWpquRVAswdagSEXSkAdIQN5drkVQBdIUPwYF0pAoP8evHa5FUBNvW4RGBdKQA=="
+  },
+  {
+    "id": 6405239,
+    "linkIdReversed": null,
+    "fromNodeId": 5467947,
+    "toNodeId": 1121779,
+    "speedInKilometersPerHour": 24,
+    "reverseSpeedInKilometersPerHour": 0,
+    "distanceInMeters": 47.913,
+    "geometry": "AQIAAAADAAAAoP8evHa5FUBNvW4RGBdKQLE2xk54uRVAlgUTfxQXSkD7c9GQ8bgVQDyGx34WF0pA"
+  },
+  {
+    "id": 6405244,
+    "linkIdReversed": 6405243,
+    "fromNodeId": 1121766,
+    "toNodeId": 5467951,
+    "speedInKilometersPerHour": 30,
+    "reverseSpeedInKilometersPerHour": 30,
+    "distanceInMeters": 38.815,
+    "geometry": "AQIAAAACAAAA5IIz+Pu1FUBTl4xjJBdKQIgrZ++MthVA19081SEXSkA="
+  },
+  {
+    "id": 6405245,
+    "linkIdReversed": 6405242,
+    "fromNodeId": 5467951,
+    "toNodeId": 5467952,
+    "speedInKilometersPerHour": 30,
+    "reverseSpeedInKilometersPerHour": 30,
+    "distanceInMeters": 38.815,
+    "geometry": "AQIAAAACAAAAiCtn74y2FUDX3TzVIRdKQCzUmuYdtxVAWyTtRh8XSkA="
+  },
+  {
+    "id": 6405246,
+    "linkIdReversed": 6405241,
+    "fromNodeId": 5467952,
+    "toNodeId": 5467953,
+    "speedInKilometersPerHour": 30,
+    "reverseSpeedInKilometersPerHour": 30,
+    "distanceInMeters": 38.815,
+    "geometry": "AQIAAAACAAAALNSa5h23FUBbJO1GHxdKQNB8zt2utxVAD+85sBwXSkA="
+  },
+  {
+    "id": 6405247,
+    "linkIdReversed": 6405240,
+    "fromNodeId": 5467953,
+    "toNodeId": 1121780,
+    "speedInKilometersPerHour": 30,
+    "reverseSpeedInKilometersPerHour": 30,
+    "distanceInMeters": 38.815,
+    "geometry": "AQIAAAACAAAA0HzO3a63FUAP7zmwHBdKQHQlAtU/uBVAkzXqIRoXSkA="
+  },
+  {
+    "id": 6405249,
+    "linkIdReversed": 6405252,
+    "fromNodeId": 5467954,
+    "toNodeId": 5467955,
+    "speedInKilometersPerHour": 30,
+    "reverseSpeedInKilometersPerHour": 30,
+    "distanceInMeters": 44.599,
+    "geometry": "AQIAAAACAAAANszQeCK4FUDfpGlQNBdKQNV46SYxuBVAUS/4NCcXSkA="
+  },
+  {
+    "id": 6405250,
+    "linkIdReversed": 6405251,
+    "fromNodeId": 5467955,
+    "toNodeId": 1121780,
+    "speedInKilometersPerHour": 30,
+    "reverseSpeedInKilometersPerHour": 30,
+    "distanceInMeters": 44.599,
+    "geometry": "AQIAAAACAAAA1XjpJjG4FUBRL/g0JxdKQHQlAtU/uBVAkzXqIRoXSkA="
+  },
+  {
+    "id": 6405257,
+    "linkIdReversed": 6405256,
+    "fromNodeId": 1121766,
+    "toNodeId": 5467960,
+    "speedInKilometersPerHour": 30,
+    "reverseSpeedInKilometersPerHour": 30,
+    "distanceInMeters": 35.349,
+    "geometry": "AQIAAAACAAAA5IIz+Pu1FUBTl4xjJBdKQDnQQ20bthVA0Amhgy4XSkA="
+  },
+  {
+    "id": 6409986,
+    "linkIdReversed": null,
+    "fromNodeId": 5470745,
+    "toNodeId": 5470746,
+    "speedInKilometersPerHour": 65,
+    "reverseSpeedInKilometersPerHour": 0,
+    "distanceInMeters": 47.408,
+    "geometry": "AQIAAAADAAAAJLTlXIq7FUDXvRWJCRZKQA+BI4EGuxVAXFX2XREWSkAD6s2o+boVQAMK9fQRFkpA"
+  },
+  {
+    "id": 6409987,
+    "linkIdReversed": null,
+    "fromNodeId": 5470746,
+    "toNodeId": 5470747,
+    "speedInKilometersPerHour": 65,
+    "reverseSpeedInKilometersPerHour": 0,
+    "distanceInMeters": 47.408,
+    "geometry": "AQIAAAADAAAAA+rNqPm6FUADCvX0ERZKQF/v/nivuhVA6UXtfhUWSkDAlIEDWroVQGq8dJMYFkpA"
+  },
+  {
+    "id": 6409988,
+    "linkIdReversed": null,
+    "fromNodeId": 5470747,
+    "toNodeId": 5470748,
+    "speedInKilometersPerHour": 65,
+    "reverseSpeedInKilometersPerHour": 0,
+    "distanceInMeters": 47.408,
+    "geometry": "AQIAAAAEAAAAwJSBA1q6FUBqvHSTGBZKQLq6Y7FNuhVA/wWCABkWSkDSjEXT2bkVQNrHCn4bFkpAUDqRYKq5FUAPCd/7GxZKQA=="
+  },
+  {
+    "id": 6409989,
+    "linkIdReversed": null,
+    "fromNodeId": 5470748,
+    "toNodeId": 5470749,
+    "speedInKilometersPerHour": 65,
+    "reverseSpeedInKilometersPerHour": 0,
+    "distanceInMeters": 47.408,
+    "geometry": "AQIAAAADAAAAUDqRYKq5FUAPCd/7GxZKQKtcqPxruRVAV7WkoxwWSkCmfXN/9bgVQBXGFoIcFkpA"
+  },
+  {
+    "id": 6409990,
+    "linkIdReversed": null,
+    "fromNodeId": 5470749,
+    "toNodeId": 5470750,
+    "speedInKilometersPerHour": 65,
+    "reverseSpeedInKilometersPerHour": 0,
+    "distanceInMeters": 47.408,
+    "geometry": "AQIAAAAEAAAApn1zf/W4FUAVxhaCHBZKQNRIS+XtuBVAFcYWghwWSkBMi/okd7gVQGOXqN4aFkpAJezbSUS4FUDVPh2PGRZKQA=="
+  },
+  {
+    "id": 6409991,
+    "linkIdReversed": null,
+    "fromNodeId": 5470750,
+    "toNodeId": 5470751,
+    "speedInKilometersPerHour": 65,
+    "reverseSpeedInKilometersPerHour": 0,
+    "distanceInMeters": 47.408,
+    "geometry": "AQIAAAAEAAAAJezbSUS4FUDVPh2PGRZKQDbptkQuuBVA/wWCABkWSkCzXDY657cVQCRE+YIWFkpAX7hzYaS3FUB/944aExZKQA=="
+  },
+  {
+    "id": 6409992,
+    "linkIdReversed": null,
+    "fromNodeId": 5470751,
+    "toNodeId": 5470752,
+    "speedInKilometersPerHour": 65,
+    "reverseSpeedInKilometersPerHour": 0,
+    "distanceInMeters": 47.408,
+    "geometry": "AQIAAAAFAAAAX7hzYaS3FUB/944aExZKQCv2l92TtxVAVmR0QBIWSkB2G9R+a7cVQDmzXaEPFkpAjX40nDK3FUChFK3cCxZKQHwNwXEZtxVAfnIUIAoWSkA="
+  },
+  {
+    "id": 6410877,
+    "linkIdReversed": null,
+    "fromNodeId": 1122767,
+    "toNodeId": 5471354,
+    "speedInKilometersPerHour": 45,
+    "reverseSpeedInKilometersPerHour": 0,
+    "distanceInMeters": 47.431,
+    "geometry": "AQIAAAACAAAAraHUXkS7FUDCNAwfERdKQIqsNZTauxVAbCHIQQkXSkA="
+  },
+  {
+    "id": 6410880,
+    "linkIdReversed": null,
+    "fromNodeId": 5471355,
+    "toNodeId": 5471356,
+    "speedInKilometersPerHour": 45,
+    "reverseSpeedInKilometersPerHour": 0,
+    "distanceInMeters": 45.451,
+    "geometry": "AQIAAAAEAAAAJ2a9GMq5FUCE1O3sKxdKQLb4FADjuRVA2spL/icXSkBEqFKzB7oVQI7J4v4jF0pA1xTI7Cy6FUBOQukLIRdKQA=="
+  },
+  {
+    "id": 6410881,
+    "linkIdReversed": null,
+    "fromNodeId": 5471356,
+    "toNodeId": 5471357,
+    "speedInKilometersPerHour": 45,
+    "reverseSpeedInKilometersPerHour": 0,
+    "distanceInMeters": 45.451,
+    "geometry": "AQIAAAAEAAAA1xTI7Cy6FUBOQukLIRdKQP95GjBIuhVAl1ZD4h4XSkBlcmpnmLoVQIeHMH4aF0pAqYjTSba6FUDWWMLaGBdKQA=="
+  },
+  {
+    "id": 6410882,
+    "linkIdReversed": null,
+    "fromNodeId": 5471357,
+    "toNodeId": 1122767,
+    "speedInKilometersPerHour": 45,
+    "reverseSpeedInKilometersPerHour": 0,
+    "distanceInMeters": 45.451,
+    "geometry": "AQIAAAACAAAAqYjTSba6FUDWWMLaGBdKQK2h1F5EuxVAwjQMHxEXSkA="
+  },
+  {
+    "id": 7223061,
+    "linkIdReversed": null,
+    "fromNodeId": 5985262,
+    "toNodeId": 5985263,
+    "speedInKilometersPerHour": 80,
+    "reverseSpeedInKilometersPerHour": 0,
+    "distanceInMeters": 38.697,
+    "geometry": "AQIAAAACAAAA3zMSoRG8FUAgJuFCHhdKQHke3J21uxVA7xzKUBUXSkA="
+  },
+  {
+    "id": 7223062,
+    "linkIdReversed": null,
+    "fromNodeId": 5985263,
+    "toNodeId": 596832,
+    "speedInKilometersPerHour": 80,
+    "reverseSpeedInKilometersPerHour": 0,
+    "distanceInMeters": 38.697,
+    "geometry": "AQIAAAACAAAAeR7cnbW7FUDvHMpQFRdKQBQJpppZuxVAvhOzXgwXSkA="
+  },
+  {
+    "id": 7223065,
+    "linkIdReversed": null,
+    "fromNodeId": 5985265,
+    "toNodeId": 5985266,
+    "speedInKilometersPerHour": 95,
+    "reverseSpeedInKilometersPerHour": 0,
+    "distanceInMeters": 47.631,
+    "geometry": "AQIAAAADAAAANQ2K5gG8FUAj9gmgGBdKQEazsn3IuxVAelT83xEXSkBj8DDtm7sVQDVEFf4MF0pA"
+  },
+  {
+    "id": 7223066,
+    "linkIdReversed": null,
+    "fromNodeId": 5985266,
+    "toNodeId": 5985267,
+    "speedInKilometersPerHour": 95,
+    "reverseSpeedInKilometersPerHour": 0,
+    "distanceInMeters": 47.631,
+    "geometry": "AQIAAAACAAAAY/Aw7Zu7FUA1RBX+DBdKQG9lic4yuxVAWf0RhgEXSkA="
+  },
+  {
+    "id": 7223067,
+    "linkIdReversed": null,
+    "fromNodeId": 5985267,
+    "toNodeId": 5985268,
+    "speedInKilometersPerHour": 95,
+    "reverseSpeedInKilometersPerHour": 0,
+    "distanceInMeters": 47.631,
+    "geometry": "AQIAAAACAAAAb2WJzjK7FUBZ/RGGARdKQHva4a/JuhVAfLYODvYWSkA="
+  },
+  {
+    "id": 7223068,
+    "linkIdReversed": null,
+    "fromNodeId": 5985268,
+    "toNodeId": 5985269,
+    "speedInKilometersPerHour": 95,
+    "reverseSpeedInKilometersPerHour": 0,
+    "distanceInMeters": 47.631,
+    "geometry": "AQIAAAACAAAAe9rhr8m6FUB8tg4O9hZKQIdPOpFguhVAoG8LluoWSkA="
+  },
+  {
+    "id": 7223069,
+    "linkIdReversed": null,
+    "fromNodeId": 5985269,
+    "toNodeId": 5985270,
+    "speedInKilometersPerHour": 95,
+    "reverseSpeedInKilometersPerHour": 0,
+    "distanceInMeters": 47.631,
+    "geometry": "AQIAAAADAAAAh086kWC6FUCgbwuW6hZKQD4IAfkSuhVApKfIIeIWSkAWo66197kVQMMoCB7fFkpA"
+  },
+  {
+    "id": 7223070,
+    "linkIdReversed": null,
+    "fromNodeId": 5985270,
+    "toNodeId": 5985271,
+    "speedInKilometersPerHour": 95,
+    "reverseSpeedInKilometersPerHour": 0,
+    "distanceInMeters": 47.631,
+    "geometry": "AQIAAAACAAAAFqOutfe5FUDDKAge3xZKQCjVPh2PuRVAF2ahndMWSkA="
+  },
+  {
+    "id": 7223071,
+    "linkIdReversed": null,
+    "fromNodeId": 5985271,
+    "toNodeId": 5985272,
+    "speedInKilometersPerHour": 95,
+    "reverseSpeedInKilometersPerHour": 0,
+    "distanceInMeters": 47.631,
+    "geometry": "AQIAAAACAAAAKNU+HY+5FUAXZqGd0xZKQL3l6scmuRVAaqM6HcgWSkA="
+  },
+  {
+    "id": 7223072,
+    "linkIdReversed": null,
+    "fromNodeId": 5985272,
+    "toNodeId": 5985273,
+    "speedInKilometersPerHour": 95,
+    "reverseSpeedInKilometersPerHour": 0,
+    "distanceInMeters": 47.631,
+    "geometry": "AQIAAAACAAAAveXqxya5FUBqozodyBZKQM4Xey++uBVAveDTnLwWSkA="
+  },
+  {
+    "id": 7223073,
+    "linkIdReversed": null,
+    "fromNodeId": 5985273,
+    "toNodeId": 597029,
+    "speedInKilometersPerHour": 95,
+    "reverseSpeedInKilometersPerHour": 0,
+    "distanceInMeters": 47.631,
+    "geometry": "AQIAAAACAAAAzhd7L764FUC94NOcvBZKQGMoJ9pVuBVAER5tHLEWSkA="
+  },
+  {
+    "id": 7930097,
+    "linkIdReversed": null,
+    "fromNodeId": 6349336,
+    "toNodeId": 6349337,
+    "speedInKilometersPerHour": 65,
+    "reverseSpeedInKilometersPerHour": 0,
+    "distanceInMeters": 47.846,
+    "geometry": "AQIAAAAEAAAASL99HTi3FUBb0HtjCBZKQHyBWaFItxVAB0KygAkWSkDyzTY3prcVQIGTbeAOFkpAD9b/Ocy3FUB1sWmlEBZKQA=="
+  },
+  {
+    "id": 7930098,
+    "linkIdReversed": null,
+    "fromNodeId": 6349337,
+    "toNodeId": 6349338,
+    "speedInKilometersPerHour": 65,
+    "reverseSpeedInKilometersPerHour": 0,
+    "distanceInMeters": 47.846,
+    "geometry": "AQIAAAAEAAAAD9b/Ocy3FUB1sWmlEBZKQDZ1HhX/txVADoRkARMWSkBjKCfaVbgVQGwkCcIVFkpAHqM883K4FUAS2QdZFhZKQA=="
+  },
+  {
+    "id": 7930099,
+    "linkIdReversed": null,
+    "fromNodeId": 6349338,
+    "toNodeId": 6349339,
+    "speedInKilometersPerHour": 65,
+    "reverseSpeedInKilometersPerHour": 0,
+    "distanceInMeters": 47.846,
+    "geometry": "AQIAAAAEAAAAHqM883K4FUAS2QdZFhZKQFG8ytqmuBVATdcTXRcWSkDOxd/2BLkVQDs42JsYFkpAwqIiTie5FUCsqwK1GBZKQA=="
+  },
+  {
+    "id": 7930100,
+    "linkIdReversed": null,
+    "fromNodeId": 6349339,
+    "toNodeId": 6349340,
+    "speedInKilometersPerHour": 65,
+    "reverseSpeedInKilometersPerHour": 0,
+    "distanceInMeters": 47.846,
+    "geometry": "AQIAAAAEAAAAwqIiTie5FUCsqwK1GBZKQABTBg5ouRVAvhb03hgWSkCOk8K8x7kVQAb3Ax4YFkpA+rfLft25FUBBKVq5FxZKQA=="
+  },
+  {
+    "id": 7930101,
+    "linkIdReversed": null,
+    "fromNodeId": 6349340,
+    "toNodeId": 6349341,
+    "speedInKilometersPerHour": 65,
+    "reverseSpeedInKilometersPerHour": 0,
+    "distanceInMeters": 47.846,
+    "geometry": "AQIAAAADAAAA+rfLft25FUBBKVq5FxZKQEn2CDVDuhVArROX4xUWSkBUHt0Ii7oVQKPNcW4TFkpA"
+  },
+  {
+    "id": 7930102,
+    "linkIdReversed": null,
+    "fromNodeId": 6349341,
+    "toNodeId": 6349342,
+    "speedInKilometersPerHour": 65,
+    "reverseSpeedInKilometersPerHour": 0,
+    "distanceInMeters": 47.846,
+    "geometry": "AQIAAAAEAAAAVB7dCIu6FUCjzXFuExZKQBsTYi6puhVAl1MCYhIWSkB7a2CrBLsVQEaVYdwNFkpA2zLgLCW7FUChFK3cCxZKQA=="
+  }
+]

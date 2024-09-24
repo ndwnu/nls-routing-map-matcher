@@ -84,10 +84,9 @@ public class IsochroneService {
         // It also sets the closestNode of the matchedQueryResult to the virtual node ID. In this way, it creates a
         // start point for isochrone calculation based on the snapped point coordinates.
         QueryGraph queryGraph = QueryGraph.create(baseGraph, startSegment);
-        boolean searchDirectionIsReversed = reversed != reverseFlow;
         IsochroneByTimeDistanceAndWeight isochrone = shortestPathTreeFactory
                 .createShortestPathTreeByTimeDistanceAndWeight(null, queryGraph, TraversalMode.EDGE_BASED,
-                        isochroneValue, isochroneUnit, searchDirectionIsReversed);
+                        isochroneValue, isochroneUnit, reverseFlow, reversed);
         // Here the closestNode is the virtual node ID created by the queryGraph.lookup.
         List<IsoLabel> isoLabels = new ArrayList<>();
         isochrone.search(startSegment.getClosestNode(), isoLabels::add);
