@@ -25,9 +25,11 @@ public class LinkDeserializer extends StdDeserializer<TestLink> {
     public TestLink deserialize(JsonParser jsonParser, DeserializationContext deserializationContext)
             throws IOException {
         JsonNode node = jsonParser.getCodec().readTree(jsonParser);
-        int id = node.get("id").intValue();
-        int fromNodeId = node.get("fromNodeId").intValue();
-        int toNodeId = node.get("toNodeId").intValue();
+        long id = node.get("id").longValue();
+        JsonNode node2 = node.get("linkIdReversed");
+        Long linkIdReversed = node2 == null || node2.isNull() ? null : node2.longValue();
+        long fromNodeId = node.get("fromNodeId").longValue();
+        long toNodeId = node.get("toNodeId").longValue();
         double speedInKilometersPerHour = node.get("speedInKilometersPerHour").doubleValue();
         double reverseSpeedInKilometersPerHour = node.get("reverseSpeedInKilometersPerHour").doubleValue();
         double distanceInMeters = node.get("distanceInMeters").doubleValue();
@@ -36,6 +38,7 @@ public class LinkDeserializer extends StdDeserializer<TestLink> {
 
         return TestLink.builder()
                 .id(id)
+                .linkIdReversed(linkIdReversed)
                 .fromNodeId(fromNodeId)
                 .toNodeId(toNodeId)
                 .speedInKilometersPerHour(speedInKilometersPerHour)

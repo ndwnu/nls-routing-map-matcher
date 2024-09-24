@@ -54,8 +54,7 @@ public class TestNetworkProvider {
     public static final String CAR = "car";
     public static final String CAR_NO_U_TURNS = "car_no_u_turns";
     public static List<Profile> TEST_PROFILES = List.of(
-            new Profile(CAR)
-            ,
+            new Profile(CAR),
             new Profile(CAR_NO_U_TURNS)
                     .setTurnCostsConfig(new TurnCostsConfig(List.of("motor_vehicle"))
                             .setUTurnCosts(TurnCostsConfig.INFINITE_U_TURN_COSTS))
@@ -64,10 +63,8 @@ public class TestNetworkProvider {
     public static GraphHopperNetworkService getNetworkService(
             List<LinkVehicleMapper<? extends Link>> vehicleProviders) {
         return new GraphHopperNetworkService(
-                getLinkVehicleProvider(vehicleProviders)
-                , getEncoderFactories(), getEncodedValuesMapper(),
-                getParserFactories(), getCustomModelMapper(),
-                getProfileAccessAndSpeedAttributesMapper());
+                getLinkVehicleProvider(vehicleProviders), getEncoderFactories(), getEncodedValuesMapper(),
+                getParserFactories(), getCustomModelMapper(), getProfileAccessAndSpeedAttributesMapper());
     }
 
     @NotNull
@@ -94,7 +91,6 @@ public class TestNetworkProvider {
         SIMPLE_MODULE.addDeserializer(LineStringLocation.class, new LineStringLocationDeserializer());
         OBJECT_MAPPER.registerModule(SIMPLE_MODULE);
     }
-
 
     public static List<TestLink> getTestLinks(String path) throws IOException {
         InputStream resourceAsStream = TestNetworkProvider.class.getResourceAsStream(path);
@@ -147,7 +143,6 @@ public class TestNetworkProvider {
         ));
     }
 
-
     private static LinkVehicleMapperProvider getLinkVehicleProvider(List<LinkVehicleMapper<? extends Link>> vehicles) {
         return new LinkVehicleMapperProvider(vehicles);
     }
@@ -165,8 +160,7 @@ public class TestNetworkProvider {
         protected TestLink(long id, long fromNodeId, long toNodeId, double speedInKilometersPerHour,
                 double reverseSpeedInKilometersPerHour, Boolean hgvAccessible, double distanceInMeters,
                 LineString geometry, Long linkIdReversed) {
-            super(id, fromNodeId, toNodeId, distanceInMeters,
-                    geometry, linkIdReversed);
+            super(id, fromNodeId, toNodeId, distanceInMeters, geometry, linkIdReversed);
             this.speedInKilometersPerHour = speedInKilometersPerHour;
             this.reverseSpeedInKilometersPerHour = reverseSpeedInKilometersPerHour;
             this.hgvAccessible = Optional.ofNullable(hgvAccessible).orElse(true);

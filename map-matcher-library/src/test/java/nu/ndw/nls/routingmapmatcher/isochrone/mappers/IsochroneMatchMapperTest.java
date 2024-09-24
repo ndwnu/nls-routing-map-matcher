@@ -45,7 +45,6 @@ class IsochroneMatchMapperTest {
     private static final int MATCHED_LINK_ID_ONE = 1;
     private static final int PARENT_LINK_ID = 2;
     private static final int MATCHED_REVERSED_LINK_ID = 42;
-    private static final int MATCHED_REVERSED_LINK_ID_ABSENT = 0;
 
     @Mock
     private QueryGraph queryGraph;
@@ -79,7 +78,6 @@ class IsochroneMatchMapperTest {
     private LineString isoLabelWayGeometry;
 
     private IsochroneMatchMapper isochroneMatchMapper;
-
 
     @BeforeEach
     void setup() {
@@ -151,10 +149,10 @@ class IsochroneMatchMapperTest {
         IsochroneMatch result = isochroneMatchMapper.mapToIsochroneMatch(isoLabel, MAX_DISTANCE, queryGraph, startEdge,
                 true);
         assertThat(result.getMatchedLinkId()).isEqualTo(MATCHED_LINK_ID_ONE);
-        assertThat(result.getStartFraction()).isEqualTo(0.0);
-        assertThat(result.getEndFraction()).isEqualTo(0.6337610596812917);
+        assertThat(result.getStartFraction()).isEqualTo(0.3662389403187083);
+        assertThat(result.getEndFraction()).isEqualTo(1);
         assertThat(result.isReversed()).isFalse();
-        assertThat(result.getGeometry()).isEqualTo(isoLabelWayGeometry);
+        assertThat(result.getGeometry()).isEqualTo(isoLabelWayGeometry.reverse());
     }
 
     @Test
@@ -212,8 +210,8 @@ class IsochroneMatchMapperTest {
         // If reversed EdgeIterator returns reversed geometry
         LineString wayGeometry = isoLabelWayGeometry;
         setupFixtureReversedFlow(MATCHED_LINK_ID_ONE, isoLabel);
-        when(edgeIteratorStateReverseExtractor.hasReversed(currentEdge)).thenReturn(false);
-        when(edgeIteratorStateReverseExtractor.hasReversed(startEdge)).thenReturn(false);
+        when(edgeIteratorStateReverseExtractor.hasReversed(currentEdge)).thenReturn(true);
+        when(edgeIteratorStateReverseExtractor.hasReversed(startEdge)).thenReturn(true);
         when(startEdge.fetchWayGeometry(FetchMode.ALL)).thenReturn(pointList);
         when(pointListUtil.toLineString(pointList)).thenReturn(wayGeometry, startSegmentWayGeometry);
     }
@@ -241,9 +239,7 @@ class IsochroneMatchMapperTest {
         when(edgeIteratorStateReverseExtractor.hasReversed(currentEdge)).thenReturn(true);
         when(encodingManager.getIntEncodedValue(WAY_ID_KEY)).thenReturn(matchedLinkIdEncodedValue);
         when(currentEdge.get(matchedLinkIdEncodedValue)).thenReturn(MATCHED_LINK_ID_ONE);
-        when(encodingManager.getIntEncodedValue(REVERSED_LINK_ID)).thenReturn(matchedReversedLinkIdEncodedValue);
-        when(currentEdge.get(matchedReversedLinkIdEncodedValue)).thenReturn(MATCHED_REVERSED_LINK_ID_ABSENT);
-        when(startEdge.get(matchedReversedLinkIdEncodedValue)).thenReturn(linkId);
+        when(startEdge.get(matchedLinkIdEncodedValue)).thenReturn(linkId);
         when(currentEdge.fetchWayGeometry(FetchMode.ALL)).thenReturn(pointList);
     }
 }
