@@ -13,6 +13,7 @@ import org.locationtech.jts.geom.LineString;
 @ToString
 public class IsochroneMatch {
 
+    private final int edgeKey;
     private final IsochroneParentLink parentLink;
     private final int matchedLinkId;
     @ToString.Exclude
