@@ -73,6 +73,7 @@ public class IsochroneMatchMapper {
 
         return IsochroneMatch
                 .builder()
+                .edgeKey(currentEdge.getEdgeKey())
                 .matchedLinkId(matchedLinkId)
                 .startFraction(correctedStartFraction)
                 .endFraction(correctedEndFraction)
