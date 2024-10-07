@@ -5,6 +5,16 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
 Here we write upgrade notes. It's a team effort to make them as straightforward as possible.
+## [13.0.0] - 2024-10-07
+
+### Added
+- properties edgeid and edge key to isochrone match dto
+
+### Changed
+
+### Fixed
+- VirtualEdgeIteratorStateReverseExtractor throws class cast exception when VirtualEdgeIteratorState has an IteratorStateImpl member
+- QueryGraphWeightingAdapter was blocking non start virtual edges in reverse direction.
 
 ## [12.0.0] - 2024-09-24
 

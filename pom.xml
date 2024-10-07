@@ -13,7 +13,7 @@
 
     <groupId>nu.ndw.nls</groupId>
     <artifactId>routing-map-matcher-parent</artifactId>
-    <version>12.0.2-SNAPSHOT</version>
+    <version>13.0.0-SNAPSHOT</version>
     <name>routing map matcher parent</name>
     <description>Routing Map Matcher modules containing the core library and spring boot starter modules</description>
     <packaging>pom</packaging>
@@ -39,7 +39,7 @@
         <commons-io.version>2.16.1</commons-io.version>
         <sonar-maven-plugin.version>3.9.1.2184</sonar-maven-plugin.version>
         <sonar.projectName>nls-routing-map-matcher</sonar.projectName>
-        <nls-geometry.version>3.0.0</nls-geometry.version>
+        <nls-geometry.version>3.1.0</nls-geometry.version>
         <kryo5.version>5.5.0</kryo5.version>
     </properties>
     <repositories>

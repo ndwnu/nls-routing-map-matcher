@@ -56,10 +56,12 @@ public class LineStringMatchUtil {
         this.pointListUtil = new PointListUtil();
         IsochroneMatchMapper isochroneMatchMapper = new IsochroneMatchMapper(encodingManager,
                 edgeIteratorStateReverseExtractor, pointListUtil, fractionAndDistanceCalculator);
-        this.isochroneService = new IsochroneService(encodingManager, networkGraphHopper.getBaseGraph(),
-                edgeIteratorStateReverseExtractor,
-                isochroneMatchMapper, new ShortestPathTreeFactory(shortestWeighting),
-                networkGraphHopper.getLocationIndex(), profile);
+        this.isochroneService = new IsochroneService(encodingManager,
+                networkGraphHopper.getBaseGraph(),
+                isochroneMatchMapper,
+                new ShortestPathTreeFactory(shortestWeighting, networkGraphHopper.getEncodingManager()),
+                networkGraphHopper.getLocationIndex(),
+                profile);
     }
 
     private PMap createShortestDistanceHints() {

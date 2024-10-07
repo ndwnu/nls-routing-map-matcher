@@ -74,11 +74,12 @@ public class SinglePointMapMatcher implements MapMatcher<SinglePointLocation, Si
         Weighting shortestWeightingForIsochrone = network.createWeighting(profile, createShortestDistanceHints());
         this.edgeIteratorStateReverseExtractor = new EdgeIteratorStateReverseExtractor();
         this.pointListUtil = new PointListUtil();
-        this.isochroneService = new IsochroneService(encodingManager, baseGraph, edgeIteratorStateReverseExtractor,
+        this.isochroneService = new IsochroneService(encodingManager, baseGraph,
                 new IsochroneMatchMapper(encodingManager, edgeIteratorStateReverseExtractor,
                         pointListUtil,
                         fractionAndDistanceCalculator),
-                new ShortestPathTreeFactory(shortestWeightingForIsochrone), this.locationIndexTree, profile);
+                new ShortestPathTreeFactory(shortestWeightingForIsochrone, network.getEncodingManager()),
+                this.locationIndexTree, profile);
         this.pointMatchingService = new PointMatchingService(geometryFactoryWgs84, bearingCalculator,
                 fractionAndDistanceCalculator, closestPointService);
 
