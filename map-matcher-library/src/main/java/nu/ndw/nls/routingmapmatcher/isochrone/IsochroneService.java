@@ -10,7 +10,6 @@ import com.graphhopper.routing.querygraph.QueryGraph;
 import com.graphhopper.routing.util.EncodingManager;
 import com.graphhopper.routing.util.TraversalMode;
 import com.graphhopper.storage.BaseGraph;
-import com.graphhopper.storage.EdgeIteratorStateReverseExtractor;
 import com.graphhopper.storage.index.LocationIndexTree;
 import com.graphhopper.storage.index.Snap;
 import com.graphhopper.util.EdgeIteratorState;
@@ -35,7 +34,6 @@ public class IsochroneService {
     private static final int MILLISECONDS = 1000;
     private final EncodingManager encodingManager;
     private final BaseGraph baseGraph;
-    private final EdgeIteratorStateReverseExtractor edgeIteratorStateReverseExtractor;
     private final IsochroneMatchMapper isochroneMatchMapper;
     private final ShortestPathTreeFactory shortestPathTreeFactory;
     private final LocationIndexTree locationIndexTree;
@@ -86,7 +84,7 @@ public class IsochroneService {
         QueryGraph queryGraph = QueryGraph.create(baseGraph, startSegment);
         IsochroneByTimeDistanceAndWeight isochrone = shortestPathTreeFactory
                 .createShortestPathTreeByTimeDistanceAndWeight(null, queryGraph, TraversalMode.EDGE_BASED,
-                        isochroneValue, isochroneUnit, reverseFlow, reversed);
+                        isochroneValue, isochroneUnit, reverseFlow, reversed, matchedLinkId);
         // Here the closestNode is the virtual node ID created by the queryGraph.lookup.
         List<IsoLabel> isoLabels = new ArrayList<>();
         isochrone.search(startSegment.getClosestNode(), isoLabels::add);
