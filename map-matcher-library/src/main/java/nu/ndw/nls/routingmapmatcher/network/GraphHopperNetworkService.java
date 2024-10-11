@@ -4,24 +4,26 @@ import static java.util.Objects.requireNonNull;
 import static nu.ndw.nls.routingmapmatcher.util.GraphHopperNetworkPathUtils.formatNormalizedPath;
 
 import com.graphhopper.config.Profile;
-import com.graphhopper.routing.util.VehicleTagParserFactory;
+import com.graphhopper.routing.ev.DefaultImportRegistry;
+import com.graphhopper.routing.ev.ImportRegistry;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import lombok.RequiredArgsConstructor;
 import nu.ndw.nls.routingmapmatcher.exception.GraphHopperNotImportedException;
 import nu.ndw.nls.routingmapmatcher.network.annotations.mappers.EncodedValuesMapper;
 import nu.ndw.nls.routingmapmatcher.network.annotations.model.EncodedValuesByTypeDto;
-import nu.ndw.nls.routingmapmatcher.network.init.annotation.AnnotatedEncodedMapperFactory;
-import nu.ndw.nls.routingmapmatcher.network.init.annotation.AnnotatedEncodedValueFactory;
 import nu.ndw.nls.routingmapmatcher.network.init.annotation.EncodedMapperFactoryRegistry;
 import nu.ndw.nls.routingmapmatcher.network.init.annotation.EncodedValueFactoryRegistry;
-import nu.ndw.nls.routingmapmatcher.network.init.vehicle.CustomVehicleEncodedValuesFactory;
-import nu.ndw.nls.routingmapmatcher.network.init.vehicle.LinkVehicleParserFactory;
+import nu.ndw.nls.routingmapmatcher.network.init.vehicle.LinkImportRegistry;
+import nu.ndw.nls.routingmapmatcher.network.mappers.CustomModelMapper;
+import nu.ndw.nls.routingmapmatcher.network.mappers.ProfileAccessAndSpeedAttributesMapper;
 import nu.ndw.nls.routingmapmatcher.network.model.Link;
 import nu.ndw.nls.routingmapmatcher.network.model.LinkVehicleMapper;
+import nu.ndw.nls.routingmapmatcher.network.model.ProfileAccessAndSpeedAttributes;
 import nu.ndw.nls.routingmapmatcher.network.model.RoutingNetworkSettings;
 import org.springframework.stereotype.Service;
 
@@ -38,10 +40,11 @@ public class GraphHopperNetworkService {
     private static final String NO_NETWORK_MSG = "GraphHopper network %s is not imported on disk";
 
     private final LinkVehicleMapperProvider linkVehicleMapperProvider;
-    private final EncodedMapperFactoryRegistry encodedMapperFactoryRegistry;
     private final EncodedValueFactoryRegistry encodedValueFactoryRegistry;
-    private final CustomVehicleEncodedValuesFactory vehicleEncodedValuesFactory;
     private final EncodedValuesMapper encodedValuesMapper;
+    private final EncodedMapperFactoryRegistry encodedMapperFactoryRegistry;
+    private final CustomModelMapper customModelMapper;
+    private final ProfileAccessAndSpeedAttributesMapper profileAccessAndSpeedAttributesMapper;
 
 
     /**
@@ -52,9 +55,11 @@ public class GraphHopperNetworkService {
      */
     public <T extends Link> NetworkGraphHopper inMemory(RoutingNetworkSettings<T> networkSettings) {
         NetworkGraphHopper graphHopper = new NetworkGraphHopper(networkSettings);
+
+        Map<String, LinkVehicleMapper<T>> providers = linkVehicleMapperProvider.getLinksForType(
+                networkSettings.getLinkType());
+        validateVehicles(networkSettings.getProfiles(), providers, networkSettings.getLinkType());
         configureGraphHopper(networkSettings.getLinkType(), networkSettings.getProfiles(), graphHopper);
-        // defines for each vehicle the values of the above, deducted from the network and other logic
-        graphHopper.setVehicleTagParserFactory(getVehicleTagParserFactory(networkSettings));
 
         graphHopper.setStoreOnFlush(false);
         // Required even though we explicitly set store on flush to false
@@ -64,6 +69,7 @@ public class GraphHopperNetworkService {
 
         return graphHopper;
     }
+
 
     /***
      * In order to separate reads and writes to/form disk cache this method only loads existing networks from disk.
@@ -101,11 +107,10 @@ public class GraphHopperNetworkService {
         Path path = requireNonNull(networkSettings.getGraphhopperRootPath(), NO_PATH_MSG_WRITE);
         String nameAndVersion = requireNonNull(networkSettings.getNetworkNameAndVersion(), NO_NAME_MSG_WRITE);
         graphHopper.setGraphHopperLocation(formatNormalizedPath(path, nameAndVersion).toString());
-
+        Map<String, LinkVehicleMapper<T>> providers = linkVehicleMapperProvider.getLinksForType(
+                networkSettings.getLinkType());
+        validateVehicles(networkSettings.getProfiles(), providers, networkSettings.getLinkType());
         configureGraphHopper(networkSettings.getLinkType(), networkSettings.getProfiles(), graphHopper);
-        // defines for each vehicle the values of the above, deducted from the network and other logic
-        graphHopper.setVehicleTagParserFactory(getVehicleTagParserFactory(networkSettings));
-
         graphHopper.clean();
         graphHopper.setStoreOnFlush(true);
         graphHopper.importAndClose();
@@ -122,39 +127,40 @@ public class GraphHopperNetworkService {
     private <T extends Link> void configureGraphHopper(Class<T> linkClass, List<Profile> profiles,
             NetworkGraphHopper networkGraphHopper) {
         networkGraphHopper.setElevation(false);
-        // defines for each vehicle how data is encoded
-        networkGraphHopper.setVehicleEncodedValuesFactory(vehicleEncodedValuesFactory);
 
         EncodedValuesByTypeDto<T> encodedValuesByTypeDto = encodedValuesMapper.map(linkClass);
-        AnnotatedEncodedValueFactory<T> encodedvalueFactory = new AnnotatedEncodedValueFactory<>(
-                encodedValueFactoryRegistry, encodedValuesByTypeDto);
-        AnnotatedEncodedMapperFactory<T> tagParserFactory = new AnnotatedEncodedMapperFactory<>(
-                encodedMapperFactoryRegistry, encodedValuesByTypeDto);
-
-        //How to set a value in a link
-        networkGraphHopper.setEncodedValueFactory(encodedvalueFactory);
-
-        //How to get back a value from a link
-        networkGraphHopper.setTagParserFactory(tagParserFactory);
-
-        networkGraphHopper.setEncodedValuesString(String.join(DELIMITER, encodedValuesByTypeDto.keySet()));
-
+        Map<String, LinkVehicleMapper<T>> providers = linkVehicleMapperProvider.getLinksForType(
+                linkClass);
+        ProfileAccessAndSpeedAttributes profileAccessAndSpeedAttributes = profileAccessAndSpeedAttributesMapper.map(
+                profiles);
+        String encodedValuesString = getEncodedValuesString(profileAccessAndSpeedAttributes.getAll(),
+                encodedValuesByTypeDto);
+        ImportRegistry importRegistry = new LinkImportRegistry<>(encodedValuesByTypeDto,
+                encodedValueFactoryRegistry, encodedMapperFactoryRegistry,
+                providers,
+                new DefaultImportRegistry(),
+                profileAccessAndSpeedAttributes);
+        addSpeedAndAccessRestrictionsToProfiles(profiles);
+        networkGraphHopper.setImportRegistry(importRegistry);
+        networkGraphHopper.setEncodedValuesString(encodedValuesString);
         networkGraphHopper.setProfiles(profiles);
         networkGraphHopper.setMinNetworkSize(0);
     }
 
-    private <T extends Link> VehicleTagParserFactory getVehicleTagParserFactory(RoutingNetworkSettings<T>
-            networkSettings) {
-        Map<String, LinkVehicleMapper<T>> providers = linkVehicleMapperProvider.getLinksForType(
-                networkSettings.getLinkType());
-        validateVehicles(networkSettings.getProfiles(), providers, networkSettings.getLinkType());
-        return new LinkVehicleParserFactory<>(providers);
+    private <T extends Link> String getEncodedValuesString(List<String> accessAndSpeedAttributes,
+            EncodedValuesByTypeDto<T> encodedValuesByTypeDto) {
+        return Stream.concat(
+                        encodedValuesByTypeDto.keySet().stream(),
+                        accessAndSpeedAttributes.stream()
+                )
+                .collect(Collectors.joining(DELIMITER));
     }
+
 
     private <T extends Link> void validateVehicles(List<Profile> profiles, Map<String, LinkVehicleMapper<T>> providers,
             Class<T> linkClass) {
         Set<String> missingVehicles = profiles.stream()
-                .map(Profile::getVehicle)
+                .map(Profile::getName)
                 .filter(vehicle -> !providers.containsKey(vehicle))
                 .collect(Collectors.toSet());
         if (!missingVehicles.isEmpty()) {
@@ -162,6 +168,10 @@ public class GraphHopperNetworkService {
                     "Missing LinkVehicle implementations for Link type [%s] and vehicle type(s) [%s]"
                             .formatted(linkClass.getSimpleName(), String.join(", ", missingVehicles)));
         }
+    }
+
+    private void addSpeedAndAccessRestrictionsToProfiles(List<Profile> profiles) {
+        profiles.forEach(profile -> profile.setCustomModel(customModelMapper.mapToCustomModel(profile)));
     }
 
 }

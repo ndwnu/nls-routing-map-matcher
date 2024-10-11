@@ -40,6 +40,7 @@ public class PointMatchingService {
         LineString originalGeometry = matchedQueryResult.getOriginalGeometry();
         EdgeIteratorTravelDirection travelDirection = matchedQueryResult.getTravelDirection();
         int matchedLinkId = matchedQueryResult.getMatchedLinkId();
+        int matchedReversedLinkId = matchedQueryResult.getMatchedReversedLinkId();
         matchedQueryResult.getCutoffGeometryAsLineStrings()
                 .forEach(cutOffGeometry -> {
                             Coordinate[] coordinates = cutOffGeometry.getCoordinates();
@@ -48,6 +49,7 @@ public class PointMatchingService {
                                                 MatchedPoint matchedPoint = createMatchedPoint(
                                                         inputCoordinate,
                                                         matchedLinkId,
+                                                        matchedReversedLinkId,
                                                         originalGeometry,
                                                         false,
                                                         lineString,
@@ -64,6 +66,7 @@ public class PointMatchingService {
                                                     MatchedPoint matchedPoint = createMatchedPoint(
                                                             inputCoordinate,
                                                             matchedLinkId,
+                                                            matchedReversedLinkId,
                                                             originalGeometry,
                                                             true,
                                                             lineString,
@@ -79,7 +82,8 @@ public class PointMatchingService {
         return matchedPoints;
     }
 
-    private MatchedPoint createMatchedPoint(Coordinate input, int matchedLinkId, LineString originalGeometry,
+    private MatchedPoint createMatchedPoint(Coordinate input, int matchedLinkId, int matchedReversedLinkId,
+            LineString originalGeometry,
             boolean reversed, LineString aggregatedGeometry, BearingFilter bearingFilter, double cutoffDistance) {
         ClosestPointResult projectionResult = closestPointService.closestPoint(
                 Arrays.asList(aggregatedGeometry.getCoordinates()), input);
@@ -89,6 +93,7 @@ public class PointMatchingService {
         return MatchedPoint
                 .builder()
                 .matchedLinkId(matchedLinkId)
+                .matchedReversedLinkId(matchedReversedLinkId)
                 .reversed(reversed)
                 .snappedPoint(geometryFactory.createPoint(projectionResult.point()))
                 .fraction(reversed ? (1 - fraction) : fraction)

@@ -20,5 +20,5 @@ extends:
     jdkVersion: 1.21
     mavenReleaseGoal: deploy
     sonarOptionalCoverageExclusions: '**/config/**'
-    sonarOptionalExclusions: '**/graphhopper/isochrone/ShortestPathTree.java,**/graphhopper/routing/PathRouter.java'
+    sonarOptionalExclusions: '**/graphhopper/isochrone/ShortestPathTree.java,**/graphhopper/routing/PathRouter.java,**/graphhopper/routing/querygraph/VirtualEdgeIteratorStateReverseExtractor.java'
     pushToGitHub: true

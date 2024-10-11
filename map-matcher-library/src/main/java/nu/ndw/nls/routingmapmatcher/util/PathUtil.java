@@ -1,5 +1,6 @@
 package nu.ndw.nls.routingmapmatcher.util;
 
+import static nu.ndw.nls.routingmapmatcher.network.model.Link.REVERSED_LINK_ID;
 import static nu.ndw.nls.routingmapmatcher.network.model.Link.WAY_ID_KEY;
 
 import com.graphhopper.routing.ev.VehicleAccess;
@@ -32,16 +33,31 @@ public final class PathUtil {
             Collection<EdgeIteratorState> edges) {
         List<MatchedEdgeLink> matchedEdgeLinks = new ArrayList<>();
         for (EdgeIteratorState edge : edges) {
-            int matchedLinkId = edge.get(encodingManager.getIntEncodedValue(WAY_ID_KEY));
+            boolean reversed = EDGE_ITERATOR_STATE_REVERSE_EXTRACTOR.hasReversed(edge);
+            int matchedLinkId = reversed && hasReversedLinkId(encodingManager, edge)
+                    ? getReversedLinkId(encodingManager, edge)
+                    : getLinkId(encodingManager, edge);
             if (matchedEdgeLinks.isEmpty() ||
                     matchedEdgeLinks.getLast().getLinkId() != matchedLinkId) {
                 matchedEdgeLinks.add(MatchedEdgeLink.builder()
                         .linkId(matchedLinkId)
-                        .reversed(EDGE_ITERATOR_STATE_REVERSE_EXTRACTOR.hasReversed(edge))
+                        .reversed(reversed && !hasReversedLinkId(encodingManager, edge))
                         .build());
             }
         }
         return matchedEdgeLinks;
+    }
+
+    private static int getLinkId(EncodingManager encodingManager, EdgeIteratorState edge) {
+        return edge.get(encodingManager.getIntEncodedValue(WAY_ID_KEY));
+    }
+
+    private static int getReversedLinkId(EncodingManager encodingManager, EdgeIteratorState edge) {
+        return edge.get(encodingManager.getIntEncodedValue(REVERSED_LINK_ID));
+    }
+
+    private static boolean hasReversedLinkId(EncodingManager encodingManager, EdgeIteratorState edge) {
+        return getReversedLinkId(encodingManager, edge) > 0L;
     }
 
     /**
@@ -101,8 +117,6 @@ public final class PathUtil {
                 .getEndPoint().getCoordinate();
         return fractionAndDistanceCalculator.calculateFractionAndDistance(originalGeometry, coordinate)
                 .getFraction();
-
-
     }
 
     private static EdgeIteratorState findOriginalEdge(EdgeIteratorState edge, QueryGraph queryGraph) {

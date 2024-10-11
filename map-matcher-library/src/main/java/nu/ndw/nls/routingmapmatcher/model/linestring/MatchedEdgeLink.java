@@ -10,6 +10,7 @@ import lombok.experimental.SuperBuilder;
 @EqualsAndHashCode
 @ToString
 public class MatchedEdgeLink {
+
     private final int linkId;
     private final boolean reversed;
 }

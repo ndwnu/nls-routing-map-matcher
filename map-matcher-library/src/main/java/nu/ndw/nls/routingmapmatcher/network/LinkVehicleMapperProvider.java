@@ -7,6 +7,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import nu.ndw.nls.routingmapmatcher.network.model.Link;
 import nu.ndw.nls.routingmapmatcher.network.model.LinkVehicleMapper;
+import nu.ndw.nls.routingmapmatcher.util.Constants;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -45,6 +46,9 @@ public class LinkVehicleMapperProvider {
             return Optional.of(DUPLICATE_VEHICLE_MSG.formatted(linkClass.getSimpleName(), duplicatedVehicleNames));
         }
     }
+
+
+
 
     public <T extends Link> Map<String, LinkVehicleMapper<T>> getLinksForType(Class<T> linkType) {
         return Optional.ofNullable(vehiclesByLinkType.get(linkType)).orElse(List.of()).stream()

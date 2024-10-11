@@ -7,13 +7,13 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>3.3.0</version>
+        <version>3.3.4</version>
         <relativePath/>
     </parent>
 
     <groupId>nu.ndw.nls</groupId>
     <artifactId>routing-map-matcher-parent</artifactId>
-    <version>10.0.3-SNAPSHOT</version>
+    <version>13.0.2-SNAPSHOT</version>
     <name>routing map matcher parent</name>
     <description>Routing Map Matcher modules containing the core library and spring boot starter modules</description>
     <packaging>pom</packaging>
@@ -27,20 +27,20 @@
         <maven.compiler.target>21</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.javadoc.failOnError>false</maven.javadoc.failOnError>
-        <graphhopper.version>8.0</graphhopper.version>
+        <graphhopper.version>9.1</graphhopper.version>
         <!-- Janino version should match the one used in GraphHopper -->
         <janino.version>3.1.12</janino.version>
         <jts-core.version>1.19.0</jts-core.version>
-        <guava.version>33.2.0-jre</guava.version>
+        <guava.version>33.3.1-jre</guava.version>
         <hamcrest.version>3.0</hamcrest.version>
         <jacoco.version>0.8.12</jacoco.version>
         <geotools.version>30.2</geotools.version>
         <jts2geojson.version>0.18.1</jts2geojson.version>
-        <commons-io.version>2.16.1</commons-io.version>
+        <commons-io.version>2.17.0</commons-io.version>
         <sonar-maven-plugin.version>3.9.1.2184</sonar-maven-plugin.version>
         <sonar.projectName>nls-routing-map-matcher</sonar.projectName>
-        <nls-geometry.version>3.0.0</nls-geometry.version>
-        <kryo5.version>5.5.0</kryo5.version>
+        <nls-geometry.version>3.1.0</nls-geometry.version>
+        <kryo5.version>5.6.2</kryo5.version>
     </properties>
     <repositories>
         <repository>
@@ -84,7 +84,7 @@
                 <artifactId>graphhopper-core</artifactId>
                 <version>${graphhopper.version}</version>
             </dependency>
-            <!-- Fixes weird error see https://discuss.graphhopper.com/t/custommodelparser-error-when-parsing-priority-statement/7386/5-->
+            <!-- Fixes weird error see https://discuss.graphhopper.com/t/custommodelparser-error-when-parsing-priority-statement/7386/5 -->
             <dependency>
                 <groupId>org.codehaus.janino</groupId>
                 <artifactId>janino</artifactId>

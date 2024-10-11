@@ -1,5 +1,6 @@
 package nu.ndw.nls.routingmapmatcher.viterbi;
 
+import static nu.ndw.nls.routingmapmatcher.util.Constants.WEIGHTING_SHORTEST_DISTANCE_INFLUENCE;
 import static nu.ndw.nls.routingmapmatcher.util.MatchUtil.getQueryResults;
 
 import com.google.common.base.Preconditions;
@@ -15,6 +16,7 @@ import com.graphhopper.routing.util.FiniteWeightFilter;
 import com.graphhopper.routing.weighting.Weighting;
 import com.graphhopper.storage.index.LocationIndexTree;
 import com.graphhopper.storage.index.Snap;
+import com.graphhopper.util.CustomModel;
 import com.graphhopper.util.PMap;
 import com.graphhopper.util.Parameters;
 import com.graphhopper.util.PathSimplification;
@@ -31,6 +33,7 @@ import nu.ndw.nls.routingmapmatcher.model.MatchStatus;
 import nu.ndw.nls.routingmapmatcher.model.linestring.LineStringLocation;
 import nu.ndw.nls.routingmapmatcher.model.linestring.LineStringMatch;
 import nu.ndw.nls.routingmapmatcher.network.NetworkGraphHopper;
+import nu.ndw.nls.routingmapmatcher.util.Constants;
 import nu.ndw.nls.routingmapmatcher.util.LineStringMatchUtil;
 import nu.ndw.nls.routingmapmatcher.util.LineStringScoreUtil;
 import nu.ndw.nls.routingmapmatcher.util.PointListUtil;
@@ -135,6 +138,7 @@ public class ViterbiLineStringMapMatcher implements
 
     private PMap createHints() {
         PMap hints = new PMap();
+        hints.putObject(CustomModel.KEY, Constants.SHORTEST_CUSTOM_MODEL);
         hints.putObject(PROFILE_KEY, this.profile.getName());
         hints.putObject(Parameters.CH.DISABLE, true);
         return hints;

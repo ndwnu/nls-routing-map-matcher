@@ -26,7 +26,7 @@ public class PathRouter extends Router {
 
     public PathRouter(BaseGraph graph, EncodingManager encodingManager,
             LocationIndex locationIndex,
-            Map<String, Profile> profilesByName,
+            Map<String,Profile> profilesByName,
             PathDetailsBuilderFactory pathDetailsBuilderFactory,
             TranslationMap translationMap, RouterConfig routerConfig,
             WeightingFactory weightingFactory,
