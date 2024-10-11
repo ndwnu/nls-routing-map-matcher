@@ -14,7 +14,6 @@ class DirectionalFieldGenericTypeArgumentMapperTest {
     private final DirectionalFieldGenericTypeArgumentMapper directionalFieldGenericTypeArgumentMapper =
             new DirectionalFieldGenericTypeArgumentMapper();
 
-
     @Getter
     @Setter
     private static class TestDto extends Link {
@@ -24,7 +23,7 @@ class DirectionalFieldGenericTypeArgumentMapperTest {
         private DirectionalDto<Integer> integerField;
 
         protected TestDto(long id, long fromNodeId, long toNodeId, double distanceInMeters, LineString geometry) {
-            super(id, fromNodeId, toNodeId, distanceInMeters, geometry);
+            super(id, fromNodeId, toNodeId, distanceInMeters, geometry, null);
         }
     }
 
@@ -33,7 +32,4 @@ class DirectionalFieldGenericTypeArgumentMapperTest {
         assertEquals(String.class, directionalFieldGenericTypeArgumentMapper.map(TestDto.class, "stringField"));
         assertEquals(Integer.class, directionalFieldGenericTypeArgumentMapper.map(TestDto.class, "integerField"));
     }
-
-
-
 }

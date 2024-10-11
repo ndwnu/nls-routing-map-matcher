@@ -1,21 +1,18 @@
 package nu.ndw.nls.routingmapmatcher.util;
 
+import static nu.ndw.nls.routingmapmatcher.util.Constants.SHORTEST_CUSTOM_MODEL;
+
 import com.graphhopper.config.Profile;
 import com.graphhopper.routing.Path;
-import com.graphhopper.routing.ev.BooleanEncodedValue;
-import com.graphhopper.routing.ev.DecimalEncodedValue;
-import com.graphhopper.routing.ev.VehicleAccess;
-import com.graphhopper.routing.ev.VehicleSpeed;
 import com.graphhopper.routing.querygraph.QueryGraph;
 import com.graphhopper.routing.util.EncodingManager;
-import com.graphhopper.routing.weighting.ShortestWeighting;
 import com.graphhopper.routing.weighting.Weighting;
-import com.graphhopper.storage.BaseGraph;
 import com.graphhopper.storage.EdgeIteratorStateReverseExtractor;
-import com.graphhopper.storage.index.LocationIndexTree;
+import com.graphhopper.util.CustomModel;
 import com.graphhopper.util.EdgeIteratorState;
 import com.graphhopper.util.FetchMode;
 import com.graphhopper.util.Helper;
+import com.graphhopper.util.PMap;
 import com.graphhopper.util.PathSimplification;
 import com.graphhopper.util.PointList;
 import com.graphhopper.util.RamerDouglasPeucker;
@@ -47,27 +44,31 @@ public class LineStringMatchUtil {
     private final MatchedLinkMapper matchedLinkMapper = new MatchedLinkMapper();
     private final FractionAndDistanceCalculator fractionAndDistanceCalculator;
 
-    private LineStringMatchUtil(LocationIndexTree locationIndexTree, BaseGraph baseGraph,
-            EncodingManager encodingManager, Profile profile,
+    public LineStringMatchUtil(NetworkGraphHopper networkGraphHopper, Profile profile,
             FractionAndDistanceCalculator fractionAndDistanceCalculator) {
-        this.encodingManager = encodingManager;
+
+        PMap requestHints = createShortestDistanceHints();
+        Weighting shortestWeighting = networkGraphHopper.createWeighting(profile, requestHints);
+
+        this.encodingManager = networkGraphHopper.getEncodingManager();
         this.fractionAndDistanceCalculator = fractionAndDistanceCalculator;
-        BooleanEncodedValue accessEnc = encodingManager.getBooleanEncodedValue(VehicleAccess.key(profile.getVehicle()));
-        DecimalEncodedValue speedEnc = encodingManager.getDecimalEncodedValue(VehicleSpeed.key(profile.getVehicle()));
-        Weighting weighting = new ShortestWeighting(accessEnc, speedEnc);
         EdgeIteratorStateReverseExtractor edgeIteratorStateReverseExtractor = new EdgeIteratorStateReverseExtractor();
         this.pointListUtil = new PointListUtil();
         IsochroneMatchMapper isochroneMatchMapper = new IsochroneMatchMapper(encodingManager,
-                edgeIteratorStateReverseExtractor, pointListUtil,fractionAndDistanceCalculator);
-        this.isochroneService = new IsochroneService(encodingManager, baseGraph, edgeIteratorStateReverseExtractor,
-                isochroneMatchMapper, new ShortestPathTreeFactory(weighting), locationIndexTree, profile);
+                edgeIteratorStateReverseExtractor, pointListUtil, fractionAndDistanceCalculator);
+        this.isochroneService = new IsochroneService(encodingManager,
+                networkGraphHopper.getBaseGraph(),
+                isochroneMatchMapper,
+                new ShortestPathTreeFactory(shortestWeighting, networkGraphHopper.getEncodingManager()),
+                networkGraphHopper.getLocationIndex(),
+                profile);
     }
 
-    public LineStringMatchUtil(NetworkGraphHopper networkGraphHopper, Profile profile,
-            FractionAndDistanceCalculator fractionAndDistanceCalculator) {
-        this(networkGraphHopper.getLocationIndex(), networkGraphHopper.getBaseGraph(),
-                networkGraphHopper.getEncodingManager(), profile, fractionAndDistanceCalculator);
+    private PMap createShortestDistanceHints() {
+        return new PMap()
+                .putObject(CustomModel.KEY, SHORTEST_CUSTOM_MODEL);
     }
+
 
     public LineStringMatch createMatch(LineStringLocation lineStringLocation, Path path, QueryGraph queryGraph,
             double reliability) {

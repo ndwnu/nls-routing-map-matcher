@@ -18,6 +18,7 @@ public class RouterFactory implements MapMatcherFactory<Router> {
 
     @Override
     public Router createMapMatcher(NetworkGraphHopper preInitializedNetwork, String profileName) {
-        return new Router(preInitializedNetwork, matchedLinkMapper, geometryFactoryWgs84,fractionAndDistanceCalculator);
+        return new Router(preInitializedNetwork, matchedLinkMapper, geometryFactoryWgs84,
+                fractionAndDistanceCalculator);
     }
 }

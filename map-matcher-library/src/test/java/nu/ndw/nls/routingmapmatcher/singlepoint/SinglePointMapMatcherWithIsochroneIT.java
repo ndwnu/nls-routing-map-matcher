@@ -1,16 +1,14 @@
 package nu.ndw.nls.routingmapmatcher.singlepoint;
 
-import static nu.ndw.nls.routingmapmatcher.testutil.TestNetworkProvider.CAR_FASTEST;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.closeTo;
-import static org.hamcrest.Matchers.hasSize;
-import static org.hamcrest.Matchers.is;
+import static nu.ndw.nls.routingmapmatcher.testutil.TestNetworkProvider.CAR;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.data.Offset.offset;
 import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import lombok.SneakyThrows;
 import nu.ndw.nls.geometry.factories.GeometryFactoryWgs84;
 import nu.ndw.nls.routingmapmatcher.TestConfig;
+import nu.ndw.nls.routingmapmatcher.model.IsochroneMatch;
 import nu.ndw.nls.routingmapmatcher.model.IsochroneUnit;
 import nu.ndw.nls.routingmapmatcher.model.singlepoint.BearingFilter;
 import nu.ndw.nls.routingmapmatcher.model.singlepoint.MatchFilter;
@@ -31,10 +29,11 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 @ContextConfiguration(classes = {TestConfig.class})
 public class SinglePointMapMatcherWithIsochroneIT {
 
-    private static final String LINKS_RESOURCE = "/test-data/links.json";
+    private static final String LINKS_RESOURCE = "/test-data/links_bidirectional.json";
     private static final Coordinate START_POINT = new Coordinate(5.4267250, 52.1767242);
-    private static final int UPSTREAM_ISOCHRONE_METERS = 200;
-    private static final BearingFilter BEARING_FILTER = new BearingFilter(135, 10);
+    private static final int ISOCHRONE_METERS = 200;
+    private static final int ISOCHRONE_SECONDS = 20;
+    private static final BearingFilter BEARING_FILTER = new BearingFilter(140, 10);
     private static final int CUTOFF_DISTANCE = 20;
     private static final int ID = 1;
 
@@ -45,17 +44,16 @@ public class SinglePointMapMatcherWithIsochroneIT {
 
     private SinglePointMapMatcher singlePointMapMatcher;
 
-
     @SneakyThrows
     private void setupNetwork() {
         singlePointMapMatcher = singlePointMapMatcherFactory.createMapMatcher(
                 TestNetworkProvider.getTestNetworkFromFile(LINKS_RESOURCE),
-                CAR_FASTEST);
+                CAR);
     }
 
     @SneakyThrows
     @Test
-    void matchWithDownstreamIsochrone_ok_meters() {
+    void match_ok_downstreamIsochroneMeters() {
         setupNetwork();
         Point point = geometryFactory.createPoint(START_POINT);
         var request = SinglePointLocation
@@ -64,24 +62,24 @@ public class SinglePointMapMatcherWithIsochroneIT {
                 .point(point)
                 .matchSort(MatchSort.SHORTEST_DISTANCE)
                 .matchFilter(MatchFilter.FIRST)
-                .downstreamIsochrone(UPSTREAM_ISOCHRONE_METERS)
-                .bearingFilter(BEARING_FILTER)
+                .downstreamIsochrone(ISOCHRONE_METERS)
                 .downstreamIsochroneUnit(IsochroneUnit.METERS)
+                .bearingFilter(BEARING_FILTER)
                 .cutoffDistance(CUTOFF_DISTANCE)
                 .build();
         SinglePointMatch result = singlePointMapMatcher.match(request);
-        assertThat(result.getCandidateMatches(), hasSize(ID));
+        assertThat(result.getCandidateMatches()).hasSize(1);
         CandidateMatch match = result.getCandidateMatches().getFirst();
-        assertThat(match.getDownstream(), hasSize(5));
-        var startPoint = match.getDownstream().getFirst();
-        assertThat(startPoint.getStartFraction(), closeTo(match.getFraction(), 0.000001));
-        assertThat(startPoint.getEndFraction(), is(1.0));
+        assertThat(match.getDownstream()).hasSize(5);
+        IsochroneMatch startPoint = match.getDownstream().getFirst();
+        assertThat(startPoint.getStartFraction()).isCloseTo(match.getFraction(), offset(0.000001));
+        assertThat(startPoint.getEndFraction()).isEqualTo(1.0);
         assertFalse(startPoint.isReversed());
     }
 
     @SneakyThrows
     @Test
-    void matchWithDownstreamIsochrone_ok_seconds() {
+    void match_ok_downstreamIsochroneSeconds() {
         setupNetwork();
         Point point = geometryFactory.createPoint(START_POINT);
         var request = SinglePointLocation
@@ -90,24 +88,24 @@ public class SinglePointMapMatcherWithIsochroneIT {
                 .point(point)
                 .matchSort(MatchSort.SHORTEST_DISTANCE)
                 .matchFilter(MatchFilter.FIRST)
-                .downstreamIsochrone(20)
-                .bearingFilter(BEARING_FILTER)
+                .downstreamIsochrone(ISOCHRONE_SECONDS)
                 .downstreamIsochroneUnit(IsochroneUnit.SECONDS)
+                .bearingFilter(BEARING_FILTER)
                 .cutoffDistance(CUTOFF_DISTANCE)
                 .build();
         SinglePointMatch result = singlePointMapMatcher.match(request);
-        assertThat(result.getCandidateMatches(), hasSize(ID));
+        assertThat(result.getCandidateMatches()).hasSize(1);
         CandidateMatch match = result.getCandidateMatches().getFirst();
-        assertThat(match.getDownstream(), hasSize(14));
-        var startPoint = match.getDownstream().getFirst();
-        assertThat(startPoint.getStartFraction(), closeTo(match.getFraction(), 0.000001));
-        assertThat(startPoint.getEndFraction(), is(1.0));
+        assertThat(match.getDownstream()).hasSize(14);
+        IsochroneMatch startPoint = match.getDownstream().getFirst();
+        assertThat(startPoint.getStartFraction()).isCloseTo(match.getFraction(), offset(0.000001));
+        assertThat(startPoint.getEndFraction()).isEqualTo(1.0);
         assertFalse(startPoint.isReversed());
     }
 
     @SneakyThrows
     @Test
-    void matchWithUpstreamIsochrone_ok_meters() {
+    void match_ok_upstreamIsochroneMeters() {
         setupNetwork();
         Point point = geometryFactory.createPoint(START_POINT);
         var request = SinglePointLocation
@@ -116,24 +114,24 @@ public class SinglePointMapMatcherWithIsochroneIT {
                 .point(point)
                 .matchSort(MatchSort.SHORTEST_DISTANCE)
                 .matchFilter(MatchFilter.FIRST)
-                .upstreamIsochrone(UPSTREAM_ISOCHRONE_METERS)
-                .bearingFilter(BEARING_FILTER)
+                .upstreamIsochrone(ISOCHRONE_METERS)
                 .upstreamIsochroneUnit(IsochroneUnit.METERS)
+                .bearingFilter(BEARING_FILTER)
                 .cutoffDistance(CUTOFF_DISTANCE)
                 .build();
         SinglePointMatch result = singlePointMapMatcher.match(request);
-        assertThat(result.getCandidateMatches(), hasSize(ID));
+        assertThat(result.getCandidateMatches()).hasSize(1);
         CandidateMatch match = result.getCandidateMatches().getFirst();
-        assertThat(match.getUpstream(), hasSize(5));
-        var startPoint = match.getUpstream().getFirst();
-        assertThat(startPoint.getStartFraction(), closeTo(1 - match.getFraction(), 0.000001));
-        assertThat(startPoint.getEndFraction(), is(1.0));
-        assertTrue(startPoint.isReversed());
+        assertThat(match.getUpstream()).hasSize(5);
+        IsochroneMatch startPoint = match.getUpstream().getFirst();
+        assertThat(startPoint.getStartFraction()).isEqualTo(0.0);
+        assertThat(startPoint.getEndFraction()).isCloseTo(match.getFraction(), offset(0.000001));
+        assertFalse(startPoint.isReversed());
     }
 
     @SneakyThrows
     @Test
-    void matchWithUpstreamIsochrone_ok_seconds() {
+    void match_ok_upstreamIsochroneSeconds() {
         setupNetwork();
         Point point = geometryFactory.createPoint(START_POINT);
         var request = SinglePointLocation
@@ -142,18 +140,18 @@ public class SinglePointMapMatcherWithIsochroneIT {
                 .point(point)
                 .matchSort(MatchSort.SHORTEST_DISTANCE)
                 .matchFilter(MatchFilter.FIRST)
-                .upstreamIsochrone(20)
-                .bearingFilter(BEARING_FILTER)
+                .upstreamIsochrone(ISOCHRONE_SECONDS)
                 .upstreamIsochroneUnit(IsochroneUnit.SECONDS)
+                .bearingFilter(BEARING_FILTER)
                 .cutoffDistance(CUTOFF_DISTANCE)
                 .build();
         SinglePointMatch result = singlePointMapMatcher.match(request);
-        assertThat(result.getCandidateMatches(), hasSize(ID));
+        assertThat(result.getCandidateMatches()).hasSize(1);
         CandidateMatch match = result.getCandidateMatches().getFirst();
-        assertThat(match.getUpstream(), hasSize(11));
-        var startPoint = match.getUpstream().getFirst();
-        assertThat(startPoint.getStartFraction(), closeTo(1 - match.getFraction(), 0.000001));
-        assertThat(startPoint.getEndFraction(), is(1.0));
-        assertTrue(startPoint.isReversed());
+        assertThat(match.getUpstream()).hasSize(11);
+        IsochroneMatch startPoint = match.getUpstream().getFirst();
+        assertThat(startPoint.getStartFraction()).isEqualTo(0.0);
+        assertThat(startPoint.getEndFraction()).isCloseTo(match.getFraction(), offset(0.000001));
+        assertFalse(startPoint.isReversed());
     }
 }

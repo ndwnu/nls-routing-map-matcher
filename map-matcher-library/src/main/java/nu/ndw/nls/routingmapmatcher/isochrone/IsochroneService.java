@@ -2,7 +2,6 @@ package nu.ndw.nls.routingmapmatcher.isochrone;
 
 import static java.util.Comparator.comparing;
 import static nu.ndw.nls.routingmapmatcher.network.model.Link.WAY_ID_KEY;
-import static nu.ndw.nls.routingmapmatcher.util.PathUtil.determineEdgeDirection;
 
 import com.graphhopper.config.Profile;
 import com.graphhopper.routing.ev.DecimalEncodedValue;
@@ -11,7 +10,6 @@ import com.graphhopper.routing.querygraph.QueryGraph;
 import com.graphhopper.routing.util.EncodingManager;
 import com.graphhopper.routing.util.TraversalMode;
 import com.graphhopper.storage.BaseGraph;
-import com.graphhopper.storage.EdgeIteratorStateReverseExtractor;
 import com.graphhopper.storage.index.LocationIndexTree;
 import com.graphhopper.storage.index.Snap;
 import com.graphhopper.util.EdgeIteratorState;
@@ -22,7 +20,6 @@ import nu.ndw.nls.routingmapmatcher.isochrone.algorithm.IsoLabel;
 import nu.ndw.nls.routingmapmatcher.isochrone.algorithm.IsochroneByTimeDistanceAndWeight;
 import nu.ndw.nls.routingmapmatcher.isochrone.algorithm.ShortestPathTreeFactory;
 import nu.ndw.nls.routingmapmatcher.isochrone.mappers.IsochroneMatchMapper;
-import nu.ndw.nls.routingmapmatcher.model.EdgeIteratorTravelDirection;
 import nu.ndw.nls.routingmapmatcher.model.IsochroneMatch;
 import nu.ndw.nls.routingmapmatcher.model.IsochroneUnit;
 import nu.ndw.nls.routingmapmatcher.model.base.BaseLocation;
@@ -37,7 +34,6 @@ public class IsochroneService {
     private static final int MILLISECONDS = 1000;
     private final EncodingManager encodingManager;
     private final BaseGraph baseGraph;
-    private final EdgeIteratorStateReverseExtractor edgeIteratorStateReverseExtractor;
     private final IsochroneMatchMapper isochroneMatchMapper;
     private final ShortestPathTreeFactory shortestPathTreeFactory;
     private final LocationIndexTree locationIndexTree;
@@ -86,24 +82,24 @@ public class IsochroneService {
         // It also sets the closestNode of the matchedQueryResult to the virtual node ID. In this way, it creates a
         // start point for isochrone calculation based on the snapped point coordinates.
         QueryGraph queryGraph = QueryGraph.create(baseGraph, startSegment);
-        boolean searchDirectionIsReversed = reversed != reverseFlow;
         IsochroneByTimeDistanceAndWeight isochrone = shortestPathTreeFactory
                 .createShortestPathTreeByTimeDistanceAndWeight(null, queryGraph, TraversalMode.EDGE_BASED,
-                        isochroneValue, isochroneUnit, searchDirectionIsReversed);
+                        isochroneValue, isochroneUnit, reverseFlow, reversed, matchedLinkId);
         // Here the closestNode is the virtual node ID created by the queryGraph.lookup.
         List<IsoLabel> isoLabels = new ArrayList<>();
         isochrone.search(startSegment.getClosestNode(), isoLabels::add);
         boolean searchDirectionReversed = reversed != reverseFlow;
         EdgeIteratorState startEdge = startSegment.getClosestEdge();
         return isoLabels.stream()
-                .filter(isoLabel -> ! isoLabel.isRoot())
+                .filter(isoLabel -> !isoLabel.isRoot())
                 .sorted(comparing(IsoLabel::getDistance))
                 .map(isoLabel -> {
                     // Specify the maximum distance on which to crop the geometries.
                     // In the case of seconds, convert to meters based on the average speed of the iso label.
                     double maxDistance = IsochroneUnit.METERS == isochroneUnit ? isochroneValue
                             : calculateMaxDistance(queryGraph, isochroneValue, isoLabel, searchDirectionReversed);
-                    return isochroneMatchMapper.mapToIsochroneMatch(isoLabel, maxDistance, queryGraph, startEdge);
+                    return isochroneMatchMapper.mapToIsochroneMatch(isoLabel, maxDistance, queryGraph, startEdge,
+                            reverseFlow);
                 })
                 .toList();
     }
@@ -135,7 +131,7 @@ public class IsochroneService {
 
     private double getAverageSpeedFromEdge(EdgeIteratorState currentEdge, boolean useSpeedFromReversedDirection) {
         DecimalEncodedValue vehicleSpeedDecimalEncodedValue = encodingManager.getDecimalEncodedValue(
-                VehicleSpeed.key(profile.getVehicle()));
+                VehicleSpeed.key(profile.getName()));
         if (useSpeedFromReversedDirection) {
             return currentEdge.getReverse(vehicleSpeedDecimalEncodedValue);
         }

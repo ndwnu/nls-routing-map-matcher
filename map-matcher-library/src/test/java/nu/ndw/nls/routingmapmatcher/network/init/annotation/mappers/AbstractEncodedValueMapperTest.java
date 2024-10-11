@@ -26,7 +26,7 @@ class AbstractEncodedValueMapperTest {
     private static class MyLink extends Link {
         protected MyLink(long id, long fromNodeId, long toNodeId, double distanceInMeters,
                 LineString geometry) {
-            super(id, fromNodeId, toNodeId, distanceInMeters, geometry);
+            super(id, fromNodeId, toNodeId, distanceInMeters, geometry, null);
         }
     }
 

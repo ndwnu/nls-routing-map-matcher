@@ -88,22 +88,21 @@ class LinkVehicleMapperProviderTest {
     private static class TestALink extends Link {
 
         public TestALink() {
-            super(0, 1, 2, 5.0, null);
+            super(0, 1, 2, 5.0, null, null);
         }
     }
 
     private static class TestBLink extends Link {
 
         public TestBLink() {
-            super(0, 1, 2, 5.0, null);
+            super(0, 1, 2, 5.0, null, null);
         }
     }
 
     private static class TestCLink extends Link {
 
         public TestCLink() {
-            super(0, 1, 2, 5.0, null);
+            super(0, 1, 2, 5.0, null, null);
         }
     }
-
 }

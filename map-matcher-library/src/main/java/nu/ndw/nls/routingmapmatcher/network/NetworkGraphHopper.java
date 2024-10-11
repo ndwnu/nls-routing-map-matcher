@@ -81,7 +81,7 @@ public class NetworkGraphHopper extends GraphHopper {
         if (this.dataDate != null) {
             putDateProperty(DATAREADER_DATA_DATE, this.dataDate);
         }
-        this.writeEncodingManagerToProperties();
+
     }
 
     @Override

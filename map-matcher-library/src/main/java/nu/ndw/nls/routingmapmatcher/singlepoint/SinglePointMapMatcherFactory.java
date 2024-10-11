@@ -27,4 +27,5 @@ public class SinglePointMapMatcherFactory implements MapMatcherFactory<SinglePoi
                 geometryFactoryWgs84, fractionAndDistanceCalculator, preInitializedNetwork, profileName,
                 closestPointService);
     }
+
 }

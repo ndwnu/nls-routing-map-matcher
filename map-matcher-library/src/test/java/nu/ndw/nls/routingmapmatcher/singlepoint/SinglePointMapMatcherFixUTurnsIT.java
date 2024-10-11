@@ -1,8 +1,7 @@
 
 package nu.ndw.nls.routingmapmatcher.singlepoint;
 
-import static nu.ndw.nls.routingmapmatcher.testutil.TestNetworkProvider.CAR_FASTEST;
-import static nu.ndw.nls.routingmapmatcher.testutil.TestNetworkProvider.CAR_FASTEST_NO_U_TURNS;
+import static nu.ndw.nls.routingmapmatcher.testutil.TestNetworkProvider.CAR_NO_U_TURNS;
 import static nu.ndw.nls.routingmapmatcher.testutil.TestNetworkProvider.getTestNetwork;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -48,7 +47,7 @@ class SinglePointMapMatcherFixUTurnsIT {
     @BeforeEach
     void setup() {
         singlePointMapMatcher = singlePointMapMatcherFactory.createMapMatcher(getTestNetwork(createLinks()),
-                CAR_FASTEST_NO_U_TURNS);
+                CAR_NO_U_TURNS);
     }
 
     /**

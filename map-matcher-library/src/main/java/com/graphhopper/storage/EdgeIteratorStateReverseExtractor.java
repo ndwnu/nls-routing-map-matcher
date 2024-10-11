@@ -26,7 +26,17 @@ public final class EdgeIteratorStateReverseExtractor {
             return edgeIterable.reverse;
         } else {
             return VirtualEdgeIteratorStateReverseExtractor.hasReversed(closestEdge);
+        }
+    }
 
+    public static EdgeIteratorState getEdgeIteratorStateImpl(EdgeIteratorState closestEdge) {
+
+        if (closestEdge instanceof EdgeIteratorStateImpl edgeIterable) {
+            return edgeIterable;
+        } else {
+            throw new IllegalArgumentException(
+                    "This method can only be called with an EdgeIteratorStateImpl instance of EdgeIteratorState %s".formatted(
+                            closestEdge));
         }
     }
 }
