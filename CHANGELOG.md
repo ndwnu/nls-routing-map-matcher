@@ -5,6 +5,12 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
 Here we write upgrade notes. It's a team effort to make them as straightforward as possible.
+
+## [13.0.3] - 2024-10-15
+
+### Fixed
+- MINOR Removed vulnerable transitive dependency com.google.protobuf:protobuf-java:3.12.2
+
 ## [13.0.0] - 2024-10-07
 
 ### Added
