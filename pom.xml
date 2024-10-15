@@ -83,8 +83,17 @@
                 <groupId>com.graphhopper</groupId>
                 <artifactId>graphhopper-core</artifactId>
                 <version>${graphhopper.version}</version>
+                <!-- Osmosis pulls in com.google.protobuf:protobuf-java:3.12.2, which contains several vulnerabilities.
+                     We don't need it, because we load maps into GraphHopper from our database, not from OSM PBF. -->
+                <exclusions>
+                    <exclusion>
+                        <groupId>org.openstreetmap.osmosis</groupId>
+                        <artifactId>osmosis-osm-binary</artifactId>
+                    </exclusion>
+                </exclusions>
             </dependency>
-            <!-- Fixes weird error see https://discuss.graphhopper.com/t/custommodelparser-error-when-parsing-priority-statement/7386/5 -->
+            <!-- Fixes weird error. See
+                 https://discuss.graphhopper.com/t/custommodelparser-error-when-parsing-priority-statement/7386/5 -->
             <dependency>
                 <groupId>org.codehaus.janino</groupId>
                 <artifactId>janino</artifactId>
