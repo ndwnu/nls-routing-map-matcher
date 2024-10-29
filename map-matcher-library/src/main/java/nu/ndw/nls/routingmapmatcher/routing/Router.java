@@ -101,7 +101,7 @@ public class Router {
             double endFraction = PathUtil.determineEndLinkFraction(edges.getLast(),
                     QueryGraphExtractor.extractQueryGraph(path),fractionAndDistanceCalculator);
             List<MatchedEdgeLink> matchedEdgeLinks = PathUtil.determineMatchedLinks(
-                    networkGraphHopper.getEncodingManager(),
+                    networkGraphHopper.getEncodingManager(), fractionAndDistanceCalculator,
                     edges);
 
             routingLegResponse.add(RoutingLegResponse.builder()

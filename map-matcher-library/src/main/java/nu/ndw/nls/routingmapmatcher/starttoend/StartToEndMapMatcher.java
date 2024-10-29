@@ -34,6 +34,7 @@ import nu.ndw.nls.routingmapmatcher.network.NetworkGraphHopper;
 import nu.ndw.nls.routingmapmatcher.util.Constants;
 import nu.ndw.nls.routingmapmatcher.util.LineStringMatchUtil;
 import nu.ndw.nls.routingmapmatcher.util.LineStringScoreUtil;
+import nu.ndw.nls.routingmapmatcher.util.PointListUtil;
 import org.locationtech.jts.geom.Point;
 
 public class StartToEndMapMatcher implements MapMatcher<LineStringLocation, LineStringMatch> {
@@ -53,7 +54,7 @@ public class StartToEndMapMatcher implements MapMatcher<LineStringLocation, Line
     private final Weighting weighting;
 
     public StartToEndMapMatcher(NetworkGraphHopper networkGraphHopper, String profileName,
-            FractionAndDistanceCalculator fractionAndDistanceCalculator) {
+            FractionAndDistanceCalculator fractionAndDistanceCalculator, PointListUtil pointListUtil) {
         this.networkGraphHopper = Preconditions.checkNotNull(networkGraphHopper);
         Profile profile = Preconditions.checkNotNull(networkGraphHopper.getProfile(profileName));
         this.routingGraph = networkGraphHopper.getBaseGraph();
@@ -62,7 +63,8 @@ public class StartToEndMapMatcher implements MapMatcher<LineStringLocation, Line
                 .setTraversalMode(TraversalMode.NODE_BASED);
         this.algorithmFactory = new RoutingAlgorithmFactorySimple();
         this.locationIndexTree = networkGraphHopper.getLocationIndex();
-        this.lineStringMatchUtil = new LineStringMatchUtil(networkGraphHopper, profile, fractionAndDistanceCalculator);
+        this.lineStringMatchUtil = new LineStringMatchUtil(networkGraphHopper, profile, fractionAndDistanceCalculator,
+                pointListUtil);
         this.lineStringScoreUtil = new LineStringScoreUtil(fractionAndDistanceCalculator);
         this.weighting = networkGraphHopper.createWeighting(profile, createShortestDistanceHints());
     }

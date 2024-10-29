@@ -1,6 +1,5 @@
 package nu.ndw.nls.routingmapmatcher.viterbi;
 
-import static nu.ndw.nls.routingmapmatcher.util.Constants.WEIGHTING_SHORTEST_DISTANCE_INFLUENCE;
 import static nu.ndw.nls.routingmapmatcher.util.MatchUtil.getQueryResults;
 
 import com.google.common.base.Preconditions;
@@ -84,15 +83,16 @@ public class ViterbiLineStringMapMatcher implements
     private final GeometryFactoryWgs84 geometryFactoryWgs84;
 
     public ViterbiLineStringMapMatcher(NetworkGraphHopper networkGraphHopper, String profileName,
-            GeometryFactoryWgs84 geometryFactoryWgs84, FractionAndDistanceCalculator fractionAndDistanceCalculator) {
+            GeometryFactoryWgs84 geometryFactoryWgs84, FractionAndDistanceCalculator fractionAndDistanceCalculator,
+            PointListUtil pointListUtil) {
         this.networkGraphHopper = Preconditions.checkNotNull(networkGraphHopper);
         this.locationIndexTree = networkGraphHopper.getLocationIndex();
         this.geometryFactoryWgs84 = geometryFactoryWgs84;
         this.profile = Preconditions.checkNotNull(networkGraphHopper.getProfile(profileName));
         this.lineStringMatchUtil = new LineStringMatchUtil(networkGraphHopper, this.profile,
-                fractionAndDistanceCalculator);
+                fractionAndDistanceCalculator, pointListUtil);
         this.lineStringScoreUtil = new LineStringScoreUtil(fractionAndDistanceCalculator);
-        this.pointListUtil = new PointListUtil();
+        this.pointListUtil = pointListUtil;
     }
 
     @Override

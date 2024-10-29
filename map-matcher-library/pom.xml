@@ -16,6 +16,11 @@
             <artifactId>spring-context</artifactId>
             <scope>provided</scope>
         </dependency>
+        <dependency>
+            <groupId>com.conductor</groupId>
+            <artifactId>stream-utils</artifactId>
+        </dependency>
+
         <!-- Graphhopper -->
         <dependency>
             <groupId>com.graphhopper</groupId>

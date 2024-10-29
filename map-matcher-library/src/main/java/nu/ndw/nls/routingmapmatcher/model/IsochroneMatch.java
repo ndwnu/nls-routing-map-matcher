@@ -22,4 +22,5 @@ public class IsochroneMatch {
     private final double startFraction;
     private final double endFraction;
     private final boolean reversed;
+    private final double distance;
 }

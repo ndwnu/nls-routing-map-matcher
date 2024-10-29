@@ -70,7 +70,8 @@ public class IsochroneMatchMapper {
         double correctedEndFraction = reverseFlow ? (1 - startFraction) : endFraction;
         boolean correctedReversed = (reversed != reverseFlow) && !hasReversedLinkId(currentEdge);
         LineString correctedGeometry = reverseFlow ? partialGeometry.reverse() : partialGeometry;
-
+        double fullDistance = fractionAndDistanceCalculator.calculateLengthInMeters(isoLabelWayGeometry);
+        double linkDistance = Math.abs(fullDistance * (correctedEndFraction - correctedStartFraction));
         return IsochroneMatch
                 .builder()
                 .edge(currentEdge)
@@ -78,6 +79,7 @@ public class IsochroneMatchMapper {
                 .startFraction(correctedStartFraction)
                 .endFraction(correctedEndFraction)
                 .reversed(correctedReversed)
+                .distance(linkDistance)
                 .parentLink(createParentLink(isoLabel, queryGraph, reverseFlow))
                 .geometry(correctedGeometry)
                 .build();
@@ -133,7 +135,7 @@ public class IsochroneMatchMapper {
             double maxDistance) {
         double isoLabelEdgeGeometryDistance = fractionAndDistanceCalculator.calculateLengthInMeters(edgeGeometry);
         double partialFraction = (maxDistance - totalDistanceTravelled + isoLabelEdgeGeometryDistance)
-                / isoLabelEdgeGeometryDistance;
+                                 / isoLabelEdgeGeometryDistance;
         return fractionAndDistanceCalculator.getSubLineString(edgeGeometry, partialFraction);
     }
 }

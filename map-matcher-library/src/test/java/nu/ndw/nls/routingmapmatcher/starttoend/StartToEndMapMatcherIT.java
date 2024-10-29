@@ -17,6 +17,7 @@ import nu.ndw.nls.routingmapmatcher.model.linestring.MatchedLink;
 import nu.ndw.nls.routingmapmatcher.model.linestring.ReliabilityCalculationType;
 import nu.ndw.nls.routingmapmatcher.testutil.TestNetworkProvider;
 import org.apache.commons.io.IOUtils;
+import org.assertj.core.data.Percentage;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -60,44 +61,127 @@ class StartToEndMapMatcherIT {
                 .reliabilityCalculationType(ReliabilityCalculationType.POINT_OBSERVATIONS)
                 .build();
         LineStringMatch lineStringMatch = startToEndMapMatcher.match(lineStringLocation);
+        verifySumDistanceOfIndividualRoadSections(lineStringMatch);
         assertThat(lineStringMatch.getId()).isEqualTo(1);
         assertThat(lineStringMatch.getStatus()).isEqualTo(MatchStatus.MATCH);
         assertThat(lineStringMatch.getReliability()).isEqualTo(73.88564657201005);
         assertThat(lineStringMatch.getLocationIndex()).isEqualTo(1);
         assertThat(lineStringMatch.isReversed()).isFalse();
-        assertThat(lineStringMatch.getMatchedLinks()).containsExactly(
-                MatchedLink.builder().linkId(6405237).reversed(false).startFraction(0.6496530239639768)
-                        .endFraction(END_FRACTION_1).build(),
-                MatchedLink.builder().linkId(6405238).reversed(false).startFraction(START_FRACTION_0)
-                        .endFraction(END_FRACTION_1).build(),
-                MatchedLink.builder().linkId(6405239).reversed(false).startFraction(START_FRACTION_0)
-                        .endFraction(END_FRACTION_1).build(),
-                MatchedLink.builder().linkId(6405226).reversed(false).startFraction(START_FRACTION_0)
-                        .endFraction(END_FRACTION_1).build(),
-                MatchedLink.builder().linkId(6405227).reversed(false).startFraction(START_FRACTION_0)
-                        .endFraction(END_FRACTION_1).build(),
-                MatchedLink.builder().linkId(6405228).reversed(false).startFraction(START_FRACTION_0)
-                        .endFraction(END_FRACTION_1).build(),
-                MatchedLink.builder().linkId(6405229).reversed(false).startFraction(START_FRACTION_0)
-                        .endFraction(END_FRACTION_1).build(),
-                MatchedLink.builder().linkId(6405230).reversed(false).startFraction(START_FRACTION_0)
-                        .endFraction(END_FRACTION_1).build(),
-                MatchedLink.builder().linkId(6405231).reversed(false).startFraction(START_FRACTION_0)
-                        .endFraction(END_FRACTION_1).build(),
-                MatchedLink.builder().linkId(6405232).reversed(false).startFraction(START_FRACTION_0)
-                        .endFraction(END_FRACTION_1).build(),
-                MatchedLink.builder().linkId(6405233).reversed(false).startFraction(START_FRACTION_0)
-                        .endFraction(END_FRACTION_1).build(),
-                MatchedLink.builder().linkId(6369284).reversed(false).startFraction(START_FRACTION_0)
-                        .endFraction(END_FRACTION_1).build(),
-                MatchedLink.builder().linkId(6369285).reversed(false).startFraction(START_FRACTION_0)
-                        .endFraction(END_FRACTION_1).build(),
-                MatchedLink.builder().linkId(6369286).reversed(false).startFraction(START_FRACTION_0)
-                        .endFraction(END_FRACTION_1).build(),
-                MatchedLink.builder().linkId(6369287).reversed(false).startFraction(START_FRACTION_0)
-                        .endFraction(END_FRACTION_1).build(),
-                MatchedLink.builder().linkId(6369288).reversed(false).startFraction(START_FRACTION_0)
-                        .endFraction(0.9813310134286733).build());
+        assertThat(lineStringMatch.getMatchedLinks())
+                .containsExactly(
+                        MatchedLink
+                                .builder()
+                                .linkId(6405237)
+                                .reversed(false)
+                                .distance(16.778291076754744)
+                                .startFraction(0.6496530239639768)
+                                .endFraction(END_FRACTION_1)
+                                .build(),
+                        MatchedLink.builder()
+                                .linkId(6405238)
+                                .reversed(false)
+                                .distance(47.9205870917096)
+                                .startFraction(START_FRACTION_0)
+                                .endFraction(END_FRACTION_1)
+                                .build(),
+                        MatchedLink.builder()
+                                .linkId(6405239)
+                                .reversed(false)
+                                .distance(47.949831373948484)
+                                .startFraction(START_FRACTION_0)
+                                .endFraction(END_FRACTION_1)
+                                .build(),
+                        MatchedLink.builder()
+                                .linkId(6405226)
+                                .reversed(false)
+                                .distance(47.2778725149238)
+                                .startFraction(START_FRACTION_0)
+                                .endFraction(END_FRACTION_1)
+                                .build(),
+                        MatchedLink.builder()
+                                .linkId(6405227)
+                                .reversed(false)
+                                .distance(47.29028486517949)
+                                .startFraction(START_FRACTION_0)
+                                .endFraction(END_FRACTION_1)
+                                .build(),
+                        MatchedLink.builder()
+                                .linkId(6405228)
+                                .reversed(false)
+                                .distance(47.27890649156571)
+                                .startFraction(START_FRACTION_0)
+                                .endFraction(END_FRACTION_1)
+                                .build(),
+                        MatchedLink.builder()
+                                .linkId(6405229)
+                                .reversed(false)
+                                .distance(47.28626401413389)
+                                .startFraction(START_FRACTION_0)
+                                .endFraction(END_FRACTION_1)
+                                .build(),
+                        MatchedLink.builder()
+                                .linkId(6405230)
+                                .reversed(false)
+                                .distance(47.28629148349626)
+                                .startFraction(START_FRACTION_0)
+                                .endFraction(END_FRACTION_1)
+                                .build(),
+                        MatchedLink.builder()
+                                .linkId(6405231)
+                                .reversed(false)
+                                .distance(47.2863189526818)
+                                .startFraction(START_FRACTION_0)
+                                .endFraction(END_FRACTION_1)
+                                .build(),
+                        MatchedLink.builder()
+                                .linkId(6405232)
+                                .reversed(false)
+                                .distance(47.27620456112605)
+                                .startFraction(START_FRACTION_0)
+                                .endFraction(END_FRACTION_1)
+                                .build(),
+                        MatchedLink.builder()
+                                .linkId(6405233)
+                                .reversed(false)
+                                .distance(47.27258911093719)
+                                .startFraction(START_FRACTION_0)
+                                .endFraction(END_FRACTION_1)
+                                .build(),
+                        MatchedLink.builder()
+                                .linkId(6369284)
+                                .reversed(false)
+                                .distance(47.40127154230754)
+                                .startFraction(START_FRACTION_0)
+                                .endFraction(END_FRACTION_1)
+                                .build(),
+                        MatchedLink.builder()
+                                .linkId(6369285)
+                                .reversed(false)
+                                .distance(47.441537785852276)
+                                .startFraction(START_FRACTION_0)
+                                .endFraction(END_FRACTION_1)
+                                .build(),
+                        MatchedLink.builder()
+                                .linkId(6369286)
+                                .reversed(false)
+                                .distance(47.43760357701261)
+                                .startFraction(START_FRACTION_0)
+                                .endFraction(END_FRACTION_1)
+                                .build(),
+                        MatchedLink.builder()
+                                .linkId(6369287)
+                                .reversed(false)
+                                .distance(47.42443190911065)
+                                .startFraction(START_FRACTION_0)
+                                .endFraction(END_FRACTION_1)
+                                .build(),
+                        MatchedLink.builder()
+                                .linkId(6369288)
+                                .reversed(false)
+                                .distance(46.560118306514006)
+                                .startFraction(START_FRACTION_0)
+                                .endFraction(0.9813310134286733)
+                                .build());
         assertThat(lineStringMatch.getUpstreamLinkIds()).isNull();
         assertThat(lineStringMatch.getDownstreamLinkIds()).isNull();
         assertThat(lineStringMatch.getStartLinkFraction()).isEqualTo(0.6496530239639768);
@@ -115,6 +199,7 @@ class StartToEndMapMatcherIT {
                 StandardCharsets.UTF_8);
         LineStringLocation lineStringLocation = mapper.readValue(locationJson, LineStringLocation.class);
         LineStringMatch lineStringMatch = startToEndMapMatcher.match(lineStringLocation);
+        verifySumDistanceOfIndividualRoadSections(lineStringMatch);
         assertSuccess(lineStringMatch, new Coordinate[]{new Coordinate(5.431641, 52.17898),
                 new Coordinate(5.431601, 52.178947), new Coordinate(5.43111, 52.178622),
                 new Coordinate(5.431077, 52.1786), new Coordinate(5.430663, 52.178413),
@@ -154,6 +239,7 @@ class StartToEndMapMatcherIT {
                 .build();
 
         LineStringMatch lineStringMatch = startToEndMapMatcher.match(lineStringLocation);
+        verifySumDistanceOfIndividualRoadSections(lineStringMatch);
         assertSuccess(lineStringMatch, new Coordinate[]{new Coordinate(5.431641, 52.17898),
                 new Coordinate(5.431077, 52.1786), new Coordinate(5.430663, 52.178413),
                 new Coordinate(5.430206, 52.178246), new Coordinate(5.429884, 52.178165),
@@ -171,30 +257,90 @@ class StartToEndMapMatcherIT {
         assertThat(lineStringMatch.getLocationIndex()).isEqualTo(-1);
         assertThat(lineStringMatch.isReversed()).isTrue();
         assertThat(lineStringMatch.getMatchedLinks()).containsExactly(
-                MatchedLink.builder().linkId(3666097).reversed(false).startFraction(0.8813982849151963)
-                        .endFraction(END_FRACTION_1).build(),
-                MatchedLink.builder().linkId(3666076).reversed(false).startFraction(START_FRACTION_0)
-                        .endFraction(END_FRACTION_1).build(),
-                MatchedLink.builder().linkId(3666077).reversed(false).startFraction(START_FRACTION_0)
-                        .endFraction(END_FRACTION_1).build(),
-                MatchedLink.builder().linkId(3666078).reversed(false).startFraction(START_FRACTION_0)
-                        .endFraction(END_FRACTION_1).build(),
-                MatchedLink.builder().linkId(3666079).reversed(false).startFraction(START_FRACTION_0)
-                        .endFraction(END_FRACTION_1).build(),
-                MatchedLink.builder().linkId(3666080).reversed(false).startFraction(START_FRACTION_0)
-                        .endFraction(END_FRACTION_1).build(),
-                MatchedLink.builder().linkId(3666081).reversed(false).startFraction(START_FRACTION_0)
-                        .endFraction(END_FRACTION_1).build(),
-                MatchedLink.builder().linkId(3666082).reversed(false).startFraction(START_FRACTION_0)
-                        .endFraction(END_FRACTION_1).build(),
-                MatchedLink.builder().linkId(3666083).reversed(false).startFraction(START_FRACTION_0)
-                        .endFraction(END_FRACTION_1).build(),
-                MatchedLink.builder().linkId(3666084).reversed(false).startFraction(START_FRACTION_0)
-                        .endFraction(END_FRACTION_1).build(),
-                MatchedLink.builder().linkId(3666085).reversed(false).startFraction(START_FRACTION_0)
-                        .endFraction(END_FRACTION_1).build(),
-                MatchedLink.builder().linkId(3666086).reversed(false).startFraction(START_FRACTION_0)
-                        .endFraction(0.4580642228401559).build());
+                MatchedLink
+                        .builder()
+                        .linkId(3666097)
+                        .reversed(false)
+                        .distance(4.606277878496104)
+                        .startFraction(0.8813982849151963)
+                        .endFraction(END_FRACTION_1)
+                        .build(),
+                MatchedLink.builder()
+                        .linkId(3666076)
+                        .reversed(false)
+                        .distance(49.35391266671562)
+                        .startFraction(START_FRACTION_0)
+                        .endFraction(END_FRACTION_1)
+                        .build(),
+                MatchedLink.builder()
+                        .linkId(3666077)
+                        .reversed(false)
+                        .distance(49.37020988457812)
+                        .startFraction(START_FRACTION_0)
+                        .endFraction(END_FRACTION_1)
+                        .build(),
+                MatchedLink.builder().linkId(3666078)
+                        .reversed(false)
+                        .distance(49.4042427750329)
+                        .startFraction(START_FRACTION_0)
+                        .endFraction(END_FRACTION_1)
+                        .build(),
+                MatchedLink.builder()
+                        .linkId(3666079)
+                        .reversed(false)
+                        .distance(49.34170254220332)
+                        .startFraction(START_FRACTION_0)
+                        .endFraction(END_FRACTION_1)
+                        .build(),
+                MatchedLink.builder()
+                        .linkId(3666080)
+                        .reversed(false)
+                        .distance(49.378713223864594)
+                        .startFraction(START_FRACTION_0)
+                        .endFraction(END_FRACTION_1)
+                        .build(),
+                MatchedLink.builder()
+                        .linkId(3666081)
+                        .reversed(false)
+                        .distance(49.3572706954056)
+                        .startFraction(START_FRACTION_0)
+                        .endFraction(END_FRACTION_1)
+                        .build(),
+                MatchedLink.builder()
+                        .linkId(3666082)
+                        .reversed(false)
+                        .distance(49.39696866946102)
+                        .startFraction(START_FRACTION_0)
+                        .endFraction(END_FRACTION_1)
+                        .build(),
+                MatchedLink.builder()
+                        .linkId(3666083)
+                        .reversed(false)
+                        .distance(49.37634675580076)
+                        .startFraction(START_FRACTION_0)
+                        .endFraction(END_FRACTION_1)
+                        .build(),
+                MatchedLink.builder()
+                        .linkId(3666084)
+                        .reversed(false)
+                        .distance(49.40652704805976)
+                        .startFraction(START_FRACTION_0)
+                        .endFraction(END_FRACTION_1)
+                        .build(),
+                MatchedLink.builder()
+                        .linkId(3666085)
+                        .reversed(false)
+                        .distance(49.37832995226587)
+                        .startFraction(START_FRACTION_0)
+                        .endFraction(END_FRACTION_1)
+                        .build(),
+                MatchedLink.builder()
+                        .linkId(3666086)
+                        .reversed(false)
+                        .distance(22.597894098636313)
+                        .startFraction(START_FRACTION_0)
+                        .endFraction(0.4580642228401559)
+                        .build());
         assertThat(lineStringMatch.getUpstreamLinkIds())
                 .containsExactlyInAnyOrder(3666097, 3666096, 3666095, 3666094, 7223062, 7223061);
         assertThat(lineStringMatch.getDownstreamLinkIds())
@@ -234,5 +380,14 @@ class StartToEndMapMatcherIT {
         assertThat(lineStringMatch.getWeight()).isEqualTo(0.0);
         assertThat(lineStringMatch.getDuration()).isEqualTo(0.0);
         assertThat(lineStringMatch.getDistance()).isEqualTo(0.0);
+    }
+
+    private static void verifySumDistanceOfIndividualRoadSections(LineStringMatch lineStringMatch) {
+        assertThat((Double) lineStringMatch.getMatchedLinks()
+                .stream()
+                .map(MatchedLink::getDistance)
+                .mapToDouble(Double::doubleValue)
+                .sum())
+                .isCloseTo(lineStringMatch.getDistance(), Percentage.withPercentage(0.1));
     }
 }
