@@ -53,6 +53,7 @@ class IsochroneMatchMapperTest {
     @Mock
     private PointListUtil pointListUtil;
 
+
     @Mock
     private EdgeIteratorState currentEdge;
     @Mock
@@ -101,7 +102,6 @@ class IsochroneMatchMapperTest {
 
         IsoLabel isoLabel = createIsoLabelWithNonRootParent(0, 0);
         setupFixture(0, isoLabel);
-
         when(pointListUtil.toLineString(pointList)).thenReturn(isoLabelWayGeometry);
         when(queryGraph.getEdgeIteratorState(isoLabel.getParent().getEdge(), isoLabel.getParent().getNode()))
                 .thenReturn(parentEdge);
@@ -121,6 +121,7 @@ class IsochroneMatchMapperTest {
         assertThat(isochroneMatch.getStartFraction()).isEqualTo(0);
         assertThat(isochroneMatch.getEndFraction()).isEqualTo(1.0);
         assertThat(isochroneMatch.isReversed()).isFalse();
+        assertThat(isochroneMatch.getDistance()).isEqualTo(250.30366999283603);
         assertThat(isochroneMatch.getGeometry()).isEqualTo(isoLabelWayGeometry);
         assertThat(isochroneMatch.getParentLink().getLinkId()).isEqualTo(PARENT_LINK_ID);
         assertThat(isochroneMatch.getParentLink().isReversed()).isFalse();
@@ -143,6 +144,7 @@ class IsochroneMatchMapperTest {
         assertThat(isochroneMatch.getStartFraction()).isEqualTo(0);
         assertThat(isochroneMatch.getEndFraction()).isEqualTo(0.6337610596812917);
         assertThat(isochroneMatch.isReversed()).isFalse();
+        assertThat(isochroneMatch.getDistance()).isEqualTo(158.6327191367761);
         assertThat(isochroneMatch.getGeometry()).isEqualTo(isoLabelWayGeometry);
     }
 
@@ -163,6 +165,7 @@ class IsochroneMatchMapperTest {
         assertThat(isochroneMatch.getStartFraction()).isEqualTo(0.6337610596812917);
         assertThat(isochroneMatch.getEndFraction()).isEqualTo(0);
         assertThat(isochroneMatch.isReversed()).isFalse();
+        assertThat(isochroneMatch.getDistance()).isEqualTo(158.6327191367761);
         assertThat(isochroneMatch.getGeometry()).isEqualTo(isoLabelWayGeometry.reverse());
     }
 
@@ -183,6 +186,7 @@ class IsochroneMatchMapperTest {
         assertThat(isochroneMatch.getStartFraction()).isEqualTo(0.3662389403187083);
         assertThat(isochroneMatch.getEndFraction()).isEqualTo(1);
         assertThat(isochroneMatch.isReversed()).isFalse();
+        assertThat(isochroneMatch.getDistance()).isEqualTo(158.6327191367761);
         assertThat(isochroneMatch.getGeometry()).isEqualTo(isoLabelWayGeometry.reverse());
     }
 
@@ -204,6 +208,7 @@ class IsochroneMatchMapperTest {
         assertThat(isochroneMatch.getStartFraction()).isEqualTo(0.0);
         assertThat(isochroneMatch.getEndFraction()).isEqualTo(0.5063949887068743);
         assertThat(isochroneMatch.isReversed()).isFalse();
+        assertThat(isochroneMatch.getDistance()).isEqualTo(126.75252413931139);
         assertThat(isochroneMatch.getGeometry().getLength()).isLessThan(originalGeometry.getLength());
 
         double lengthInMeters = fractionAndDistanceCalculator.calculateLengthInMeters(isochroneMatch.getGeometry());
@@ -250,7 +255,7 @@ class IsochroneMatchMapperTest {
 
         // If reversed EdgeIterator returns reversed geometry
         LineString wayGeometry = isoLabelWayGeometry.reverse();
-        setupFixtureReversed(MATCHED_REVERSED_LINK_ID, isoLabel);
+        setupFixtureReversed(isoLabel);
         when(edgeIteratorStateReverseExtractor.hasReversed(startEdge)).thenReturn(true);
         when(startEdge.fetchWayGeometry(FetchMode.ALL)).thenReturn(pointList);
         when(pointListUtil.toLineString(pointList)).thenReturn(wayGeometry, startSegmentWayGeometry);
@@ -277,13 +282,14 @@ class IsochroneMatchMapperTest {
         when(currentEdge.fetchWayGeometry(FetchMode.ALL)).thenReturn(pointList);
     }
 
-    private void setupFixtureReversed(int linkId, IsoLabel isoLabel) {
+    private void setupFixtureReversed(IsoLabel isoLabel) {
 
         when(queryGraph.getEdgeIteratorState(isoLabel.getEdge(), isoLabel.getNode())).thenReturn(currentEdge);
         when(edgeIteratorStateReverseExtractor.hasReversed(currentEdge)).thenReturn(true);
         when(encodingManager.getIntEncodedValue(REVERSED_LINK_ID)).thenReturn(matchedReversedLinkIdEncodedValue);
         when(currentEdge.get(matchedReversedLinkIdEncodedValue)).thenReturn(MATCHED_REVERSED_LINK_ID);
-        when(startEdge.get(matchedReversedLinkIdEncodedValue)).thenReturn(linkId);
+        when(startEdge.get(matchedReversedLinkIdEncodedValue)).thenReturn(
+                IsochroneMatchMapperTest.MATCHED_REVERSED_LINK_ID);
         when(currentEdge.fetchWayGeometry(FetchMode.ALL)).thenReturn(pointList);
     }
 

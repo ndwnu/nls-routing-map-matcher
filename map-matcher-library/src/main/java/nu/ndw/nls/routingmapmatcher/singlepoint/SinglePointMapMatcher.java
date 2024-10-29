@@ -64,7 +64,8 @@ public class SinglePointMapMatcher implements MapMatcher<SinglePointLocation, Si
     public SinglePointMapMatcher(DiameterToPolygonMapper diameterToPolygonMapper,
             BearingCalculator bearingCalculator, GeometryFactoryWgs84 geometryFactoryWgs84,
             FractionAndDistanceCalculator fractionAndDistanceCalculator, NetworkGraphHopper network,
-            String profileName, ClosestPointService closestPointService) {
+            String profileName, ClosestPointService closestPointService,
+            PointListUtil pointListUtil) {
         this.diameterToPolygonMapper = diameterToPolygonMapper;
         this.network = Preconditions.checkNotNull(network);
         this.profile = Preconditions.checkNotNull(network.getProfile(profileName));
@@ -73,7 +74,7 @@ public class SinglePointMapMatcher implements MapMatcher<SinglePointLocation, Si
         EncodingManager encodingManager = network.getEncodingManager();
         Weighting shortestWeightingForIsochrone = network.createWeighting(profile, createShortestDistanceHints());
         this.edgeIteratorStateReverseExtractor = new EdgeIteratorStateReverseExtractor();
-        this.pointListUtil = new PointListUtil();
+        this.pointListUtil = pointListUtil;
         this.isochroneService = new IsochroneService(encodingManager, baseGraph,
                 new IsochroneMatchMapper(encodingManager, edgeIteratorStateReverseExtractor,
                         pointListUtil,

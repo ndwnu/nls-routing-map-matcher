@@ -1,6 +1,7 @@
 package nu.ndw.nls.routingmapmatcher.routing;
 
 import static nu.ndw.nls.routingmapmatcher.testutil.TestNetworkProvider.getNetworkService;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -18,6 +19,7 @@ import nu.ndw.nls.routingmapmatcher.network.model.DirectionalDto;
 import nu.ndw.nls.routingmapmatcher.network.model.LinkVehicleMapper;
 import nu.ndw.nls.routingmapmatcher.network.model.RoutingNetworkSettings;
 import nu.ndw.nls.routingmapmatcher.testutil.TestNetworkProvider;
+import org.assertj.core.data.Percentage;
 import org.geotools.geometry.jts.WKTReader2;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -103,7 +105,7 @@ class RoutingFractionsIT {
                 .routingProfile(PROFILE_NAME)
                 .wayPoints(List.of(pointA, pointB))
                 .build());
-
+        verifySumDistanceOfIndividualRoadSections(resultA);
         assertEquals(1, resultA.getLegs().size());
         RoutingLegResponse routingLegResponseA = resultA.getLegs().getFirst();
         assertEquals(1, routingLegResponseA.getMatchedLinks().size());
@@ -118,7 +120,7 @@ class RoutingFractionsIT {
                 .routingProfile(PROFILE_NAME)
                 .wayPoints(List.of(pointB, pointA))
                 .build());
-
+        verifySumDistanceOfIndividualRoadSections(resultB);
         assertEquals(1, resultB.getLegs().size());
         RoutingLegResponse routingLegResponseB = resultB.getLegs().getFirst();
         List<MatchedLink> matchedLinks = routingLegResponseB.getMatchedLinks();
@@ -131,10 +133,10 @@ class RoutingFractionsIT {
 
         assertEquals(1.0, matchedLinkA.getStartFraction() + matchedLinkB.getEndFraction(), 0.0000001,
                 "Fractions are in the direction of driving, therefore the sum of the fraction and the fraction of the "
-                        + "same point traveling in the reverse direction should always end up as 1.0");
+                + "same point traveling in the reverse direction should always end up as 1.0");
         assertEquals(1.0, matchedLinkA.getEndFraction() + matchedLinkB.getStartFraction(), 0.0000001,
                 "Fractions are in the direction of driving, therefore the sum of the fraction and the fraction of the "
-                        + "same point traveling in the in reverse direction should always end up as 1.0");
+                + "same point traveling in the in reverse direction should always end up as 1.0");
     }
 
     /**
@@ -150,51 +152,63 @@ class RoutingFractionsIT {
                         createPoint(5.42576075, 52.17986470),
                         createPoint(5.42639323, 52.17976530)))
                 .build());
+        verifySumDistanceOfIndividualRoadSections(result);
+        assertThat(result).isEqualTo(RoutingResponse.builder()
+                .geometry(createLineString())
+                .snappedWaypoints(List.of(createPoint(5.425122870485016, 52.17986902304874),
+                        createPoint(5.425755082159361, 52.17986556367133),
+                        createPoint(5.426393415313249, 52.179772178137206)))
+                .distance(107.739)
+                .weight(38.786)
+                .duration(38.787)
+                .legs(List.of(RoutingLegResponse.builder()
+                                .matchedLinks(List.of(
+                                        MatchedLink.builder()
+                                                .linkId(6369283)
+                                                .reversed(false)
+                                                .distance(42.10921482022403)
+                                                .startFraction(0.11164377136022784)
+                                                .endFraction(1.0)
+                                                .build(),
+                                        MatchedLink.builder()
+                                                .linkId(6405185)
+                                                .reversed(true)
+                                                .distance(9.926436244977584)
+                                                .startFraction(0.0)
+                                                .endFraction(0.2075867812415673)
+                                                .build())
+                                ).build(),
+                        RoutingLegResponse.builder()
+                                .matchedLinks(List.of(
+                                        MatchedLink.builder()
+                                                .linkId(6405185)
+                                                .reversed(false)
+                                                .distance(9.926436244977584)
+                                                .startFraction(0.7924132187612766)
+                                                .endFraction(1.0)
+                                                .build(),
+                                        MatchedLink.builder()
+                                                .linkId(6405218)
+                                                .reversed(false)
+                                                .distance(46.06958804725149)
+                                                .startFraction(0.0)
+                                                .endFraction(0.9745518261996916)
+                                                .build())
+                                ).build()
+                )).build()
 
-        assertEquals(RoutingResponse.builder()
-                        .geometry(createLineString())
-                        .snappedWaypoints(List.of(createPoint(5.425122870485016, 52.17986902304874),
-                                createPoint(5.425755082159361, 52.17986556367133),
-                                createPoint(5.426393415313249, 52.179772178137206)))
-                        .distance(107.739)
-                        .weight(38.786)
-                        .duration(38.787)
-                        .legs(List.of(RoutingLegResponse.builder()
-                                        .matchedLinks(List.of(
-                                                MatchedLink.builder()
-                                                        .linkId(6369283)
-                                                        .reversed(false)
-                                                        .startFraction(0.11164377136022784)
-                                                        .endFraction(1.0)
-                                                        .build(),
-                                                MatchedLink.builder()
-                                                        .linkId(6405185)
-                                                        .reversed(true)
-                                                        .startFraction(0.0)
-                                                        .endFraction(0.2075867812415673)
-                                                        .build())
-                                        ).build(),
-                                RoutingLegResponse.builder()
-                                        .matchedLinks(List.of(
-                                                MatchedLink.builder()
-                                                        .linkId(6405185)
-                                                        .reversed(false)
-                                                        .startFraction(0.7924132187612766)
-                                                        .endFraction(1.0)
-                                                        .build(),
-                                                MatchedLink.builder()
-                                                        .linkId(6405218)
-                                                        .reversed(false)
-                                                        .startFraction(0.0)
-                                                        .endFraction(0.9745518261996916)
-                                                        .build())
-                                        ).build()
-                        )).build(),
-                result
         );
 
     }
 
+    private static void verifySumDistanceOfIndividualRoadSections(RoutingResponse response) {
+        assertThat((Double) response.getMatchedLinks()
+                .stream()
+                .map(MatchedLink::getDistance)
+                .mapToDouble(Double::doubleValue)
+                .sum())
+                .isCloseTo(response.getDistance(), Percentage.withPercentage(0.3));
+    }
     @SneakyThrows
     private LineString createLineString() {
         WKTReader wktReader = new WKTReader2();

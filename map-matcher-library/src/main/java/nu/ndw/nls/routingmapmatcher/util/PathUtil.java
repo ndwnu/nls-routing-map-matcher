@@ -3,6 +3,7 @@ package nu.ndw.nls.routingmapmatcher.util;
 import static nu.ndw.nls.routingmapmatcher.network.model.Link.REVERSED_LINK_ID;
 import static nu.ndw.nls.routingmapmatcher.network.model.Link.WAY_ID_KEY;
 
+import com.conductor.stream.utils.OrderedStreamUtils;
 import com.graphhopper.routing.ev.VehicleAccess;
 import com.graphhopper.routing.querygraph.QueryGraph;
 import com.graphhopper.routing.querygraph.VirtualEdgeIteratorState;
@@ -14,6 +15,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import nu.ndw.nls.geometry.distance.FractionAndDistanceCalculator;
+import nu.ndw.nls.geometry.factories.GeometryFactoryWgs84;
 import nu.ndw.nls.routingmapmatcher.model.EdgeIteratorTravelDirection;
 import nu.ndw.nls.routingmapmatcher.model.linestring.MatchedEdgeLink;
 import org.locationtech.jts.geom.Coordinate;
@@ -23,13 +25,15 @@ public final class PathUtil {
 
     private static final EdgeIteratorStateReverseExtractor EDGE_ITERATOR_STATE_REVERSE_EXTRACTOR =
             new EdgeIteratorStateReverseExtractor();
-    private static final PointListUtil POINT_LIST_UTIL = new PointListUtil();
+    //todo : replace logic in this class to spring managed service
+    private static final PointListUtil POINT_LIST_UTIL = new PointListUtil(new GeometryFactoryWgs84());
 
     private PathUtil() {
         // Util class
     }
 
     public static List<MatchedEdgeLink> determineMatchedLinks(EncodingManager encodingManager,
+            FractionAndDistanceCalculator fractionAndDistanceCalculator,
             Collection<EdgeIteratorState> edges) {
         List<MatchedEdgeLink> matchedEdgeLinks = new ArrayList<>();
         for (EdgeIteratorState edge : edges) {
@@ -37,15 +41,39 @@ public final class PathUtil {
             int matchedLinkId = reversed && hasReversedLinkId(encodingManager, edge)
                     ? getReversedLinkId(encodingManager, edge)
                     : getLinkId(encodingManager, edge);
-            if (matchedEdgeLinks.isEmpty() ||
-                    matchedEdgeLinks.getLast().getLinkId() != matchedLinkId) {
-                matchedEdgeLinks.add(MatchedEdgeLink.builder()
-                        .linkId(matchedLinkId)
-                        .reversed(reversed && !hasReversedLinkId(encodingManager, edge))
-                        .build());
-            }
+            LineString lineString = POINT_LIST_UTIL.toLineString(edge.fetchWayGeometry(FetchMode.ALL));
+            matchedEdgeLinks.add(MatchedEdgeLink.builder()
+                    .linkId(matchedLinkId)
+                    .distance(fractionAndDistanceCalculator.calculateLengthInMeters(lineString))
+                    .reversed(reversed && !hasReversedLinkId(encodingManager, edge))
+                    .build());
         }
-        return matchedEdgeLinks;
+
+        // Road sections can be subdivided into multiple virtual edges because of via points in routing and match requests.
+        // See https://github.com/graphhopper/graphhopper/blob/master/docs/core/low-level-api.md#what-are-virtual-edges-and-nodes
+        // In the output
+        // we need to group over road sections with the same linkId and direction and take the sum of the distances.
+        return OrderedStreamUtils.groupBy(matchedEdgeLinks
+                        .stream(), PathUtil::byLinkIdAndDirection)
+                .map(PathUtil::reduceWithSummedDistance)
+                .toList();
+    }
+
+    private static String byLinkIdAndDirection(MatchedEdgeLink matchedEdgeLink) {
+        return matchedEdgeLink.getLinkId() + "_" + matchedEdgeLink.isReversed();
+    }
+
+    private static MatchedEdgeLink reduceWithSummedDistance(List<MatchedEdgeLink> grouped) {
+        double totalDistance = grouped.stream()
+                .map(MatchedEdgeLink::getDistance)
+                .mapToDouble(Double::doubleValue)
+                .sum();
+        return MatchedEdgeLink
+                .builder()
+                .distance(totalDistance)
+                .linkId(grouped.getFirst().getLinkId())
+                .reversed(grouped.getFirst().isReversed())
+                .build();
     }
 
     private static int getLinkId(EncodingManager encodingManager, EdgeIteratorState edge) {

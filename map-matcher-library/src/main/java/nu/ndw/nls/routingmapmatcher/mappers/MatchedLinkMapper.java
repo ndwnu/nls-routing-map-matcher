@@ -46,6 +46,7 @@ public class MatchedLinkMapper {
                     .linkId(matchedEdgeLink.getLinkId())
                     .reversed(matchedEdgeLink.isReversed())
                     .startFraction(startFraction)
+                    .distance(matchedEdgeLink.getDistance())
                     .endFraction(endFraction)
                     .build());
 

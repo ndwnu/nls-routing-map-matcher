@@ -45,7 +45,7 @@ public class LineStringMatchUtil {
     private final FractionAndDistanceCalculator fractionAndDistanceCalculator;
 
     public LineStringMatchUtil(NetworkGraphHopper networkGraphHopper, Profile profile,
-            FractionAndDistanceCalculator fractionAndDistanceCalculator) {
+            FractionAndDistanceCalculator fractionAndDistanceCalculator, PointListUtil pointListUtil) {
 
         PMap requestHints = createShortestDistanceHints();
         Weighting shortestWeighting = networkGraphHopper.createWeighting(profile, requestHints);
@@ -53,7 +53,7 @@ public class LineStringMatchUtil {
         this.encodingManager = networkGraphHopper.getEncodingManager();
         this.fractionAndDistanceCalculator = fractionAndDistanceCalculator;
         EdgeIteratorStateReverseExtractor edgeIteratorStateReverseExtractor = new EdgeIteratorStateReverseExtractor();
-        this.pointListUtil = new PointListUtil();
+        this.pointListUtil = pointListUtil;
         IsochroneMatchMapper isochroneMatchMapper = new IsochroneMatchMapper(encodingManager,
                 edgeIteratorStateReverseExtractor, pointListUtil, fractionAndDistanceCalculator);
         this.isochroneService = new IsochroneService(encodingManager,
@@ -86,7 +86,8 @@ public class LineStringMatchUtil {
                 fractionAndDistanceCalculator);
 
         List<MatchedLink> matchedLinks = matchedLinkMapper.map(
-                PathUtil.determineMatchedLinks(encodingManager, edges), startLinkFraction, endLinkFraction);
+                PathUtil.determineMatchedLinks(encodingManager, fractionAndDistanceCalculator, edges),
+                startLinkFraction, endLinkFraction);
 
         Point startPoint = pointListUtil.toLineString(startEdge.fetchWayGeometry(FetchMode.ALL)).getStartPoint();
         MatchedLink startLink = matchedLinks.getFirst();

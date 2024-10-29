@@ -19,4 +19,5 @@ public class MatchedLink {
     private final boolean reversed;
     private final double startFraction;
     private final double endFraction;
+    private final double distance;
 }

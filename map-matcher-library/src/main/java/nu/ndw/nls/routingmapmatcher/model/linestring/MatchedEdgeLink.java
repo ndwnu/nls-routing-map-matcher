@@ -13,4 +13,5 @@ public class MatchedEdgeLink {
 
     private final int linkId;
     private final boolean reversed;
+    private final double distance;
 }
