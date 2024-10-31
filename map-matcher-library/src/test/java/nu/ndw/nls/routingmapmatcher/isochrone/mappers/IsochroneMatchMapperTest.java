@@ -144,7 +144,7 @@ class IsochroneMatchMapperTest {
         assertThat(isochroneMatch.getStartFraction()).isEqualTo(0);
         assertThat(isochroneMatch.getEndFraction()).isEqualTo(0.6337610596812917);
         assertThat(isochroneMatch.isReversed()).isFalse();
-        assertThat(isochroneMatch.getDistance()).isEqualTo(158.6327191367761);
+        assertThat(isochroneMatch.getDistance()).isEqualTo(250.30366999283606);
         assertThat(isochroneMatch.getGeometry()).isEqualTo(isoLabelWayGeometry);
     }
 
@@ -165,7 +165,7 @@ class IsochroneMatchMapperTest {
         assertThat(isochroneMatch.getStartFraction()).isEqualTo(0.6337610596812917);
         assertThat(isochroneMatch.getEndFraction()).isEqualTo(0);
         assertThat(isochroneMatch.isReversed()).isFalse();
-        assertThat(isochroneMatch.getDistance()).isEqualTo(158.6327191367761);
+        assertThat(isochroneMatch.getDistance()).isEqualTo(250.30366999283606);
         assertThat(isochroneMatch.getGeometry()).isEqualTo(isoLabelWayGeometry.reverse());
     }
 
@@ -186,7 +186,7 @@ class IsochroneMatchMapperTest {
         assertThat(isochroneMatch.getStartFraction()).isEqualTo(0.3662389403187083);
         assertThat(isochroneMatch.getEndFraction()).isEqualTo(1);
         assertThat(isochroneMatch.isReversed()).isFalse();
-        assertThat(isochroneMatch.getDistance()).isEqualTo(158.6327191367761);
+        assertThat(isochroneMatch.getDistance()).isEqualTo(250.30366999283606);
         assertThat(isochroneMatch.getGeometry()).isEqualTo(isoLabelWayGeometry.reverse());
     }
 
@@ -208,7 +208,7 @@ class IsochroneMatchMapperTest {
         assertThat(isochroneMatch.getStartFraction()).isEqualTo(0.0);
         assertThat(isochroneMatch.getEndFraction()).isEqualTo(0.5063949887068743);
         assertThat(isochroneMatch.isReversed()).isFalse();
-        assertThat(isochroneMatch.getDistance()).isEqualTo(126.75252413931139);
+        assertThat(isochroneMatch.getDistance()).isEqualTo(200.00049261949482);
         assertThat(isochroneMatch.getGeometry().getLength()).isLessThan(originalGeometry.getLength());
 
         double lengthInMeters = fractionAndDistanceCalculator.calculateLengthInMeters(isochroneMatch.getGeometry());

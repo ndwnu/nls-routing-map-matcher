@@ -70,7 +70,7 @@ public class IsochroneMatchMapper {
         double correctedEndFraction = reverseFlow ? (1 - startFraction) : endFraction;
         boolean correctedReversed = (reversed != reverseFlow) && !hasReversedLinkId(currentEdge);
         LineString correctedGeometry = reverseFlow ? partialGeometry.reverse() : partialGeometry;
-        double fullDistance = fractionAndDistanceCalculator.calculateLengthInMeters(isoLabelWayGeometry);
+        double fullDistance = fractionAndDistanceCalculator.calculateLengthInMeters(fullGeometry);
         double linkDistance = Math.abs(fullDistance * (correctedEndFraction - correctedStartFraction));
         return IsochroneMatch
                 .builder()
