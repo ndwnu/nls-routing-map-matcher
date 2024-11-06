@@ -21,4 +21,5 @@ extends:
     mavenReleaseGoal: deploy
     sonarOptionalCoverageExclusions: '**/config/**'
     sonarOptionalExclusions: '**/graphhopper/isochrone/ShortestPathTree.java,**/graphhopper/routing/PathRouter.java,**/graphhopper/routing/querygraph/VirtualEdgeIteratorStateReverseExtractor.java'
+    mavenDeployToNdwShared: true
     pushToGitHub: true
