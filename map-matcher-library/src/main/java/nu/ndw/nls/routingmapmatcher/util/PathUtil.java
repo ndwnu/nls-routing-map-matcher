@@ -5,6 +5,7 @@ import static nu.ndw.nls.routingmapmatcher.network.model.Link.WAY_ID_KEY;
 
 import com.conductor.stream.utils.OrderedStreamUtils;
 import com.graphhopper.routing.ev.BooleanEncodedValue;
+import com.graphhopper.routing.ev.EncodedValueLookup;
 import com.graphhopper.routing.ev.VehicleAccess;
 import com.graphhopper.routing.querygraph.QueryGraph;
 import com.graphhopper.routing.querygraph.VirtualEdgeIteratorState;
@@ -13,7 +14,6 @@ import com.graphhopper.storage.EdgeIteratorStateReverseExtractor;
 import com.graphhopper.util.EdgeIteratorState;
 import com.graphhopper.util.FetchMode;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import nu.ndw.nls.geometry.distance.FractionAndDistanceCalculator;
 import nu.ndw.nls.geometry.factories.GeometryFactoryWgs84;
@@ -33,9 +33,12 @@ public final class PathUtil {
         // Util class
     }
 
-    public static List<MatchedEdgeLink> determineMatchedLinks(EncodingManager encodingManager,
+    public static List<MatchedEdgeLink> determineMatchedLinks(
+            EncodingManager encodingManager,
+            QueryGraph queryGraph,
             FractionAndDistanceCalculator fractionAndDistanceCalculator,
-            Collection<EdgeIteratorState> edges) {
+            Iterable<EdgeIteratorState> edges
+    ) {
         List<MatchedEdgeLink> matchedEdgeLinks = new ArrayList<>();
         for (EdgeIteratorState edge : edges) {
             boolean reversed = EDGE_ITERATOR_STATE_REVERSE_EXTRACTOR.hasReversed(edge);
@@ -47,6 +50,8 @@ public final class PathUtil {
                     .linkId(matchedLinkId)
                     .distance(fractionAndDistanceCalculator.calculateLengthInMeters(lineString))
                     .reversed(reversed && !hasReversedLinkId(encodingManager, edge))
+                    .geometry(lineString)
+                    .originalGeometry(POINT_LIST_UTIL.toLineString(findOriginalEdge(edge, queryGraph).fetchWayGeometry(FetchMode.ALL)))
                     .build());
         }
 
@@ -66,11 +71,12 @@ public final class PathUtil {
         double totalDistance = grouped.stream()
                 .mapToDouble(MatchedEdgeLink::getDistance)
                 .sum();
-        return MatchedEdgeLink
-                .builder()
+        return MatchedEdgeLink.builder()
                 .distance(totalDistance)
                 .linkId(grouped.getFirst().getLinkId())
                 .reversed(grouped.getFirst().isReversed())
+                .geometry(grouped.getFirst().getGeometry())
+                .originalGeometry(grouped.getFirst().getOriginalGeometry())
                 .build();
     }
 
@@ -99,10 +105,10 @@ public final class PathUtil {
      */
     public static EdgeIteratorTravelDirection determineEdgeDirection(
             EdgeIteratorState edge,
-            EncodingManager encodingManager,
+            EncodedValueLookup encodedValueLookup,
             String vehicleName
     ) {
-        BooleanEncodedValue vehicleAccessEncodedValue = encodingManager.getBooleanEncodedValue(VehicleAccess.key(vehicleName));
+        BooleanEncodedValue vehicleAccessEncodedValue = encodedValueLookup.getBooleanEncodedValue(VehicleAccess.key(vehicleName));
         boolean edgeCanBeTraveledFromBaseToAdjacent = edge.get(vehicleAccessEncodedValue);
         boolean edgeCanBeTraveledFromAdjacentToBase = edge.getReverse(vehicleAccessEncodedValue);
         if (edgeCanBeTraveledFromAdjacentToBase && edgeCanBeTraveledFromBaseToAdjacent) {

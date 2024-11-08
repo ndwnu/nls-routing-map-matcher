@@ -5,6 +5,11 @@ import com.graphhopper.GHResponse;
 import com.graphhopper.ResponsePath;
 import com.graphhopper.routing.Path;
 import com.graphhopper.routing.QueryGraphExtractor;
+import com.graphhopper.routing.querygraph.QueryGraph;
+import com.graphhopper.routing.util.EncodingManager;
+import com.graphhopper.routing.util.FiniteWeightFilter;
+import com.graphhopper.routing.weighting.Weighting;
+import com.graphhopper.storage.index.Snap;
 import com.graphhopper.util.EdgeIteratorState;
 import com.graphhopper.util.Helper;
 import com.graphhopper.util.PMap;
@@ -44,8 +49,12 @@ public class Router {
     private final GeometryFactoryWgs84 geometryFactoryWgs84;
     private final FractionAndDistanceCalculator fractionAndDistanceCalculator;
 
-    public Router(NetworkGraphHopper networkGraphHopper, MatchedLinkMapper matchedLinkMapper,
-            GeometryFactoryWgs84 geometryFactoryWgs84, FractionAndDistanceCalculator fractionAndDistanceCalculator) {
+    public Router(
+            NetworkGraphHopper networkGraphHopper,
+            MatchedLinkMapper matchedLinkMapper,
+            GeometryFactoryWgs84 geometryFactoryWgs84,
+            FractionAndDistanceCalculator fractionAndDistanceCalculator
+    ) {
         this.networkGraphHopper = networkGraphHopper;
         this.matchedLinkMapper = matchedLinkMapper;
         this.geometryFactoryWgs84 = geometryFactoryWgs84;
@@ -57,11 +66,33 @@ public class Router {
     }
 
     public RoutingResponse route(RoutingRequest routingRequest) throws RoutingException, RoutingRequestException {
-        GHRequest ghRequest = getGHRequest(routingRequest.getWayPoints(), routingRequest.getRoutingProfile());
+        String routingProfile = routingRequest.getRoutingProfile();
+        List<Point> points = routingRequest.isSnapToNodes()
+                ? snapPointsToNodes(routingProfile, routingRequest.getWayPoints())
+                : routingRequest.getWayPoints();
+        GHRequest graphHopperRequest = getGraphHopperRequest(routingProfile, points);
         if (routingRequest.getCustomModel() != null) {
-            ghRequest.setCustomModel(routingRequest.getCustomModel());
+            graphHopperRequest.setCustomModel(routingRequest.getCustomModel());
         }
-        return getRoutingResponse(ghRequest, routingRequest.isSimplifyResponseGeometry());
+        return getRoutingResponse(
+                graphHopperRequest,
+                routingRequest.isSimplifyResponseGeometry()
+        );
+    }
+
+    private List<Point> snapPointsToNodes(String routingRequest, List<Point> points) {
+        return points.stream()
+                .map(point -> snapPointToNode(routingRequest, point))
+                .toList();
+    }
+
+    private Point snapPointToNode(String profile, Point point) {
+        Weighting weighting = networkGraphHopper.createWeighting(networkGraphHopper.getProfile(profile), new PMap());
+        FiniteWeightFilter finiteWeightFilter = new FiniteWeightFilter(weighting);
+        Snap snap = networkGraphHopper.getLocationIndex().findClosest(point.getY(), point.getX(), finiteWeightFilter);
+        double snappedLat = networkGraphHopper.getBaseGraph().getNodeAccess().getLat(snap.getClosestNode());
+        double snappedLon = networkGraphHopper.getBaseGraph().getNodeAccess().getLon(snap.getClosestNode());
+        return geometryFactoryWgs84.createPoint(new Coordinate(snappedLon, snappedLat));
     }
 
     private RoutingResponse getRoutingResponse(GHRequest ghRequest, boolean simplify)
@@ -71,24 +102,25 @@ public class Router {
         ResponsePath responsePath = ghResponse.getBest();
         ensurePathsAreNotEmpty(responsePath);
 
-        RoutingResponseBuilder routingResponseBuilder = createRoutingResponse(responsePath, simplify);
-        return setFractionsAndMatchedLinks(routingResponseBuilder, ghRequest);
+        List<RoutingLegResponse> routingLegResponses = getRoutingLegResponses(ghRequest);
+        return createRoutingResponse(responsePath, simplify)
+                .legs(routingLegResponses)
+                .build();
     }
 
-    private static GHRequest getGHRequest(List<Point> wayPoints, String routingRequest) {
-        List<GHPoint> points = getGHPointsFromPoints(wayPoints);
-        GHRequest request = new GHRequest(points);
-        request.setProfile(routingRequest);
-        PMap hints = request.getHints();
-        hints.putObject(Routing.CALC_POINTS, true);
-        hints.putObject(Routing.INSTRUCTIONS, false);
-        hints.putObject(CH.DISABLE, true);
-        hints.putObject(Routing.PASS_THROUGH, false);
-        return request;
+    private static GHRequest getGraphHopperRequest(String profile, List<Point> points) {
+        GHRequest ghRequest = new GHRequest(getGHPointsFromPoints(points));
+        ghRequest.setProfile(profile);
+        PMap snappedHints = ghRequest.getHints();
+        snappedHints.putObject(Routing.CALC_POINTS, true);
+        snappedHints.putObject(Routing.INSTRUCTIONS, false);
+        snappedHints.putObject(CH.DISABLE, true);
+        snappedHints.putObject(Routing.PASS_THROUGH, false);
+        return ghRequest;
     }
 
-    private RoutingResponse setFractionsAndMatchedLinks(RoutingResponseBuilder routingResponseBuilder,
-            GHRequest ghRequest) throws RoutingException {
+    private List<RoutingLegResponse> getRoutingLegResponses(GHRequest ghRequest) throws RoutingException {
+        EncodingManager encodingManager = networkGraphHopper.getEncodingManager();
         List<RoutingLegResponse> routingLegResponse = new ArrayList<>();
 
         for (Path path : networkGraphHopper.calcPaths(ghRequest)) {
@@ -96,27 +128,26 @@ public class Router {
             if (edges.isEmpty()) {
                 throw new RoutingException("Unexpected: path has no edges");
             }
-            double startFraction = PathUtil.determineStartLinkFraction(edges.getFirst(),
-                    QueryGraphExtractor.extractQueryGraph(path),fractionAndDistanceCalculator);
-            double endFraction = PathUtil.determineEndLinkFraction(edges.getLast(),
-                    QueryGraphExtractor.extractQueryGraph(path),fractionAndDistanceCalculator);
+            QueryGraph queryGraph = QueryGraphExtractor.extractQueryGraph(path);
+            double startFraction = PathUtil.determineStartLinkFraction(edges.getFirst(), queryGraph, fractionAndDistanceCalculator);
+            double endFraction = PathUtil.determineEndLinkFraction(edges.getLast(), queryGraph, fractionAndDistanceCalculator);
             List<MatchedEdgeLink> matchedEdgeLinks = PathUtil.determineMatchedLinks(
-                    networkGraphHopper.getEncodingManager(), fractionAndDistanceCalculator,
-                    edges);
+                    encodingManager,
+                    queryGraph,
+                    fractionAndDistanceCalculator,
+                    edges
+            );
 
             routingLegResponse.add(RoutingLegResponse.builder()
                     .matchedLinks(matchedLinkMapper.map(matchedEdgeLinks, startFraction, endFraction))
                     .build());
         }
 
-        routingResponseBuilder.legs(routingLegResponse);
-
-        return routingResponseBuilder.build();
+        return routingLegResponse;
     }
 
     private RoutingResponseBuilder createRoutingResponse(ResponsePath path, boolean simplify) {
-        PointList points = simplify ? PathSimplification.simplify(path, new RamerDouglasPeucker(), false)
-                : path.getPoints();
+        PointList points = simplify ? PathSimplification.simplify(path, new RamerDouglasPeucker(), false) : path.getPoints();
         return RoutingResponse.builder()
                 .geometry(points.toLineString(INCLUDE_ELEVATION))
                 .snappedWaypoints(mapToSnappedWaypoints(path.getWaypoints()))
@@ -146,8 +177,7 @@ public class Router {
     private List<Point> mapToSnappedWaypoints(PointList pointList) {
         List<Point> waypoints = new ArrayList<>(pointList.size());
         for (int i = 0; i < pointList.size(); i++) {
-            Point waypoint = geometryFactoryWgs84.createPoint(
-                    new Coordinate(pointList.getLon(i), pointList.getLat(i)));
+            Point waypoint = geometryFactoryWgs84.createPoint(new Coordinate(pointList.getLon(i), pointList.getLat(i)));
             waypoints.add(waypoint);
         }
         return waypoints;
