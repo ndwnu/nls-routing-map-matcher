@@ -4,6 +4,7 @@ import static nu.ndw.nls.routingmapmatcher.network.model.Link.REVERSED_LINK_ID;
 import static nu.ndw.nls.routingmapmatcher.network.model.Link.WAY_ID_KEY;
 
 import com.conductor.stream.utils.OrderedStreamUtils;
+import com.graphhopper.routing.ev.BooleanEncodedValue;
 import com.graphhopper.routing.ev.VehicleAccess;
 import com.graphhopper.routing.querygraph.QueryGraph;
 import com.graphhopper.routing.querygraph.VirtualEdgeIteratorState;
@@ -23,8 +24,8 @@ import org.locationtech.jts.geom.LineString;
 
 public final class PathUtil {
 
-    private static final EdgeIteratorStateReverseExtractor EDGE_ITERATOR_STATE_REVERSE_EXTRACTOR =
-            new EdgeIteratorStateReverseExtractor();
+    private static final EdgeIteratorStateReverseExtractor EDGE_ITERATOR_STATE_REVERSE_EXTRACTOR = new EdgeIteratorStateReverseExtractor();
+
     //todo : replace logic in this class to spring managed service
     private static final PointListUtil POINT_LIST_UTIL = new PointListUtil(new GeometryFactoryWgs84());
 
@@ -51,10 +52,8 @@ public final class PathUtil {
 
         // Road sections can be subdivided into multiple virtual edges because of via points in routing and match requests.
         // See https://github.com/graphhopper/graphhopper/blob/master/docs/core/low-level-api.md#what-are-virtual-edges-and-nodes
-        // In the output
-        // we need to group over road sections with the same linkId and direction and take the sum of the distances.
-        return OrderedStreamUtils.groupBy(matchedEdgeLinks
-                        .stream(), PathUtil::byLinkIdAndDirection)
+        // In the output we need to group over road sections with the same linkId and direction and take the sum of the distances.
+        return OrderedStreamUtils.groupBy(matchedEdgeLinks.stream(), PathUtil::byLinkIdAndDirection)
                 .map(PathUtil::reduceWithSummedDistance)
                 .toList();
     }
@@ -65,8 +64,7 @@ public final class PathUtil {
 
     private static MatchedEdgeLink reduceWithSummedDistance(List<MatchedEdgeLink> grouped) {
         double totalDistance = grouped.stream()
-                .map(MatchedEdgeLink::getDistance)
-                .mapToDouble(Double::doubleValue)
+                .mapToDouble(MatchedEdgeLink::getDistance)
                 .sum();
         return MatchedEdgeLink
                 .builder()
@@ -99,12 +97,14 @@ public final class PathUtil {
      *
      * @return travel direction on this specific edge
      */
-    public static EdgeIteratorTravelDirection determineEdgeDirection(EdgeIteratorState edge,
-            EncodingManager encodingManager, String vehicleName) {
-        boolean edgeCanBeTraveledFromBaseToAdjacent = edge.get(
-                encodingManager.getBooleanEncodedValue(VehicleAccess.key(vehicleName)));
-        boolean edgeCanBeTraveledFromAdjacentToBase = edge.getReverse(
-                encodingManager.getBooleanEncodedValue(VehicleAccess.key(vehicleName)));
+    public static EdgeIteratorTravelDirection determineEdgeDirection(
+            EdgeIteratorState edge,
+            EncodingManager encodingManager,
+            String vehicleName
+    ) {
+        BooleanEncodedValue vehicleAccessEncodedValue = encodingManager.getBooleanEncodedValue(VehicleAccess.key(vehicleName));
+        boolean edgeCanBeTraveledFromBaseToAdjacent = edge.get(vehicleAccessEncodedValue);
+        boolean edgeCanBeTraveledFromAdjacentToBase = edge.getReverse(vehicleAccessEncodedValue);
         if (edgeCanBeTraveledFromAdjacentToBase && edgeCanBeTraveledFromBaseToAdjacent) {
             return EdgeIteratorTravelDirection.BOTH_DIRECTIONS;
         } else if (edgeCanBeTraveledFromAdjacentToBase) {
@@ -116,8 +116,11 @@ public final class PathUtil {
         }
     }
 
-    public static double determineStartLinkFraction(EdgeIteratorState firstEdge, QueryGraph queryGraph,
-            FractionAndDistanceCalculator fractionAndDistanceCalculator) {
+    public static double determineStartLinkFraction(
+            EdgeIteratorState firstEdge,
+            QueryGraph queryGraph,
+            FractionAndDistanceCalculator fractionAndDistanceCalculator
+    ) {
         if (!queryGraph.isVirtualNode(firstEdge.getBaseNode())) {
             return 0D;
         }
@@ -129,11 +132,13 @@ public final class PathUtil {
                 .getStartPoint().getCoordinate();
         return fractionAndDistanceCalculator.calculateFractionAndDistance(originalGeometry, coordinate)
                 .getFraction();
-
     }
 
-    public static double determineEndLinkFraction(EdgeIteratorState lastEdge, QueryGraph queryGraph,
-            FractionAndDistanceCalculator fractionAndDistanceCalculator) {
+    public static double determineEndLinkFraction(
+            EdgeIteratorState lastEdge,
+            QueryGraph queryGraph,
+            FractionAndDistanceCalculator fractionAndDistanceCalculator
+    ) {
         if (!queryGraph.isVirtualNode(lastEdge.getAdjNode())) {
             return 1D;
         }
@@ -148,13 +153,10 @@ public final class PathUtil {
     }
 
     private static EdgeIteratorState findOriginalEdge(EdgeIteratorState edge, QueryGraph queryGraph) {
-        EdgeIteratorState originalEdge;
         if (edge instanceof VirtualEdgeIteratorState state) {
-            originalEdge = queryGraph.getEdgeIteratorStateForKey(
-                    state.getOriginalEdgeKey());
-        } else {
-            originalEdge = edge;
+            return queryGraph.getEdgeIteratorStateForKey(state.getOriginalEdgeKey());
         }
-        return originalEdge;
+
+        return edge;
     }
 }
