@@ -18,4 +18,6 @@ public class RoutingRequest {
     private final CustomModel customModel;
     @Builder.Default
     private final boolean simplifyResponseGeometry = true;
+    @Builder.Default
+    private final boolean snapToNodes = false;
 }
