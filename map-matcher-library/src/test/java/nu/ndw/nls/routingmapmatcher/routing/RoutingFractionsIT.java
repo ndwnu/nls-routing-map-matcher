@@ -169,6 +169,18 @@ class RoutingFractionsIT {
                                                 .distance(42.10921482022403)
                                                 .startFraction(0.11164377136022784)
                                                 .endFraction(1.0)
+                                                .geometry(geometryFactoryWgs84.createLineString(
+                                                        new Coordinate[]{
+                                                                new Coordinate(5.425122870485016, 52.17986902304874),
+                                                                new Coordinate(5.425237, 52.179844),
+                                                                new Coordinate(5.42572, 52.179779)
+                                                        }))
+                                                .originalGeometry(geometryFactoryWgs84.createLineString(
+                                                        new Coordinate[]{
+                                                                new Coordinate(5.42505, 52.179885),
+                                                                new Coordinate(5.425237, 52.179844),
+                                                                new Coordinate(5.42572, 52.179779)
+                                                        }))
                                                 .build(),
                                         MatchedLink.builder()
                                                 .linkId(6405185)
@@ -176,6 +188,16 @@ class RoutingFractionsIT {
                                                 .distance(9.926436244977584)
                                                 .startFraction(0.0)
                                                 .endFraction(0.2075867812415673)
+                                                .geometry(geometryFactoryWgs84.createLineString(
+                                                        new Coordinate[]{
+                                                                new Coordinate(5.42572, 52.179779),
+                                                                new Coordinate(5.425755082159361, 52.17986556367133)
+                                                        }))
+                                                .originalGeometry(geometryFactoryWgs84.createLineString(
+                                                        new Coordinate[]{
+                                                                new Coordinate(5.42572, 52.179779),
+                                                                new Coordinate(5.425889, 52.180196)
+                                                        }))
                                                 .build())
                                 ).build(),
                         RoutingLegResponse.builder()
@@ -186,6 +208,16 @@ class RoutingFractionsIT {
                                                 .distance(9.926436244977584)
                                                 .startFraction(0.7924132187612766)
                                                 .endFraction(1.0)
+                                                .geometry(geometryFactoryWgs84.createLineString(
+                                                        new Coordinate[]{
+                                                                new Coordinate(5.425755082159361, 52.17986556367133),
+                                                                new Coordinate(5.42572, 52.179779)
+                                                        }))
+                                                .originalGeometry(geometryFactoryWgs84.createLineString(
+                                                        new Coordinate[]{
+                                                                new Coordinate(5.425889, 52.180196),
+                                                                new Coordinate(5.42572, 52.179779)
+                                                        }))
                                                 .build(),
                                         MatchedLink.builder()
                                                 .linkId(6405218)
@@ -193,6 +225,16 @@ class RoutingFractionsIT {
                                                 .distance(46.06958804725149)
                                                 .startFraction(0.0)
                                                 .endFraction(0.9745518261996916)
+                                                .geometry(geometryFactoryWgs84.createLineString(
+                                                        new Coordinate[]{
+                                                                new Coordinate(5.42572, 52.179779),
+                                                                new Coordinate(5.426393415313249, 52.179772178137206)
+                                                        }))
+                                                .originalGeometry(geometryFactoryWgs84.createLineString(
+                                                        new Coordinate[]{
+                                                                new Coordinate(5.42572, 52.179779),
+                                                                new Coordinate(5.426411, 52.179772)
+                                                        }))
                                                 .build())
                                 ).build()
                 )).build()
@@ -217,6 +259,7 @@ class RoutingFractionsIT {
     }
 
     private Point createPoint(double x, double y) {
-        return geometryFactoryWgs84.createPoint(new Coordinate(x, y));
+        return geometryFactoryWgs84.createPoint(
+                new Coordinate(x, y));
     }
 }

@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.ToString;
 import lombok.With;
 import lombok.experimental.SuperBuilder;
+import org.locationtech.jts.geom.LineString;
 
 @With
 @Getter
@@ -20,4 +21,6 @@ public class MatchedLink {
     private final double startFraction;
     private final double endFraction;
     private final double distance;
+    private final LineString geometry;
+    private final LineString originalGeometry;
 }
