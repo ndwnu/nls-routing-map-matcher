@@ -2,11 +2,13 @@ package nu.ndw.nls.routingmapmatcher.routing;
 
 import static nu.ndw.nls.routingmapmatcher.testutil.TestNetworkProvider.CAR;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatException;
 
 import java.util.List;
 import lombok.SneakyThrows;
 import nu.ndw.nls.geometry.factories.GeometryFactoryWgs84;
 import nu.ndw.nls.routingmapmatcher.TestConfig;
+import nu.ndw.nls.routingmapmatcher.exception.RoutingRequestException;
 import nu.ndw.nls.routingmapmatcher.model.linestring.MatchedLink;
 import nu.ndw.nls.routingmapmatcher.model.routing.RoutingLegResponse;
 import nu.ndw.nls.routingmapmatcher.model.routing.RoutingRequest;
@@ -76,6 +78,47 @@ class RouterIT {
                 new Coordinate(5.430413, 52.177631),
                 new Coordinate(5.428276, 52.175759)
         });
+    }
+
+    @SneakyThrows
+    @Test
+    void route_outOfBounds_snapToNodes() {
+        setupNetwork();
+        Point start = geometryFactory.createPoint(new Coordinate(5.430496, 52.177687));
+        Point outOfBounds = geometryFactory.createPoint(new Coordinate(5.430496, 42.0));
+        Point end = geometryFactory.createPoint(new Coordinate(5.428436, 52.175901));
+        List<Point> wayPoints = List.of(start, outOfBounds, end);
+        assertThatException()
+                .isThrownBy(
+                        () -> router.route(RoutingRequest.builder()
+                                .routingProfile(CAR)
+                                .wayPoints(wayPoints)
+                                .snapToNodes(true)
+                                .build())
+                )
+                .isInstanceOf(RoutingRequestException.class)
+                .withMessage("Invalid routing request: Point is out of bounds: POINT (5.430496 42), "
+                             + "the bounds are: 4.9467900079047,5.433661,52.172107,52.63028869479728");
+    }
+
+    @SneakyThrows
+    @Test
+    void route_cannotSnap_snapToNodes() {
+        setupNetwork();
+        Point start = geometryFactory.createPoint(new Coordinate(5.430496, 52.177687));
+        Point cannotSnap = geometryFactory.createPoint(new Coordinate(5.430496, 52.318371));
+        Point end = geometryFactory.createPoint(new Coordinate(5.428436, 52.175901));
+        List<Point> wayPoints = List.of(start, cannotSnap, end);
+        assertThatException()
+                .isThrownBy(
+                        () -> router.route(RoutingRequest.builder()
+                                .routingProfile(CAR)
+                                .wayPoints(wayPoints)
+                                .snapToNodes(true)
+                                .build())
+                )
+                .isInstanceOf(RoutingRequestException.class)
+                .withMessage("Invalid routing request: Cannot snap point 52.318371,5.430496 to node");
     }
 
     @SneakyThrows

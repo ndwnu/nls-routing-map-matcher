@@ -18,6 +18,7 @@ import com.graphhopper.util.Parameters.Routing;
 import com.graphhopper.util.PathSimplification;
 import com.graphhopper.util.PointList;
 import com.graphhopper.util.RamerDouglasPeucker;
+import com.graphhopper.util.shapes.BBox;
 import com.graphhopper.util.shapes.GHPoint;
 import java.util.ArrayList;
 import java.util.List;
@@ -81,15 +82,32 @@ public class Router {
     }
 
     private List<Point> snapPointsToNodes(String routingRequest, List<Point> points) {
+        ensurePointsAreInBounds(points);
         return points.stream()
                 .map(point -> snapPointToNode(routingRequest, point))
                 .toList();
+    }
+
+    private void ensurePointsAreInBounds(List<Point> points) {
+        BBox bounds = networkGraphHopper.getBaseGraph().getBounds();
+        for (Point point : points) {
+            if (!bounds.contains(point.getY(), point.getX())) {
+                throw new RoutingRequestException(
+                        "Invalid routing request: Point is out of bounds: %s, the bounds are: %s".formatted(point, bounds)
+                );
+            }
+        }
     }
 
     private Point snapPointToNode(String profile, Point point) {
         Weighting weighting = networkGraphHopper.createWeighting(networkGraphHopper.getProfile(profile), new PMap());
         FiniteWeightFilter finiteWeightFilter = new FiniteWeightFilter(weighting);
         Snap snap = networkGraphHopper.getLocationIndex().findClosest(point.getY(), point.getX(), finiteWeightFilter);
+        if (!snap.isValid()) {
+            throw new RoutingRequestException(
+                    "Invalid routing request: Cannot snap point %f,%f to node".formatted(point.getY(), point.getX())
+            );
+        }
         double snappedLat = networkGraphHopper.getBaseGraph().getNodeAccess().getLat(snap.getClosestNode());
         double snappedLon = networkGraphHopper.getBaseGraph().getNodeAccess().getLon(snap.getClosestNode());
         return geometryFactoryWgs84.createPoint(new Coordinate(snappedLon, snappedLat));
