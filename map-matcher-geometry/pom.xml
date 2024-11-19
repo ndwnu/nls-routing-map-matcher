@@ -6,7 +6,7 @@
     <parent>
         <groupId>nu.ndw.nls</groupId>
         <artifactId>routing-map-matcher-parent</artifactId>
-        <version>13.1.0-SNAPSHOT</version>
+        <version>13.1.0</version>
     </parent>
     <artifactId>routing-map-matcher-geometry</artifactId>
     <dependencies>
