@@ -6,6 +6,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 Here we write upgrade notes. It's a team effort to make them as straightforward as possible.
 
+## [13.2.0] - 2024-11-19
+
+### Fixed
+- MINOR Removed obsolete fields added in 13.1.0
+
 ## [13.1.0] - 2024-11-18
 
 ### Added
