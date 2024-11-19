@@ -6,6 +6,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 Here we write upgrade notes. It's a team effort to make them as straightforward as possible.
 
+## [13.1.0] - 2024-11-18
+
+### Added
+- Added snap to nodes functionality for routing operation
+
 ## [13.0.3] - 2024-10-15
 
 ### Fixed
