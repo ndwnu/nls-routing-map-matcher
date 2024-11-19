@@ -35,7 +35,6 @@ public final class PathUtil {
 
     public static List<MatchedEdgeLink> determineMatchedLinks(
             EncodingManager encodingManager,
-            QueryGraph queryGraph,
             FractionAndDistanceCalculator fractionAndDistanceCalculator,
             Iterable<EdgeIteratorState> edges
     ) {
@@ -50,8 +49,6 @@ public final class PathUtil {
                     .linkId(matchedLinkId)
                     .distance(fractionAndDistanceCalculator.calculateLengthInMeters(lineString))
                     .reversed(reversed && !hasReversedLinkId(encodingManager, edge))
-                    .geometry(lineString)
-                    .originalGeometry(POINT_LIST_UTIL.toLineString(findOriginalEdge(edge, queryGraph).fetchWayGeometry(FetchMode.ALL)))
                     .build());
         }
 
@@ -75,8 +72,6 @@ public final class PathUtil {
                 .distance(totalDistance)
                 .linkId(grouped.getFirst().getLinkId())
                 .reversed(grouped.getFirst().isReversed())
-                .geometry(grouped.getFirst().getGeometry())
-                .originalGeometry(grouped.getFirst().getOriginalGeometry())
                 .build();
     }
 

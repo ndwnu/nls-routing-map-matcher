@@ -76,16 +76,6 @@ class StartToEndMapMatcherIT {
                                 .distance(16.778291076754744)
                                 .startFraction(0.6496530239639768)
                                 .endFraction(END_FRACTION_1)
-                                .geometry(geometryFactory.createLineString(new Coordinate[]{
-                                        new Coordinate(5.431043564998698, 52.18100146158125),
-                                        new Coordinate(5.431057, 52.1808509)
-                                }))
-                                .originalGeometry(geometryFactory.createLineString(
-                                        new Coordinate[]{
-                                                new Coordinate(5.431004, 52.18128),
-                                                new Coordinate(5.431042, 52.181019),
-                                                new Coordinate(5.431057, 52.1808509)
-                                        }))
                                 .build(),
                         MatchedLink.builder()
                                 .linkId(6405238)
@@ -93,20 +83,6 @@ class StartToEndMapMatcherIT {
                                 .distance(47.9205870917096)
                                 .startFraction(START_FRACTION_0)
                                 .endFraction(END_FRACTION_1)
-                                .geometry(geometryFactory.createLineString(
-                                        new Coordinate[]{
-                                                new Coordinate(5.431057, 52.1808509),
-                                                new Coordinate(5.43107, 52.18071),
-                                                new Coordinate(5.431116, 52.18045),
-                                                new Coordinate(5.431117, 52.180422)
-                                        }))
-                                .originalGeometry(geometryFactory.createLineString(
-                                        new Coordinate[]{
-                                                new Coordinate(5.431057, 52.1808509),
-                                                new Coordinate(5.43107, 52.18071),
-                                                new Coordinate(5.431116, 52.18045),
-                                                new Coordinate(5.431117, 52.180422)
-                                        }))
                                 .build(),
                         MatchedLink.builder()
                                 .linkId(6405239)
@@ -114,18 +90,6 @@ class StartToEndMapMatcherIT {
                                 .distance(47.949831373948484)
                                 .startFraction(START_FRACTION_0)
                                 .endFraction(END_FRACTION_1)
-                                .geometry(geometryFactory.createLineString(
-                                        new Coordinate[]{
-                                                new Coordinate(5.431117, 52.180422),
-                                                new Coordinate(5.431123, 52.180313),
-                                                new Coordinate(5.4306089, 52.180374)
-                                        }))
-                                .originalGeometry(geometryFactory.createLineString(
-                                        new Coordinate[]{
-                                                new Coordinate(5.431117, 52.180422),
-                                                new Coordinate(5.431123, 52.180313),
-                                                new Coordinate(5.4306089, 52.180374)
-                                        }))
                                 .build(),
                         MatchedLink.builder()
                                 .linkId(6405226)
@@ -133,24 +97,6 @@ class StartToEndMapMatcherIT {
                                 .distance(47.2778725149238)
                                 .startFraction(START_FRACTION_0)
                                 .endFraction(END_FRACTION_1)
-                                .geometry(geometryFactory.createLineString(
-                                        new Coordinate[]{
-                                                new Coordinate(5.4306089, 52.180374),
-                                                new Coordinate(5.430639, 52.180237),
-                                                new Coordinate(5.430644, 52.180176),
-                                                new Coordinate(5.430629, 52.1800799),
-                                                new Coordinate(5.430536, 52.179966),
-                                                new Coordinate(5.430534, 52.179965)
-                                        }))
-                                .originalGeometry(geometryFactory.createLineString(
-                                        new Coordinate[]{
-                                                new Coordinate(5.4306089, 52.180374),
-                                                new Coordinate(5.430639, 52.180237),
-                                                new Coordinate(5.430644, 52.180176),
-                                                new Coordinate(5.430629, 52.1800799),
-                                                new Coordinate(5.430536, 52.179966),
-                                                new Coordinate(5.430534, 52.179965)
-                                        }))
                                 .build(),
                         MatchedLink.builder()
                                 .linkId(6405227)
@@ -158,18 +104,6 @@ class StartToEndMapMatcherIT {
                                 .distance(47.29028486517949)
                                 .startFraction(START_FRACTION_0)
                                 .endFraction(END_FRACTION_1)
-                                .geometry(geometryFactory.createLineString(
-                                        new Coordinate[]{
-                                                new Coordinate(5.430534, 52.179965),
-                                                new Coordinate(5.43036, 52.179916),
-                                                new Coordinate(5.429861, 52.1798969)
-                                        }))
-                                .originalGeometry(geometryFactory.createLineString(
-                                        new Coordinate[]{
-                                                new Coordinate(5.430534, 52.179965),
-                                                new Coordinate(5.43036, 52.179916),
-                                                new Coordinate(5.429861, 52.1798969)
-                                        }))
                                 .build(),
                         MatchedLink.builder()
                                 .linkId(6405228)
@@ -177,16 +111,6 @@ class StartToEndMapMatcherIT {
                                 .distance(47.27890649156571)
                                 .startFraction(START_FRACTION_0)
                                 .endFraction(END_FRACTION_1)
-                                .geometry(geometryFactory.createLineString(
-                                        new Coordinate[]{
-                                                new Coordinate(5.429861, 52.1798969),
-                                                new Coordinate(5.429171, 52.179872)
-                                        }))
-                                .originalGeometry(geometryFactory.createLineString(
-                                        new Coordinate[]{
-                                                new Coordinate(5.429861, 52.1798969),
-                                                new Coordinate(5.429171, 52.179872)
-                                        }))
                                 .build(),
                         MatchedLink.builder()
                                 .linkId(6405229)
@@ -194,16 +118,6 @@ class StartToEndMapMatcherIT {
                                 .distance(47.28626401413389)
                                 .startFraction(START_FRACTION_0)
                                 .endFraction(END_FRACTION_1)
-                                .geometry(geometryFactory.createLineString(
-                                        new Coordinate[]{
-                                                new Coordinate(5.429171, 52.179872),
-                                                new Coordinate(5.428481, 52.179846)
-                                        }))
-                                .originalGeometry(geometryFactory.createLineString(
-                                        new Coordinate[]{
-                                                new Coordinate(5.429171, 52.179872),
-                                                new Coordinate(5.428481, 52.179846)
-                                        }))
                                 .build(),
                         MatchedLink.builder()
                                 .linkId(6405230)
@@ -211,16 +125,6 @@ class StartToEndMapMatcherIT {
                                 .distance(47.28629148349626)
                                 .startFraction(START_FRACTION_0)
                                 .endFraction(END_FRACTION_1)
-                                .geometry(geometryFactory.createLineString(
-                                        new Coordinate[]{
-                                                new Coordinate(5.428481, 52.179846),
-                                                new Coordinate(5.427791, 52.17982)
-                                        }))
-                                .originalGeometry(geometryFactory.createLineString(
-                                        new Coordinate[]{
-                                                new Coordinate(5.428481, 52.179846),
-                                                new Coordinate(5.427791, 52.17982)
-                                        }))
                                 .build(),
                         MatchedLink.builder()
                                 .linkId(6405231)
@@ -228,16 +132,6 @@ class StartToEndMapMatcherIT {
                                 .distance(47.2863189526818)
                                 .startFraction(START_FRACTION_0)
                                 .endFraction(END_FRACTION_1)
-                                .geometry(geometryFactory.createLineString(
-                                        new Coordinate[]{
-                                                new Coordinate(5.427791, 52.17982),
-                                                new Coordinate(5.427101, 52.179794)
-                                        }))
-                                .originalGeometry(geometryFactory.createLineString(
-                                        new Coordinate[]{
-                                                new Coordinate(5.427791, 52.17982),
-                                                new Coordinate(5.427101, 52.179794)
-                                        }))
                                 .build(),
                         MatchedLink.builder()
                                 .linkId(6405232)
@@ -245,18 +139,6 @@ class StartToEndMapMatcherIT {
                                 .distance(47.27620456112605)
                                 .startFraction(START_FRACTION_0)
                                 .endFraction(END_FRACTION_1)
-                                .geometry(geometryFactory.createLineString(
-                                        new Coordinate[]{
-                                                new Coordinate(5.427101, 52.179794),
-                                                new Coordinate(5.426481, 52.179771),
-                                                new Coordinate(5.426411, 52.179772)
-                                        }))
-                                .originalGeometry(geometryFactory.createLineString(
-                                        new Coordinate[]{
-                                                new Coordinate(5.427101, 52.179794),
-                                                new Coordinate(5.426481, 52.179771),
-                                                new Coordinate(5.426411, 52.179772)
-                                        }))
                                 .build(),
                         MatchedLink.builder()
                                 .linkId(6405233)
@@ -264,16 +146,6 @@ class StartToEndMapMatcherIT {
                                 .distance(47.27258911093719)
                                 .startFraction(START_FRACTION_0)
                                 .endFraction(END_FRACTION_1)
-                                .geometry(geometryFactory.createLineString(
-                                        new Coordinate[]{
-                                                new Coordinate(5.426411, 52.179772),
-                                                new Coordinate(5.42572, 52.179779)
-                                        }))
-                                .originalGeometry(geometryFactory.createLineString(
-                                        new Coordinate[]{
-                                                new Coordinate(5.426411, 52.179772),
-                                                new Coordinate(5.42572, 52.179779)
-                                        }))
                                 .build(),
                         MatchedLink.builder()
                                 .linkId(6369284)
@@ -281,18 +153,6 @@ class StartToEndMapMatcherIT {
                                 .distance(47.40127154230754)
                                 .startFraction(START_FRACTION_0)
                                 .endFraction(END_FRACTION_1)
-                                .geometry(geometryFactory.createLineString(
-                                        new Coordinate[]{
-                                                new Coordinate(5.42572, 52.179779),
-                                                new Coordinate(5.425237, 52.179844),
-                                                new Coordinate(5.42505, 52.179885)
-                                        }))
-                                .originalGeometry(geometryFactory.createLineString(
-                                        new Coordinate[]{
-                                                new Coordinate(5.42572, 52.179779),
-                                                new Coordinate(5.425237, 52.179844),
-                                                new Coordinate(5.42505, 52.179885)
-                                        }))
                                 .build(),
                         MatchedLink.builder()
                                 .linkId(6369285)
@@ -300,20 +160,6 @@ class StartToEndMapMatcherIT {
                                 .distance(47.441537785852276)
                                 .startFraction(START_FRACTION_0)
                                 .endFraction(END_FRACTION_1)
-                                .geometry(geometryFactory.createLineString(
-                                        new Coordinate[]{
-                                                new Coordinate(5.42505, 52.179885),
-                                                new Coordinate(5.4249409, 52.179909),
-                                                new Coordinate(5.424675, 52.179996),
-                                                new Coordinate(5.424449, 52.1800939)
-                                        }))
-                                .originalGeometry(geometryFactory.createLineString(
-                                        new Coordinate[]{
-                                                new Coordinate(5.42505, 52.179885),
-                                                new Coordinate(5.4249409, 52.179909),
-                                                new Coordinate(5.424675, 52.179996),
-                                                new Coordinate(5.424449, 52.1800939)
-                                        }))
                                 .build(),
                         MatchedLink.builder()
                                 .linkId(6369286)
@@ -321,20 +167,6 @@ class StartToEndMapMatcherIT {
                                 .distance(47.43760357701261)
                                 .startFraction(START_FRACTION_0)
                                 .endFraction(END_FRACTION_1)
-                                .geometry(geometryFactory.createLineString(
-                                        new Coordinate[]{
-                                                new Coordinate(5.424449, 52.1800939),
-                                                new Coordinate(5.424419, 52.180107),
-                                                new Coordinate(5.424184, 52.180229),
-                                                new Coordinate(5.423955, 52.180391)
-                                        }))
-                                .originalGeometry(geometryFactory.createLineString(
-                                        new Coordinate[]{
-                                                new Coordinate(5.424449, 52.1800939),
-                                                new Coordinate(5.424419, 52.180107),
-                                                new Coordinate(5.424184, 52.180229),
-                                                new Coordinate(5.423955, 52.180391)
-                                        }))
                                 .build(),
                         MatchedLink.builder()
                                 .linkId(6369287)
@@ -342,16 +174,6 @@ class StartToEndMapMatcherIT {
                                 .distance(47.42443190911065)
                                 .startFraction(START_FRACTION_0)
                                 .endFraction(END_FRACTION_1)
-                                .geometry(geometryFactory.createLineString(
-                                        new Coordinate[]{
-                                                new Coordinate(5.423955, 52.180391),
-                                                new Coordinate(5.4234989, 52.180712)
-                                        }))
-                                .originalGeometry(geometryFactory.createLineString(
-                                        new Coordinate[]{
-                                                new Coordinate(5.423955, 52.180391),
-                                                new Coordinate(5.4234989, 52.180712)
-                                        }))
                                 .build(),
                         MatchedLink.builder()
                                 .linkId(6369288)
@@ -359,16 +181,6 @@ class StartToEndMapMatcherIT {
                                 .distance(46.560118306514006)
                                 .startFraction(START_FRACTION_0)
                                 .endFraction(0.9813310134286733)
-                                .geometry(geometryFactory.createLineString(
-                                        new Coordinate[]{
-                                                new Coordinate(5.4234989, 52.180712),
-                                                new Coordinate(5.423052492534798, 52.18102789044416)
-                                        }))
-                                .originalGeometry(geometryFactory.createLineString(
-                                        new Coordinate[]{
-                                                new Coordinate(5.4234989, 52.180712),
-                                                new Coordinate(5.423044, 52.1810339)
-                                        }))
                                 .build());
         assertThat(lineStringMatch.getUpstreamLinkIds()).isNull();
         assertThat(lineStringMatch.getDownstreamLinkIds()).isNull();
@@ -452,12 +264,6 @@ class StartToEndMapMatcherIT {
                         .distance(4.606277878496104)
                         .startFraction(0.8813982849151963)
                         .endFraction(END_FRACTION_1)
-                        .geometry(geometryFactory.createLineString(new Coordinate[]{
-                                new Coordinate(5.431641205942293, 52.17898020844791), new Coordinate(5.431601, 52.178947)
-                        }))
-                        .originalGeometry(geometryFactory.createLineString(new Coordinate[]{
-                                new Coordinate(5.43194, 52.179227), new Coordinate(5.431601, 52.178947)
-                        }))
                         .build(),
                 MatchedLink.builder()
                         .linkId(3666076)
@@ -465,12 +271,6 @@ class StartToEndMapMatcherIT {
                         .distance(49.35391266671562)
                         .startFraction(START_FRACTION_0)
                         .endFraction(END_FRACTION_1)
-                        .geometry(geometryFactory.createLineString(new Coordinate[]{
-                                new Coordinate(5.431601, 52.178947), new Coordinate(5.43111, 52.178622)
-                        }))
-                        .originalGeometry(geometryFactory.createLineString(new Coordinate[]{
-                                new Coordinate(5.431601, 52.178947), new Coordinate(5.43111, 52.178622)
-                        }))
                         .build(),
                 MatchedLink.builder()
                         .linkId(3666077)
@@ -478,14 +278,6 @@ class StartToEndMapMatcherIT {
                         .distance(49.37020988457812)
                         .startFraction(START_FRACTION_0)
                         .endFraction(END_FRACTION_1)
-                        .geometry(geometryFactory.createLineString(new Coordinate[]{
-                                new Coordinate(5.43111, 52.178622), new Coordinate(5.431077, 52.1786),
-                                new Coordinate(5.430663, 52.178413), new Coordinate(5.430526, 52.178363)
-                        }))
-                        .originalGeometry(geometryFactory.createLineString(new Coordinate[]{
-                                new Coordinate(5.43111, 52.178622), new Coordinate(5.431077, 52.1786),
-                                new Coordinate(5.430663, 52.178413), new Coordinate(5.430526, 52.178363)
-                        }))
                         .build(),
                 MatchedLink.builder()
                         .linkId(3666078)
@@ -493,14 +285,6 @@ class StartToEndMapMatcherIT {
                         .distance(49.4042427750329)
                         .startFraction(START_FRACTION_0)
                         .endFraction(END_FRACTION_1)
-                        .geometry(geometryFactory.createLineString(new Coordinate[]{
-                                new Coordinate(5.430526, 52.178363), new Coordinate(5.430206, 52.178246),
-                                new Coordinate(5.429884, 52.178165), new Coordinate(5.429882, 52.178165)
-                        }))
-                        .originalGeometry(geometryFactory.createLineString(new Coordinate[]{
-                                new Coordinate(5.430526, 52.178363), new Coordinate(5.430206, 52.178246),
-                                new Coordinate(5.429884, 52.178165), new Coordinate(5.429882, 52.178165)
-                        }))
                         .build(),
                 MatchedLink.builder()
                         .linkId(3666079)
@@ -508,14 +292,6 @@ class StartToEndMapMatcherIT {
                         .distance(49.34170254220332)
                         .startFraction(START_FRACTION_0)
                         .endFraction(END_FRACTION_1)
-                        .geometry(geometryFactory.createLineString(new Coordinate[]{
-                                new Coordinate(5.429882, 52.178165), new Coordinate(5.429507, 52.178104),
-                                new Coordinate(5.42918, 52.178064)
-                        }))
-                        .originalGeometry(geometryFactory.createLineString(new Coordinate[]{
-                                new Coordinate(5.429882, 52.178165), new Coordinate(5.429507, 52.178104),
-                                new Coordinate(5.42918, 52.178064)
-                        }))
                         .build(),
                 MatchedLink.builder()
                         .linkId(3666080)
@@ -523,14 +299,6 @@ class StartToEndMapMatcherIT {
                         .distance(49.378713223864594)
                         .startFraction(START_FRACTION_0)
                         .endFraction(END_FRACTION_1)
-                        .geometry(geometryFactory.createLineString(new Coordinate[]{
-                                new Coordinate(5.42918, 52.178064), new Coordinate(5.4291029, 52.178055),
-                                new Coordinate(5.428641, 52.178005), new Coordinate(5.428467, 52.177998)
-                        }))
-                        .originalGeometry(geometryFactory.createLineString(new Coordinate[]{
-                                new Coordinate(5.42918, 52.178064), new Coordinate(5.4291029, 52.178055),
-                                new Coordinate(5.428641, 52.178005), new Coordinate(5.428467, 52.177998)
-                        }))
                         .build(),
                 MatchedLink.builder()
                         .linkId(3666081)
@@ -538,14 +306,6 @@ class StartToEndMapMatcherIT {
                         .distance(49.3572706954056)
                         .startFraction(START_FRACTION_0)
                         .endFraction(END_FRACTION_1)
-                        .geometry(geometryFactory.createLineString(new Coordinate[]{
-                                new Coordinate(5.428467, 52.177998), new Coordinate(5.427836, 52.177971),
-                                new Coordinate(5.427747, 52.17797)
-                        }))
-                        .originalGeometry(geometryFactory.createLineString(new Coordinate[]{
-                                new Coordinate(5.428467, 52.177998), new Coordinate(5.427836, 52.177971),
-                                new Coordinate(5.427747, 52.17797)
-                        }))
                         .build(),
                 MatchedLink.builder()
                         .linkId(3666082)
@@ -553,14 +313,6 @@ class StartToEndMapMatcherIT {
                         .distance(49.39696866946102)
                         .startFraction(START_FRACTION_0)
                         .endFraction(END_FRACTION_1)
-                        .geometry(geometryFactory.createLineString(new Coordinate[]{
-                                new Coordinate(5.427747, 52.17797), new Coordinate(5.427079, 52.177963),
-                                new Coordinate(5.427025, 52.177964)
-                        }))
-                        .originalGeometry(geometryFactory.createLineString(new Coordinate[]{
-                                new Coordinate(5.427747, 52.17797), new Coordinate(5.427079, 52.177963),
-                                new Coordinate(5.427025, 52.177964)
-                        }))
                         .build(),
                 MatchedLink.builder()
                         .linkId(3666083)
@@ -568,14 +320,6 @@ class StartToEndMapMatcherIT {
                         .distance(49.37634675580076)
                         .startFraction(START_FRACTION_0)
                         .endFraction(END_FRACTION_1)
-                        .geometry(geometryFactory.createLineString(new Coordinate[]{
-                                new Coordinate(5.427025, 52.177964), new Coordinate(5.4266949, 52.177971),
-                                new Coordinate(5.426323, 52.178013), new Coordinate(5.42631, 52.178015)
-                        }))
-                        .originalGeometry(geometryFactory.createLineString(new Coordinate[]{
-                                new Coordinate(5.427025, 52.177964), new Coordinate(5.4266949, 52.177971),
-                                new Coordinate(5.426323, 52.178013), new Coordinate(5.42631, 52.178015)
-                        }))
                         .build(),
                 MatchedLink.builder()
                         .linkId(3666084)
@@ -583,14 +327,6 @@ class StartToEndMapMatcherIT {
                         .distance(49.40652704805976)
                         .startFraction(START_FRACTION_0)
                         .endFraction(END_FRACTION_1)
-                        .geometry(geometryFactory.createLineString(new Coordinate[]{
-                                new Coordinate(5.42631, 52.178015), new Coordinate(5.42593, 52.178082),
-                                new Coordinate(5.425628, 52.178159)
-                        }))
-                        .originalGeometry(geometryFactory.createLineString(new Coordinate[]{
-                                new Coordinate(5.42631, 52.178015), new Coordinate(5.42593, 52.178082),
-                                new Coordinate(5.425628, 52.178159)
-                        }))
                         .build(),
                 MatchedLink.builder()
                         .linkId(3666085)
@@ -598,14 +334,6 @@ class StartToEndMapMatcherIT {
                         .distance(49.37832995226587)
                         .startFraction(START_FRACTION_0)
                         .endFraction(END_FRACTION_1)
-                        .geometry(geometryFactory.createLineString(new Coordinate[]{
-                                new Coordinate(5.425628, 52.178159), new Coordinate(5.425557, 52.178177),
-                                new Coordinate(5.4252269, 52.178303), new Coordinate(5.425037, 52.178409)
-                        }))
-                        .originalGeometry(geometryFactory.createLineString(new Coordinate[]{
-                                new Coordinate(5.425628, 52.178159), new Coordinate(5.425557, 52.178177),
-                                new Coordinate(5.4252269, 52.178303), new Coordinate(5.425037, 52.178409)
-                        }))
                         .build(),
                 MatchedLink.builder()
                         .linkId(3666086)
@@ -613,12 +341,6 @@ class StartToEndMapMatcherIT {
                         .distance(22.597894098636313)
                         .startFraction(START_FRACTION_0)
                         .endFraction(0.4580642228401559)
-                        .geometry(geometryFactory.createLineString(new Coordinate[]{
-                                new Coordinate(5.425037, 52.178409), new Coordinate(5.4247923939463245, 52.17854550300374)
-                        }))
-                        .originalGeometry(geometryFactory.createLineString(new Coordinate[]{
-                                new Coordinate(5.425037, 52.178409), new Coordinate(5.424503, 52.178707)
-                        }))
                         .build());
         assertThat(lineStringMatch.getUpstreamLinkIds())
                 .containsExactlyInAnyOrder(3666097, 3666096, 3666095, 3666094, 7223062, 7223061);
