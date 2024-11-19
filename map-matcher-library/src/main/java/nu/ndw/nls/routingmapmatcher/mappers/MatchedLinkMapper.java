@@ -49,8 +49,6 @@ public class MatchedLinkMapper {
                     .startFraction(startFraction)
                     .distance(matchedEdgeLink.getDistance())
                     .endFraction(endFraction)
-                    .geometry(matchedEdgeLink.getGeometry())
-                    .originalGeometry(matchedEdgeLink.getOriginalGeometry())
                     .build());
 
             i++;
