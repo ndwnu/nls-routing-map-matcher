@@ -131,12 +131,7 @@ public class Router {
             QueryGraph queryGraph = QueryGraphExtractor.extractQueryGraph(path);
             double startFraction = PathUtil.determineStartLinkFraction(edges.getFirst(), queryGraph, fractionAndDistanceCalculator);
             double endFraction = PathUtil.determineEndLinkFraction(edges.getLast(), queryGraph, fractionAndDistanceCalculator);
-            List<MatchedEdgeLink> matchedEdgeLinks = PathUtil.determineMatchedLinks(
-                    encodingManager,
-                    queryGraph,
-                    fractionAndDistanceCalculator,
-                    edges
-            );
+            List<MatchedEdgeLink> matchedEdgeLinks = PathUtil.determineMatchedLinks(encodingManager, fractionAndDistanceCalculator, edges);
 
             routingLegResponse.add(RoutingLegResponse.builder()
                     .matchedLinks(matchedLinkMapper.map(matchedEdgeLinks, startFraction, endFraction))

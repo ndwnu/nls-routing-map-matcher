@@ -86,7 +86,7 @@ public class LineStringMatchUtil {
                 fractionAndDistanceCalculator);
 
         List<MatchedLink> matchedLinks = matchedLinkMapper.map(
-                PathUtil.determineMatchedLinks(encodingManager, queryGraph, fractionAndDistanceCalculator, edges),
+                PathUtil.determineMatchedLinks(encodingManager, fractionAndDistanceCalculator, edges),
                 startLinkFraction, endLinkFraction);
 
         Point startPoint = pointListUtil.toLineString(startEdge.fetchWayGeometry(FetchMode.ALL)).getStartPoint();
