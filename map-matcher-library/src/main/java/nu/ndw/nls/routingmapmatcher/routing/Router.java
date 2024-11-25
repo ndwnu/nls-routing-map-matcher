@@ -83,9 +83,14 @@ public class Router {
 
     private List<Point> snapPointsToNodes(String routingRequest, List<Point> points) {
         ensurePointsAreInBounds(points);
-        return points.stream()
+        List<Point> snappedPoints = points.stream()
                 .map(point -> snapPointToNode(routingRequest, point))
+                .distinct()
                 .toList();
+        if (snappedPoints.size() != points.size()) {
+            throw new RoutingRequestException("Invalid routing request: Points are snapped to the same node");
+        }
+        return snappedPoints;
     }
 
     private void ensurePointsAreInBounds(List<Point> points) {

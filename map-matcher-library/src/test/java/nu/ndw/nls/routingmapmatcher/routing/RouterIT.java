@@ -123,6 +123,26 @@ class RouterIT {
 
     @SneakyThrows
     @Test
+    void route_sameNode_snapToNodes() {
+        setupNetwork();
+        Point start = geometryFactory.createPoint(new Coordinate(5.430496, 52.177687));
+        Point sameAsStart = geometryFactory.createPoint(new Coordinate(5.430500, 52.177700));
+        Point end = geometryFactory.createPoint(new Coordinate(5.428436, 52.175901));
+        List<Point> wayPoints = List.of(start, sameAsStart, end);
+        assertThatException()
+                .isThrownBy(
+                        () -> router.route(RoutingRequest.builder()
+                                .routingProfile(CAR)
+                                .wayPoints(wayPoints)
+                                .snapToNodes(true)
+                                .build())
+                )
+                .isInstanceOf(RoutingRequestException.class)
+                .withMessage("Invalid routing request: Points are snapped to the same node");
+    }
+
+    @SneakyThrows
+    @Test
     void route_ok_noSimplify() {
         setupNetwork();
         Point start = geometryFactory.createPoint(new Coordinate(5.430496, 52.177687));
