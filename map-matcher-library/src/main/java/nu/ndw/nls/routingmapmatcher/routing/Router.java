@@ -110,7 +110,7 @@ public class Router {
         Snap snap = networkGraphHopper.getLocationIndex().findClosest(point.getY(), point.getX(), finiteWeightFilter);
         if (!snap.isValid()) {
             throw new RoutingRequestException(
-                    "Invalid routing request: Cannot snap point %f,%f to node".formatted(point.getY(), point.getX())
+                    "Invalid routing request: Cannot snap point %s,%s to node".formatted(point.getY(), point.getX())
             );
         }
         double snappedLat = networkGraphHopper.getBaseGraph().getNodeAccess().getLat(snap.getClosestNode());
