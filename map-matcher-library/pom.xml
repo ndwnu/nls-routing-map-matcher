@@ -20,8 +20,6 @@
             <groupId>com.conductor</groupId>
             <artifactId>stream-utils</artifactId>
         </dependency>
-
-        <!-- Graphhopper -->
         <dependency>
             <groupId>com.graphhopper</groupId>
             <artifactId>graphhopper-core</artifactId>
@@ -39,17 +37,19 @@
             <artifactId>routing-map-matcher-geometry</artifactId>
             <version>${project.version}</version>
         </dependency>
-        <!-- JTS GEO-->
         <dependency>
             <groupId>nu.ndw.nls.geometry</groupId>
             <artifactId>nls-geometry</artifactId>
         </dependency>
         <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
             <groupId>org.wololo</groupId>
             <artifactId>jts2geojson</artifactId>
         </dependency>
-
-        <!-- Utilities -->
         <dependency>
             <groupId>com.esotericsoftware.kryo</groupId>
             <artifactId>kryo5</artifactId>
@@ -62,7 +62,6 @@
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
         </dependency>
-        <!-- Logging -->
         <dependency>
             <groupId>ch.qos.logback</groupId>
             <artifactId>logback-classic</artifactId>
