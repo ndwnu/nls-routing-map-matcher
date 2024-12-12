@@ -2,8 +2,8 @@ package nu.ndw.nls.routingmapmatcher.network.init.annotation.encodedvaluefactori
 
 import com.graphhopper.routing.ev.DecimalEncodedValueImpl;
 import com.graphhopper.routing.ev.EncodedValue;
+import nu.ndw.nls.routingmapmatcher.network.annotations.NetworkEncoded;
 import nu.ndw.nls.routingmapmatcher.network.annotations.model.EncodedValueDto;
-import nu.ndw.nls.routingmapmatcher.network.model.Link;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -17,7 +17,7 @@ public class EncodedDoubleValueFactory implements EncodedValueFactory<Double> {
     }
 
     @Override
-    public <T extends Link> EncodedValue encode(EncodedValueDto<T, Double> encodedValueDto) {
+    public <T extends NetworkEncoded> EncodedValue encode(EncodedValueDto<T, Double> encodedValueDto) {
         return new DecimalEncodedValueImpl(encodedValueDto.key(), encodedValueDto.bits(), 0.0,
                 DECIMAL_FACTOR, false, encodedValueDto.isDirectional(), true);
     }

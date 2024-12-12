@@ -4,11 +4,11 @@ import com.graphhopper.routing.ev.DecimalEncodedValue;
 import com.graphhopper.routing.ev.EdgeIntAccess;
 import com.graphhopper.routing.ev.EncodedValueLookup;
 import lombok.extern.slf4j.Slf4j;
+import nu.ndw.nls.routingmapmatcher.network.annotations.NetworkEncoded;
 import nu.ndw.nls.routingmapmatcher.network.annotations.model.EncodedValueDto;
-import nu.ndw.nls.routingmapmatcher.network.model.Link;
 
 @Slf4j
-public class EncodedDoubleMapper<T extends Link> extends AbstractEncodedMapper<T, Double> {
+public class EncodedDoubleMapper<T extends NetworkEncoded> extends AbstractEncodedMapper<T, Double> {
 
     private final DecimalEncodedValue doubleEnc;
 

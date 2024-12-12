@@ -3,10 +3,10 @@ package nu.ndw.nls.routingmapmatcher.network.init.annotation.mappers;
 import com.graphhopper.routing.ev.EdgeIntAccess;
 import com.graphhopper.routing.ev.EncodedValueLookup;
 import com.graphhopper.routing.ev.StringEncodedValue;
+import nu.ndw.nls.routingmapmatcher.network.annotations.NetworkEncoded;
 import nu.ndw.nls.routingmapmatcher.network.annotations.model.EncodedValueDto;
-import nu.ndw.nls.routingmapmatcher.network.model.Link;
 
-public class EncodedStringValueMapper<T extends Link> extends AbstractEncodedMapper<T, String> {
+public class EncodedStringValueMapper<T extends NetworkEncoded> extends AbstractEncodedMapper<T, String> {
 
     private final StringEncodedValue stringEncodedValue;
 

@@ -88,7 +88,11 @@ public class LinkImportRegistry<T extends Link> implements ImportRegistry {
         } else if (profileAccessAndSpeedAttributes.isAccessAttribute(name)) {
             return VehicleAccess.create(vehicleName);
         }
-        EncodedValueDto<T, U> encodedValueDto = encodedValuesByTypeDto.get(type, name);
+
+        EncodedValueDto<T, U> encodedValueDto = encodedValuesByTypeDto.getByKey(type, name)
+                .orElseThrow(() -> new IllegalStateException("Failed to find encoded value by type '%s' and name '%s'"
+                        .formatted(type.getSimpleName(), name)));
+
         EncodedValueFactory<U> encodedValueFactory =
                 encodedValueFactoryRegistry.lookupEncodedValueFactory(type)
                         .orElseThrow(() -> new IllegalStateException(
@@ -105,7 +109,9 @@ public class LinkImportRegistry<T extends Link> implements ImportRegistry {
                         .orElseThrow(() -> new IllegalStateException(
                                 "No tag parser found for name: %s with type: %s".formatted(name, valueType)));
 
-        return encodedMapperFactory.create(lookup, encodedValuesByTypeDto.get(valueType, name));
+        return encodedMapperFactory.create(lookup, encodedValuesByTypeDto.getByKey(valueType, name)
+                .orElseThrow(() -> new IllegalStateException("Failed to find encoded value by type '%s' and name '%s'"
+                        .formatted(valueType.getSimpleName(), name))));
     }
 
     private LinkVehicleMapper<T> getMapperForAttribute(String attributeName) {

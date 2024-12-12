@@ -1,9 +1,9 @@
 package nu.ndw.nls.routingmapmatcher.network.init.annotation.parserfactories;
 
 import com.graphhopper.routing.ev.EncodedValueLookup;
+import nu.ndw.nls.routingmapmatcher.network.annotations.NetworkEncoded;
 import nu.ndw.nls.routingmapmatcher.network.annotations.model.EncodedValueDto;
 import nu.ndw.nls.routingmapmatcher.network.init.annotation.mappers.AbstractEncodedMapper;
-import nu.ndw.nls.routingmapmatcher.network.model.Link;
 import nu.ndw.nls.routingmapmatcher.typesafety.Typed;
 
 /**
@@ -14,7 +14,7 @@ public interface EncodedMapperFactory<T> extends Typed<T> {
 
     Class<T> getType();
 
-    <U extends Link> AbstractEncodedMapper<U, T> create(EncodedValueLookup lookup,
+    <U extends NetworkEncoded> AbstractEncodedMapper<U, T> create(EncodedValueLookup lookup,
             EncodedValueDto<U, T> encodedValueDto);
 
 }

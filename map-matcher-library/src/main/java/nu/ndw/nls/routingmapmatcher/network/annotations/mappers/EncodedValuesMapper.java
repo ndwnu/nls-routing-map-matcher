@@ -8,11 +8,11 @@ import java.util.function.Function;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import nu.ndw.nls.routingmapmatcher.network.annotations.EncodedValue;
+import nu.ndw.nls.routingmapmatcher.network.annotations.NetworkEncoded;
 import nu.ndw.nls.routingmapmatcher.network.annotations.model.AnnotatedPropertyDto;
 import nu.ndw.nls.routingmapmatcher.network.annotations.model.EncodedValueDto;
 import nu.ndw.nls.routingmapmatcher.network.annotations.model.EncodedValuesByTypeDto;
 import nu.ndw.nls.routingmapmatcher.network.model.DirectionalDto;
-import nu.ndw.nls.routingmapmatcher.network.model.Link;
 import org.apache.commons.lang3.ClassUtils;
 import org.springframework.stereotype.Component;
 
@@ -37,8 +37,7 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class EncodedValuesMapper {
 
-    private static final String DIRECTIONAL_EXCEPTION_MSG =
-            "Failed invoke getter method %s to obtain Link DirectionalDto %s value";
+    private static final String DIRECTIONAL_EXCEPTION_MSG = "Failed invoke getter method %s to obtain Link DirectionalDto %s value";
 
     private final AnnotationMapper annotationMapper;
     private final DirectionalFieldGenericTypeArgumentMapper directionalFieldGenericTypeArgumentMapper;
@@ -59,7 +58,7 @@ public class EncodedValuesMapper {
                                                                  Function<T, R> valueSupplierReverse) {
     }
 
-    public <T extends Link> EncodedValuesByTypeDto<T> map(Class<T> annotatedClass) {
+    public <T extends NetworkEncoded> EncodedValuesByTypeDto<T> map(Class<T> annotatedClass) {
 
         Map<String, AnnotatedPropertyDto<T, EncodedValue>> fieldAnnotatedPropertyDtoMap = annotationMapper
                 .resolveAnnotation(EncodedValue.class, annotatedClass);
@@ -74,7 +73,7 @@ public class EncodedValuesMapper {
         return result;
     }
 
-    private <T extends Link, R> EncodedValueDto<T, R> mapDecideDirectional(Class<T> annotatedClass,
+    private <T extends NetworkEncoded, R> EncodedValueDto<T, R> mapDecideDirectional(Class<T> annotatedClass,
             AnnotatedPropertyDto<T, EncodedValue> dto) {
         if (DirectionalDto.class.equals(dto.getterMethod().getReturnType())) {
             return mapDirectional(annotatedClass, dto);
@@ -83,7 +82,7 @@ public class EncodedValuesMapper {
         }
     }
 
-    private <T extends Link, R> EncodedValueDto<T, R> mapDirectional(Class<T> annotatedClass,
+    private <T extends NetworkEncoded, R> EncodedValueDto<T, R> mapDirectional(Class<T> annotatedClass,
             AnnotatedPropertyDto<T, EncodedValue> dto) {
 
         TypeAndValueSupplierFunctionDirectional<T,R> valueGetterFunctionDirectional =
@@ -92,11 +91,13 @@ public class EncodedValuesMapper {
         return EncodedValueDto.<T, R>builder().key(dto.annotationValue().key()).bits(dto.annotationValue().bits())
                 .valueType(valueGetterFunctionDirectional.returnType())
                 .valueSupplier(valueGetterFunctionDirectional.valueSupplierForward())
-                .valueReverseSupplier(valueGetterFunctionDirectional.valueSupplierReverse()).build();
+                .valueReverseSupplier(valueGetterFunctionDirectional.valueSupplierReverse())
+                .propertyName(dto.propertyName())
+                .build();
     }
 
 
-    private <T extends Link, R> EncodedValueDto<T, R> mapNonDirectional(AnnotatedPropertyDto<T, EncodedValue> dto) {
+    private static <T extends NetworkEncoded, R> EncodedValueDto<T, R> mapNonDirectional(AnnotatedPropertyDto<T, EncodedValue> dto) {
 
         TypeAndValueSupplierFunction<T, R> valueGetterFunction = createValueGetterFunction(dto.getterMethod());
 
@@ -104,7 +105,9 @@ public class EncodedValuesMapper {
                 .key(dto.annotationValue().key())
                 .bits(dto.annotationValue().bits())
                 .valueType(valueGetterFunction.returnType())
-                .valueSupplier(valueGetterFunction.valueSupplierFunction()).build();
+                .valueSupplier(valueGetterFunction.valueSupplierFunction())
+                .propertyName(dto.propertyName())
+                .build();
     }
 
     /**
@@ -116,11 +119,10 @@ public class EncodedValuesMapper {
      * @param <R> Value
      */
     @SuppressWarnings("unchecked")
-    private <T extends Link, R> TypeAndValueSupplierFunctionDirectional<T, R> createValueGetterFunctionDirectional(
+    private <T extends NetworkEncoded, R> TypeAndValueSupplierFunctionDirectional<T, R> createValueGetterFunctionDirectional(
             Class<T> annotatedClass, AnnotatedPropertyDto<T, EncodedValue> dto) {
 
-        Class<?> directionalGenericType = directionalFieldGenericTypeArgumentMapper.map(annotatedClass,
-                dto.propertyName());
+        Class<?> directionalGenericType = directionalFieldGenericTypeArgumentMapper.map(annotatedClass, dto.propertyName());
 
         Method getterMethod = dto.getterMethod();
         return new TypeAndValueSupplierFunctionDirectional<>(
@@ -128,20 +130,19 @@ public class EncodedValuesMapper {
                 link -> getForward(getterMethod, link),
                 link -> getReverse(getterMethod, link)
         );
-
     }
 
-    private <T extends Link, R> R getForward(Method getterMethod, T link) {
+    private static <T extends NetworkEncoded, R> R getForward(Method getterMethod, T link) {
         Optional<DirectionalDto<R>> directionalDtoOptional = getDirectionalDto(getterMethod, link, "forward");
         return directionalDtoOptional.map(DirectionalDto::forward).orElse(null);
     }
 
-    private <T extends Link, R> R getReverse(Method getterMethod, T link) {
+    private static <T extends NetworkEncoded, R> R getReverse(Method getterMethod, T link) {
         Optional<DirectionalDto<R>> directionalDtoOptional = getDirectionalDto(getterMethod, link, "reverse");
         return directionalDtoOptional.map(DirectionalDto::reverse).orElse(null);
     }
 
-    private <T extends Link, R> Optional<DirectionalDto<R>> getDirectionalDto(Method getterMethod, T link,
+    private static <T extends NetworkEncoded, R> Optional<DirectionalDto<R>> getDirectionalDto(Method getterMethod, T link,
             String direction) {
         try {
             return Optional.ofNullable((DirectionalDto<R>) getterMethod.invoke(link));
@@ -151,7 +152,7 @@ public class EncodedValuesMapper {
     }
 
     @SuppressWarnings("unchecked")
-    private static <T extends Link, R> TypeAndValueSupplierFunction<T, R> createValueGetterFunction(
+    private static <T extends NetworkEncoded, R> TypeAndValueSupplierFunction<T, R> createValueGetterFunction(
             Method getterMethod) {
         return new TypeAndValueSupplierFunction<>((Class<R>) boxPrimitive(getterMethod.getReturnType()), link -> {
             try {

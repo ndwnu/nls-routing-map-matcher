@@ -17,6 +17,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 class EncodedStringValueFactoryTest {
 
     private static final String NAME_KEY = "key";
+    protected static final int VALUE_COUNT = 3;
 
     @Mock
     private EncodedValueDto<?, String> encodedValueDto;
@@ -41,8 +42,10 @@ class EncodedStringValueFactoryTest {
     private void encode(Boolean directional) {
         when(encodedValueDto.key()).thenReturn(NAME_KEY);
         when(encodedValueDto.isDirectional()).thenReturn(directional);
+        when(encodedValueDto.bits()).thenReturn(VALUE_COUNT);
         EncodedValue encode = encodedStringValueFactory.encode(encodedValueDto);
         verify(encodedValueDto).key();
+        verify(encodedValueDto).bits();
         verify(encodedValueDto).isDirectional();
         StringEncodedValue stringEncodedValue = assertInstanceOf(StringEncodedValue.class, encode);
         assertEquals(NAME_KEY, stringEncodedValue.getName());

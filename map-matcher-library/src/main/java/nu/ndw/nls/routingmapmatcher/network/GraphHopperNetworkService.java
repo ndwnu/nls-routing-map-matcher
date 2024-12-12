@@ -150,7 +150,7 @@ public class GraphHopperNetworkService {
     private <T extends Link> String getEncodedValuesString(List<String> accessAndSpeedAttributes,
             EncodedValuesByTypeDto<T> encodedValuesByTypeDto) {
         return Stream.concat(
-                        encodedValuesByTypeDto.keySet().stream(),
+                        encodedValuesByTypeDto.getNetworkEncodedValueNameKeySet().stream(),
                         accessAndSpeedAttributes.stream()
                 )
                 .collect(Collectors.joining(DELIMITER));
