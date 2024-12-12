@@ -3,6 +3,7 @@ package nu.ndw.nls.routingmapmatcher.network.annotations.model;
 import java.util.function.Function;
 import lombok.Builder;
 import nu.ndw.nls.routingmapmatcher.network.annotations.EncodedValue;
+import nu.ndw.nls.routingmapmatcher.network.annotations.NetworkEncoded;
 import nu.ndw.nls.routingmapmatcher.network.model.DirectionalDto;
 import nu.ndw.nls.routingmapmatcher.network.model.Link;
 
@@ -10,6 +11,7 @@ import nu.ndw.nls.routingmapmatcher.network.model.Link;
  * Meta information about {@link Link } fields that are annotated with {@link EncodedValue}. Describes which fields
  * need to be encoded into a graphhopper network and how the encoding should be performed.
  *
+ * @param propertyName property name associated with the encoded key.
  * @param key key used to encode the value into graphhopper
  * @param bits the amount of bits as read from the {@link EncodedValue}. Only applies for graphhopper encoders that
  *             offer specifying the amount of bits, like for the integer encoder.
@@ -25,8 +27,8 @@ import nu.ndw.nls.routingmapmatcher.network.model.Link;
  *           the same type.
  */
 @Builder
-public record EncodedValueDto<T extends Link, R>(String key, int bits, Class<R> valueType,
-                                                 Function<T, R> valueSupplier, Function<T, R> valueReverseSupplier) {
+public record EncodedValueDto<T extends NetworkEncoded, R>(String propertyName, String key, int bits, Class<R> valueType,
+                                                           Function<T, R> valueSupplier, Function<T, R> valueReverseSupplier) {
 
     /**
      * @return true if this instance is describing a directional field

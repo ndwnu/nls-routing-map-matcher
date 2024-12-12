@@ -4,11 +4,12 @@ import com.graphhopper.reader.ReaderWay;
 import lombok.Getter;
 import lombok.ToString;
 import nu.ndw.nls.routingmapmatcher.network.annotations.EncodedValue;
+import nu.ndw.nls.routingmapmatcher.network.annotations.NetworkEncoded;
 import org.locationtech.jts.geom.LineString;
 
 @Getter
 @ToString(exclude = "geometry", callSuper = true)
-public class Link extends ReaderWay {
+public class Link extends ReaderWay implements NetworkEncoded {
 
     public static final String WAY_ID_KEY = "way_id";
     public static final String REVERSED_LINK_ID = "reversed_link_id";

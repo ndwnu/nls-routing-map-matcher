@@ -1,10 +1,10 @@
 package nu.ndw.nls.routingmapmatcher.network.init.annotation.parserfactories;
 
 import com.graphhopper.routing.ev.EncodedValueLookup;
+import nu.ndw.nls.routingmapmatcher.network.annotations.NetworkEncoded;
 import nu.ndw.nls.routingmapmatcher.network.annotations.model.EncodedValueDto;
 import nu.ndw.nls.routingmapmatcher.network.init.annotation.mappers.AbstractEncodedMapper;
 import nu.ndw.nls.routingmapmatcher.network.init.annotation.mappers.EncodedLongMapper;
-import nu.ndw.nls.routingmapmatcher.network.model.Link;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -15,7 +15,7 @@ public class EncodedLongMapperFactory implements EncodedMapperFactory<Long> {
     }
 
     @Override
-    public <U extends Link> AbstractEncodedMapper<U, Long> create(EncodedValueLookup lookup,
+    public <U extends NetworkEncoded> AbstractEncodedMapper<U, Long> create(EncodedValueLookup lookup,
             EncodedValueDto<U, Long> encodedValueDto) {
         return new EncodedLongMapper<>(lookup, encodedValueDto);
     }

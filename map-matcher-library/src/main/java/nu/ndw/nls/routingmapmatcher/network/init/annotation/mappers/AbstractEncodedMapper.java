@@ -5,6 +5,7 @@ import com.graphhopper.routing.ev.EdgeIntAccess;
 import com.graphhopper.routing.util.parsers.TagParser;
 import com.graphhopper.storage.IntsRef;
 import lombok.RequiredArgsConstructor;
+import nu.ndw.nls.routingmapmatcher.network.annotations.NetworkEncoded;
 import nu.ndw.nls.routingmapmatcher.network.annotations.model.EncodedValueDto;
 import nu.ndw.nls.routingmapmatcher.network.model.Link;
 
@@ -17,7 +18,7 @@ import nu.ndw.nls.routingmapmatcher.network.model.Link;
  * @param <U> Field type of the value that is obtained
  */
 @RequiredArgsConstructor
-public abstract class AbstractEncodedMapper<T extends Link, U> implements TagParser {
+public abstract class AbstractEncodedMapper<T extends NetworkEncoded, U> implements TagParser {
 
     private final EncodedValueDto<T, U> encodedValueDto;
 

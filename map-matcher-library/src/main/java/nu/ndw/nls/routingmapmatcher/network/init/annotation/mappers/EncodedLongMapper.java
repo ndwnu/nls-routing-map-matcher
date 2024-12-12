@@ -3,10 +3,10 @@ package nu.ndw.nls.routingmapmatcher.network.init.annotation.mappers;
 import com.graphhopper.routing.ev.EdgeIntAccess;
 import com.graphhopper.routing.ev.EncodedValueLookup;
 import com.graphhopper.routing.ev.IntEncodedValue;
+import nu.ndw.nls.routingmapmatcher.network.annotations.NetworkEncoded;
 import nu.ndw.nls.routingmapmatcher.network.annotations.model.EncodedValueDto;
-import nu.ndw.nls.routingmapmatcher.network.model.Link;
 
-public class EncodedLongMapper<T extends Link> extends AbstractEncodedMapper<T, Long> {
+public class EncodedLongMapper<T extends NetworkEncoded> extends AbstractEncodedMapper<T, Long> {
 
     private static final String CODE_TOO_LARGE_MSG =
             "Cannot store %s: %d as it is too large (> %d). You can disable %s if you do not need it.";
