@@ -7,7 +7,6 @@ import com.graphhopper.util.shapes.GHPoint;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import nu.ndw.nls.geometry.bearing.BearingCalculator;
-import nu.ndw.nls.geometry.constants.SRID;
 import nu.ndw.nls.routingmapmatcher.geometry.model.ClosestPointResult;
 import org.locationtech.jts.geom.Coordinate;
 import org.springframework.stereotype.Service;
@@ -50,7 +49,7 @@ public class ClosestPointService {
 
         return new ClosestPointResult(
                 DIST_PLANE.calcDist(r.y, r.x, projection.lat, projection.lon),
-                bearingCalculator.calculateBearing(a, b, SRID.WGS84),
+                bearingCalculator.calculateBearing(a, b),
                 new Coordinate(projection.lon, projection.lat)
         );
     }
