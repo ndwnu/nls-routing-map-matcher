@@ -6,8 +6,6 @@ import static nu.ndw.nls.routingmapmatcher.network.model.Link.WAY_ID_KEY;
 import static nu.ndw.nls.routingmapmatcher.util.MatchUtil.getQueryResults;
 import static nu.ndw.nls.routingmapmatcher.util.PathUtil.determineEdgeDirection;
 
-import com.google.common.base.Preconditions;
-import com.google.common.collect.Lists;
 import com.graphhopper.config.Profile;
 import com.graphhopper.routing.util.EncodingManager;
 import com.graphhopper.routing.util.FiniteWeightFilter;
@@ -21,6 +19,7 @@ import com.graphhopper.util.EdgeIteratorState;
 import com.graphhopper.util.FetchMode;
 import com.graphhopper.util.PMap;
 import java.util.List;
+import java.util.Objects;
 import nu.ndw.nls.geometry.bearing.BearingCalculator;
 import nu.ndw.nls.geometry.distance.FractionAndDistanceCalculator;
 import nu.ndw.nls.geometry.factories.GeometryFactoryWgs84;
@@ -67,8 +66,8 @@ public class SinglePointMapMatcher implements MapMatcher<SinglePointLocation, Si
             String profileName, ClosestPointService closestPointService,
             PointListUtil pointListUtil) {
         this.diameterToPolygonMapper = diameterToPolygonMapper;
-        this.network = Preconditions.checkNotNull(network);
-        this.profile = Preconditions.checkNotNull(network.getProfile(profileName));
+        this.network = Objects.requireNonNull(network);
+        this.profile = Objects.requireNonNull(network.getProfile(profileName));
         this.locationIndexTree = network.getLocationIndex();
         BaseGraph baseGraph = network.getBaseGraph();
         EncodingManager encodingManager = network.getEncodingManager();
@@ -92,7 +91,7 @@ public class SinglePointMapMatcher implements MapMatcher<SinglePointLocation, Si
     }
 
     public SinglePointMatch match(SinglePointLocation singlePointLocation) {
-        Preconditions.checkNotNull(singlePointLocation);
+        Objects.requireNonNull(singlePointLocation);
         Weighting matchWeighting = network.createWeighting(profile, new PMap());
         Point inputPoint = singlePointLocation.getPoint();
         double inputRadius = singlePointLocation.getCutoffDistance();
@@ -211,7 +210,7 @@ public class SinglePointMapMatcher implements MapMatcher<SinglePointLocation, Si
     private SinglePointMatch createFailedMatch(SinglePointLocation singlePointLocation) {
         return SinglePointMatch.builder()
                 .id(singlePointLocation.getId())
-                .candidateMatches(Lists.newArrayList())
+                .candidateMatches(List.of())
                 .reliability(0.0)
                 .status(MatchStatus.NO_MATCH)
                 .build();
