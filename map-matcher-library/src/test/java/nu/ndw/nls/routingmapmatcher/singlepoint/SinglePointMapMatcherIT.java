@@ -1,14 +1,8 @@
 package nu.ndw.nls.routingmapmatcher.singlepoint;
 
 import static nu.ndw.nls.routingmapmatcher.testutil.TestNetworkProvider.CAR;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.closeTo;
-import static org.hamcrest.Matchers.containsInAnyOrder;
-import static org.hamcrest.Matchers.hasSize;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.notNullValue;
-import static org.hamcrest.Matchers.nullValue;
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.offset;
 
 import java.util.List;
 import java.util.Set;
@@ -68,14 +62,14 @@ public class SinglePointMapMatcherIT {
                 .id(ID)
                 .point(point)
                 .build());
-        assertThat(singlePointMatch, is(notNullValue()));
-        assertEquals(ID, singlePointMatch.getId());
-        assertThat(singlePointMatch.getStatus(), is(MatchStatus.MATCH));
+        assertThat(singlePointMatch).isNotNull();
+        assertThat(singlePointMatch.getId()).isEqualTo(ID);
+        assertThat(singlePointMatch.getStatus()).isEqualTo(MatchStatus.MATCH);
         List<CandidateMatch> candidateMatches = getNearestCandidateMatches(singlePointMatch.getCandidateMatches());
-        assertThat(candidateMatches, hasSize(1));
+        assertThat(candidateMatches).hasSize(1);
         assertThatUpstreamAndDownstreamAreNull(candidateMatches);
-        assertThat(getSnappedPoints(candidateMatches), hasSize(1));
-        assertThat(singlePointMatch.getCandidateMatches().getFirst().getFraction(), closeTo(expectedFraction, 0.01));
+        assertThat(getSnappedPoints(candidateMatches)).hasSize(1);
+        assertThat(singlePointMatch.getCandidateMatches().getFirst().getFraction()).isCloseTo(expectedFraction, offset(0.01));
     }
 
     @SneakyThrows
@@ -89,14 +83,14 @@ public class SinglePointMapMatcherIT {
                 .id(ID)
                 .point(point)
                 .build());
-        assertThat(singlePointMatch, is(notNullValue()));
-        assertEquals(ID, singlePointMatch.getId());
-        assertThat(singlePointMatch.getStatus(), is(MatchStatus.MATCH));
+        assertThat(singlePointMatch).isNotNull();
+        assertThat(singlePointMatch.getId()).isEqualTo(ID);
+        assertThat(singlePointMatch.getStatus()).isEqualTo(MatchStatus.MATCH);
         List<CandidateMatch> candidateMatches = getNearestCandidateMatches(singlePointMatch.getCandidateMatches());
-        assertThat(candidateMatches, hasSize(1));
+        assertThat(candidateMatches).hasSize(1);
         assertThatUpstreamAndDownstreamAreNull(candidateMatches);
-        assertThat(getSnappedPoints(candidateMatches), hasSize(1));
-        assertThat(singlePointMatch.getReliability(), is(66.96798791959225));
+        assertThat(getSnappedPoints(candidateMatches)).hasSize(1);
+        assertThat(singlePointMatch.getReliability()).isEqualTo(66.96798791959225);
     }
 
     @SneakyThrows
@@ -110,14 +104,14 @@ public class SinglePointMapMatcherIT {
                 .id(ID)
                 .point(point)
                 .build());
-        assertThat(singlePointMatch, is(notNullValue()));
-        assertEquals(ID, singlePointMatch.getId());
-        assertThat(singlePointMatch.getStatus(), is(MatchStatus.MATCH));
+        assertThat(singlePointMatch).isNotNull();
+        assertThat(singlePointMatch.getId()).isEqualTo(ID);
+        assertThat(singlePointMatch.getStatus()).isEqualTo(MatchStatus.MATCH);
         List<CandidateMatch> candidateMatches = getNearestCandidateMatches(singlePointMatch.getCandidateMatches());
-        assertThat(candidateMatches, hasSize(2));
+        assertThat(candidateMatches).hasSize(2);
         assertThatUpstreamAndDownstreamAreNull(candidateMatches);
-        assertThat(getSnappedPoints(candidateMatches), hasSize(1));
-        assertThat(singlePointMatch.getReliability(), is(84.53118547414594));
+        assertThat(getSnappedPoints(candidateMatches)).hasSize(1);
+        assertThat(singlePointMatch.getReliability()).isEqualTo(84.53118547414594);
     }
 
     @SneakyThrows
@@ -132,14 +126,14 @@ public class SinglePointMapMatcherIT {
                 .point(point)
                 .bearingFilter(new BearingFilter(85, 30))
                 .build());
-        assertThat(singlePointMatch, is(notNullValue()));
-        assertEquals(ID, singlePointMatch.getId());
-        assertThat(singlePointMatch.getStatus(), is(MatchStatus.MATCH));
+        assertThat(singlePointMatch).isNotNull();
+        assertThat(singlePointMatch.getId()).isEqualTo(ID);
+        assertThat(singlePointMatch.getStatus()).isEqualTo(MatchStatus.MATCH);
         List<CandidateMatch> candidateMatches = getNearestCandidateMatches(singlePointMatch.getCandidateMatches());
-        assertThat(candidateMatches, hasSize(1));
+        assertThat(candidateMatches).hasSize(1);
         assertThatUpstreamAndDownstreamAreNull(candidateMatches);
-        assertThat(getSnappedPoints(candidateMatches), hasSize(1));
-        assertThat(singlePointMatch.getReliability(), is(79.55725120440115));
+        assertThat(getSnappedPoints(candidateMatches)).hasSize(1);
+        assertThat(singlePointMatch.getReliability()).isEqualTo(79.55725120440115);
     }
 
     @SneakyThrows
@@ -153,14 +147,14 @@ public class SinglePointMapMatcherIT {
                 .id(ID)
                 .point(point)
                 .build());
-        assertThat(singlePointMatch, is(notNullValue()));
-        assertEquals(ID, singlePointMatch.getId());
-        assertThat(singlePointMatch.getStatus(), is(MatchStatus.MATCH));
+        assertThat(singlePointMatch).isNotNull();
+        assertThat(singlePointMatch.getId()).isEqualTo(ID);
+        assertThat(singlePointMatch.getStatus()).isEqualTo(MatchStatus.MATCH);
         List<CandidateMatch> candidateMatches = getNearestCandidateMatches(singlePointMatch.getCandidateMatches());
-        assertThat(candidateMatches, hasSize(8));
+        assertThat(candidateMatches).hasSize(8);
         assertThatUpstreamAndDownstreamAreNull(candidateMatches);
-        assertThat(getSnappedPoints(candidateMatches), hasSize(1));
-        assertThat(singlePointMatch.getReliability(), is(100.0));
+        assertThat(getSnappedPoints(candidateMatches)).hasSize(1);
+        assertThat(singlePointMatch.getReliability()).isEqualTo(100.0);
     }
 
     @SneakyThrows
@@ -175,14 +169,14 @@ public class SinglePointMapMatcherIT {
                 .point(point)
                 .bearingFilter(new BearingFilter(15, 30))
                 .build());
-        assertThat(singlePointMatch, is(notNullValue()));
-        assertEquals(ID, singlePointMatch.getId());
-        assertThat(singlePointMatch.getStatus(), is(MatchStatus.MATCH));
+        assertThat(singlePointMatch).isNotNull();
+        assertThat(singlePointMatch.getId()).isEqualTo(ID);
+        assertThat(singlePointMatch.getStatus()).isEqualTo(MatchStatus.MATCH);
         List<CandidateMatch> candidateMatches = getNearestCandidateMatches(singlePointMatch.getCandidateMatches());
-        assertThat(candidateMatches, hasSize(2));
+        assertThat(candidateMatches).hasSize(2);
         assertThatUpstreamAndDownstreamAreNull(candidateMatches);
-        assertThat(getSnappedPoints(candidateMatches), hasSize(1));
-        assertThat(singlePointMatch.getReliability(), is(97.28721697585911));
+        assertThat(getSnappedPoints(candidateMatches)).hasSize(1);
+        assertThat(singlePointMatch.getReliability()).isEqualTo(97.28721697585911);
     }
 
     @SneakyThrows
@@ -196,14 +190,14 @@ public class SinglePointMapMatcherIT {
                 .id(ID)
                 .point(point)
                 .build());
-        assertThat(singlePointMatch, is(notNullValue()));
-        assertEquals(ID, singlePointMatch.getId());
-        assertThat(singlePointMatch.getStatus(), is(MatchStatus.MATCH));
+        assertThat(singlePointMatch).isNotNull();
+        assertThat(singlePointMatch.getId()).isEqualTo(ID);
+        assertThat(singlePointMatch.getStatus()).isEqualTo(MatchStatus.MATCH);
         List<CandidateMatch> candidateMatches = getNearestCandidateMatches(singlePointMatch.getCandidateMatches());
-        assertThat(candidateMatches, hasSize(2));
+        assertThat(candidateMatches).hasSize(2);
         assertThatUpstreamAndDownstreamAreNull(candidateMatches);
-        assertThat(getSnappedPoints(candidateMatches), hasSize(2));
-        assertThat(singlePointMatch.getReliability(), is(95.53279394202733));
+        assertThat(getSnappedPoints(candidateMatches)).hasSize(2);
+        assertThat(singlePointMatch.getReliability()).isEqualTo(95.53279394202733);
     }
 
     @SneakyThrows
@@ -216,11 +210,11 @@ public class SinglePointMapMatcherIT {
                 .id(ID)
                 .point(point)
                 .build());
-        assertThat(singlePointMatch, is(notNullValue()));
-        assertEquals(ID, singlePointMatch.getId());
-        assertThat(singlePointMatch.getStatus(), is(MatchStatus.NO_MATCH));
-        assertThat(singlePointMatch.getCandidateMatches(), hasSize(0));
-        assertThat(singlePointMatch.getReliability(), is(0.0));
+        assertThat(singlePointMatch).isNotNull();
+        assertThat(singlePointMatch.getId()).isEqualTo(ID);
+        assertThat(singlePointMatch.getStatus()).isEqualTo(MatchStatus.NO_MATCH);
+        assertThat(singlePointMatch.getCandidateMatches()).isEmpty();
+        assertThat(singlePointMatch.getReliability()).isEqualTo(0.0);
     }
 
     @SneakyThrows
@@ -237,32 +231,26 @@ public class SinglePointMapMatcherIT {
                 .downstreamIsochrone(30)
                 .downstreamIsochroneUnit(IsochroneUnit.SECONDS)
                 .build());
-        assertThat(singlePointMatch, is(notNullValue()));
-        assertEquals(ID, singlePointMatch.getId());
-        assertThat(singlePointMatch.getStatus(), is(MatchStatus.MATCH));
+        assertThat(singlePointMatch).isNotNull();
+        assertThat(singlePointMatch.getId()).isEqualTo(ID);
+        assertThat(singlePointMatch.getStatus()).isEqualTo(MatchStatus.MATCH);
         List<CandidateMatch> candidateMatches = getNearestCandidateMatches(singlePointMatch.getCandidateMatches());
-        assertThat(candidateMatches, hasSize(1));
-        assertThat(getSnappedPoints(candidateMatches), hasSize(1));
-        assertThat(singlePointMatch.getReliability(), is(92.4716649970769));
+        assertThat(candidateMatches).hasSize(1);
+        assertThat(getSnappedPoints(candidateMatches)).hasSize(1);
+        assertThat(singlePointMatch.getReliability()).isEqualTo(92.4716649970769);
 
         SinglePointMatch.CandidateMatch candidateMatch = singlePointMatch.getCandidateMatches().getFirst();
-        assertThat(candidateMatch.getMatchedLinkId(), is(3666958));
+        assertThat(candidateMatch.getMatchedLinkId()).isEqualTo(3666958);
 
         // TODO upstream and downstream shouldn't contain matched segment itself?
-        assertThat(
-                candidateMatch.getUpstreamLinkIds(), containsInAnyOrder(3666958,
-                        3666957, 3666956, 3666955, 3667003, 3667002, 3667001, 3667000, 3666999, 3666998, 3666997,
-                        3666996,
-                        3666256, 3666973, 3666972, 3666971, 3666970, 3666969, 3666968, 3666967, 3666966, 3666974,
-                        3667137,
-                        3667136, 3667135, 3667134, 3666244, 3666243, 3666242, 3666241, 3666240, 3666223, 3667125,
-                        3667124,
-                        3667123, 3667122, 3667121, 3667120));
-        assertThat(candidateMatch.getDownstreamLinkIds(), containsInAnyOrder(3666958,
-                3666098, 3666099, 3666100, 3666101, 3666102, 3666103, 3666104, 3666105, 3666106, 3666107, 3666108,
-                3666109, 3686216, 3686217, 3666945, 3666946, 3666947, 3666948, 3666949, 3666950, 3666951, 3666952,
-                3666943, 3666944, 3666953, 3666954, 3666123, 3666110, 3666111, 3666112, 3666113, 3666114, 3666130,
-                3666115, 3666116, 3666117, 3666118, 3666119, 3666120));
+        assertThat(candidateMatch.getUpstreamLinkIds()).containsExactlyInAnyOrder(3666958, 3666957, 3666956, 3666955, 3667003, 3667002,
+                3667001, 3667000, 3666999, 3666998, 3666997, 3666996, 3666256, 3666973, 3666972, 3666971, 3666970, 3666969, 3666968,
+                3666967, 3666966, 3666974, 3667137, 3667136, 3667135, 3667134, 3666244, 3666243, 3666242, 3666241, 3666240, 3666223,
+                3667125, 3667124, 3667123, 3667122, 3667121, 3667120);
+        assertThat(candidateMatch.getDownstreamLinkIds()).containsExactlyInAnyOrder(3666958, 3666098, 3666099, 3666100, 3666101, 3666102,
+                3666103, 3666104, 3666105, 3666106, 3666107, 3666108, 3666109, 3686216, 3686217, 3666945, 3666946, 3666947, 3666948,
+                3666949, 3666950, 3666951, 3666952, 3666943, 3666944, 3666953, 3666954, 3666123, 3666110, 3666111, 3666112, 3666113,
+                3666114, 3666130, 3666115, 3666116, 3666117, 3666118, 3666119, 3666120);
     }
 
     private List<CandidateMatch> getNearestCandidateMatches(List<CandidateMatch> candidateMatches) {
@@ -272,8 +260,8 @@ public class SinglePointMapMatcherIT {
 
     private void assertThatUpstreamAndDownstreamAreNull(List<CandidateMatch> candidateMatches) {
         for (SinglePointMatch.CandidateMatch candidateMatch : candidateMatches) {
-            assertThat(candidateMatch.getUpstream(), is(nullValue()));
-            assertThat(candidateMatch.getDownstream(), is(nullValue()));
+            assertThat(candidateMatch.getUpstream()).isNull();
+            assertThat(candidateMatch.getDownstream()).isNull();
         }
     }
 
