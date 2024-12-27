@@ -1,7 +1,5 @@
 package nu.ndw.nls.routingmapmatcher.network.init;
 
-
-import com.google.common.base.Preconditions;
 import com.graphhopper.coll.LongLongMap;
 import com.graphhopper.routing.ev.EdgeIntAccess;
 import com.graphhopper.routing.util.parsers.TagParser;
@@ -13,6 +11,7 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.function.Supplier;
 import lombok.extern.slf4j.Slf4j;
 import nu.ndw.nls.routingmapmatcher.network.model.Link;
@@ -37,11 +36,10 @@ public class NetworkReader {
             List<TagParser> wayTagParsers, LongLongMap nodeIdToInternalNodeIdMap, Map<Long, Integer> edgeMap,
             boolean expandBounds) {
         this.linkSupplier = linkSupplier;
-        this.nodeIdToInternalNodeIdMap = Preconditions.checkNotNull(nodeIdToInternalNodeIdMap);
-        this.wayTagParsers = Preconditions.checkNotNull(wayTagParsers);
-        this.baseGraph = Preconditions.checkNotNull(baseGraph);
+        this.nodeIdToInternalNodeIdMap = Objects.requireNonNull(nodeIdToInternalNodeIdMap);
+        this.wayTagParsers = Objects.requireNonNull(wayTagParsers);
+        this.baseGraph = Objects.requireNonNull(baseGraph);
         this.edgeIntAccess = baseGraph.createEdgeIntAccess();
-
         this.edgeMap = edgeMap;
         this.expandBounds = expandBounds;
     }
