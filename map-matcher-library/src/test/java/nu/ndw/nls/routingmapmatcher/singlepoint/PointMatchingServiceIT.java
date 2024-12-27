@@ -182,7 +182,7 @@ class PointMatchingServiceIT {
                 .travelDirection(EdgeIteratorTravelDirection.BOTH_DIRECTIONS)
                 .build();
         var matches = pointMatchingService.calculateMatches(request);
-        assertThat(matches).hasSize(0);
+        assertThat(matches).isEmpty();
     }
 
     @Test

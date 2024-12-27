@@ -2,7 +2,6 @@ package nu.ndw.nls.routingmapmatcher.viterbi;
 
 import static nu.ndw.nls.routingmapmatcher.util.MatchUtil.getQueryResults;
 
-import com.google.common.base.Preconditions;
 import com.graphhopper.config.Profile;
 import com.graphhopper.matching.MapMatching;
 import com.graphhopper.matching.MatchResult;
@@ -24,6 +23,7 @@ import com.graphhopper.util.RamerDouglasPeucker;
 import com.graphhopper.util.shapes.GHPoint;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import lombok.extern.slf4j.Slf4j;
 import nu.ndw.nls.geometry.distance.FractionAndDistanceCalculator;
 import nu.ndw.nls.geometry.factories.GeometryFactoryWgs84;
@@ -85,19 +85,18 @@ public class ViterbiLineStringMapMatcher implements
     public ViterbiLineStringMapMatcher(NetworkGraphHopper networkGraphHopper, String profileName,
             GeometryFactoryWgs84 geometryFactoryWgs84, FractionAndDistanceCalculator fractionAndDistanceCalculator,
             PointListUtil pointListUtil) {
-        this.networkGraphHopper = Preconditions.checkNotNull(networkGraphHopper);
+        this.networkGraphHopper = Objects.requireNonNull(networkGraphHopper);
         this.locationIndexTree = networkGraphHopper.getLocationIndex();
         this.geometryFactoryWgs84 = geometryFactoryWgs84;
-        this.profile = Preconditions.checkNotNull(networkGraphHopper.getProfile(profileName));
-        this.lineStringMatchUtil = new LineStringMatchUtil(networkGraphHopper, this.profile,
-                fractionAndDistanceCalculator, pointListUtil);
+        this.profile = Objects.requireNonNull(networkGraphHopper.getProfile(profileName));
+        this.lineStringMatchUtil = new LineStringMatchUtil(networkGraphHopper, this.profile, fractionAndDistanceCalculator, pointListUtil);
         this.lineStringScoreUtil = new LineStringScoreUtil(fractionAndDistanceCalculator);
         this.pointListUtil = pointListUtil;
     }
 
     @Override
     public LineStringMatch match(LineStringLocation lineStringLocation) {
-        Preconditions.checkNotNull(lineStringLocation);
+        Objects.requireNonNull(lineStringLocation);
         PointList pointList = PointList.fromLineString(lineStringLocation.getGeometry());
         var simplifier = new RamerDouglasPeucker();
         simplifier.setMaxDistance(LINE_SMOOTHING_TOLERANCE);

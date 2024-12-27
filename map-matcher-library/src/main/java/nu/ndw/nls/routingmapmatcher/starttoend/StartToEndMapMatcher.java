@@ -3,7 +3,6 @@ package nu.ndw.nls.routingmapmatcher.starttoend;
 import static com.graphhopper.util.Parameters.Algorithms.DIJKSTRA_BI;
 import static nu.ndw.nls.routingmapmatcher.util.MatchUtil.getQueryResults;
 
-import com.google.common.base.Preconditions;
 import com.graphhopper.config.Profile;
 import com.graphhopper.routing.AlgorithmOptions;
 import com.graphhopper.routing.Path;
@@ -25,6 +24,7 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import nu.ndw.nls.geometry.distance.FractionAndDistanceCalculator;
 import nu.ndw.nls.routingmapmatcher.domain.MapMatcher;
 import nu.ndw.nls.routingmapmatcher.model.MatchStatus;
@@ -55,8 +55,8 @@ public class StartToEndMapMatcher implements MapMatcher<LineStringLocation, Line
 
     public StartToEndMapMatcher(NetworkGraphHopper networkGraphHopper, String profileName,
             FractionAndDistanceCalculator fractionAndDistanceCalculator, PointListUtil pointListUtil) {
-        this.networkGraphHopper = Preconditions.checkNotNull(networkGraphHopper);
-        Profile profile = Preconditions.checkNotNull(networkGraphHopper.getProfile(profileName));
+        this.networkGraphHopper = Objects.requireNonNull(networkGraphHopper);
+        Profile profile = Objects.requireNonNull(networkGraphHopper.getProfile(profileName));
         this.routingGraph = networkGraphHopper.getBaseGraph();
         this.algorithmOptions = new AlgorithmOptions()
                 .setAlgorithm(DIJKSTRA_BI)
@@ -75,7 +75,7 @@ public class StartToEndMapMatcher implements MapMatcher<LineStringLocation, Line
     }
 
     public LineStringMatch match(LineStringLocation lineStringLocation) {
-        Preconditions.checkNotNull(lineStringLocation);
+        Objects.requireNonNull(lineStringLocation);
 
         List<Snap> startCandidates = findCandidates(lineStringLocation.getGeometry().getStartPoint());
         List<Snap> endCandidates = findCandidates(lineStringLocation.getGeometry().getEndPoint());

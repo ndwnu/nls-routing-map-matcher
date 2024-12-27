@@ -1,8 +1,7 @@
 package nu.ndw.nls.routingmapmatcher.singlepoint;
 
 import static nu.ndw.nls.routingmapmatcher.testutil.TestNetworkProvider.CAR;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.is;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.List;
 import lombok.SneakyThrows;
@@ -59,7 +58,7 @@ public class SinglePointMapMatcherWithBearingIT {
                 .build();
         SinglePointMatch result = singlePointMapMatcher.match(request);
 
-        assertThat(result, is(SinglePointMatch.builder()
+        assertThat(result).isEqualTo(SinglePointMatch.builder()
                 .id(1)
                 .status(MatchStatus.MATCH)
                 .reliability(BEARING_RELIABILITY)
@@ -71,7 +70,7 @@ public class SinglePointMapMatcherWithBearingIT {
                         .bearing(137.88345016490496)
                         .reliability(BEARING_RELIABILITY)
                         .build()))
-                .build()));
+                .build());
     }
 
     @Test
@@ -84,7 +83,7 @@ public class SinglePointMapMatcherWithBearingIT {
                 .bearingFilter(new BearingFilter(160, 5))
                 .build();
         SinglePointMatch result = singlePointMapMatcher.match(request);
-        assertThat(result, is(SinglePointMatch.builder()
+        assertThat(result).isEqualTo(SinglePointMatch.builder()
                 .id(1)
                 .status(MatchStatus.MATCH)
                 .reliability(SNAPPED_RELIABILITY)
@@ -105,7 +104,7 @@ public class SinglePointMapMatcherWithBearingIT {
                                 .bearing(161.06168302121978)
                                 .reliability(0)
                                 .build()))
-                .build()));
+                .build());
     }
 
     private Point createPoint(double x, double y) {
