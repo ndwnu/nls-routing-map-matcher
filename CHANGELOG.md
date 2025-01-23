@@ -12,7 +12,7 @@ Here we write upgrade notes. It's a team effort to make them as straightforward 
 
 - Introduced a new `absoluteRelativeWeighingFactor` configuration parameter in the `ViterbiLineStringMapMatcher` and `StartToEndMapMatcher`
   classes to enhance flexibility in scoring calculations.
-- Added a `combinedWeightedDifference` method to calculate a weighted difference using both absolute and relative measurement differences.
+- Added a `combinedWeighedDifference` method to calculate a weighed difference using both absolute and relative measurement differences.
 - Enhanced logging to include the configuration of the `absoluteRelativeWeighingFactor` for debugging purposes.
 
 ### Changed

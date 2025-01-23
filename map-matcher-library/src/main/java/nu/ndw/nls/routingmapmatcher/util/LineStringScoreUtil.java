@@ -56,7 +56,7 @@ public class LineStringScoreUtil {
         if (originalDistance != null) {
             double pathDistanceLengthDifferenceInMeters = Math.abs(pathDistance - originalDistance);
             double pathDistanceLengthDifferenceInPercent = pathDistanceLengthDifferenceInMeters / originalDistance;
-            score -= PATH_LENGTH_DIFFERENCE_PENALTY_FACTOR * combinedWeightedDifference(pathDistanceLengthDifferenceInMeters,
+            score -= PATH_LENGTH_DIFFERENCE_PENALTY_FACTOR * calculateWeighedScore(pathDistanceLengthDifferenceInMeters,
                     pathDistanceLengthDifferenceInPercent);
         }
 
@@ -77,7 +77,7 @@ public class LineStringScoreUtil {
 
         return Math.max(MIN_RELIABILITY_SCORE, MAX_RELIABILITY_SCORE
                 - (DISTANCE_PENALTY_FACTOR * maximumDistanceInMeters)
-                - (PATH_LENGTH_DIFFERENCE_PENALTY_FACTOR * combinedWeightedDifference(pathDistanceLengthDifferenceInMeters,
+                - (PATH_LENGTH_DIFFERENCE_PENALTY_FACTOR * calculateWeighedScore(pathDistanceLengthDifferenceInMeters,
                 pathDistanceLengthDifferenceInPercent)));
     }
 
@@ -125,7 +125,7 @@ public class LineStringScoreUtil {
         return smallestDistanceToLtcLink;
     }
 
-    private double combinedWeightedDifference(double absoluteDifference, double relativeDifference) {
+    private double calculateWeighedScore(double absoluteDifference, double relativeDifference) {
         return absoluteRelativeWeighingFactor * absoluteDifference + (1.0 - absoluteRelativeWeighingFactor)
                 * relativeDifference;
     }

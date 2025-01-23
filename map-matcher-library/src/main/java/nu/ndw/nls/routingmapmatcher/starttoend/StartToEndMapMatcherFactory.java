@@ -14,7 +14,7 @@ public class StartToEndMapMatcherFactory implements MapMatcherFactory<StartToEnd
 
     private final FractionAndDistanceCalculator fractionAndDistanceCalculator;
     private final PointListUtil pointListUtil;
-    @Value("${nls.routing.map-matcher.score.weighting.factor:1.0}")
+    @Value("${nls.routing.map-matcher.score.weighing.factor:1.0}")
     private double absoluteRelativeWeighingFactor;
 
     @Override
