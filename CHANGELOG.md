@@ -6,6 +6,19 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 Here we write upgrade notes. It's a team effort to make them as straightforward as possible.
 
+## [14.0.0] - 2024-11-20
+
+### Added
+
+- Introduced a new `absoluteRelativeWeighingFactor` configuration parameter in the `ViterbiLineStringMapMatcher` and `StartToEndMapMatcher`
+  classes to enhance flexibility in scoring calculations.
+- Added a `combinedWeightedDifference` method to calculate a weighted difference using both absolute and relative measurement differences.
+- Enhanced logging to include the configuration of the `absoluteRelativeWeighingFactor` for debugging purposes.
+
+### Changed
+
+- Updated `LineStringScoreUtil` to utilize the new `absoluteRelativeWeighingFactor` for improved scoring of line string matches.
+
 ## [13.2.0] - 2024-11-19
 
 ### Fixed

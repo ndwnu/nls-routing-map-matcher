@@ -22,9 +22,11 @@ public class LineStringScoreUtil {
 
     private final DistanceCalcCustom distanceCalc = new DistanceCalcCustom();
     private final FractionAndDistanceCalculator fractionAndDistanceCalculator;
+    private final double absoluteRelativeWeighingFactor;
 
-    public LineStringScoreUtil(FractionAndDistanceCalculator fractionAndDistanceCalculator) {
+    public LineStringScoreUtil(FractionAndDistanceCalculator fractionAndDistanceCalculator, double absoluteRelativeWeighingFactor) {
         this.fractionAndDistanceCalculator = fractionAndDistanceCalculator;
+        this.absoluteRelativeWeighingFactor = absoluteRelativeWeighingFactor;
     }
 
     public double calculateCandidatePathScore(Path path, LineStringLocation lineStringLocation) {
@@ -53,7 +55,9 @@ public class LineStringScoreUtil {
 
         if (originalDistance != null) {
             double pathDistanceLengthDifferenceInMeters = Math.abs(pathDistance - originalDistance);
-            score -= PATH_LENGTH_DIFFERENCE_PENALTY_FACTOR * pathDistanceLengthDifferenceInMeters;
+            double pathDistanceLengthDifferenceInPercent = pathDistanceLengthDifferenceInMeters / originalDistance;
+            score -= PATH_LENGTH_DIFFERENCE_PENALTY_FACTOR * combinedWeightedDifference(pathDistanceLengthDifferenceInMeters,
+                    pathDistanceLengthDifferenceInPercent);
         }
 
         return Math.max(MIN_RELIABILITY_SCORE, score);
@@ -69,10 +73,12 @@ public class LineStringScoreUtil {
         double lengthInMeters = originalDistance != null ? originalDistance
                 : fractionAndDistanceCalculator.calculateLengthInMeters(originalGeometry);
         double pathDistanceLengthDifferenceInMeters = Math.abs(pathDistance - lengthInMeters);
+        double pathDistanceLengthDifferenceInPercent = pathDistanceLengthDifferenceInMeters / lengthInMeters;
 
         return Math.max(MIN_RELIABILITY_SCORE, MAX_RELIABILITY_SCORE
                 - (DISTANCE_PENALTY_FACTOR * maximumDistanceInMeters)
-                - (PATH_LENGTH_DIFFERENCE_PENALTY_FACTOR * pathDistanceLengthDifferenceInMeters));
+                - (PATH_LENGTH_DIFFERENCE_PENALTY_FACTOR * combinedWeightedDifference(pathDistanceLengthDifferenceInMeters,
+                pathDistanceLengthDifferenceInPercent)));
     }
 
     private double calculateMaximumDistanceInMeters(PointList pathPointList, LineString geometry) {
@@ -117,5 +123,10 @@ public class LineStringScoreUtil {
             smallestDistanceToLtcLink = Math.min(smallestDistanceToLtcLink, distanceInMeters);
         }
         return smallestDistanceToLtcLink;
+    }
+
+    private double combinedWeightedDifference(double absoluteDifference, double relativeDifference) {
+        return absoluteRelativeWeighingFactor * absoluteDifference + (1.0 - absoluteRelativeWeighingFactor)
+                * relativeDifference;
     }
 }
