@@ -68,7 +68,7 @@ public class StartToEndMapMatcher implements MapMatcher<LineStringLocation, Line
         this.locationIndexTree = networkGraphHopper.getLocationIndex();
         this.lineStringMatchUtil = new LineStringMatchUtil(networkGraphHopper, profile, fractionAndDistanceCalculator,
                 pointListUtil);
-        log.debug("LineStringScoreUtil created with absoluteRelativeWeighingFactor of {}", absoluteRelativeWeighingFactor);
+
         this.lineStringScoreUtil = new LineStringScoreUtil(fractionAndDistanceCalculator, absoluteRelativeWeighingFactor);
         this.weighting = networkGraphHopper.createWeighting(profile, createShortestDistanceHints());
     }
