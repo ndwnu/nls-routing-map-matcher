@@ -90,7 +90,6 @@ public class ViterbiLineStringMapMatcher implements
         this.geometryFactoryWgs84 = geometryFactoryWgs84;
         this.profile = Objects.requireNonNull(networkGraphHopper.getProfile(profileName));
         this.lineStringMatchUtil = new LineStringMatchUtil(networkGraphHopper, this.profile, fractionAndDistanceCalculator, pointListUtil);
-        log.debug("LineStringScoreUtil created with absoluteRelativeWeighingFactor of {}", absoluteRelativeWeighingFactor);
         this.lineStringScoreUtil = new LineStringScoreUtil(fractionAndDistanceCalculator, absoluteRelativeWeighingFactor);
         this.pointListUtil = pointListUtil;
     }

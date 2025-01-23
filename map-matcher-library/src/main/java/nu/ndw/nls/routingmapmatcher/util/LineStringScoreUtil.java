@@ -6,12 +6,14 @@ import com.graphhopper.util.PointList;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import lombok.extern.slf4j.Slf4j;
 import nu.ndw.nls.geometry.distance.FractionAndDistanceCalculator;
 import nu.ndw.nls.routingmapmatcher.model.linestring.LineStringLocation;
 import nu.ndw.nls.routingmapmatcher.model.linestring.ReliabilityCalculationType;
 import org.locationtech.jts.geom.CoordinateSequence;
 import org.locationtech.jts.geom.LineString;
 
+@Slf4j
 public class LineStringScoreUtil {
 
     private static final boolean REDUCE_TO_SEGMENT = true;
@@ -24,9 +26,11 @@ public class LineStringScoreUtil {
     private final FractionAndDistanceCalculator fractionAndDistanceCalculator;
     private final double absoluteRelativeWeighingFactor;
 
+
     public LineStringScoreUtil(FractionAndDistanceCalculator fractionAndDistanceCalculator, double absoluteRelativeWeighingFactor) {
         this.fractionAndDistanceCalculator = fractionAndDistanceCalculator;
         this.absoluteRelativeWeighingFactor = absoluteRelativeWeighingFactor;
+        log.debug("LineStringScoreUtil created with absoluteRelativeWeighingFactor of {}", absoluteRelativeWeighingFactor);
     }
 
     public double calculateCandidatePathScore(Path path, LineStringLocation lineStringLocation) {
