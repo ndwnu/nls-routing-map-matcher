@@ -84,13 +84,13 @@ public class ViterbiLineStringMapMatcher implements
 
     public ViterbiLineStringMapMatcher(NetworkGraphHopper networkGraphHopper, String profileName,
             GeometryFactoryWgs84 geometryFactoryWgs84, FractionAndDistanceCalculator fractionAndDistanceCalculator,
-            PointListUtil pointListUtil) {
+            PointListUtil pointListUtil, double absoluteRelativeWeighingFactor) {
         this.networkGraphHopper = Objects.requireNonNull(networkGraphHopper);
         this.locationIndexTree = networkGraphHopper.getLocationIndex();
         this.geometryFactoryWgs84 = geometryFactoryWgs84;
         this.profile = Objects.requireNonNull(networkGraphHopper.getProfile(profileName));
         this.lineStringMatchUtil = new LineStringMatchUtil(networkGraphHopper, this.profile, fractionAndDistanceCalculator, pointListUtil);
-        this.lineStringScoreUtil = new LineStringScoreUtil(fractionAndDistanceCalculator);
+        this.lineStringScoreUtil = new LineStringScoreUtil(fractionAndDistanceCalculator, absoluteRelativeWeighingFactor);
         this.pointListUtil = pointListUtil;
     }
 

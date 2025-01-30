@@ -25,6 +25,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import lombok.extern.slf4j.Slf4j;
 import nu.ndw.nls.geometry.distance.FractionAndDistanceCalculator;
 import nu.ndw.nls.routingmapmatcher.domain.MapMatcher;
 import nu.ndw.nls.routingmapmatcher.model.MatchStatus;
@@ -37,6 +38,7 @@ import nu.ndw.nls.routingmapmatcher.util.LineStringScoreUtil;
 import nu.ndw.nls.routingmapmatcher.util.PointListUtil;
 import org.locationtech.jts.geom.Point;
 
+@Slf4j
 public class StartToEndMapMatcher implements MapMatcher<LineStringLocation, LineStringMatch> {
 
     /**
@@ -54,7 +56,8 @@ public class StartToEndMapMatcher implements MapMatcher<LineStringLocation, Line
     private final Weighting weighting;
 
     public StartToEndMapMatcher(NetworkGraphHopper networkGraphHopper, String profileName,
-            FractionAndDistanceCalculator fractionAndDistanceCalculator, PointListUtil pointListUtil) {
+            FractionAndDistanceCalculator fractionAndDistanceCalculator, PointListUtil pointListUtil,
+            double absoluteRelativeWeighingFactor) {
         this.networkGraphHopper = Objects.requireNonNull(networkGraphHopper);
         Profile profile = Objects.requireNonNull(networkGraphHopper.getProfile(profileName));
         this.routingGraph = networkGraphHopper.getBaseGraph();
@@ -65,7 +68,8 @@ public class StartToEndMapMatcher implements MapMatcher<LineStringLocation, Line
         this.locationIndexTree = networkGraphHopper.getLocationIndex();
         this.lineStringMatchUtil = new LineStringMatchUtil(networkGraphHopper, profile, fractionAndDistanceCalculator,
                 pointListUtil);
-        this.lineStringScoreUtil = new LineStringScoreUtil(fractionAndDistanceCalculator);
+
+        this.lineStringScoreUtil = new LineStringScoreUtil(fractionAndDistanceCalculator, absoluteRelativeWeighingFactor);
         this.weighting = networkGraphHopper.createWeighting(profile, createShortestDistanceHints());
     }
 
