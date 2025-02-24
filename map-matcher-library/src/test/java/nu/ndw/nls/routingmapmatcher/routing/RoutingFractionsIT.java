@@ -46,7 +46,6 @@ class RoutingFractionsIT {
     private GeometryFactoryWgs84 geometryFactoryWgs84;
     private Router router;
 
-
     // Our sample data contains one way driving directions, but we need to simulate a U-turn to get fractions.
     // This vehicle mapper ignores the restrictions, so we can still simulate it
     public static class AlwaysAccessibleAndHasSpeedVehicleMapper extends
@@ -74,12 +73,10 @@ class RoutingFractionsIT {
         }
     }
 
-
     @BeforeEach
     @SneakyThrows
     public void setup() {
-
-        List<TestNetworkProvider.TestLink> testLinks = TestNetworkProvider.getTestLinks("/test-data/links.json");
+        List<TestNetworkProvider.TestLink> testLinks = TestNetworkProvider.getTestLinks("/test-data/network.geojson");
 
         RoutingNetworkSettings<TestNetworkProvider.TestLink> routingNetworkSettings =
                 RoutingNetworkSettings.builder(TestNetworkProvider.TestLink.class)
@@ -91,7 +88,6 @@ class RoutingFractionsIT {
         router = routerFactory.createMapMatcher(
                 getNetworkService(List.of(new AlwaysAccessibleAndHasSpeedVehicleMapper()))
                         .inMemory(routingNetworkSettings), PROFILE.getName());
-
     }
 
     @Test
@@ -198,7 +194,6 @@ class RoutingFractionsIT {
                 )).build()
 
         );
-
     }
 
     private static void verifySumDistanceOfIndividualRoadSections(RoutingResponse response) {
@@ -209,6 +204,7 @@ class RoutingFractionsIT {
                 .sum())
                 .isCloseTo(response.getDistance(), Percentage.withPercentage(0.3));
     }
+
     @SneakyThrows
     private LineString createLineString() {
         WKTReader wktReader = new WKTReader2();

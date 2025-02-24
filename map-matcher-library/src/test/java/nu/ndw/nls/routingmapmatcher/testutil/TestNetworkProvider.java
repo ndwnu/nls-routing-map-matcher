@@ -1,19 +1,16 @@
 package nu.ndw.nls.routingmapmatcher.testutil;
 
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.graphhopper.config.Profile;
 import com.graphhopper.config.TurnCostsConfig;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import lombok.Builder;
 import lombok.Getter;
-import nu.ndw.nls.routingmapmatcher.model.linestring.LineStringLocation;
 import nu.ndw.nls.routingmapmatcher.network.GraphHopperNetworkService;
 import nu.ndw.nls.routingmapmatcher.network.LinkVehicleMapperProvider;
 import nu.ndw.nls.routingmapmatcher.network.NetworkGraphHopper;
@@ -40,16 +37,14 @@ import nu.ndw.nls.routingmapmatcher.network.model.DirectionalDto;
 import nu.ndw.nls.routingmapmatcher.network.model.Link;
 import nu.ndw.nls.routingmapmatcher.network.model.LinkVehicleMapper;
 import nu.ndw.nls.routingmapmatcher.network.model.RoutingNetworkSettings;
-import nu.ndw.nls.routingmapmatcher.viterbi.LineStringLocationDeserializer;
-import nu.ndw.nls.routingmapmatcher.viterbi.LinkDeserializer;
 import org.apache.commons.io.IOUtils;
+import org.geotools.data.geojson.GeoJSONReader;
+import org.geotools.data.simple.SimpleFeatureIterator;
 import org.jetbrains.annotations.NotNull;
 import org.locationtech.jts.geom.LineString;
 
-public class TestNetworkProvider {
+public final class TestNetworkProvider {
 
-    public static final ObjectMapper OBJECT_MAPPER;
-    private static final SimpleModule SIMPLE_MODULE;
     public static final String HGV_ACCESSIBLE_KEY = "hgv_accessible";
     public static final String CAR = "car";
     public static final String CAR_NO_U_TURNS = "car_no_u_turns";
@@ -59,6 +54,10 @@ public class TestNetworkProvider {
                     .setTurnCostsConfig(new TurnCostsConfig(List.of("motor_vehicle"))
                             .setUTurnCosts(TurnCostsConfig.INFINITE_U_TURN_COSTS))
     );
+
+    private TestNetworkProvider() {
+        // Util class
+    }
 
     public static GraphHopperNetworkService getNetworkService(
             List<LinkVehicleMapper<? extends Link>> vehicleProviders) {
@@ -83,20 +82,19 @@ public class TestNetworkProvider {
             List.of(new TestLinkCarMapper(CAR),
                     new TestLinkCarMapper(CAR_NO_U_TURNS)));
 
-    static {
-        SIMPLE_MODULE = new SimpleModule();
-        OBJECT_MAPPER = new ObjectMapper();
-
-        SIMPLE_MODULE.addDeserializer(TestLink.class, new LinkDeserializer());
-        SIMPLE_MODULE.addDeserializer(LineStringLocation.class, new LineStringLocationDeserializer());
-        OBJECT_MAPPER.registerModule(SIMPLE_MODULE);
-    }
-
     public static List<TestLink> getTestLinks(String path) throws IOException {
-        InputStream resourceAsStream = TestNetworkProvider.class.getResourceAsStream(path);
-        String linksJson = IOUtils.toString(Objects.requireNonNull(resourceAsStream), StandardCharsets.UTF_8);
-        return OBJECT_MAPPER.readValue(linksJson, new TypeReference<>() {
-        });
+        String linksJson;
+        try (InputStream resourceAsStream = TestNetworkProvider.class.getResourceAsStream(path)) {
+            linksJson = IOUtils.toString(Objects.requireNonNull(resourceAsStream), StandardCharsets.UTF_8);
+        }
+        List<TestLink> links = new ArrayList<>();
+        try (GeoJSONReader geoJSONReader = new GeoJSONReader(linksJson)) {
+            SimpleFeatureIterator it = geoJSONReader.getIterator();
+            while (it.hasNext()) {
+                links.add(LinkDeserializer.deserialize(it.next()));
+            }
+        }
+        return links;
     }
 
     public static NetworkGraphHopper getTestNetwork(List<TestLink> links) {

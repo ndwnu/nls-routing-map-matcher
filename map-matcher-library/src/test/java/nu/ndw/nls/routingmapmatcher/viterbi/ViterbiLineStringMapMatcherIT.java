@@ -1,13 +1,9 @@
 package nu.ndw.nls.routingmapmatcher.viterbi;
 
 import static nu.ndw.nls.routingmapmatcher.testutil.TestNetworkProvider.CAR;
-import static nu.ndw.nls.routingmapmatcher.testutil.TestNetworkProvider.OBJECT_MAPPER;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import java.nio.charset.StandardCharsets;
-import java.util.Objects;
 import lombok.SneakyThrows;
 import nu.ndw.nls.geometry.factories.GeometryFactoryWgs84;
 import nu.ndw.nls.routingmapmatcher.TestConfig;
@@ -15,9 +11,9 @@ import nu.ndw.nls.routingmapmatcher.model.MatchStatus;
 import nu.ndw.nls.routingmapmatcher.model.linestring.LineStringLocation;
 import nu.ndw.nls.routingmapmatcher.model.linestring.LineStringMatch;
 import nu.ndw.nls.routingmapmatcher.model.linestring.MatchedLink;
+import nu.ndw.nls.routingmapmatcher.testutil.TestLineStringProvider;
 import nu.ndw.nls.routingmapmatcher.testutil.TestNetworkProvider;
 import nu.ndw.nls.routingmapmatcher.util.CoordinateHelper;
-import org.apache.commons.io.IOUtils;
 import org.assertj.core.data.Percentage;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -53,23 +49,19 @@ class ViterbiLineStringMapMatcherIT {
     private GeometryFactoryWgs84 geometryFactory;
 
     private ViterbiLineStringMapMatcher viterbiLineStringMapMatcher;
-    private final ObjectMapper mapper = OBJECT_MAPPER;
-
 
     @SneakyThrows
     @BeforeEach
     void setup() {
         viterbiLineStringMapMatcher = viterbiLinestringMapMatcherFactory.createMapMatcher(
-                TestNetworkProvider.getTestNetworkFromFile("/test-data/links.json"), CAR);
+                TestNetworkProvider.getTestNetworkFromFile("/test-data/network.geojson"), CAR);
     }
 
     @SneakyThrows
     @Test
     void match_ok() {
-        String locationJson = IOUtils.toString(
-                Objects.requireNonNull(getClass().getResourceAsStream("/test-data/matched_linestring_location.json")),
-                StandardCharsets.UTF_8);
-        LineStringLocation lineStringLocation = mapper.readValue(locationJson, LineStringLocation.class);
+        LineStringLocation lineStringLocation = TestLineStringProvider.getLineStringLocation(
+                "/test-data/matched_linestring_location.geojson");
         LineStringMatch lineStringMatch = viterbiLineStringMapMatcher.match(lineStringLocation);
         verifySumDistanceOfIndividualRoadSections(lineStringMatch);
         assertSuccess(lineStringMatch, new Coordinate[]{new Coordinate(5.431641, 52.17898),
@@ -95,16 +87,13 @@ class ViterbiLineStringMapMatcherIT {
     @SneakyThrows
     @Test
     void match_ok_doubleEnd() {
-        String locationJson = IOUtils.toString(
-                Objects.requireNonNull(
-                        getClass().getResourceAsStream("/test-data/matched_linestring_location_double_end.json")),
-                StandardCharsets.UTF_8);
-        LineStringLocation lineStringLocation = mapper.readValue(locationJson, LineStringLocation.class);
+        LineStringLocation lineStringLocation = TestLineStringProvider.getLineStringLocation(
+                "/test-data/matched_linestring_location_double_end.geojson");
         LineStringMatch lineStringMatch = viterbiLineStringMapMatcher.match(lineStringLocation);
         verifySumDistanceOfIndividualRoadSections(lineStringMatch);
         assertThat(lineStringMatch.getId()).isEqualTo(29);
         assertThat(lineStringMatch.getStatus()).isEqualTo(MatchStatus.MATCH);
-        assertThat(lineStringMatch.getReliability()).isEqualTo(59.97209861861505);
+        assertThat(lineStringMatch.getReliability()).isEqualTo(97.50886628818601);
         assertThat(lineStringMatch.getLocationIndex()).isEqualTo(-1);
         assertThat(lineStringMatch.isReversed()).isTrue();
         assertThat(lineStringMatch.getMatchedLinks()).hasSize(10);
@@ -187,16 +176,12 @@ class ViterbiLineStringMapMatcherIT {
         assertThat(lineStringMatch.getWeight()).isEqualTo(2432.198);
         assertThat(lineStringMatch.getDuration()).isEqualTo(87.559);
         assertThat(lineStringMatch.getDistance()).isEqualTo(2432.198);
-
     }
 
     @SneakyThrows
     @Test
     void match_ok_simplify() {
-        String locationJson = IOUtils.toString(
-                Objects.requireNonNull(getClass().getResourceAsStream("/test-data/matched_linestring_location.json")),
-                StandardCharsets.UTF_8);
-        LineStringLocation l = mapper.readValue(locationJson, LineStringLocation.class);
+        LineStringLocation l = TestLineStringProvider.getLineStringLocation("/test-data/matched_linestring_location.geojson");
         LineStringLocation lineStringLocation = LineStringLocation.builder()
                 .id(l.getId())
                 .upstreamIsochrone(l.getUpstreamIsochrone())
@@ -205,7 +190,6 @@ class ViterbiLineStringMapMatcherIT {
                 .downstreamIsochroneUnit(l.getDownstreamIsochroneUnit())
                 .locationIndex(l.getLocationIndex())
                 .reversed(l.isReversed())
-                .lengthInMeters(l.getLengthInMeters())
                 .geometry(l.getGeometry())
                 .reliabilityCalculationType(l.getReliabilityCalculationType())
                 .radius(l.getRadius())
@@ -227,7 +211,7 @@ class ViterbiLineStringMapMatcherIT {
     private void assertSuccess(LineStringMatch lineStringMatch, Coordinate[] coordinates) {
         assertThat(lineStringMatch.getId()).isEqualTo(29);
         assertThat(lineStringMatch.getStatus()).isEqualTo(MatchStatus.MATCH);
-        assertThat(lineStringMatch.getReliability()).isEqualTo(93.18611307333045);
+        assertThat(lineStringMatch.getReliability()).isEqualTo(93.75305757443932);
         assertThat(lineStringMatch.getLocationIndex()).isEqualTo(-1);
         assertThat(lineStringMatch.isReversed()).isTrue();
         assertThat(lineStringMatch.getMatchedLinks()).containsExactly(
@@ -330,10 +314,8 @@ class ViterbiLineStringMapMatcherIT {
     @SneakyThrows
     @Test
     void match_noMatch() {
-        String locationJson = IOUtils.toString(
-                Objects.requireNonNull(getClass().getResourceAsStream("/test-data/unmatched_linestring_location.json")),
-                StandardCharsets.UTF_8);
-        LineStringLocation lineStringLocation = mapper.readValue(locationJson, LineStringLocation.class);
+        LineStringLocation lineStringLocation = TestLineStringProvider.getLineStringLocation(
+                "/test-data/unmatched_linestring_location.geojson");
         LineStringMatch lineStringMatch = viterbiLineStringMapMatcher.match(lineStringLocation);
         assertThat(lineStringMatch.getId()).isEqualTo(15);
         assertThat(lineStringMatch.getStatus()).isEqualTo(MatchStatus.NO_MATCH);
@@ -350,10 +332,9 @@ class ViterbiLineStringMapMatcherIT {
         assertThat(lineStringMatch.getDistance()).isEqualTo(0.0);
     }
 
-
     @SneakyThrows
     @Test
-    void match_ok_distance_round_trip() {
+    void match_ok_distanceRoundTrip() {
         // coordinates are a circular route with part of the road-sections traversed twice in the same direction
         LineString lineString = geometryFactory.createLineString(
                 CoordinateHelper
@@ -376,7 +357,6 @@ class ViterbiLineStringMapMatcherIT {
         assertThat(lineStringMatch.getMatchedLinks())
                 .filteredOn("linkId", 6405177)
                 .hasSize(2);
-
     }
 
     private static void verifySumDistanceOfIndividualRoadSections(LineStringMatch lineStringMatch) {

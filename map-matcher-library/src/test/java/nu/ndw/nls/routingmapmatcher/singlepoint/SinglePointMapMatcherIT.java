@@ -29,10 +29,10 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = {TestConfig.class})
-public class SinglePointMapMatcherIT {
+class SinglePointMapMatcherIT {
 
-    private static final String LINKS_RESOURCE = "/test-data/links.json";
-    private static final String SHIVI_LINKS_RESOURCE = "/test-data/shivi-verkeersbanen.json";
+    private static final String LINKS_RESOURCE = "/test-data/network.geojson";
+    private static final String SHIVI_LINKS_RESOURCE = "/test-data/network_shivi_traffic_ways.geojson";
     private static final int ID = 123;
     private static final double DISTANCE_ROUNDING_ERROR = 0.1;
     @Autowired
@@ -42,12 +42,10 @@ public class SinglePointMapMatcherIT {
 
     private SinglePointMapMatcher singlePointMapMatcher;
 
-
     @SneakyThrows
     private void setupNetwork(String resource) {
         singlePointMapMatcher = singlePointMapMatcherFactory.createMapMatcher(
                 TestNetworkProvider.getTestNetworkFromFile(resource), CAR);
-
     }
 
     @SneakyThrows

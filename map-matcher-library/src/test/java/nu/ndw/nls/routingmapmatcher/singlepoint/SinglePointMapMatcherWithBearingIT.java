@@ -26,9 +26,9 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 @TestInstance(Lifecycle.PER_CLASS)
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = {TestConfig.class})
-public class SinglePointMapMatcherWithBearingIT {
+class SinglePointMapMatcherWithBearingIT {
 
-    private static final String LINKS_RESOURCE = "/test-data/links.json";
+    private static final String LINKS_RESOURCE = "/test-data/network.geojson";
     private static final double SNAPPED_RELIABILITY = 58.5059250048517;
     private static final double BEARING_RELIABILITY = 7.956622176353855;
     @Autowired
