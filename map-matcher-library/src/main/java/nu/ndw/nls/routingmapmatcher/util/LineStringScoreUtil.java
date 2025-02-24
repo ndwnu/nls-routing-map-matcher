@@ -34,9 +34,7 @@ public class LineStringScoreUtil {
         return calculateCandidatePathScoreLineString(path.calcPoints(), lineStringLocation.getGeometry());
     }
 
-    // This method is public to allow applications that implement other mapmatching algorithms than GraphHopper to
-    // calculate reliability scores using the same algorithm.
-    public double calculateCandidatePathScoreOnlyPoints(PointList pathPointList, LineString originalGeometry) {
+    private double calculateCandidatePathScoreOnlyPoints(PointList pathPointList, LineString originalGeometry) {
         CoordinateSequence geometryCoordinates = originalGeometry.getCoordinateSequence();
         List<Double> pointDistancesToMatch = new ArrayList<>();
         for (int index = 0; index < geometryCoordinates.size(); index++) {
@@ -49,10 +47,14 @@ public class LineStringScoreUtil {
         return Math.max(MIN_RELIABILITY_SCORE, score);
     }
 
+    private double calculateCandidatePathScoreLineString(PointList pathPointList, LineString originalGeometry) {
+        LineString pathLineString = pointListUtil.toLineString(pathPointList);
+        return calculateCandidatePathScoreLineString(originalGeometry, pathLineString);
+    }
+
     // This method is public to allow applications that implement other mapmatching algorithms than GraphHopper to
     // calculate reliability scores using the same algorithm.
-    public double calculateCandidatePathScoreLineString(PointList pathPointList, LineString originalGeometry) {
-        LineString pathLineString = pointListUtil.toLineString(pathPointList);
+    public double calculateCandidatePathScoreLineString(LineString originalGeometry, LineString pathLineString) {
         double maximumDistanceInMeters = frechetDistanceCalculator.calculateFrechetDistanceInMetresFromWgs84(originalGeometry,
                 pathLineString);
 
