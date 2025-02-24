@@ -25,6 +25,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import lombok.extern.slf4j.Slf4j;
+import nu.ndw.nls.geometry.confidence.LineStringReliabilityCalculator;
 import nu.ndw.nls.geometry.distance.FractionAndDistanceCalculator;
 import nu.ndw.nls.geometry.factories.GeometryFactoryWgs84;
 import nu.ndw.nls.routingmapmatcher.domain.MapMatcher;
@@ -84,13 +85,13 @@ public class ViterbiLineStringMapMatcher implements
 
     public ViterbiLineStringMapMatcher(NetworkGraphHopper networkGraphHopper, String profileName,
             GeometryFactoryWgs84 geometryFactoryWgs84, FractionAndDistanceCalculator fractionAndDistanceCalculator,
-            PointListUtil pointListUtil, double absoluteRelativeWeighingFactor) {
+            PointListUtil pointListUtil, LineStringReliabilityCalculator lineStringReliabilityCalculator) {
         this.networkGraphHopper = Objects.requireNonNull(networkGraphHopper);
         this.locationIndexTree = networkGraphHopper.getLocationIndex();
         this.geometryFactoryWgs84 = geometryFactoryWgs84;
         this.profile = Objects.requireNonNull(networkGraphHopper.getProfile(profileName));
         this.lineStringMatchUtil = new LineStringMatchUtil(networkGraphHopper, this.profile, fractionAndDistanceCalculator, pointListUtil);
-        this.lineStringScoreUtil = new LineStringScoreUtil(fractionAndDistanceCalculator, absoluteRelativeWeighingFactor);
+        this.lineStringScoreUtil = new LineStringScoreUtil(pointListUtil, lineStringReliabilityCalculator);
         this.pointListUtil = pointListUtil;
     }
 
