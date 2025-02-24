@@ -8,7 +8,7 @@ import java.util.Collections;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import nu.ndw.nls.geometry.distance.FrechetDistanceCalculator;
+import nu.ndw.nls.geometry.confidence.LineStringReliabilityCalculator;
 import nu.ndw.nls.routingmapmatcher.model.linestring.LineStringLocation;
 import nu.ndw.nls.routingmapmatcher.model.linestring.ReliabilityCalculationType;
 import org.locationtech.jts.geom.CoordinateSequence;
@@ -21,11 +21,10 @@ public class LineStringScoreUtil {
     private static final boolean REDUCE_TO_SEGMENT = true;
     private static final int MIN_RELIABILITY_SCORE = 0;
     private static final int MAX_RELIABILITY_SCORE = 100;
-    private static final double DISTANCE_PENALTY_FACTOR = 1.5;
 
     private final DistanceCalcCustom distanceCalc = new DistanceCalcCustom();
     private final PointListUtil pointListUtil;
-    private final FrechetDistanceCalculator frechetDistanceCalculator;
+    private final LineStringReliabilityCalculator lineStringReliabilityCalculator;
 
     public double calculateCandidatePathScore(Path path, LineStringLocation lineStringLocation) {
         if (ReliabilityCalculationType.POINT_OBSERVATIONS == lineStringLocation.getReliabilityCalculationType()) {
@@ -49,17 +48,7 @@ public class LineStringScoreUtil {
 
     private double calculateCandidatePathScoreLineString(PointList pathPointList, LineString originalGeometry) {
         LineString pathLineString = pointListUtil.toLineString(pathPointList);
-        return calculateCandidatePathScoreLineString(originalGeometry, pathLineString);
-    }
-
-    // This method is public to allow applications that implement other mapmatching algorithms than GraphHopper to
-    // calculate reliability scores using the same algorithm.
-    public double calculateCandidatePathScoreLineString(LineString originalGeometry, LineString pathLineString) {
-        double maximumDistanceInMeters = frechetDistanceCalculator.calculateFrechetDistanceInMetresFromWgs84(originalGeometry,
-                pathLineString);
-
-        double score = MAX_RELIABILITY_SCORE - (DISTANCE_PENALTY_FACTOR * maximumDistanceInMeters);
-        return Math.max(MIN_RELIABILITY_SCORE, score);
+        return lineStringReliabilityCalculator.calculateLineStringReliability(originalGeometry, pathLineString);
     }
 
     private double calculateSmallestDistanceToPointList(double latitude, double longitude, PointList pointList) {
