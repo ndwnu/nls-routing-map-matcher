@@ -25,9 +25,9 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = {TestConfig.class})
-public class SinglePointMapMatcherWithBidirectionalIsochroneIT {
+class SinglePointMapMatcherWithBidirectionalIsochroneIT {
 
-    private static final String LINKS_RESOURCE = "/test-data/links_bidirectional.json";
+    private static final String LINKS_RESOURCE = "/test-data/network_bidirectional.geojson";
     private static final Coordinate START_POINT = new Coordinate(5.4303030, 52.1804201);
     private static final int ISOCHRONE_METERS = 100;
     private static final BearingFilter BEARING_FILTER_FORWARD = new BearingFilter(105, 10);

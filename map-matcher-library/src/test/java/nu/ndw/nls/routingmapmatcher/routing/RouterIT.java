@@ -40,7 +40,7 @@ class RouterIT {
 
     @SneakyThrows
     private void setupNetwork() {
-        router = routerFactory.createMapMatcher(TestNetworkProvider.getTestNetworkFromFile("/test-data/links.json"), CAR);
+        router = routerFactory.createMapMatcher(TestNetworkProvider.getTestNetworkFromFile("/test-data/network.geojson"), CAR);
     }
 
     @SneakyThrows
