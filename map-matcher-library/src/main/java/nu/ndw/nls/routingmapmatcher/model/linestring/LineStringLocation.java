@@ -15,7 +15,6 @@ public class LineStringLocation extends BaseLocation {
 
     private final int locationIndex;
     private final boolean reversed;
-    private final Double lengthInMeters;
     @ToString.Exclude
     private final LineString geometry;
     private final ReliabilityCalculationType reliabilityCalculationType;

@@ -40,7 +40,7 @@ class GraphHopperNetworkServiceIT {
     @SneakyThrows
     @BeforeEach
     void setUp() {
-        List<TestLink> links = getTestLinks("/test-data/links.json");
+        List<TestLink> links = getTestLinks("/test-data/network.geojson");
         iteratorSupplier = links::iterator;
         graphHopperNetworkService = TestNetworkProvider.NETWORK_SERVICE;
     }

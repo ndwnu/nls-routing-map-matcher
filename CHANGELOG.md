@@ -6,17 +6,21 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 Here we write upgrade notes. It's a team effort to make them as straightforward as possible.
 
+## [15.0.0] - 2025-02-24
+
+### Changed
+- Replace reliability algorithm in `LineStringScoreUtil`: use only Fréchet distance instead of combination of Hausdorff distance and
+  absolute length difference.
+
 ## [14.0.0] - 2024-11-20
 
 ### Added
-
 - Introduced a new `absoluteRelativeWeighingFactor` configuration parameter in the `ViterbiLineStringMapMatcher` and `StartToEndMapMatcher`
   classes to enhance flexibility in scoring calculations.
 - Added a `combinedWeighedDifference` method to calculate a weighed difference using both absolute and relative measurement differences.
 - Enhanced logging to include the configuration of the `absoluteRelativeWeighingFactor` for debugging purposes.
 
 ### Changed
-
 - Updated `LineStringScoreUtil` to utilize the new `absoluteRelativeWeighingFactor` for improved scoring of line string matches.
 
 ## [13.2.0] - 2024-11-19

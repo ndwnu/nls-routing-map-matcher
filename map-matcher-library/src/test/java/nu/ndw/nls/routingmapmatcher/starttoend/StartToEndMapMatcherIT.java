@@ -1,12 +1,8 @@
 package nu.ndw.nls.routingmapmatcher.starttoend;
 
 import static nu.ndw.nls.routingmapmatcher.testutil.TestNetworkProvider.CAR;
-import static nu.ndw.nls.routingmapmatcher.testutil.TestNetworkProvider.OBJECT_MAPPER;
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import java.nio.charset.StandardCharsets;
-import java.util.Objects;
 import lombok.SneakyThrows;
 import nu.ndw.nls.geometry.factories.GeometryFactoryWgs84;
 import nu.ndw.nls.routingmapmatcher.TestConfig;
@@ -15,8 +11,8 @@ import nu.ndw.nls.routingmapmatcher.model.linestring.LineStringLocation;
 import nu.ndw.nls.routingmapmatcher.model.linestring.LineStringMatch;
 import nu.ndw.nls.routingmapmatcher.model.linestring.MatchedLink;
 import nu.ndw.nls.routingmapmatcher.model.linestring.ReliabilityCalculationType;
+import nu.ndw.nls.routingmapmatcher.testutil.TestLineStringProvider;
 import nu.ndw.nls.routingmapmatcher.testutil.TestNetworkProvider;
-import org.apache.commons.io.IOUtils;
 import org.assertj.core.data.Percentage;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -34,7 +30,6 @@ class StartToEndMapMatcherIT {
     private static final int END_FRACTION_1 = 1;
     private static final int START_FRACTION_0 = 0;
     private StartToEndMapMatcher startToEndMapMatcher;
-    private final ObjectMapper mapper = OBJECT_MAPPER;
     @Autowired
     private StartToEndMapMatcherFactory startToEndMapMatcherFactory;
     @Autowired
@@ -44,7 +39,7 @@ class StartToEndMapMatcherIT {
     @BeforeEach
     void setup() {
         this.startToEndMapMatcher = startToEndMapMatcherFactory.createMapMatcher(
-                TestNetworkProvider.getTestNetworkFromFile("/test-data/links.json"), CAR);
+                TestNetworkProvider.getTestNetworkFromFile("/test-data/network.geojson"), CAR);
     }
 
     @SneakyThrows
@@ -56,7 +51,6 @@ class StartToEndMapMatcherIT {
                 .id(1)
                 .locationIndex(1)
                 .reversed(false)
-                .lengthInMeters(543.0)
                 .geometry(lineString)
                 .reliabilityCalculationType(ReliabilityCalculationType.POINT_OBSERVATIONS)
                 .build();
@@ -64,7 +58,7 @@ class StartToEndMapMatcherIT {
         verifySumDistanceOfIndividualRoadSections(lineStringMatch);
         assertThat(lineStringMatch.getId()).isEqualTo(1);
         assertThat(lineStringMatch.getStatus()).isEqualTo(MatchStatus.MATCH);
-        assertThat(lineStringMatch.getReliability()).isEqualTo(73.88564657201005);
+        assertThat(lineStringMatch.getReliability()).isEqualTo(92.28950238194943);
         assertThat(lineStringMatch.getLocationIndex()).isEqualTo(1);
         assertThat(lineStringMatch.isReversed()).isFalse();
         assertThat(lineStringMatch.getMatchedLinks())
@@ -194,10 +188,8 @@ class StartToEndMapMatcherIT {
     @SneakyThrows
     @Test
     void match_ok_lineStringWithIsochrones() {
-        String locationJson = IOUtils.toString(
-                Objects.requireNonNull(getClass().getResourceAsStream("/test-data/matched_linestring_location.json")),
-                StandardCharsets.UTF_8);
-        LineStringLocation lineStringLocation = mapper.readValue(locationJson, LineStringLocation.class);
+        LineStringLocation lineStringLocation = TestLineStringProvider.getLineStringLocation(
+                "/test-data/matched_linestring_location.geojson");
         LineStringMatch lineStringMatch = startToEndMapMatcher.match(lineStringLocation);
         verifySumDistanceOfIndividualRoadSections(lineStringMatch);
         assertSuccess(lineStringMatch, new Coordinate[]{new Coordinate(5.431641, 52.17898),
@@ -219,10 +211,7 @@ class StartToEndMapMatcherIT {
     @SneakyThrows
     @Test
     void match_ok_lineStringWithIsochrones_simplify() {
-        String locationJson = IOUtils.toString(
-                Objects.requireNonNull(getClass().getResourceAsStream("/test-data/matched_linestring_location.json")),
-                StandardCharsets.UTF_8);
-        LineStringLocation l = mapper.readValue(locationJson, LineStringLocation.class);
+        LineStringLocation l = TestLineStringProvider.getLineStringLocation("/test-data/matched_linestring_location.geojson");
         LineStringLocation lineStringLocation = LineStringLocation.builder()
                 .id(l.getId())
                 .upstreamIsochrone(l.getUpstreamIsochrone())
@@ -231,7 +220,6 @@ class StartToEndMapMatcherIT {
                 .downstreamIsochroneUnit(l.getDownstreamIsochroneUnit())
                 .locationIndex(l.getLocationIndex())
                 .reversed(l.isReversed())
-                .lengthInMeters(l.getLengthInMeters())
                 .geometry(l.getGeometry())
                 .reliabilityCalculationType(l.getReliabilityCalculationType())
                 .radius(l.getRadius())
@@ -253,7 +241,7 @@ class StartToEndMapMatcherIT {
     private void assertSuccess(LineStringMatch lineStringMatch, Coordinate[] coordinates) {
         assertThat(lineStringMatch.getId()).isEqualTo(29);
         assertThat(lineStringMatch.getStatus()).isEqualTo(MatchStatus.MATCH);
-        assertThat(lineStringMatch.getReliability()).isEqualTo(93.29643981088304);
+        assertThat(lineStringMatch.getReliability()).isEqualTo(93.75305757443932);
         assertThat(lineStringMatch.getLocationIndex()).isEqualTo(-1);
         assertThat(lineStringMatch.isReversed()).isTrue();
         assertThat(lineStringMatch.getMatchedLinks()).containsExactly(
@@ -364,7 +352,6 @@ class StartToEndMapMatcherIT {
                 .id(1)
                 .locationIndex(1)
                 .reversed(false)
-                .lengthInMeters(130.0)
                 .geometry(lineString)
                 .reliabilityCalculationType(ReliabilityCalculationType.POINT_OBSERVATIONS)
                 .build();
