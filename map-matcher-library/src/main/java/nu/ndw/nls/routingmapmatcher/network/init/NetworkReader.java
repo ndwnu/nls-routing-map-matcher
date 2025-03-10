@@ -39,7 +39,7 @@ public class NetworkReader {
         this.nodeIdToInternalNodeIdMap = Objects.requireNonNull(nodeIdToInternalNodeIdMap);
         this.wayTagParsers = Objects.requireNonNull(wayTagParsers);
         this.baseGraph = Objects.requireNonNull(baseGraph);
-        this.edgeIntAccess = baseGraph.createEdgeIntAccess();
+        this.edgeIntAccess = baseGraph.getEdgeAccess();
         this.edgeMap = edgeMap;
         this.expandBounds = expandBounds;
     }
@@ -75,7 +75,7 @@ public class NetworkReader {
             log.debug("GraphHopper >= 8.0 does not support loop edges, skipping link ID " + link.getId());
             return;
         }
-        if(expandBounds) {
+        if (expandBounds) {
             Arrays.stream(coordinates).forEach(coord -> {
                 baseGraph.getBounds().update(coord.y + BOUND_EXPAND, coord.x + BOUND_EXPAND);
                 baseGraph.getBounds().update(coord.y - BOUND_EXPAND, coord.x - BOUND_EXPAND);

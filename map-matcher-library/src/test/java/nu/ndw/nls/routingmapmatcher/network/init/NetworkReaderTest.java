@@ -110,7 +110,7 @@ class NetworkReaderTest {
     void setupWithExpandBoundsParameter(boolean expandBounds) {
         // Use parameters from NetworkGraphHopper class
         nodeIdToInternalNodeIdMap = new GHLongLongBTree(200, 4, -1);
-        when(baseGraph.createEdgeIntAccess()).thenReturn(edgeIntAccess);
+        when(baseGraph.getEdgeAccess()).thenReturn(edgeIntAccess);
         networkReader = new NetworkReader(baseGraph, List.of(link)::iterator, List.of(tagParser),
                 nodeIdToInternalNodeIdMap, edgeMap, expandBounds);
 

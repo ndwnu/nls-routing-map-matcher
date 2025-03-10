@@ -34,9 +34,9 @@ class CustomModelMapperTest {
         List<Statement> accessStatements = customModel.getPriority();
         assertThat(speedStatements).hasSize(1);
         assertThat(accessStatements).hasSize(1);
-        assertThat(speedStatements.getFirst().toString())
-                .isEqualTo("{\"if\": \"true\", \"limit_to\": car_average_speed}");
-        assertThat(accessStatements.getFirst().toString())
-                .isEqualTo("{\"if\": \"car_access == false\", \"multiply_by\": 0}");
+        assertThat(speedStatements.getFirst())
+                .hasToString("{\"if\": \"true\", \"limit_to: \"car_average_speed\"}");
+        assertThat(accessStatements.getFirst())
+                .hasToString("{\"if\": \"car_access == false\", \"multiply_by: \"0\"}");
     }
 }
