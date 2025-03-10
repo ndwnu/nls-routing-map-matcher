@@ -24,13 +24,13 @@ import com.carrotsearch.hppc.IntArrayList;
 import com.graphhopper.routing.util.EncodingManager;
 import com.graphhopper.routing.weighting.QueryGraphWeighting;
 import com.graphhopper.routing.weighting.Weighting;
+import com.graphhopper.storage.BaseGraph;
 import com.graphhopper.storage.EdgeIteratorStateReverseExtractor;
 import com.graphhopper.util.EdgeIteratorState;
 
 /**
- * Whenever a {@link QueryGraph} is used for shortest path calculations including turn costs we need to wrap the
- * {@link Weighting} we want to use with this class. Otherwise turn costs at virtual nodes and/or including virtual
- * edges will not be calculated correctly.
+ * Whenever a {@link QueryGraph} is used for shortest path calculations including turn costs we need to wrap the {@link Weighting} we want
+ * to use with this class. Otherwise turn costs at virtual nodes and/or including virtual edges will not be calculated correctly.
  */
 public class QueryGraphWeightingAdapter extends QueryGraphWeighting {
 
@@ -40,13 +40,13 @@ public class QueryGraphWeightingAdapter extends QueryGraphWeighting {
     private final int startSegmentLinkId;
     private final EncodingManager encodingManager;
 
-    public QueryGraphWeightingAdapter(Weighting weighting, int firstVirtualNodeId, int firstVirtualEdgeId,
+    public QueryGraphWeightingAdapter(BaseGraph graph, Weighting weighting,
             IntArrayList closestEdges, EdgeIteratorStateReverseExtractor edgeIteratorStateReverseExtractor,
             boolean isSearchDirectionReversed, int startSegmentLinkId, EncodingManager encodingManager) {
-        super(weighting, firstVirtualNodeId, firstVirtualEdgeId, closestEdges);
+        super(graph, weighting, closestEdges);
         this.isSearchDirectionReversed = isSearchDirectionReversed;
         this.edgeIteratorStateReverseExtractor = edgeIteratorStateReverseExtractor;
-        this.firstVirtualEdgeId = firstVirtualEdgeId;
+        this.firstVirtualEdgeId = graph.getEdges();
         this.startSegmentLinkId = startSegmentLinkId;
         this.encodingManager = encodingManager;
     }
@@ -81,9 +81,7 @@ public class QueryGraphWeightingAdapter extends QueryGraphWeighting {
     public static QueryGraphWeightingAdapter fromQueryGraph(Weighting baseWeighting, QueryGraph queryGraph,
             EdgeIteratorStateReverseExtractor edgeIteratorStateReverseExtractor, boolean reverseFlow, int matchedLinkId,
             EncodingManager encodingManager) {
-        return new QueryGraphWeightingAdapter(baseWeighting,
-                queryGraph.getBaseGraph().getNodes(),
-                queryGraph.getBaseGraph().getEdges(),
+        return new QueryGraphWeightingAdapter(queryGraph.getBaseGraph(), baseWeighting,
                 queryGraph
                         .getQueryOverlay()
                         .getClosestEdges(),

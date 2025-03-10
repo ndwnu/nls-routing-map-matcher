@@ -10,6 +10,7 @@ import com.carrotsearch.hppc.IntArrayList;
 import com.graphhopper.routing.ev.IntEncodedValue;
 import com.graphhopper.routing.util.EncodingManager;
 import com.graphhopper.routing.weighting.Weighting;
+import com.graphhopper.storage.BaseGraph;
 import com.graphhopper.storage.EdgeIteratorStateReverseExtractor;
 import com.graphhopper.util.EdgeIteratorState;
 import org.junit.jupiter.api.BeforeEach;
@@ -21,12 +22,13 @@ import org.mockito.junit.jupiter.MockitoExtension;
 @ExtendWith(MockitoExtension.class)
 class QueryGraphWeightingAdapterTest {
 
-    private static final int FIRST_VIRTUAL_NODE_ID = 3;
     private static final int FIRST_VIRTUAL_EDGE_ID = 4;
     private static final int START_LINK_ID = 10;
     private static final double WEIGHT = 1D;
     private static final int NORMAL_EDGE_ID = 2;
     private static final int VIRTUAL_EDGE_ID = 5;
+    @Mock
+    private BaseGraph baseGraph;
     @Mock
     private Weighting weighting;
     @Mock
@@ -44,8 +46,8 @@ class QueryGraphWeightingAdapterTest {
 
     @BeforeEach
     void setup() {
-        adapter = new QueryGraphWeightingAdapter(weighting, FIRST_VIRTUAL_NODE_ID,
-                FIRST_VIRTUAL_EDGE_ID,
+        when(baseGraph.getEdges()).thenReturn(FIRST_VIRTUAL_EDGE_ID);
+        adapter = new QueryGraphWeightingAdapter(baseGraph, weighting,
                 closestEdges,
                 edgeIteratorStateReverseExtractor,
                 false, START_LINK_ID, encodingManager);
@@ -79,6 +81,7 @@ class QueryGraphWeightingAdapterTest {
 
     @Test
     void calcEdgeWeight_ok_no_virtual_edge() {
+
         when(weighting.calcEdgeWeight(edgeState, false)).thenReturn(WEIGHT);
         when(edgeState.getEdge()).thenReturn(NORMAL_EDGE_ID);
         double weight = adapter.calcEdgeWeight(edgeState, false);

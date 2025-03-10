@@ -93,7 +93,7 @@ class ViterbiLineStringMapMatcherIT {
         verifySumDistanceOfIndividualRoadSections(lineStringMatch);
         assertThat(lineStringMatch.getId()).isEqualTo(29);
         assertThat(lineStringMatch.getStatus()).isEqualTo(MatchStatus.MATCH);
-        assertThat(lineStringMatch.getReliability()).isEqualTo(97.50886628818601);
+        assertThat(lineStringMatch.getReliability()).isEqualTo(97.50292373328064);
         assertThat(lineStringMatch.getLocationIndex()).isEqualTo(-1);
         assertThat(lineStringMatch.isReversed()).isTrue();
         assertThat(lineStringMatch.getMatchedLinks()).hasSize(10);
@@ -102,42 +102,42 @@ class ViterbiLineStringMapMatcherIT {
                 MatchedLink.builder()
                         .linkId(600767674)
                         .reversed(false)
-                        .distance(55.714350053181654)
-                        .startFraction(0.6615449075921327)
+                        .distance(55.7269078919993)
+                        .startFraction(0.6614835323132342)
                         .endFraction(END_FRACTION_1)
                         .build(),
                 MatchedLink.builder()
                         .linkId(252408103)
                         .reversed(false)
-                        .distance(161.02326851252982)
+                        .distance(161.02181552508915)
                         .startFraction(START_FRACTION_0)
                         .endFraction(END_FRACTION_1)
                         .build(),
                 MatchedLink.builder()
                         .linkId(252408066)
                         .reversed(false)
-                        .distance(15.570829978849499)
+                        .distance(15.570967532038367)
                         .startFraction(START_FRACTION_0)
                         .endFraction(END_FRACTION_1)
                         .build(),
                 MatchedLink.builder()
                         .linkId(600125366)
                         .reversed(false)
-                        .distance(629.530359881841)
+                        .distance(629.5335032815475)
                         .startFraction(START_FRACTION_0)
                         .endFraction(END_FRACTION_1)
                         .build(),
                 MatchedLink.builder()
                         .linkId(600126141)
                         .reversed(false)
-                        .distance(508.76706750198866)
+                        .distance(508.76382489575286)
                         .startFraction(START_FRACTION_0)
                         .endFraction(END_FRACTION_1)
                         .build(),
                 MatchedLink.builder()
                         .linkId(600126144)
                         .reversed(false)
-                        .distance(9.944331278004947)
+                        .distance(9.938118126182806)
                         .startFraction(START_FRACTION_0)
                         .endFraction(END_FRACTION_1)
                         .build(),
@@ -151,31 +151,31 @@ class ViterbiLineStringMapMatcherIT {
                 MatchedLink.builder()
                         .linkId(600126037)
                         .reversed(false)
-                        .distance(413.21490814764564)
+                        .distance(413.21114427929854)
                         .startFraction(START_FRACTION_0)
                         .endFraction(END_FRACTION_1)
                         .build(),
                 MatchedLink.builder()
                         .linkId(600125593)
                         .reversed(false)
-                        .distance(116.64863705130153)
+                        .distance(116.63920786420704)
                         .startFraction(START_FRACTION_0)
                         .endFraction(END_FRACTION_1)
                         .build(),
                 MatchedLink.builder()
                         .linkId(250409010)
                         .reversed(false)
-                        .distance(491.61806977151326)
+                        .distance(491.6180414981985)
                         .startFraction(START_FRACTION_0)
-                        .endFraction(0.30408706328439755)
+                        .endFraction(0.30408660990827346)
                         .build());
         assertNull(lineStringMatch.getUpstreamLinkIds());
         assertNull(lineStringMatch.getDownstreamLinkIds());
-        assertThat(lineStringMatch.getStartLinkFraction()).isEqualTo(0.6615449075921327);
-        assertThat(lineStringMatch.getEndLinkFraction()).isEqualTo(0.30408706328439755);
-        assertThat(lineStringMatch.getWeight()).isEqualTo(2432.198);
+        assertThat(lineStringMatch.getStartLinkFraction()).isEqualTo(0.6614835323132342);
+        assertThat(lineStringMatch.getEndLinkFraction()).isEqualTo(0.30408660990827346);
+        assertThat(lineStringMatch.getWeight()).isEqualTo(2432.21);
         assertThat(lineStringMatch.getDuration()).isEqualTo(87.559);
-        assertThat(lineStringMatch.getDistance()).isEqualTo(2432.198);
+        assertThat(lineStringMatch.getDistance()).isEqualTo(2432.21);
     }
 
     @SneakyThrows
@@ -253,7 +253,7 @@ class ViterbiLineStringMapMatcherIT {
                 MatchedLink.builder()
                         .linkId(3666080)
                         .reversed(false)
-                        .distance(49.37871322376412)
+                        .distance(49.378729840237824)
                         .startFraction(START_FRACTION_0)
                         .endFraction(END_FRACTION_1)
                         .build(),
@@ -274,7 +274,7 @@ class ViterbiLineStringMapMatcherIT {
                 MatchedLink.builder()
                         .linkId(3666083)
                         .reversed(false)
-                        .distance(49.37634675570945)
+                        .distance(49.37623826871774)
                         .startFraction(START_FRACTION_0)
                         .endFraction(END_FRACTION_1)
                         .build(),
@@ -288,7 +288,7 @@ class ViterbiLineStringMapMatcherIT {
                 MatchedLink.builder()
                         .linkId(3666085)
                         .reversed(false)
-                        .distance(49.37832995331975)
+                        .distance(49.3775837239065)
                         .startFraction(START_FRACTION_0)
                         .endFraction(END_FRACTION_1)
                         .build(),
@@ -299,6 +299,7 @@ class ViterbiLineStringMapMatcherIT {
                         .startFraction(START_FRACTION_0)
                         .endFraction(0.4580642228401559)
                         .build());
+
         assertThat(lineStringMatch.getUpstreamLinkIds())
                 .containsExactlyInAnyOrder(3666097, 3666096, 3666095, 3666094, 7223062, 7223061);
         assertThat(lineStringMatch.getDownstreamLinkIds())
@@ -306,9 +307,9 @@ class ViterbiLineStringMapMatcherIT {
         assertThat(lineStringMatch.getStartLinkFraction()).isEqualTo(0.8813982849151963);
         assertThat(lineStringMatch.getEndLinkFraction()).isEqualTo(0.4580642228401559);
         assertThat(lineStringMatch.getLineString()).isEqualTo(geometryFactory.createLineString(coordinates));
-        assertThat(lineStringMatch.getWeight()).isEqualTo(519.767);
-        assertThat(lineStringMatch.getDuration()).isEqualTo(18.713);
-        assertThat(lineStringMatch.getDistance()).isEqualTo(519.767);
+        assertThat(lineStringMatch.getWeight()).isEqualTo(519.766);
+        assertThat(lineStringMatch.getDuration()).isEqualTo(18.712);
+        assertThat(lineStringMatch.getDistance()).isEqualTo(519.766);
     }
 
     @SneakyThrows

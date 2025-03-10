@@ -58,7 +58,7 @@ class StartToEndMapMatcherIT {
         verifySumDistanceOfIndividualRoadSections(lineStringMatch);
         assertThat(lineStringMatch.getId()).isEqualTo(1);
         assertThat(lineStringMatch.getStatus()).isEqualTo(MatchStatus.MATCH);
-        assertThat(lineStringMatch.getReliability()).isEqualTo(92.28950238194943);
+        assertThat(lineStringMatch.getReliability()).isEqualTo(92.28219732699584);
         assertThat(lineStringMatch.getLocationIndex()).isEqualTo(1);
         assertThat(lineStringMatch.isReversed()).isFalse();
         assertThat(lineStringMatch.getMatchedLinks())
@@ -67,42 +67,42 @@ class StartToEndMapMatcherIT {
                                 .builder()
                                 .linkId(6405237)
                                 .reversed(false)
-                                .distance(16.778291076754744)
-                                .startFraction(0.6496530239639768)
+                                .distance(16.767277352527792)
+                                .startFraction(0.6498017568799005)
                                 .endFraction(END_FRACTION_1)
                                 .build(),
                         MatchedLink.builder()
                                 .linkId(6405238)
                                 .reversed(false)
-                                .distance(47.9205870917096)
+                                .distance(47.93169632812054)
                                 .startFraction(START_FRACTION_0)
                                 .endFraction(END_FRACTION_1)
                                 .build(),
                         MatchedLink.builder()
                                 .linkId(6405239)
                                 .reversed(false)
-                                .distance(47.949831373948484)
+                                .distance(47.94311519286801)
                                 .startFraction(START_FRACTION_0)
                                 .endFraction(END_FRACTION_1)
                                 .build(),
                         MatchedLink.builder()
                                 .linkId(6405226)
                                 .reversed(false)
-                                .distance(47.2778725149238)
+                                .distance(47.2758278464927)
                                 .startFraction(START_FRACTION_0)
                                 .endFraction(END_FRACTION_1)
                                 .build(),
                         MatchedLink.builder()
                                 .linkId(6405227)
                                 .reversed(false)
-                                .distance(47.29028486517949)
+                                .distance(47.28959514374181)
                                 .startFraction(START_FRACTION_0)
                                 .endFraction(END_FRACTION_1)
                                 .build(),
                         MatchedLink.builder()
                                 .linkId(6405228)
                                 .reversed(false)
-                                .distance(47.27890649156571)
+                                .distance(47.27955981337373)
                                 .startFraction(START_FRACTION_0)
                                 .endFraction(END_FRACTION_1)
                                 .build(),
@@ -151,38 +151,38 @@ class StartToEndMapMatcherIT {
                         MatchedLink.builder()
                                 .linkId(6369285)
                                 .reversed(false)
-                                .distance(47.441537785852276)
+                                .distance(47.447547899337266)
                                 .startFraction(START_FRACTION_0)
                                 .endFraction(END_FRACTION_1)
                                 .build(),
                         MatchedLink.builder()
                                 .linkId(6369286)
                                 .reversed(false)
-                                .distance(47.43760357701261)
+                                .distance(47.431176246946976)
                                 .startFraction(START_FRACTION_0)
                                 .endFraction(END_FRACTION_1)
                                 .build(),
                         MatchedLink.builder()
                                 .linkId(6369287)
                                 .reversed(false)
-                                .distance(47.42443190911065)
+                                .distance(47.41993244678749)
                                 .startFraction(START_FRACTION_0)
                                 .endFraction(END_FRACTION_1)
                                 .build(),
                         MatchedLink.builder()
                                 .linkId(6369288)
                                 .reversed(false)
-                                .distance(46.560118306514006)
+                                .distance(46.564372446729806)
                                 .startFraction(START_FRACTION_0)
-                                .endFraction(0.9813310134286733)
+                                .endFraction(0.9811542024563015)
                                 .build());
         assertThat(lineStringMatch.getUpstreamLinkIds()).isNull();
         assertThat(lineStringMatch.getDownstreamLinkIds()).isNull();
-        assertThat(lineStringMatch.getStartLinkFraction()).isEqualTo(0.6496530239639768);
-        assertThat(lineStringMatch.getEndLinkFraction()).isEqualTo(0.9813310134286733);
-        assertThat(lineStringMatch.getWeight()).isEqualTo(727.039);
+        assertThat(lineStringMatch.getStartLinkFraction()).isEqualTo(0.6498017568799005);
+        assertThat(lineStringMatch.getEndLinkFraction()).isEqualTo(0.9811542024563015);
+        assertThat(lineStringMatch.getWeight()).isEqualTo(727.032);
         assertThat(lineStringMatch.getDuration()).isEqualTo(75.91);
-        assertThat(lineStringMatch.getDistance()).isEqualTo(727.039);
+        assertThat(lineStringMatch.getDistance()).isEqualTo(727.032);
     }
 
     @SneakyThrows
@@ -284,7 +284,7 @@ class StartToEndMapMatcherIT {
                 MatchedLink.builder()
                         .linkId(3666080)
                         .reversed(false)
-                        .distance(49.378713223864594)
+                        .distance(49.378729840160865)
                         .startFraction(START_FRACTION_0)
                         .endFraction(END_FRACTION_1)
                         .build(),
@@ -305,7 +305,7 @@ class StartToEndMapMatcherIT {
                 MatchedLink.builder()
                         .linkId(3666083)
                         .reversed(false)
-                        .distance(49.37634675580076)
+                        .distance(49.37623826834501)
                         .startFraction(START_FRACTION_0)
                         .endFraction(END_FRACTION_1)
                         .build(),
@@ -319,7 +319,7 @@ class StartToEndMapMatcherIT {
                 MatchedLink.builder()
                         .linkId(3666085)
                         .reversed(false)
-                        .distance(49.37832995226587)
+                        .distance(49.37758372391471)
                         .startFraction(START_FRACTION_0)
                         .endFraction(END_FRACTION_1)
                         .build(),

@@ -24,6 +24,8 @@ import java.util.Map;
  */
 public class PathRouter extends Router {
 
+    private static final String CURBSIDE_STRICTNESS = "soft";
+
     public PathRouter(BaseGraph graph, EncodingManager encodingManager,
             LocationIndex locationIndex,
             Map<String,Profile> profilesByName,
@@ -62,9 +64,8 @@ public class PathRouter extends Router {
         QueryGraph queryGraph = QueryGraph.create(graph, snaps);
         PathCalculator pathCalculator = solver.createPathCalculator(queryGraph);
         boolean passThrough = false;
-        boolean forceCurbsides = false;
         ViaRouting.Result result = ViaRouting.calcPaths(request.getPoints(), queryGraph, snaps, directedEdgeFilter,
-                pathCalculator, request.getCurbsides(), forceCurbsides, request.getHeadings(), passThrough);
+                pathCalculator, request.getCurbsides(), CURBSIDE_STRICTNESS, request.getHeadings(), passThrough);
         if (request.getPoints().size() != result.paths.size() + 1) {
             throw new RuntimeException(
                     "There should be exactly one more point than paths. points:" + request.getPoints().size()
