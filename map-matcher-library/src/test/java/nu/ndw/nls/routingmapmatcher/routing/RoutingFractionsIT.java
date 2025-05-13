@@ -19,7 +19,7 @@ import nu.ndw.nls.routingmapmatcher.network.model.DirectionalDto;
 import nu.ndw.nls.routingmapmatcher.network.model.LinkVehicleMapper;
 import nu.ndw.nls.routingmapmatcher.network.model.RoutingNetworkSettings;
 import nu.ndw.nls.routingmapmatcher.testutil.TestNetworkProvider;
-import org.assertj.core.data.Percentage;
+import org.assertj.core.data.Offset;
 import org.geotools.geometry.jts.WKTReader2;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -136,8 +136,8 @@ class RoutingFractionsIT {
     }
 
     /**
-     * This test is using a part of north of the the 'Amersfoort knoopunt' that looks like this: --┴-- First point is in
-     * the west, then turning north and last point is east
+     * This test uses roads north of knooppunt Hoevelaken in the Amersfoort test set that look like this: --┴--. The start point is in the
+     * west, the via point in the north and the end point in the east.
      */
     @Test
     @SneakyThrows
@@ -197,12 +197,17 @@ class RoutingFractionsIT {
     }
 
     private static void verifySumDistanceOfIndividualRoadSections(RoutingResponse response) {
-        assertThat((Double) response.getMatchedLinks()
-                .stream()
-                .map(MatchedLink::getDistance)
-                .mapToDouble(Double::doubleValue)
-                .sum())
-                .isCloseTo(response.getDistance(), Percentage.withPercentage(0.3));
+        double matchedLinksDistance = response.getLegs().stream()
+                .flatMap(l -> l.getMatchedLinks().stream())
+                .mapToDouble(MatchedLink::getDistance)
+                .sum();
+        assertThat(matchedLinksDistance)
+                .isCloseTo(response.getDistance(), Offset.offset(0.3));
+        double matchedLinksGroupedDistance = response.getMatchedLinksGroupedBySameLinkAndDirection().stream()
+                .mapToDouble(MatchedLink::getDistance)
+                .sum();
+        assertThat(matchedLinksGroupedDistance)
+                .isCloseTo(matchedLinksDistance, Offset.offset(0.0005));
     }
 
     @SneakyThrows

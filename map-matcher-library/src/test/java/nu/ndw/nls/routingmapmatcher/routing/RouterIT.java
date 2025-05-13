@@ -14,7 +14,7 @@ import nu.ndw.nls.routingmapmatcher.model.routing.RoutingLegResponse;
 import nu.ndw.nls.routingmapmatcher.model.routing.RoutingRequest;
 import nu.ndw.nls.routingmapmatcher.model.routing.RoutingResponse;
 import nu.ndw.nls.routingmapmatcher.testutil.TestNetworkProvider;
-import org.assertj.core.data.Percentage;
+import org.assertj.core.data.Offset;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.locationtech.jts.geom.Coordinate;
@@ -29,6 +29,56 @@ class RouterIT {
 
     private static final double START_FRACTION_0 = 0.0;
     private static final double END_FRACTION_1 = 1.0;
+
+    private static final MatchedLink MATCHED_LINK_1 = MatchedLink.builder()
+            .linkId(7223072)
+            .reversed(false)
+            .distance(8.357281610810594)
+            .startFraction(0.8246035077811711)
+            .endFraction(END_FRACTION_1)
+            .build();
+    private static final MatchedLink MATCHED_LINK_2 = MatchedLink.builder()
+            .linkId(7223073)
+            .reversed(false)
+            .distance(47.60890978696375)
+            .startFraction(START_FRACTION_0)
+            .endFraction(END_FRACTION_1)
+            .build();
+    private static final MatchedLink MATCHED_LINK_3 = MatchedLink.builder()
+            .linkId(3667130)
+            .reversed(false)
+            .distance(41.66339422474998)
+            .startFraction(START_FRACTION_0)
+            .endFraction(END_FRACTION_1)
+            .build();
+    private static final MatchedLink MATCHED_LINK_4 = MatchedLink.builder()
+            .linkId(3667131)
+            .reversed(false)
+            .distance(41.70294857485283)
+            .startFraction(START_FRACTION_0)
+            .endFraction(END_FRACTION_1)
+            .build();
+    private static final MatchedLink MATCHED_LINK_5 = MatchedLink.builder()
+            .linkId(3667132)
+            .reversed(false)
+            .distance(41.663581229545194)
+            .startFraction(START_FRACTION_0)
+            .endFraction(END_FRACTION_1)
+            .build();
+    private static final MatchedLink MATCHED_LINK_6 = MatchedLink.builder()
+            .linkId(3667133)
+            .reversed(false)
+            .distance(41.66367473281842)
+            .startFraction(START_FRACTION_0)
+            .endFraction(END_FRACTION_1)
+            .build();
+    private static final MatchedLink MATCHED_LINK_7 = MatchedLink.builder()
+            .linkId(3666204)
+            .reversed(false)
+            .distance(20.955710460926817)
+            .startFraction(START_FRACTION_0)
+            .endFraction(0.5215863361447783)
+            .build();
 
     @Autowired
     private RouterFactory routerFactory;
@@ -57,6 +107,26 @@ class RouterIT {
         verifySumDistanceOfIndividualRoadSections(result);
         assertSuccess(result, new Coordinate[]{
                 new Coordinate(5.430483, 52.177693),
+                new Coordinate(5.428436, 52.175901)
+        });
+    }
+
+    @SneakyThrows
+    @Test
+    void route_ok_viaPoint() {
+        setupNetwork();
+        Point start = geometryFactory.createPoint(new Coordinate(5.430496, 52.177687));
+        Point via = geometryFactory.createPoint(new Coordinate(5.4295216, 52.1768461));
+        Point end = geometryFactory.createPoint(new Coordinate(5.428436, 52.175901));
+        List<Point> wayPoints = List.of(start, via, end);
+        var result = router.route(RoutingRequest.builder()
+                .routingProfile(CAR)
+                .wayPoints(wayPoints)
+                .build());
+        verifySumDistanceOfIndividualRoadSections(result);
+        assertViaPointSuccess(result, new Coordinate[]{
+                new Coordinate(5.430483, 52.177693),
+                new Coordinate(5.429518, 52.176847),
                 new Coordinate(5.428436, 52.175901)
         });
     }
@@ -167,60 +237,20 @@ class RouterIT {
     }
 
     private void assertSuccess(RoutingResponse result, Coordinate[] coordinates) {
+        List<MatchedLink> matchedLinks = List.of(
+                MATCHED_LINK_1,
+                MATCHED_LINK_2,
+                MATCHED_LINK_3,
+                MATCHED_LINK_4,
+                MATCHED_LINK_5,
+                MATCHED_LINK_6,
+                MATCHED_LINK_7
+        );
         assertThat(result.getLegs()).containsExactly(
                 RoutingLegResponse.builder()
-                        .matchedLinks(List.of(
-                                MatchedLink.builder()
-                                        .linkId(7223072)
-                                        .reversed(false)
-                                        .distance(8.357281610810594)
-                                        .startFraction(0.8246035077811711)
-                                        .endFraction(END_FRACTION_1)
-                                        .build(),
-                                MatchedLink.builder()
-                                        .linkId(7223073)
-                                        .reversed(false)
-                                        .distance(47.60890978696375)
-                                        .startFraction(START_FRACTION_0)
-                                        .endFraction(END_FRACTION_1)
-                                        .build(),
-                                MatchedLink.builder()
-                                        .linkId(3667130)
-                                        .reversed(false)
-                                        .distance(41.66339422474998)
-                                        .startFraction(START_FRACTION_0)
-                                        .endFraction(END_FRACTION_1)
-                                        .build(),
-                                MatchedLink.builder()
-                                        .linkId(3667131)
-                                        .reversed(false)
-                                        .distance(41.70294857485283)
-                                        .startFraction(START_FRACTION_0)
-                                        .endFraction(END_FRACTION_1)
-                                        .build(),
-                                MatchedLink.builder()
-                                        .linkId(3667132)
-                                        .reversed(false)
-                                        .distance(41.663581229545194)
-                                        .startFraction(START_FRACTION_0)
-                                        .endFraction(END_FRACTION_1)
-                                        .build(),
-                                MatchedLink.builder()
-                                        .linkId(3667133)
-                                        .reversed(false)
-                                        .distance(41.66367473281842)
-                                        .startFraction(START_FRACTION_0)
-                                        .endFraction(END_FRACTION_1)
-                                        .build(),
-                                MatchedLink.builder()
-                                        .linkId(3666204)
-                                        .reversed(false)
-                                        .distance(20.955710460926817)
-                                        .startFraction(START_FRACTION_0)
-                                        .endFraction(0.5215863361447783)
-                                        .build()
-                        ))
+                        .matchedLinks(matchedLinks)
                         .build());
+        assertThat(result.getMatchedLinksGroupedBySameLinkAndDirection()).isEqualTo(matchedLinks);
 
         assertThat(result.getGeometry()).isEqualTo(geometryFactory.createLineString(coordinates));
         assertThat(result.getWeight()).isEqualTo(8.769);
@@ -228,54 +258,55 @@ class RouterIT {
         assertThat(result.getDistance()).isEqualTo(243.592);
     }
 
-    private void assertSnapToNodesSuccess(RoutingResponse result, Coordinate[] coordinates) {
+    private void assertViaPointSuccess(RoutingResponse result, Coordinate[] coordinates) {
         assertThat(result.getLegs()).containsExactly(
                 RoutingLegResponse.builder()
                         .matchedLinks(List.of(
-                                MatchedLink.builder()
-                                        .linkId(7223073)
-                                        .reversed(false)
-                                        .distance(47.60890978696375)
-                                        .startFraction(START_FRACTION_0)
-                                        .endFraction(END_FRACTION_1)
-                                        .build(),
-                                MatchedLink.builder()
-                                        .linkId(3667130)
-                                        .reversed(false)
-                                        .distance(41.66339422474998)
-                                        .startFraction(START_FRACTION_0)
-                                        .endFraction(END_FRACTION_1)
-                                        .build(),
-                                MatchedLink.builder()
-                                        .linkId(3667131)
-                                        .reversed(false)
-                                        .distance(41.70294857485283)
-                                        .startFraction(START_FRACTION_0)
-                                        .endFraction(END_FRACTION_1)
-                                        .build(),
-                                MatchedLink.builder()
-                                        .linkId(3667132)
-                                        .reversed(false)
-                                        .distance(41.663581229545194)
-                                        .startFraction(START_FRACTION_0)
-                                        .endFraction(END_FRACTION_1)
-                                        .build(),
-                                MatchedLink.builder()
-                                        .linkId(3667133)
-                                        .reversed(false)
-                                        .distance(41.66367473281842)
-                                        .startFraction(START_FRACTION_0)
-                                        .endFraction(END_FRACTION_1)
-                                        .build(),
-                                MatchedLink.builder()
-                                        .linkId(3666204)
-                                        .reversed(false)
-                                        .distance(40.17687774533663)
-                                        .startFraction(START_FRACTION_0)
-                                        .endFraction(END_FRACTION_1)
-                                        .build()
+                                MATCHED_LINK_1,
+                                MATCHED_LINK_2,
+                                MATCHED_LINK_3,
+                                MATCHED_LINK_4.withDistance(17.244659961414612).withEndFraction(0.4135117671960675)
+                        ))
+                        .build(),
+                RoutingLegResponse.builder()
+                        .matchedLinks(List.of(
+                                MATCHED_LINK_4.withDistance(24.458288612514636).withStartFraction(0.4135117671960675),
+                                MATCHED_LINK_5,
+                                MATCHED_LINK_6,
+                                MATCHED_LINK_7
                         ))
                         .build());
+        assertThat(result.getMatchedLinksGroupedBySameLinkAndDirection()).isEqualTo(List.of(
+                MATCHED_LINK_1,
+                MATCHED_LINK_2,
+                MATCHED_LINK_3,
+                // Tiny rounding difference compared to original
+                MATCHED_LINK_4.withDistance(41.70294857392925),
+                MATCHED_LINK_5,
+                MATCHED_LINK_6,
+                MATCHED_LINK_7
+        ));
+
+        assertThat(result.getGeometry()).isEqualTo(geometryFactory.createLineString(coordinates));
+        assertThat(result.getWeight()).isEqualTo(8.768);
+        assertThat(result.getDuration()).isEqualTo(8.767);
+        assertThat(result.getDistance()).isEqualTo(243.558);
+    }
+
+    private void assertSnapToNodesSuccess(RoutingResponse result, Coordinate[] coordinates) {
+        List<MatchedLink> matchedLinks = List.of(
+                MATCHED_LINK_2,
+                MATCHED_LINK_3,
+                MATCHED_LINK_4,
+                MATCHED_LINK_5,
+                MATCHED_LINK_6,
+                MATCHED_LINK_7.withDistance(40.17687774533663).withEndFraction(END_FRACTION_1)
+        );
+        assertThat(result.getLegs()).containsExactly(
+                RoutingLegResponse.builder()
+                        .matchedLinks(matchedLinks)
+                        .build());
+        assertThat(result.getMatchedLinksGroupedBySameLinkAndDirection()).isEqualTo(matchedLinks);
 
         assertThat(result.getGeometry()).isEqualTo(geometryFactory.createLineString(coordinates));
         assertThat(result.getWeight()).isEqualTo(9.164);
@@ -284,11 +315,16 @@ class RouterIT {
     }
 
     private static void verifySumDistanceOfIndividualRoadSections(RoutingResponse response) {
-        assertThat((Double) response.getMatchedLinks()
-                .stream()
-                .map(MatchedLink::getDistance)
-                .mapToDouble(Double::doubleValue)
-                .sum())
-                .isCloseTo(response.getDistance(), Percentage.withPercentage(0.1));
+        double matchedLinksDistance = response.getLegs().stream()
+                .flatMap(l -> l.getMatchedLinks().stream())
+                .mapToDouble(MatchedLink::getDistance)
+                .sum();
+        assertThat(matchedLinksDistance)
+                .isCloseTo(response.getDistance(), Offset.offset(0.1));
+        double matchedLinksGroupedDistance = response.getMatchedLinksGroupedBySameLinkAndDirection().stream()
+                .mapToDouble(MatchedLink::getDistance)
+                .sum();
+        assertThat(matchedLinksGroupedDistance)
+                .isCloseTo(matchedLinksDistance, Offset.offset(0.0005));
     }
 }

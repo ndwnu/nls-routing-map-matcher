@@ -25,6 +25,7 @@ class RoutingLegResponseSequenceTest {
     private MatchedLink nextFirstMatchedLink;
 
     private RoutingLegResponseSequence routingLegResponseSequence;
+
     @BeforeEach
     void setUp() {
         routingLegResponseSequence = RoutingLegResponseSequence.of(previous, next);
@@ -45,7 +46,6 @@ class RoutingLegResponseSequenceTest {
         when(previousLastMatchedLink.getLinkId()).thenReturn(1);
         when(nextFirstMatchedLink.getLinkId()).thenReturn(1);
         when(previousLastMatchedLink.getEndFraction()).thenReturn(0.75);
-        when(nextFirstMatchedLink.getStartFraction()).thenReturn(0.25);
 
         assertTrue(routingLegResponseSequence.isMakingUTurn());
 
@@ -54,7 +54,6 @@ class RoutingLegResponseSequenceTest {
         verify(previousLastMatchedLink).isReversed();
         verify(nextFirstMatchedLink).isReversed();
         verify(previousLastMatchedLink).getEndFraction();
-        verify(nextFirstMatchedLink).getStartFraction();
     }
 
     @Test
@@ -175,13 +174,9 @@ class RoutingLegResponseSequenceTest {
     void isLegsTransitionOnNode_ok_false() {
         when(previous.getLastLink()).thenReturn(previousLastMatchedLink);
         when(previousLastMatchedLink.getEndFraction()).thenReturn(0.25);
-        when(next.getFirstLink()).thenReturn(nextFirstMatchedLink);
-        when(nextFirstMatchedLink.getStartFraction()).thenReturn(0.75);
         assertFalse(routingLegResponseSequence.isLegsTransitionOnNode());
         verify(previous).getLastLink();
         verify(previousLastMatchedLink).getEndFraction();
-        verify(next).getFirstLink();
-        verify(nextFirstMatchedLink).getStartFraction();
     }
 
     @Test
@@ -197,7 +192,7 @@ class RoutingLegResponseSequenceTest {
     void isPreviousRoutingLegEndOnNode_ok_false() {
         when(previous.getLastLink()).thenReturn(previousLastMatchedLink);
         when(previousLastMatchedLink.getEndFraction()).thenReturn(0.24);
-        assertTrue(routingLegResponseSequence.isPreviousRoutingLegEndOnNode());
+        assertFalse(routingLegResponseSequence.isPreviousRoutingLegEndOnNode());
         verify(previous).getLastLink();
         verify(previousLastMatchedLink).getEndFraction();
     }

@@ -1,7 +1,6 @@
 package nu.ndw.nls.routingmapmatcher.model.routing;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.mock;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.when;
 
 import java.util.List;
@@ -13,6 +12,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
 class RoutingResponseTest {
+
     @Mock
     private RoutingLegResponse routingLegResponseA;
     @Mock
@@ -22,63 +22,36 @@ class RoutingResponseTest {
     @Mock
     private RoutingLegResponse routingLegResponseD;
 
-    @Mock
-    private MatchedLink matchedLinkA;
-    @Mock
-    private MatchedLink matchedLinkB;
-    @Mock
-    private MatchedLink matchedLinkC;
-
     @Test
     void streamRoutingLegResponseSequences_ok() {
-
         RoutingResponse routingResponse = RoutingResponse.builder()
                 .legs(List.of(routingLegResponseA, routingLegResponseB, routingLegResponseC, routingLegResponseD))
                 .build();
 
         assertEquals(List.of(RoutingLegResponseSequence.of(routingLegResponseA, routingLegResponseB),
-                             RoutingLegResponseSequence.of(routingLegResponseB, routingLegResponseC),
-                             RoutingLegResponseSequence.of(routingLegResponseC, routingLegResponseD)),
-                    routingResponse.streamRoutingLegResponseSequences().toList());
-    }
-
-    @Test
-    void getMatchedLinks_ok_asIs() {
-        RoutingResponse routingResponse = RoutingResponse.builder()
-                .legs(List.of(routingLegResponseA, routingLegResponseB))
-                .build();
-
-        when(routingLegResponseA.getMatchedLinks()).thenReturn(List.of(matchedLinkA, matchedLinkB));
-        when(routingLegResponseB.getMatchedLinks()).thenReturn(List.of(matchedLinkC));
-
-        assertEquals(List.of(matchedLinkA, matchedLinkB, matchedLinkC), routingResponse.getMatchedLinks());
+                        RoutingLegResponseSequence.of(routingLegResponseB, routingLegResponseC),
+                        RoutingLegResponseSequence.of(routingLegResponseC, routingLegResponseD)),
+                routingResponse.streamRoutingLegResponseSequences().toList());
     }
 
     @Test
     void getMatchedLinksGroupedBySameLinkAndDirection_ok_combinedMatchedLinks() {
-
         RoutingResponse routingResponse = RoutingResponse.builder()
-                .legs(List.of(routingLegResponseA, routingLegResponseB))
+                .legs(List.of(routingLegResponseA, routingLegResponseB, routingLegResponseC))
                 .build();
 
-        when(routingLegResponseA.getMatchedLinks()).thenReturn(List.of(matchedLinkA, matchedLinkB));
-        when(routingLegResponseB.getMatchedLinks()).thenReturn(List.of(matchedLinkC));
+        MatchedLink matchedLink1 = new MatchedLink(1, false, 0, 1, 2);
+        MatchedLink matchedLink2 = new MatchedLink(2, true, 0, 0.33, 1);
+        MatchedLink matchedLink3 = new MatchedLink(2, true, 0.33, 0.67, 1);
+        MatchedLink matchedLink4 = new MatchedLink(2, true, 0.67, 1, 1);
+        MatchedLink matchedLink5 = new MatchedLink(2, false, 0, 1, 1);
 
-        when(matchedLinkA.getLinkId()).thenReturn(1);
-        when(matchedLinkB.getLinkId()).thenReturn(2);
-        when(matchedLinkC.getLinkId()).thenReturn(2);
+        when(routingLegResponseA.getMatchedLinks()).thenReturn(List.of(matchedLink1, matchedLink2));
+        when(routingLegResponseB.getMatchedLinks()).thenReturn(List.of(matchedLink3));
+        when(routingLegResponseC.getMatchedLinks()).thenReturn(List.of(matchedLink4, matchedLink5));
 
-        when(matchedLinkB.isReversed()).thenReturn(true);
-        when(matchedLinkC.isReversed()).thenReturn(true);
+        List<MatchedLink> result = routingResponse.getMatchedLinksGroupedBySameLinkAndDirection();
 
-        when(matchedLinkC.getEndFraction()).thenReturn(0.75);
-
-        MatchedLink combinedMatchedLink = mock(MatchedLink.class);
-
-        when(matchedLinkB.withEndFraction(0.75)).thenReturn(combinedMatchedLink);
-
-        assertEquals(List.of(matchedLinkA, combinedMatchedLink),
-                routingResponse.getMatchedLinksGroupedBySameLinkAndDirection());
+        assertEquals(List.of(matchedLink1, new MatchedLink(2, true, 0, 1, 3), matchedLink5), result);
     }
-
 }
