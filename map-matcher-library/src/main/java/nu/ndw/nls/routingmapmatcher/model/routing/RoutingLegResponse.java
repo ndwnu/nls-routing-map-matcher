@@ -16,9 +16,6 @@ import nu.ndw.nls.routingmapmatcher.model.linestring.MatchedLink;
 @EqualsAndHashCode
 public class RoutingLegResponse {
 
-    private static final int INDEX_FIRST = 0;
-    private static final int INDEX_SIZE_TO_LAST_CORRECTION = 1;
-
     private final List<MatchedLink> matchedLinks;
 
     /**
@@ -29,7 +26,7 @@ public class RoutingLegResponse {
     }
 
     /**
-     @return end fraction of the last matched link of this leg
+     * @return end fraction of the last matched link of this leg
      */
     public double getEndFraction() {
         return getLastLink().getEndFraction();
@@ -39,13 +36,13 @@ public class RoutingLegResponse {
      * @return the first matched link
      */
     public MatchedLink getFirstLink() {
-        return matchedLinks.get(INDEX_FIRST);
+        return matchedLinks.getFirst();
     }
 
     /**
      * @return the last matched link
      */
     public MatchedLink getLastLink() {
-        return matchedLinks.get(matchedLinks.size()- INDEX_SIZE_TO_LAST_CORRECTION);
+        return matchedLinks.getLast();
     }
 }
