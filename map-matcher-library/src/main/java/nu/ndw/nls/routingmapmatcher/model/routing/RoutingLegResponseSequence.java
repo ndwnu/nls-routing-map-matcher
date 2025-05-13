@@ -14,8 +14,8 @@ import lombok.ToString;
 public class RoutingLegResponseSequence {
 
     private static final double DELTA = 0.000000001;
-    private final RoutingLegResponse previousRoutingLegResponse;
 
+    private final RoutingLegResponse previousRoutingLegResponse;
     private final RoutingLegResponse nextRoutingLegResponse;
 
     public static RoutingLegResponseSequence of(RoutingLegResponse previous, RoutingLegResponse next) {
@@ -23,11 +23,10 @@ public class RoutingLegResponseSequence {
     }
 
     /**
-     *
      * @return true if previous leg ends on the same road section as next leg begins, but in a reverse driving direction
      */
     public boolean isMakingUTurn() {
-        return (isContinuingOnSameRoadSection() && !isContinuingInSameDrivingDirection() && !isLegsTransitionOnNode());
+        return isContinuingOnSameRoadSection() && !isContinuingInSameDrivingDirection() && !isLegsTransitionOnNode();
     }
 
     public boolean isLegsTransitionOnNode() {
@@ -35,24 +34,24 @@ public class RoutingLegResponseSequence {
     }
 
     public boolean isPreviousRoutingLegEndOnNode() {
-        return getPreviousRoutingLegResponse().getLastLink().getEndFraction()-1.0 < DELTA;
+        return 1.0 - getPreviousRoutingLegResponse().getLastLink().getEndFraction() < DELTA;
     }
 
     public boolean isNextRoutingLegBeginOnNode() {
         return getNextRoutingLegResponse().getFirstLink().getStartFraction() < DELTA;
     }
 
-
     /**
      * @return true if the previous leg ends on the same road section where the next leg begins
      */
     public boolean isContinuingOnSameRoadSection() {
-        return  getPreviousRoutingLegResponse().getLastLink().getLinkId() ==
+        return getPreviousRoutingLegResponse().getLastLink().getLinkId() ==
                 getNextRoutingLegResponse().getFirstLink().getLinkId();
     }
 
     /**
      * Only meaningful when {@link RoutingLegResponseSequence#isContinuingOnSameRoadSection} is true
+     *
      * @return true if the previous legs last link and first link of the next leg have the same reverse boolean state
      */
     public boolean isContinuingInSameDrivingDirection() {

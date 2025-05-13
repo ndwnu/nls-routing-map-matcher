@@ -130,7 +130,9 @@ class RoutingBidirectionalLinkIdIT {
                 .routingProfile(CAR)
                 .wayPoints(wayPoints)
                 .build());
-        assertThat(response.getMatchedLinks())
+        assertThat(response.getLegs())
+                .hasSize(1);
+        assertThat(response.getLegs().getFirst().getMatchedLinks())
                 .hasSize(2)
                 .satisfiesExactly(
                         first -> {
@@ -155,7 +157,9 @@ class RoutingBidirectionalLinkIdIT {
                 .routingProfile(CAR)
                 .wayPoints(wayPoints)
                 .build());
-        assertThat(response.getMatchedLinks())
+        assertThat(response.getLegs())
+                .hasSize(1);
+        assertThat(response.getLegs().getFirst().getMatchedLinks())
                 .hasSize(2)
                 .satisfiesExactly(
                         first -> {
@@ -180,7 +184,9 @@ class RoutingBidirectionalLinkIdIT {
                 .routingProfile(CAR)
                 .wayPoints(wayPoints)
                 .build());
-        assertThat(result.getMatchedLinks())
+        assertThat(result.getLegs())
+                .hasSize(1);
+        assertThat(result.getLegs().getFirst().getMatchedLinks())
                 .hasSize(2)
                 .satisfiesExactly(
                         first -> {
@@ -205,7 +211,9 @@ class RoutingBidirectionalLinkIdIT {
                 .routingProfile(CAR)
                 .wayPoints(wayPoints)
                 .build());
-        assertThat(result.getMatchedLinks())
+        assertThat(result.getLegs())
+                .hasSize(1);
+        assertThat(result.getLegs().getFirst().getMatchedLinks())
                 .hasSize(2)
                 .satisfiesExactly(
                         first -> {
