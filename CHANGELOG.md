@@ -7,7 +7,17 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 Here we write upgrade notes. It's a team effort to make them as straightforward as possible.
 
-## [16.0.0] 2025-03-04
+## [17.0.0] - 2025-05-13
+
+### Fixed
+- Fixed an issue in RouteResponse where matched links were incorrectly merged at waypoints.
+- Fixed RoutingLegResponseSequence.isPreviousRoutingLegEndOnNode(), which always returned true.
+
+### Removed
+- Breaking: removed method RouteResponse.getMatchedLinks() deemed confusing. Clients should either explicitly use route legs if they support
+  this concept, or call RouteResponse.getMatchedLinksGroupedBySameLinkAndDirection() if they want a flat structure.
+
+## [16.0.0] - 2025-03-04
 
 ### Changed
 
