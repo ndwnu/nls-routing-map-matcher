@@ -4,7 +4,7 @@ trigger:
       - main
 
 pool:
-  vmImage: ubuntu-latest
+  name: Kubernetes
 
 resources:
   repositories:
@@ -13,11 +13,38 @@ resources:
       name: NLS/nls-pipeline-templates
       ref: main
 
+parameters:
+  - name: skipSonar
+    type: boolean
+    default: false
+  - name: skipTests
+    type: boolean
+    default: false
+  - name: skipDocker
+    type: boolean
+    default: false
+  - name: skipSecurityScanning
+    type: boolean
+    default: false
+  - name: forceDeployment
+    type: boolean
+    default: false
+  - name: skipDeployment
+    type: boolean
+    default: false
+
 extends:
-  template: azure-pipelines-java.yml@nls-pipeline-templates
+  template: v2/pipelines/java.yml@nls-pipeline-templates
   parameters:
-    isVersionedProject: true
     jdkVersion: 1.21
+    skipSonar: ${{ parameters.skipSonar }}
+    skipTests: ${{ parameters.skipTests }}
+    skipSecurityScanning: ${{ parameters.skipSecurityScanning }}
+    skipComponentTesting: true
+    skipPerformanceTesting: true
+    skipDocker: ${{ parameters.skipDocker }}
+    skipDeployment: ${{ parameters.skipDeployment }}
+    forceDeployment: ${{ parameters.forceDeployment }}
     mavenReleaseGoal: deploy
     sonarOptionalCoverageExclusions: '**/config/**'
     sonarOptionalExclusions: '**/graphhopper/isochrone/ShortestPathTree.java,**/graphhopper/routing/PathRouter.java,**/graphhopper/routing/querygraph/VirtualEdgeIteratorStateReverseExtractor.java'
