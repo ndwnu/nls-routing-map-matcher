@@ -20,9 +20,6 @@ parameters:
   - name: skipTests
     type: boolean
     default: false
-  - name: skipSecurityScanning
-    type: boolean
-    default: false
 
 extends:
   template: v2/pipelines/java.yml@nls-pipeline-templates
@@ -30,7 +27,7 @@ extends:
     jdkVersion: 1.21
     skipSonar: ${{ parameters.skipSonar }}
     skipTests: ${{ parameters.skipTests }}
-    skipSecurityScanning: ${{ parameters.skipSecurityScanning }}
+    skipSecurityScanning: true
     skipComponentTesting: true
     skipPerformanceTesting: true
     mavenReleaseGoal: deploy
@@ -38,3 +35,5 @@ extends:
     sonarOptionalExclusions: '**/graphhopper/isochrone/ShortestPathTree.java,**/graphhopper/routing/PathRouter.java,**/graphhopper/routing/querygraph/VirtualEdgeIteratorStateReverseExtractor.java'
     mavenDeployToNdwShared: true
     pushToGitHub: true
+    skipDocker: true
+    skipDeployment: true
