@@ -20,16 +20,7 @@ parameters:
   - name: skipTests
     type: boolean
     default: false
-  - name: skipDocker
-    type: boolean
-    default: false
   - name: skipSecurityScanning
-    type: boolean
-    default: false
-  - name: forceDeployment
-    type: boolean
-    default: false
-  - name: skipDeployment
     type: boolean
     default: false
 
@@ -42,9 +33,6 @@ extends:
     skipSecurityScanning: ${{ parameters.skipSecurityScanning }}
     skipComponentTesting: true
     skipPerformanceTesting: true
-    skipDocker: ${{ parameters.skipDocker }}
-    skipDeployment: ${{ parameters.skipDeployment }}
-    forceDeployment: ${{ parameters.forceDeployment }}
     mavenReleaseGoal: deploy
     sonarOptionalCoverageExclusions: '**/config/**'
     sonarOptionalExclusions: '**/graphhopper/isochrone/ShortestPathTree.java,**/graphhopper/routing/PathRouter.java,**/graphhopper/routing/querygraph/VirtualEdgeIteratorStateReverseExtractor.java'
