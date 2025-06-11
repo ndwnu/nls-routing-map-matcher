@@ -27,7 +27,7 @@ import lombok.extern.slf4j.Slf4j;
 import nu.ndw.nls.geometry.confidence.LineStringReliabilityCalculator;
 import nu.ndw.nls.geometry.distance.FractionAndDistanceCalculator;
 import nu.ndw.nls.geometry.factories.GeometryFactoryWgs84;
-import nu.ndw.nls.routingmapmatcher.domain.AbstractMapMatcher;
+import nu.ndw.nls.routingmapmatcher.domain.BaseMapMatcher;
 import nu.ndw.nls.routingmapmatcher.domain.MapMatcher;
 import nu.ndw.nls.routingmapmatcher.model.MatchStatus;
 import nu.ndw.nls.routingmapmatcher.model.linestring.LineStringLocation;
@@ -42,7 +42,7 @@ import org.locationtech.jts.geom.LineString;
 import org.locationtech.jts.geom.Point;
 
 @Slf4j
-public class ViterbiLineStringMapMatcher extends AbstractMapMatcher implements
+public class ViterbiLineStringMapMatcher extends BaseMapMatcher implements
         MapMatcher<LineStringLocation, LineStringMatch> {
 
     /**
