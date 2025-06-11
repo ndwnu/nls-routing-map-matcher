@@ -11,14 +11,14 @@ Here we write upgrade notes. It's a team effort to make them as straightforward 
 
 ### Added
 
-- Introduced `AbstractMapMatcher`, a base class for map-matching functionality, which provides reusable mechanisms for handling profiles,
+- Introduced `BaseMapMatcher`, a base class for map-matching functionality, which provides reusable mechanisms for handling profiles,
   custom models, and network access.
 - Added new `createMapMatcher` method in `MapMatcherFactory` interface to support the use of `CustomModel` for advanced route
   configurations.
 
 ### Changed
 
-- Refactored `SinglePointMapMatcher`, `StartToEndMapMatcher`,`ViterbiLineStringMapMatcher`,`Router`, to extend `AbstractMapMatcher` for
+- Refactored `SinglePointMapMatcher`, `StartToEndMapMatcher`,`ViterbiLineStringMapMatcher`,`Router`, to extend `BaseMapMatcher` for
   improved reuse and consistency, removing previously duplicated code related to profiles and custom models.
 
 ### Removed

@@ -11,13 +11,17 @@ import nu.ndw.nls.routingmapmatcher.util.Constants;
  * Abstract base class for implementing map-matching functionality. This class provides core mechanisms and configurations necessary for
  * extending map-matching functionality, such as handling profiles, custom models, and network access.
  */
-public abstract class AbstractMapMatcher {
+public class BaseMapMatcher {
 
     private final Profile profile;
     private final CustomModel customModel;
     private final NetworkGraphHopper network;
 
-    public AbstractMapMatcher(String profileName, NetworkGraphHopper network, CustomModel customModel) {
+    private BaseMapMatcher() {
+        throw new UnsupportedOperationException("This class should not be instantiated");
+    }
+
+    protected BaseMapMatcher(String profileName, NetworkGraphHopper network, CustomModel customModel) {
         this.network = Objects.requireNonNull(network);
         this.profile = Objects.requireNonNull(network.getProfile(profileName));
         this.customModel = customModel;
@@ -32,7 +36,7 @@ public abstract class AbstractMapMatcher {
                 .putObject(CustomModel.KEY, Constants.SHORTEST_CUSTOM_MODEL);
     }
 
-    protected PMap createCustomModelHintsIfPresent() {
+    protected final PMap createCustomModelHintsIfPresent() {
         if (customModel != null) {
             return new PMap()
                     .putObject(CustomModel.KEY, customModel);
@@ -40,15 +44,15 @@ public abstract class AbstractMapMatcher {
         return new PMap();
     }
 
-    protected CustomModel getCustomModel() {
+    protected final CustomModel getCustomModel() {
         return customModel;
     }
 
-    protected Profile getProfile() {
+    protected final Profile getProfile() {
         return profile;
     }
 
-    protected NetworkGraphHopper getNetwork() {
+    protected final NetworkGraphHopper getNetwork() {
         return network;
     }
 }

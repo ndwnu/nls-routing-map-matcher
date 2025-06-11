@@ -26,7 +26,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 import nu.ndw.nls.geometry.distance.FractionAndDistanceCalculator;
 import nu.ndw.nls.geometry.factories.GeometryFactoryWgs84;
-import nu.ndw.nls.routingmapmatcher.domain.AbstractMapMatcher;
+import nu.ndw.nls.routingmapmatcher.domain.BaseMapMatcher;
 import nu.ndw.nls.routingmapmatcher.exception.RoutingException;
 import nu.ndw.nls.routingmapmatcher.exception.RoutingRequestException;
 import nu.ndw.nls.routingmapmatcher.mappers.MatchedLinkMapper;
@@ -40,7 +40,7 @@ import nu.ndw.nls.routingmapmatcher.util.PathUtil;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Point;
 
-public class Router extends AbstractMapMatcher {
+public class Router extends BaseMapMatcher {
 
     private static final boolean INCLUDE_ELEVATION = false;
     private static final int DECIMAL_PLACES = 3;
