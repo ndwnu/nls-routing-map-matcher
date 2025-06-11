@@ -1,5 +1,6 @@
 package nu.ndw.nls.routingmapmatcher.viterbi;
 
+import com.graphhopper.util.CustomModel;
 import lombok.RequiredArgsConstructor;
 import nu.ndw.nls.geometry.confidence.LineStringReliabilityCalculator;
 import nu.ndw.nls.geometry.distance.FractionAndDistanceCalculator;
@@ -21,6 +22,14 @@ public class ViterbiLinestringMapMatcherFactory implements MapMatcherFactory<Vit
     @Override
     public ViterbiLineStringMapMatcher createMapMatcher(NetworkGraphHopper preInitializedNetwork, String profileName) {
         return new ViterbiLineStringMapMatcher(preInitializedNetwork, profileName, geometryFactoryWgs84, fractionAndDistanceCalculator,
-                pointListUtil, lineStringReliabilityCalculator);
+                pointListUtil, lineStringReliabilityCalculator, null);
     }
+
+    @Override
+    public ViterbiLineStringMapMatcher createMapMatcher(NetworkGraphHopper preInitializedNetwork, String profileName,
+            CustomModel customModel) {
+        return new ViterbiLineStringMapMatcher(preInitializedNetwork, profileName, geometryFactoryWgs84, fractionAndDistanceCalculator,
+                pointListUtil, lineStringReliabilityCalculator, customModel);
+    }
+
 }

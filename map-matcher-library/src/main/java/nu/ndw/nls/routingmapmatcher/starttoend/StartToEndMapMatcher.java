@@ -3,7 +3,6 @@ package nu.ndw.nls.routingmapmatcher.starttoend;
 import static com.graphhopper.util.Parameters.Algorithms.DIJKSTRA_BI;
 import static nu.ndw.nls.routingmapmatcher.util.MatchUtil.getQueryResults;
 
-import com.graphhopper.config.Profile;
 import com.graphhopper.routing.AlgorithmOptions;
 import com.graphhopper.routing.Path;
 import com.graphhopper.routing.RoutingAlgorithm;
@@ -18,7 +17,6 @@ import com.graphhopper.storage.BaseGraph;
 import com.graphhopper.storage.index.LocationIndexTree;
 import com.graphhopper.storage.index.Snap;
 import com.graphhopper.util.CustomModel;
-import com.graphhopper.util.PMap;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -28,19 +26,19 @@ import java.util.Objects;
 import lombok.extern.slf4j.Slf4j;
 import nu.ndw.nls.geometry.confidence.LineStringReliabilityCalculator;
 import nu.ndw.nls.geometry.distance.FractionAndDistanceCalculator;
+import nu.ndw.nls.routingmapmatcher.domain.AbstractMapMatcher;
 import nu.ndw.nls.routingmapmatcher.domain.MapMatcher;
 import nu.ndw.nls.routingmapmatcher.model.MatchStatus;
 import nu.ndw.nls.routingmapmatcher.model.linestring.LineStringLocation;
 import nu.ndw.nls.routingmapmatcher.model.linestring.LineStringMatch;
 import nu.ndw.nls.routingmapmatcher.network.NetworkGraphHopper;
-import nu.ndw.nls.routingmapmatcher.util.Constants;
 import nu.ndw.nls.routingmapmatcher.util.LineStringMatchUtil;
 import nu.ndw.nls.routingmapmatcher.util.LineStringScoreUtil;
 import nu.ndw.nls.routingmapmatcher.util.PointListUtil;
 import org.locationtech.jts.geom.Point;
 
 @Slf4j
-public class StartToEndMapMatcher implements MapMatcher<LineStringLocation, LineStringMatch> {
+public class StartToEndMapMatcher extends AbstractMapMatcher implements MapMatcher<LineStringLocation, LineStringMatch> {
 
     /**
      * Only search for candidates within this distance.
@@ -48,7 +46,6 @@ public class StartToEndMapMatcher implements MapMatcher<LineStringLocation, Line
     private static final double MAXIMUM_CANDIDATE_DISTANCE_IN_METERS = 20.0;
 
     private final BaseGraph routingGraph;
-    private final NetworkGraphHopper networkGraphHopper;
     private final LocationIndexTree locationIndexTree;
     private final RoutingAlgorithmFactory algorithmFactory;
     private final AlgorithmOptions algorithmOptions;
@@ -56,27 +53,20 @@ public class StartToEndMapMatcher implements MapMatcher<LineStringLocation, Line
     private final LineStringScoreUtil lineStringScoreUtil;
     private final Weighting weighting;
 
-    public StartToEndMapMatcher(NetworkGraphHopper networkGraphHopper, String profileName,
+    public StartToEndMapMatcher(NetworkGraphHopper network, String profileName,
             FractionAndDistanceCalculator fractionAndDistanceCalculator, PointListUtil pointListUtil,
-            LineStringReliabilityCalculator lineStringReliabilityCalculator) {
-        this.networkGraphHopper = Objects.requireNonNull(networkGraphHopper);
-        Profile profile = Objects.requireNonNull(networkGraphHopper.getProfile(profileName));
-        this.routingGraph = networkGraphHopper.getBaseGraph();
+            LineStringReliabilityCalculator lineStringReliabilityCalculator, CustomModel customModel) {
+        super(profileName, network, customModel);
+        this.routingGraph = network.getBaseGraph();
         this.algorithmOptions = new AlgorithmOptions()
                 .setAlgorithm(DIJKSTRA_BI)
                 .setTraversalMode(TraversalMode.NODE_BASED);
         this.algorithmFactory = new RoutingAlgorithmFactorySimple();
-        this.locationIndexTree = networkGraphHopper.getLocationIndex();
-        this.lineStringMatchUtil = new LineStringMatchUtil(networkGraphHopper, profile, fractionAndDistanceCalculator,
-                pointListUtil);
-
+        this.locationIndexTree = network.getLocationIndex();
+        this.lineStringMatchUtil = new LineStringMatchUtil(network, getProfile(), fractionAndDistanceCalculator,
+                pointListUtil, createCustomModelMergedWithShortestCustomModelHintsIfPresent());
         this.lineStringScoreUtil = new LineStringScoreUtil(pointListUtil, lineStringReliabilityCalculator);
-        this.weighting = networkGraphHopper.createWeighting(profile, createShortestDistanceHints());
-    }
-
-    private PMap createShortestDistanceHints() {
-        return new PMap()
-                .putObject(CustomModel.KEY, Constants.SHORTEST_CUSTOM_MODEL);
+        this.weighting = network.createWeighting(getProfile(), createCustomModelMergedWithShortestCustomModelHintsIfPresent());
     }
 
     public LineStringMatch match(LineStringLocation lineStringLocation) {
@@ -101,7 +91,7 @@ public class StartToEndMapMatcher implements MapMatcher<LineStringLocation, Line
 
     private List<Snap> findCandidates(Point point) {
         EdgeFilter edgeFilter = new FiniteWeightFilter(weighting);
-        return getQueryResults(networkGraphHopper, point,
+        return getQueryResults(getNetwork(), point,
                 MAXIMUM_CANDIDATE_DISTANCE_IN_METERS,
                 locationIndexTree, edgeFilter);
     }

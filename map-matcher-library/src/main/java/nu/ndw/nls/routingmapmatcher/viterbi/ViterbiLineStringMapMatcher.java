@@ -2,7 +2,6 @@ package nu.ndw.nls.routingmapmatcher.viterbi;
 
 import static nu.ndw.nls.routingmapmatcher.util.MatchUtil.getQueryResults;
 
-import com.graphhopper.config.Profile;
 import com.graphhopper.matching.MapMatching;
 import com.graphhopper.matching.MatchResult;
 import com.graphhopper.matching.Observation;
@@ -28,12 +27,12 @@ import lombok.extern.slf4j.Slf4j;
 import nu.ndw.nls.geometry.confidence.LineStringReliabilityCalculator;
 import nu.ndw.nls.geometry.distance.FractionAndDistanceCalculator;
 import nu.ndw.nls.geometry.factories.GeometryFactoryWgs84;
+import nu.ndw.nls.routingmapmatcher.domain.AbstractMapMatcher;
 import nu.ndw.nls.routingmapmatcher.domain.MapMatcher;
 import nu.ndw.nls.routingmapmatcher.model.MatchStatus;
 import nu.ndw.nls.routingmapmatcher.model.linestring.LineStringLocation;
 import nu.ndw.nls.routingmapmatcher.model.linestring.LineStringMatch;
 import nu.ndw.nls.routingmapmatcher.network.NetworkGraphHopper;
-import nu.ndw.nls.routingmapmatcher.util.Constants;
 import nu.ndw.nls.routingmapmatcher.util.LineStringMatchUtil;
 import nu.ndw.nls.routingmapmatcher.util.LineStringScoreUtil;
 import nu.ndw.nls.routingmapmatcher.util.PointListUtil;
@@ -43,7 +42,7 @@ import org.locationtech.jts.geom.LineString;
 import org.locationtech.jts.geom.Point;
 
 @Slf4j
-public class ViterbiLineStringMapMatcher implements
+public class ViterbiLineStringMapMatcher extends AbstractMapMatcher implements
         MapMatcher<LineStringLocation, LineStringMatch> {
 
     /**
@@ -54,15 +53,13 @@ public class ViterbiLineStringMapMatcher implements
     private static final double MEASUREMENT_ERROR_SIGMA_IN_METERS = 20.0;
 
     /**
-     * The beta (1/lambda) parameter used for the exponential distribution to determine the probability that the length
-     * of a route between two successive GPS observations is the same as the distance as the crow flies between those
-     * GPS observations.
+     * The beta (1/lambda) parameter used for the exponential distribution to determine the probability that the length of a route between
+     * two successive GPS observations is the same as the distance as the crow flies between those GPS observations.
      */
     private static final double TRANSITION_PROBABILITY_BETA = 100.0;
 
     /**
-     * When creating a GPS track, only create GPS "observations" for coordinates that are within this distance of the
-     * NDW base network.
+     * When creating a GPS track, only create GPS "observations" for coordinates that are within this distance of the NDW base network.
      * <p>
      * See also the comment in {@link #convertToObservations(LineString)}
      */
@@ -76,21 +73,20 @@ public class ViterbiLineStringMapMatcher implements
     private static final String PROFILE_KEY = "profile";
 
     private final LocationIndexTree locationIndexTree;
-    private final NetworkGraphHopper networkGraphHopper;
     private final LineStringMatchUtil lineStringMatchUtil;
     private final LineStringScoreUtil lineStringScoreUtil;
-    private final Profile profile;
     private final PointListUtil pointListUtil;
     private final GeometryFactoryWgs84 geometryFactoryWgs84;
 
-    public ViterbiLineStringMapMatcher(NetworkGraphHopper networkGraphHopper, String profileName,
+
+    public ViterbiLineStringMapMatcher(NetworkGraphHopper network, String profileName,
             GeometryFactoryWgs84 geometryFactoryWgs84, FractionAndDistanceCalculator fractionAndDistanceCalculator,
-            PointListUtil pointListUtil, LineStringReliabilityCalculator lineStringReliabilityCalculator) {
-        this.networkGraphHopper = Objects.requireNonNull(networkGraphHopper);
-        this.locationIndexTree = networkGraphHopper.getLocationIndex();
+            PointListUtil pointListUtil, LineStringReliabilityCalculator lineStringReliabilityCalculator, CustomModel customModel) {
+        super(profileName, network, customModel);
         this.geometryFactoryWgs84 = geometryFactoryWgs84;
-        this.profile = Objects.requireNonNull(networkGraphHopper.getProfile(profileName));
-        this.lineStringMatchUtil = new LineStringMatchUtil(networkGraphHopper, this.profile, fractionAndDistanceCalculator, pointListUtil);
+        this.locationIndexTree = network.getLocationIndex();
+        this.lineStringMatchUtil = new LineStringMatchUtil(network, getProfile(), fractionAndDistanceCalculator, pointListUtil,
+                createCustomModelMergedWithShortestCustomModelHintsIfPresent());
         this.lineStringScoreUtil = new LineStringScoreUtil(pointListUtil, lineStringReliabilityCalculator);
         this.pointListUtil = pointListUtil;
     }
@@ -129,7 +125,7 @@ public class ViterbiLineStringMapMatcher implements
     }
 
     private MapMatching createMapMatching(LineStringLocation lineStringLocation, PMap hints) {
-        MapMatching mapMatching = MapMatching.fromGraphHopper(networkGraphHopper, hints);
+        MapMatching mapMatching = MapMatching.fromGraphHopper(getNetwork(), hints);
         mapMatching.setMeasurementErrorSigma(lineStringLocation.getRadius() == null ? MEASUREMENT_ERROR_SIGMA_IN_METERS
                 : lineStringLocation.getRadius());
         mapMatching.setTransitionProbabilityBeta(TRANSITION_PROBABILITY_BETA);
@@ -137,9 +133,8 @@ public class ViterbiLineStringMapMatcher implements
     }
 
     private PMap createHints() {
-        PMap hints = new PMap();
-        hints.putObject(CustomModel.KEY, Constants.SHORTEST_CUSTOM_MODEL);
-        hints.putObject(PROFILE_KEY, this.profile.getName());
+        PMap hints = createCustomModelMergedWithShortestCustomModelHintsIfPresent();
+        hints.putObject(PROFILE_KEY, getProfile().getName());
         hints.putObject(Parameters.CH.DISABLE, true);
         return hints;
     }
@@ -164,9 +159,9 @@ public class ViterbiLineStringMapMatcher implements
     private boolean isNearbyNdwNetwork(Observation observation) {
         Point point = geometryFactoryWgs84.createPoint(
                 new Coordinate(observation.getPoint().getLon(), observation.getPoint().getLat()));
-        Weighting weighting = networkGraphHopper.createWeighting(profile, createHints());
+        Weighting weighting = getNetwork().createWeighting(getProfile(), createHints());
         EdgeFilter edgeFilter = new FiniteWeightFilter(weighting);
-        List<Snap> queryResults = getQueryResults(networkGraphHopper, point,
+        List<Snap> queryResults = getQueryResults(getNetwork(), point,
                 MEASUREMENT_ERROR_SIGMA_IN_METERS,
                 locationIndexTree, edgeFilter);
         for (Snap queryResult : queryResults) {

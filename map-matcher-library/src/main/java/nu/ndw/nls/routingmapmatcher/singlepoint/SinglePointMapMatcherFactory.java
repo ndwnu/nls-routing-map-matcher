@@ -1,5 +1,6 @@
 package nu.ndw.nls.routingmapmatcher.singlepoint;
 
+import com.graphhopper.util.CustomModel;
 import lombok.RequiredArgsConstructor;
 import nu.ndw.nls.geometry.bearing.BearingCalculator;
 import nu.ndw.nls.geometry.distance.FractionAndDistanceCalculator;
@@ -27,7 +28,14 @@ public class SinglePointMapMatcherFactory implements MapMatcherFactory<SinglePoi
 
         return new SinglePointMapMatcher(diameterToPolygonMapper, bearingCalculator,
                 geometryFactoryWgs84, fractionAndDistanceCalculator, preInitializedNetwork, profileName,
-                closestPointService, pointListUtil);
+                closestPointService, pointListUtil, null);
+    }
+
+    @Override
+    public SinglePointMapMatcher createMapMatcher(NetworkGraphHopper preInitializedNetwork, String profileName, CustomModel customModel) {
+        return new SinglePointMapMatcher(diameterToPolygonMapper, bearingCalculator,
+                geometryFactoryWgs84, fractionAndDistanceCalculator, preInitializedNetwork, profileName,
+                closestPointService, pointListUtil, customModel);
     }
 
 }
