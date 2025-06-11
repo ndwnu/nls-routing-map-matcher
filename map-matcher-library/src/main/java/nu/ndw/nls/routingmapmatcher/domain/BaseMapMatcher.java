@@ -27,7 +27,7 @@ public class BaseMapMatcher {
         this.customModel = customModel;
     }
 
-    protected PMap createCustomModelMergedWithShortestCustomModelHintsIfPresent() {
+    protected final PMap createCustomModelMergedWithShortestCustomModelHintsIfPresent() {
         if (customModel != null) {
             return new PMap()
                     .putObject(CustomModel.KEY, CustomModel.merge(Constants.SHORTEST_CUSTOM_MODEL, customModel));
