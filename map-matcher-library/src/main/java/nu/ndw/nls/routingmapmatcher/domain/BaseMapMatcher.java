@@ -8,8 +8,8 @@ import nu.ndw.nls.routingmapmatcher.network.NetworkGraphHopper;
 import nu.ndw.nls.routingmapmatcher.util.Constants;
 
 /**
- *  Base class for implementing map-matching functionality. This class provides core mechanisms and configurations necessary for
- * extending map-matching functionality, such as handling profiles, custom models, and network access.
+ * Base class for implementing map-matching functionality. This class provides core mechanisms and configurations necessary for extending
+ * map-matching functionality, such as handling profiles, custom models, and network access.
  */
 public class BaseMapMatcher {
 
