@@ -35,4 +35,4 @@ extends:
     mavenDeployToNdwShared: true
     pushToGitHub: true
     skipDocker: true
-    skipDeployment: true
+    skipDeployment: false
