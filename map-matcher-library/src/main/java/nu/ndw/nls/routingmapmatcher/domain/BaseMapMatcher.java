@@ -17,10 +17,6 @@ public class BaseMapMatcher {
     private final CustomModel customModel;
     private final NetworkGraphHopper network;
 
-    private BaseMapMatcher() {
-        throw new UnsupportedOperationException("This class should not be instantiated");
-    }
-
     protected BaseMapMatcher(String profileName, NetworkGraphHopper network, CustomModel customModel) {
         this.network = Objects.requireNonNull(network);
         this.profile = Objects.requireNonNull(network.getProfile(profileName));
