@@ -7,6 +7,25 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 Here we write upgrade notes. It's a team effort to make them as straightforward as possible.
 
+## [18.0.0] - 2025-06-11
+
+### Added
+
+- Introduced `BaseMapMatcher`, a base class for map-matching functionality, which provides reusable mechanisms for handling profiles,
+  custom models, and network access.
+- Added new `createMapMatcher` method in `MapMatcherFactory` interface to support the use of `CustomModel` for advanced route
+  configurations.
+
+### Changed
+
+- Refactored `SinglePointMapMatcher`, `StartToEndMapMatcher`,`ViterbiLineStringMapMatcher`,`Router`, to extend `BaseMapMatcher` for
+  improved reuse and consistency, removing previously duplicated code related to profiles and custom models.
+
+### Removed
+
+- Removed `profileName` and `customModel` from `RoutingRequest` as they are handled by the MapMatcherFactory for consistency.
+
+
 ## [17.0.0] - 2025-05-13
 
 ### Fixed

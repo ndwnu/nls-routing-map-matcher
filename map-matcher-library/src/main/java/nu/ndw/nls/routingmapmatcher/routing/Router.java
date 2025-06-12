@@ -10,6 +10,7 @@ import com.graphhopper.routing.util.EncodingManager;
 import com.graphhopper.routing.util.FiniteWeightFilter;
 import com.graphhopper.routing.weighting.Weighting;
 import com.graphhopper.storage.index.Snap;
+import com.graphhopper.util.CustomModel;
 import com.graphhopper.util.EdgeIteratorState;
 import com.graphhopper.util.Helper;
 import com.graphhopper.util.PMap;
@@ -25,6 +26,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 import nu.ndw.nls.geometry.distance.FractionAndDistanceCalculator;
 import nu.ndw.nls.geometry.factories.GeometryFactoryWgs84;
+import nu.ndw.nls.routingmapmatcher.domain.BaseMapMatcher;
 import nu.ndw.nls.routingmapmatcher.exception.RoutingException;
 import nu.ndw.nls.routingmapmatcher.exception.RoutingRequestException;
 import nu.ndw.nls.routingmapmatcher.mappers.MatchedLinkMapper;
@@ -38,42 +40,39 @@ import nu.ndw.nls.routingmapmatcher.util.PathUtil;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Point;
 
-public class Router {
+public class Router extends BaseMapMatcher {
 
     private static final boolean INCLUDE_ELEVATION = false;
     private static final int DECIMAL_PLACES = 3;
     private static final double MILLISECONDS_PER_SECOND = 1000.0;
-
-    private final NetworkGraphHopper networkGraphHopper;
-
     private final MatchedLinkMapper matchedLinkMapper;
     private final GeometryFactoryWgs84 geometryFactoryWgs84;
     private final FractionAndDistanceCalculator fractionAndDistanceCalculator;
 
+
     public Router(
-            NetworkGraphHopper networkGraphHopper,
+            NetworkGraphHopper network,
             MatchedLinkMapper matchedLinkMapper,
             GeometryFactoryWgs84 geometryFactoryWgs84,
-            FractionAndDistanceCalculator fractionAndDistanceCalculator
+            FractionAndDistanceCalculator fractionAndDistanceCalculator, String profileName, CustomModel customModel
     ) {
-        this.networkGraphHopper = networkGraphHopper;
+        super(profileName, network, customModel);
         this.matchedLinkMapper = matchedLinkMapper;
         this.geometryFactoryWgs84 = geometryFactoryWgs84;
         this.fractionAndDistanceCalculator = fractionAndDistanceCalculator;
         // This configuration is global for the routing network and is probably not thread safe.
         // To be able to configure simplification per request, it's safer to disable GraphHopper-internal simplification
         // and perform it in our own response mapping code below.
-        this.networkGraphHopper.getRouterConfig().setSimplifyResponse(false);
+        getNetwork().getRouterConfig().setSimplifyResponse(false);
     }
 
     public RoutingResponse route(RoutingRequest routingRequest) throws RoutingException, RoutingRequestException {
-        String routingProfile = routingRequest.getRoutingProfile();
         List<Point> points = routingRequest.isSnapToNodes()
-                ? snapPointsToNodes(routingProfile, routingRequest.getWayPoints())
+                ? snapPointsToNodes(routingRequest.getWayPoints())
                 : routingRequest.getWayPoints();
-        GHRequest graphHopperRequest = getGraphHopperRequest(routingProfile, points);
-        if (routingRequest.getCustomModel() != null) {
-            graphHopperRequest.setCustomModel(routingRequest.getCustomModel());
+        GHRequest graphHopperRequest = getGraphHopperRequest(points);
+        if (getCustomModel() != null) {
+            graphHopperRequest.setCustomModel(getCustomModel());
         }
         return getRoutingResponse(
                 graphHopperRequest,
@@ -81,10 +80,10 @@ public class Router {
         );
     }
 
-    private List<Point> snapPointsToNodes(String routingRequest, List<Point> points) {
+    private List<Point> snapPointsToNodes(List<Point> points) {
         ensurePointsAreInBounds(points);
         List<Point> snappedPoints = points.stream()
-                .map(point -> snapPointToNode(routingRequest, point))
+                .map(this::snapPointToNode)
                 .distinct()
                 .toList();
         if (snappedPoints.size() != points.size()) {
@@ -94,7 +93,7 @@ public class Router {
     }
 
     private void ensurePointsAreInBounds(List<Point> points) {
-        BBox bounds = networkGraphHopper.getBaseGraph().getBounds();
+        BBox bounds = getNetwork().getBaseGraph().getBounds();
         for (Point point : points) {
             if (!bounds.contains(point.getY(), point.getX())) {
                 throw new RoutingRequestException(
@@ -104,23 +103,24 @@ public class Router {
         }
     }
 
-    private Point snapPointToNode(String profile, Point point) {
-        Weighting weighting = networkGraphHopper.createWeighting(networkGraphHopper.getProfile(profile), new PMap());
+    private Point snapPointToNode(Point point) {
+        Weighting weighting = getNetwork().createWeighting(getProfile(), createCustomModelHintsIfPresent());
         FiniteWeightFilter finiteWeightFilter = new FiniteWeightFilter(weighting);
-        Snap snap = networkGraphHopper.getLocationIndex().findClosest(point.getY(), point.getX(), finiteWeightFilter);
+        Snap snap = getNetwork().getLocationIndex().findClosest(point.getY(), point.getX(), finiteWeightFilter);
         if (!snap.isValid()) {
             throw new RoutingRequestException(
                     "Invalid routing request: Cannot snap point %s,%s to node".formatted(point.getY(), point.getX())
             );
         }
-        double snappedLat = networkGraphHopper.getBaseGraph().getNodeAccess().getLat(snap.getClosestNode());
-        double snappedLon = networkGraphHopper.getBaseGraph().getNodeAccess().getLon(snap.getClosestNode());
+        double snappedLat = getNetwork().getBaseGraph().getNodeAccess().getLat(snap.getClosestNode());
+        double snappedLon = getNetwork().getBaseGraph().getNodeAccess().getLon(snap.getClosestNode());
         return geometryFactoryWgs84.createPoint(new Coordinate(snappedLon, snappedLat));
     }
 
+
     private RoutingResponse getRoutingResponse(GHRequest ghRequest, boolean simplify)
             throws RoutingRequestException, RoutingException {
-        GHResponse ghResponse = networkGraphHopper.route(ghRequest);
+        GHResponse ghResponse = getNetwork().route(ghRequest);
         ensureResponseHasNoErrors(ghResponse);
         ResponsePath responsePath = ghResponse.getBest();
         ensurePathsAreNotEmpty(responsePath);
@@ -131,9 +131,9 @@ public class Router {
                 .build();
     }
 
-    private static GHRequest getGraphHopperRequest(String profile, List<Point> points) {
+    private GHRequest getGraphHopperRequest(List<Point> points) {
         GHRequest ghRequest = new GHRequest(getGHPointsFromPoints(points));
-        ghRequest.setProfile(profile);
+        ghRequest.setProfile(getProfile().getName());
         PMap snappedHints = ghRequest.getHints();
         snappedHints.putObject(Routing.CALC_POINTS, true);
         snappedHints.putObject(Routing.INSTRUCTIONS, false);
@@ -143,10 +143,10 @@ public class Router {
     }
 
     private List<RoutingLegResponse> getRoutingLegResponses(GHRequest ghRequest) throws RoutingException {
-        EncodingManager encodingManager = networkGraphHopper.getEncodingManager();
+        EncodingManager encodingManager = getNetwork().getEncodingManager();
         List<RoutingLegResponse> routingLegResponse = new ArrayList<>();
 
-        for (Path path : networkGraphHopper.calcPaths(ghRequest)) {
+        for (Path path : getNetwork().calcPaths(ghRequest)) {
             List<EdgeIteratorState> edges = path.calcEdges();
             if (edges.isEmpty()) {
                 throw new RoutingException("Unexpected: path has no edges");

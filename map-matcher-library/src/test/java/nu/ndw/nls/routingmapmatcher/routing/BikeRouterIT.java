@@ -148,7 +148,6 @@ class BikeRouterIT {
     void route_newWay_allAccessible() {
         setup(true);
         var result = router.route(RoutingRequest.builder()
-                .routingProfile("bike")
                 .wayPoints(List.of(create1DPoint(1), create1DPoint(28)))
                 .build());
 
@@ -163,7 +162,6 @@ class BikeRouterIT {
 
         RoutingRequestException routingRequestException = assertThrows(RoutingRequestException.class,
                 () -> router.route(RoutingRequest.builder()
-                        .routingProfile("bike")
                         .wayPoints(List.of(create1DPoint(1), create1DPoint(28)))
                         .build()));
 

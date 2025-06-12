@@ -37,7 +37,6 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 class RoutingFractionsIT {
 
     private static final String VEHICLE = "car";
-    private static final String PROFILE_NAME = "car";
     private static final Profile PROFILE = new Profile(VEHICLE);
     private static final String NETWORK_NAME = "test_network";
     @Autowired
@@ -98,7 +97,7 @@ class RoutingFractionsIT {
 
         // Request a route over a single link
         var resultA = router.route(RoutingRequest.builder()
-                .routingProfile(PROFILE_NAME)
+
                 .wayPoints(List.of(pointA, pointB))
                 .build());
         verifySumDistanceOfIndividualRoadSections(resultA);
@@ -113,7 +112,6 @@ class RoutingFractionsIT {
 
         // Now request the same route, but in reverse direction
         var resultB = router.route(RoutingRequest.builder()
-                .routingProfile(PROFILE_NAME)
                 .wayPoints(List.of(pointB, pointA))
                 .build());
         verifySumDistanceOfIndividualRoadSections(resultB);
@@ -129,10 +127,10 @@ class RoutingFractionsIT {
 
         assertEquals(1.0, matchedLinkA.getStartFraction() + matchedLinkB.getEndFraction(), 0.0000001,
                 "Fractions are in the direction of driving, therefore the sum of the fraction and the fraction of the "
-                + "same point traveling in the reverse direction should always end up as 1.0");
+                        + "same point traveling in the reverse direction should always end up as 1.0");
         assertEquals(1.0, matchedLinkA.getEndFraction() + matchedLinkB.getStartFraction(), 0.0000001,
                 "Fractions are in the direction of driving, therefore the sum of the fraction and the fraction of the "
-                + "same point traveling in the in reverse direction should always end up as 1.0");
+                        + "same point traveling in the in reverse direction should always end up as 1.0");
     }
 
     /**
@@ -143,7 +141,6 @@ class RoutingFractionsIT {
     @SneakyThrows
     void route_ok_uTurnResultsInLegsWithFractions() {
         var result = router.route(RoutingRequest.builder()
-                .routingProfile(PROFILE_NAME)
                 .wayPoints(List.of(createPoint(5.42511239, 52.17985105),
                         createPoint(5.42576075, 52.17986470),
                         createPoint(5.42639323, 52.17976530)))

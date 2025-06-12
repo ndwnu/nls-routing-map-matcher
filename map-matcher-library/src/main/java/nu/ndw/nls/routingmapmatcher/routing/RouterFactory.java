@@ -1,5 +1,6 @@
 package nu.ndw.nls.routingmapmatcher.routing;
 
+import com.graphhopper.util.CustomModel;
 import lombok.RequiredArgsConstructor;
 import nu.ndw.nls.geometry.distance.FractionAndDistanceCalculator;
 import nu.ndw.nls.geometry.factories.GeometryFactoryWgs84;
@@ -19,6 +20,12 @@ public class RouterFactory implements MapMatcherFactory<Router> {
     @Override
     public Router createMapMatcher(NetworkGraphHopper preInitializedNetwork, String profileName) {
         return new Router(preInitializedNetwork, matchedLinkMapper, geometryFactoryWgs84,
-                fractionAndDistanceCalculator);
+                fractionAndDistanceCalculator, profileName, null);
+    }
+
+    @Override
+    public Router createMapMatcher(NetworkGraphHopper preInitializedNetwork, String profileName, CustomModel customModel) {
+        return new Router(preInitializedNetwork, matchedLinkMapper, geometryFactoryWgs84,
+                fractionAndDistanceCalculator, profileName, customModel);
     }
 }

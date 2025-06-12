@@ -101,7 +101,6 @@ class RouterIT {
         Point end = geometryFactory.createPoint(new Coordinate(5.428436, 52.175901));
         List<Point> wayPoints = List.of(start, end);
         var result = router.route(RoutingRequest.builder()
-                .routingProfile(CAR)
                 .wayPoints(wayPoints)
                 .build());
         verifySumDistanceOfIndividualRoadSections(result);
@@ -120,7 +119,6 @@ class RouterIT {
         Point end = geometryFactory.createPoint(new Coordinate(5.428436, 52.175901));
         List<Point> wayPoints = List.of(start, via, end);
         var result = router.route(RoutingRequest.builder()
-                .routingProfile(CAR)
                 .wayPoints(wayPoints)
                 .build());
         verifySumDistanceOfIndividualRoadSections(result);
@@ -139,7 +137,6 @@ class RouterIT {
         Point end = geometryFactory.createPoint(new Coordinate(5.428436, 52.175901));
         List<Point> wayPoints = List.of(start, end);
         var result = router.route(RoutingRequest.builder()
-                .routingProfile(CAR)
                 .wayPoints(wayPoints)
                 .snapToNodes(true)
                 .build());
@@ -161,14 +158,13 @@ class RouterIT {
         assertThatException()
                 .isThrownBy(
                         () -> router.route(RoutingRequest.builder()
-                                .routingProfile(CAR)
                                 .wayPoints(wayPoints)
                                 .snapToNodes(true)
                                 .build())
                 )
                 .isInstanceOf(RoutingRequestException.class)
                 .withMessage("Invalid routing request: Point is out of bounds: POINT (5.430496 42), "
-                             + "the bounds are: 4.9467900079047,5.433661,52.172107,52.63028869479728");
+                        + "the bounds are: 4.9467900079047,5.433661,52.172107,52.63028869479728");
     }
 
     @SneakyThrows
@@ -182,7 +178,6 @@ class RouterIT {
         assertThatException()
                 .isThrownBy(
                         () -> router.route(RoutingRequest.builder()
-                                .routingProfile(CAR)
                                 .wayPoints(wayPoints)
                                 .snapToNodes(true)
                                 .build())
@@ -202,7 +197,6 @@ class RouterIT {
         assertThatException()
                 .isThrownBy(
                         () -> router.route(RoutingRequest.builder()
-                                .routingProfile(CAR)
                                 .wayPoints(wayPoints)
                                 .snapToNodes(true)
                                 .build())
@@ -219,7 +213,6 @@ class RouterIT {
         Point end = geometryFactory.createPoint(new Coordinate(5.428436, 52.175901));
         List<Point> wayPoints = List.of(start, end);
         RoutingResponse result = router.route(RoutingRequest.builder()
-                .routingProfile(CAR)
                 .wayPoints(wayPoints)
                 .simplifyResponseGeometry(false)
                 .build());

@@ -127,7 +127,6 @@ class RoutingBidirectionalLinkIdIT {
         Point end = geometryFactoryWgs84.createPoint(new Coordinate(0, 1));
         List<Point> wayPoints = List.of(start, end);
         RoutingResponse response = router.route(RoutingRequest.builder()
-                .routingProfile(CAR)
                 .wayPoints(wayPoints)
                 .build());
         assertThat(response.getLegs())
@@ -154,7 +153,6 @@ class RoutingBidirectionalLinkIdIT {
         Point end = geometryFactoryWgs84.createPoint(new Coordinate(0, 3));
         List<Point> wayPoints = List.of(start, end);
         RoutingResponse response = router.route(RoutingRequest.builder()
-                .routingProfile(CAR)
                 .wayPoints(wayPoints)
                 .build());
         assertThat(response.getLegs())
@@ -181,7 +179,6 @@ class RoutingBidirectionalLinkIdIT {
         Point end = geometryFactoryWgs84.createPoint(new Coordinate(0, 1));
         List<Point> wayPoints = List.of(start, end);
         RoutingResponse result = router.route(RoutingRequest.builder()
-                .routingProfile(CAR)
                 .wayPoints(wayPoints)
                 .build());
         assertThat(result.getLegs())
@@ -208,7 +205,6 @@ class RoutingBidirectionalLinkIdIT {
         Point end = geometryFactoryWgs84.createPoint(new Coordinate(0, 3));
         List<Point> wayPoints = List.of(start, end);
         RoutingResponse result = router.route(RoutingRequest.builder()
-                .routingProfile(CAR)
                 .wayPoints(wayPoints)
                 .build());
         assertThat(result.getLegs())

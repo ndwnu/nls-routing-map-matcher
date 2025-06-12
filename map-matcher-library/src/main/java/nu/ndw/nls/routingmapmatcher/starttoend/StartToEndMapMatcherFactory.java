@@ -1,5 +1,6 @@
 package nu.ndw.nls.routingmapmatcher.starttoend;
 
+import com.graphhopper.util.CustomModel;
 import lombok.RequiredArgsConstructor;
 import nu.ndw.nls.geometry.confidence.LineStringReliabilityCalculator;
 import nu.ndw.nls.geometry.distance.FractionAndDistanceCalculator;
@@ -19,6 +20,12 @@ public class StartToEndMapMatcherFactory implements MapMatcherFactory<StartToEnd
     @Override
     public StartToEndMapMatcher createMapMatcher(NetworkGraphHopper preInitializedNetwork, String profileName) {
         return new StartToEndMapMatcher(preInitializedNetwork, profileName, fractionAndDistanceCalculator, pointListUtil,
-                lineStringReliabilityCalculator);
+                lineStringReliabilityCalculator, null);
+    }
+
+    @Override
+    public StartToEndMapMatcher createMapMatcher(NetworkGraphHopper preInitializedNetwork, String profileName, CustomModel customModel) {
+        return new StartToEndMapMatcher(preInitializedNetwork, profileName, fractionAndDistanceCalculator, pointListUtil,
+                lineStringReliabilityCalculator, customModel);
     }
 }
