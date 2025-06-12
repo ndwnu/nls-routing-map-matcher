@@ -6,7 +6,6 @@ import static nu.ndw.nls.routingmapmatcher.network.model.Link.WAY_ID_KEY;
 import static nu.ndw.nls.routingmapmatcher.util.MatchUtil.getQueryResults;
 import static nu.ndw.nls.routingmapmatcher.util.PathUtil.determineEdgeDirection;
 
-import com.graphhopper.config.Profile;
 import com.graphhopper.routing.util.EncodingManager;
 import com.graphhopper.routing.util.FiniteWeightFilter;
 import com.graphhopper.routing.weighting.Weighting;
@@ -17,13 +16,13 @@ import com.graphhopper.storage.index.Snap;
 import com.graphhopper.util.CustomModel;
 import com.graphhopper.util.EdgeIteratorState;
 import com.graphhopper.util.FetchMode;
-import com.graphhopper.util.PMap;
 import java.util.List;
 import java.util.Objects;
 import nu.ndw.nls.geometry.bearing.BearingCalculator;
 import nu.ndw.nls.geometry.distance.FractionAndDistanceCalculator;
 import nu.ndw.nls.geometry.factories.GeometryFactoryWgs84;
 import nu.ndw.nls.geometry.mappers.DiameterToPolygonMapper;
+import nu.ndw.nls.routingmapmatcher.domain.BaseMapMatcher;
 import nu.ndw.nls.routingmapmatcher.domain.MapMatcher;
 import nu.ndw.nls.routingmapmatcher.geometry.services.ClosestPointService;
 import nu.ndw.nls.routingmapmatcher.isochrone.IsochroneService;
@@ -38,14 +37,13 @@ import nu.ndw.nls.routingmapmatcher.model.singlepoint.SinglePointLocation;
 import nu.ndw.nls.routingmapmatcher.model.singlepoint.SinglePointMatch;
 import nu.ndw.nls.routingmapmatcher.model.singlepoint.SinglePointMatch.CandidateMatch;
 import nu.ndw.nls.routingmapmatcher.network.NetworkGraphHopper;
-import nu.ndw.nls.routingmapmatcher.util.Constants;
 import nu.ndw.nls.routingmapmatcher.util.PointListUtil;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.LineString;
 import org.locationtech.jts.geom.Point;
 import org.locationtech.jts.geom.Polygon;
 
-public class SinglePointMapMatcher implements MapMatcher<SinglePointLocation, SinglePointMatch> {
+public class SinglePointMapMatcher extends BaseMapMatcher implements MapMatcher<SinglePointLocation, SinglePointMatch> {
 
     private static final int RADIUS_TO_DIAMETER = 2;
     private static final double DISTANCE_THRESHOLD = 0.1;
@@ -56,22 +54,21 @@ public class SinglePointMapMatcher implements MapMatcher<SinglePointLocation, Si
     private final PointMatchingService pointMatchingService;
     private final DiameterToPolygonMapper diameterToPolygonMapper;
     private final EdgeIteratorStateReverseExtractor edgeIteratorStateReverseExtractor;
-    private final NetworkGraphHopper network;
-    private final Profile profile;
     private final PointListUtil pointListUtil;
 
     public SinglePointMapMatcher(DiameterToPolygonMapper diameterToPolygonMapper,
             BearingCalculator bearingCalculator, GeometryFactoryWgs84 geometryFactoryWgs84,
             FractionAndDistanceCalculator fractionAndDistanceCalculator, NetworkGraphHopper network,
             String profileName, ClosestPointService closestPointService,
-            PointListUtil pointListUtil) {
+            PointListUtil pointListUtil, CustomModel customModel) {
+        super(profileName, network, customModel);
         this.diameterToPolygonMapper = diameterToPolygonMapper;
-        this.network = Objects.requireNonNull(network);
-        this.profile = Objects.requireNonNull(network.getProfile(profileName));
         this.locationIndexTree = network.getLocationIndex();
         BaseGraph baseGraph = network.getBaseGraph();
         EncodingManager encodingManager = network.getEncodingManager();
-        Weighting shortestWeightingForIsochrone = network.createWeighting(profile, createShortestDistanceHints());
+
+        Weighting shortestWeightingForIsochrone = network.createWeighting(getProfile(),
+                createCustomModelMergedWithShortestCustomModelHintsIfPresent());
         this.edgeIteratorStateReverseExtractor = new EdgeIteratorStateReverseExtractor();
         this.pointListUtil = pointListUtil;
         this.isochroneService = new IsochroneService(encodingManager, baseGraph,
@@ -79,23 +76,18 @@ public class SinglePointMapMatcher implements MapMatcher<SinglePointLocation, Si
                         pointListUtil,
                         fractionAndDistanceCalculator),
                 new ShortestPathTreeFactory(shortestWeightingForIsochrone, network.getEncodingManager()),
-                this.locationIndexTree, profile);
+                this.locationIndexTree, getProfile());
         this.pointMatchingService = new PointMatchingService(geometryFactoryWgs84, bearingCalculator,
                 fractionAndDistanceCalculator, closestPointService);
 
     }
 
-    private PMap createShortestDistanceHints() {
-        return new PMap()
-                .putObject(CustomModel.KEY, Constants.SHORTEST_CUSTOM_MODEL);
-    }
-
     public SinglePointMatch match(SinglePointLocation singlePointLocation) {
         Objects.requireNonNull(singlePointLocation);
-        Weighting matchWeighting = network.createWeighting(profile, new PMap());
+        Weighting matchWeighting = getNetwork().createWeighting(getProfile(), createCustomModelHintsIfPresent());
         Point inputPoint = singlePointLocation.getPoint();
         double inputRadius = singlePointLocation.getCutoffDistance();
-        List<Snap> queryResults = getQueryResults(network, inputPoint, inputRadius, locationIndexTree,
+        List<Snap> queryResults = getQueryResults(getNetwork(), inputPoint, inputRadius, locationIndexTree,
                 new FiniteWeightFilter(matchWeighting));
         Polygon circle = diameterToPolygonMapper.mapToPolygonWgs84(inputPoint, RADIUS_TO_DIAMETER * inputRadius);
         List<MatchedPoint> matches = getMatchedPoints(singlePointLocation, queryResults, circle);
@@ -189,10 +181,10 @@ public class SinglePointMapMatcher implements MapMatcher<SinglePointLocation, Si
         LineString originalGeometry =
                 edgeIteratorStateReverseExtractor.hasReversed(edge) ? wayGeometry.reverse() : wayGeometry;
         Geometry cutoffGeometry = circle.intersection(originalGeometry);
-        EdgeIteratorTravelDirection travelDirection = determineEdgeDirection(edge, network.getEncodingManager(),
-                profile.getName());
-        int matchedLinkId = edge.get(network.getEncodingManager().getIntEncodedValue(WAY_ID_KEY));
-        int matchedReversedLinkId = edge.get(network.getEncodingManager().getIntEncodedValue(REVERSED_LINK_ID));
+        EdgeIteratorTravelDirection travelDirection = determineEdgeDirection(edge, getNetwork().getEncodingManager(),
+                getProfile().getName());
+        int matchedLinkId = edge.get(getNetwork().getEncodingManager().getIntEncodedValue(WAY_ID_KEY));
+        int matchedReversedLinkId = edge.get(getNetwork().getEncodingManager().getIntEncodedValue(REVERSED_LINK_ID));
         var matchedQueryResult = MatchedQueryResult.builder()
                 .matchedLinkId(matchedLinkId)
                 .matchedReversedLinkId(matchedReversedLinkId)

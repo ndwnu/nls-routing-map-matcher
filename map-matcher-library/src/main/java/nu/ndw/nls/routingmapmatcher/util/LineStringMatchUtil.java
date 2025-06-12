@@ -1,14 +1,11 @@
 package nu.ndw.nls.routingmapmatcher.util;
 
-import static nu.ndw.nls.routingmapmatcher.util.Constants.SHORTEST_CUSTOM_MODEL;
-
 import com.graphhopper.config.Profile;
 import com.graphhopper.routing.Path;
 import com.graphhopper.routing.querygraph.QueryGraph;
 import com.graphhopper.routing.util.EncodingManager;
 import com.graphhopper.routing.weighting.Weighting;
 import com.graphhopper.storage.EdgeIteratorStateReverseExtractor;
-import com.graphhopper.util.CustomModel;
 import com.graphhopper.util.EdgeIteratorState;
 import com.graphhopper.util.FetchMode;
 import com.graphhopper.util.Helper;
@@ -45,9 +42,8 @@ public class LineStringMatchUtil {
     private final FractionAndDistanceCalculator fractionAndDistanceCalculator;
 
     public LineStringMatchUtil(NetworkGraphHopper networkGraphHopper, Profile profile,
-            FractionAndDistanceCalculator fractionAndDistanceCalculator, PointListUtil pointListUtil) {
+            FractionAndDistanceCalculator fractionAndDistanceCalculator, PointListUtil pointListUtil, PMap requestHints) {
 
-        PMap requestHints = createShortestDistanceHints();
         Weighting shortestWeighting = networkGraphHopper.createWeighting(profile, requestHints);
 
         this.encodingManager = networkGraphHopper.getEncodingManager();
@@ -62,11 +58,6 @@ public class LineStringMatchUtil {
                 new ShortestPathTreeFactory(shortestWeighting, networkGraphHopper.getEncodingManager()),
                 networkGraphHopper.getLocationIndex(),
                 profile);
-    }
-
-    private PMap createShortestDistanceHints() {
-        return new PMap()
-                .putObject(CustomModel.KEY, SHORTEST_CUSTOM_MODEL);
     }
 
 
