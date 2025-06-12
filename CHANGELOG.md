@@ -25,9 +25,6 @@ Here we write upgrade notes. It's a team effort to make them as straightforward 
 
 - Removed `profileName` and `customModel` from `RoutingRequest` as they are handled by the MapMatcherFactory for consistency.
 
-### Fixed
-
-- Updated version numbers in `pom.xml` files to `18.0.0-SNAPSHOT` for consistency with the new release version.
 
 ## [17.0.0] - 2025-05-13
 
