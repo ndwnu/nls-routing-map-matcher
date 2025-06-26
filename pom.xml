@@ -7,7 +7,7 @@
   <parent>
     <groupId>org.springframework.boot</groupId>
     <artifactId>spring-boot-starter-parent</artifactId>
-    <version>3.5.0</version>
+    <version>3.5.3</version>
     <relativePath/>
   </parent>
 
@@ -43,7 +43,7 @@
     <commons-io.version>2.19.0</commons-io.version>
     <sonar-maven-plugin.version>3.9.1.2184</sonar-maven-plugin.version>
     <sonar.projectName>nls-routing-map-matcher</sonar.projectName>
-    <nls-geometry.version>5.0.5</nls-geometry.version>
+    <nls-geometry.version>5.0.7</nls-geometry.version>
     <kryo5.version>5.6.2</kryo5.version>
     <lombok.version>1.18.38</lombok.version>
     <stream-utils.version>1.3.1</stream-utils.version>
