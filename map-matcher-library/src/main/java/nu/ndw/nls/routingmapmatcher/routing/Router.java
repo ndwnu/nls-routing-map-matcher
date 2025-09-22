@@ -87,14 +87,8 @@ public class Router extends BaseMapMatcher {
     }
 
     private List<Point> snapPointsToNodes(List<Point> points) {
+
         ensurePointsAreInBounds(points);
-        BBox bounds = getNetwork().getBaseGraph().getBounds();
-        for (Point point : points) {
-            if (!bounds.contains(point.getY(), point.getX())) {
-                throw new RoutingRequestException(
-                        "Invalid routing request: Point is out of bounds: %s, the bounds are: %s".formatted(point, bounds));
-            }
-        }
         List<Point> snappedPoints = points.stream().map(this::snapPointToNode).distinct().toList();
         if (snappedPoints.size() != points.size()) {
             throw new RoutingRequestException("Invalid routing request: Points are snapped to the same node");
