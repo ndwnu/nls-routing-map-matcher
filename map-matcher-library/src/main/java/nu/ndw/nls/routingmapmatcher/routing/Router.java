@@ -19,17 +19,20 @@ import com.graphhopper.util.Parameters.Routing;
 import com.graphhopper.util.PathSimplification;
 import com.graphhopper.util.PointList;
 import com.graphhopper.util.RamerDouglasPeucker;
+import com.graphhopper.util.exceptions.ConnectionNotFoundException;
+import com.graphhopper.util.exceptions.PointOutOfBoundsException;
 import com.graphhopper.util.shapes.BBox;
 import com.graphhopper.util.shapes.GHPoint;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
+import lombok.extern.slf4j.Slf4j;
 import nu.ndw.nls.geometry.distance.FractionAndDistanceCalculator;
 import nu.ndw.nls.geometry.factories.GeometryFactoryWgs84;
 import nu.ndw.nls.routingmapmatcher.domain.BaseMapMatcher;
 import nu.ndw.nls.routingmapmatcher.exception.RoutingException;
 import nu.ndw.nls.routingmapmatcher.exception.RoutingRequestException;
 import nu.ndw.nls.routingmapmatcher.mappers.MatchedLinkMapper;
+import nu.ndw.nls.routingmapmatcher.model.RouteStatus;
 import nu.ndw.nls.routingmapmatcher.model.linestring.MatchedEdgeLink;
 import nu.ndw.nls.routingmapmatcher.model.routing.RoutingLegResponse;
 import nu.ndw.nls.routingmapmatcher.model.routing.RoutingRequest;
@@ -40,6 +43,7 @@ import nu.ndw.nls.routingmapmatcher.util.PathUtil;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Point;
 
+@Slf4j
 public class Router extends BaseMapMatcher {
 
     private static final boolean INCLUDE_ELEVATION = false;
@@ -50,12 +54,8 @@ public class Router extends BaseMapMatcher {
     private final FractionAndDistanceCalculator fractionAndDistanceCalculator;
 
 
-    public Router(
-            NetworkGraphHopper network,
-            MatchedLinkMapper matchedLinkMapper,
-            GeometryFactoryWgs84 geometryFactoryWgs84,
-            FractionAndDistanceCalculator fractionAndDistanceCalculator, String profileName, CustomModel customModel
-    ) {
+    public Router(NetworkGraphHopper network, MatchedLinkMapper matchedLinkMapper, GeometryFactoryWgs84 geometryFactoryWgs84,
+            FractionAndDistanceCalculator fractionAndDistanceCalculator, String profileName, CustomModel customModel) {
         super(profileName, network, customModel);
         this.matchedLinkMapper = matchedLinkMapper;
         this.geometryFactoryWgs84 = geometryFactoryWgs84;
@@ -67,25 +67,35 @@ public class Router extends BaseMapMatcher {
     }
 
     public RoutingResponse route(RoutingRequest routingRequest) throws RoutingException, RoutingRequestException {
-        List<Point> points = routingRequest.isSnapToNodes()
-                ? snapPointsToNodes(routingRequest.getWayPoints())
-                : routingRequest.getWayPoints();
-        GHRequest graphHopperRequest = getGraphHopperRequest(points);
-        if (getCustomModel() != null) {
-            graphHopperRequest.setCustomModel(getCustomModel());
+        try {
+            List<Point> points =
+                    routingRequest.isSnapToNodes() ? snapPointsToNodes(routingRequest.getWayPoints()) : routingRequest.getWayPoints();
+            GHRequest graphHopperRequest = getGraphHopperRequest(points);
+            if (getCustomModel() != null) {
+                graphHopperRequest.setCustomModel(getCustomModel());
+            }
+            return getRoutingResponse(graphHopperRequest, routingRequest.isSimplifyResponseGeometry());
+        } catch (RuntimeException e) {
+            log.debug("Routing request failed: {}", e.getMessage(), e);
+            if (e instanceof RoutingRequestException) {
+                return createEmptyRoutingResponse(RouteStatus.NO_ROUTE);
+            } else {
+                return createEmptyRoutingResponse(RouteStatus.EXCEPTION);
+            }
+
         }
-        return getRoutingResponse(
-                graphHopperRequest,
-                routingRequest.isSimplifyResponseGeometry()
-        );
     }
 
     private List<Point> snapPointsToNodes(List<Point> points) {
         ensurePointsAreInBounds(points);
-        List<Point> snappedPoints = points.stream()
-                .map(this::snapPointToNode)
-                .distinct()
-                .toList();
+        BBox bounds = getNetwork().getBaseGraph().getBounds();
+        for (Point point : points) {
+            if (!bounds.contains(point.getY(), point.getX())) {
+                throw new RoutingRequestException(
+                        "Invalid routing request: Point is out of bounds: %s, the bounds are: %s".formatted(point, bounds));
+            }
+        }
+        List<Point> snappedPoints = points.stream().map(this::snapPointToNode).distinct().toList();
         if (snappedPoints.size() != points.size()) {
             throw new RoutingRequestException("Invalid routing request: Points are snapped to the same node");
         }
@@ -97,8 +107,7 @@ public class Router extends BaseMapMatcher {
         for (Point point : points) {
             if (!bounds.contains(point.getY(), point.getX())) {
                 throw new RoutingRequestException(
-                        "Invalid routing request: Point is out of bounds: %s, the bounds are: %s".formatted(point, bounds)
-                );
+                        "Invalid routing request: Point is out of bounds: %s, the bounds are: %s".formatted(point, bounds));
             }
         }
     }
@@ -109,8 +118,7 @@ public class Router extends BaseMapMatcher {
         Snap snap = getNetwork().getLocationIndex().findClosest(point.getY(), point.getX(), finiteWeightFilter);
         if (!snap.isValid()) {
             throw new RoutingRequestException(
-                    "Invalid routing request: Cannot snap point %s,%s to node".formatted(point.getY(), point.getX())
-            );
+                    "Invalid routing request: Cannot snap point %s,%s to node".formatted(point.getY(), point.getX()));
         }
         double snappedLat = getNetwork().getBaseGraph().getNodeAccess().getLat(snap.getClosestNode());
         double snappedLon = getNetwork().getBaseGraph().getNodeAccess().getLon(snap.getClosestNode());
@@ -118,17 +126,28 @@ public class Router extends BaseMapMatcher {
     }
 
 
-    private RoutingResponse getRoutingResponse(GHRequest ghRequest, boolean simplify)
-            throws RoutingRequestException, RoutingException {
+    private RoutingResponse getRoutingResponse(GHRequest ghRequest, boolean simplify) throws RoutingRequestException, RoutingException {
         GHResponse ghResponse = getNetwork().route(ghRequest);
-        ensureResponseHasNoErrors(ghResponse);
+
+        if (ghResponse.hasErrors()) {
+            for (Throwable error : ghResponse.getErrors()) {
+                if (error instanceof PointOutOfBoundsException || error instanceof ConnectionNotFoundException) {
+                    throw new RoutingRequestException(error.getMessage());
+                } else {
+                    throw new RoutingException(error.getMessage());
+                }
+            }
+        }
+
         ResponsePath responsePath = ghResponse.getBest();
-        ensurePathsAreNotEmpty(responsePath);
+        if (responsePath.getWaypoints().isEmpty()) {
+            throw new RoutingRequestException("No route found for request: %s".formatted(ghRequest));
+        }
 
         List<RoutingLegResponse> routingLegResponses = getRoutingLegResponses(ghRequest);
-        return createRoutingResponse(responsePath, simplify)
-                .legs(routingLegResponses)
-                .build();
+        return createRoutingResponse(responsePath, simplify).
+                legs(routingLegResponses).
+                build();
     }
 
     private GHRequest getGraphHopperRequest(List<Point> points) {
@@ -156,40 +175,26 @@ public class Router extends BaseMapMatcher {
             double endFraction = PathUtil.determineEndLinkFraction(edges.getLast(), queryGraph, fractionAndDistanceCalculator);
             List<MatchedEdgeLink> matchedEdgeLinks = PathUtil.determineMatchedLinks(encodingManager, fractionAndDistanceCalculator, edges);
 
-            routingLegResponse.add(RoutingLegResponse.builder()
-                    .matchedLinks(matchedLinkMapper.map(matchedEdgeLinks, startFraction, endFraction))
-                    .build());
+            routingLegResponse.add(
+                    RoutingLegResponse.builder().matchedLinks(matchedLinkMapper.map(matchedEdgeLinks, startFraction, endFraction)).build());
         }
 
         return routingLegResponse;
     }
 
+    private RoutingResponse createEmptyRoutingResponse(RouteStatus routeStatus) {
+        return RoutingResponse.builder().status(routeStatus).build();
+    }
+
     private RoutingResponseBuilder createRoutingResponse(ResponsePath path, boolean simplify) {
         PointList points = simplify ? PathSimplification.simplify(path, new RamerDouglasPeucker(), false) : path.getPoints();
-        return RoutingResponse.builder()
-                .geometry(points.toLineString(INCLUDE_ELEVATION))
-                .snappedWaypoints(mapToSnappedWaypoints(path.getWaypoints()))
-                .weight(Helper.round(path.getRouteWeight(), DECIMAL_PLACES))
-                .duration(path.getTime() / MILLISECONDS_PER_SECOND)
-                .distance(Helper.round(path.getDistance(), DECIMAL_PLACES));
+        return RoutingResponse.builder().geometry(points.toLineString(INCLUDE_ELEVATION))
+                .snappedWaypoints(mapToSnappedWaypoints(path.getWaypoints())).weight(Helper.round(path.getRouteWeight(), DECIMAL_PLACES))
+                .duration(path.getTime() / MILLISECONDS_PER_SECOND).distance(Helper.round(path.getDistance(), DECIMAL_PLACES));
     }
 
     private static List<GHPoint> getGHPointsFromPoints(List<Point> points) {
         return points.stream().map(point -> new GHPoint(point.getY(), point.getX())).toList();
-    }
-
-    private static void ensurePathsAreNotEmpty(ResponsePath path) throws RoutingException {
-        if (path.getWaypoints().isEmpty()) {
-            throw new RoutingException("Calculate resulted in no paths");
-        }
-    }
-
-    private static void ensureResponseHasNoErrors(GHResponse ghResponse) throws RoutingRequestException {
-        if (ghResponse.hasErrors()) {
-            String errors = ghResponse.getErrors().stream().map(Throwable::getMessage)
-                    .collect(Collectors.joining(", "));
-            throw new RoutingRequestException("Invalid routing request: " + errors);
-        }
     }
 
     private List<Point> mapToSnappedWaypoints(PointList pointList) {

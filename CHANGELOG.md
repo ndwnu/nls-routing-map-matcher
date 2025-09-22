@@ -7,6 +7,21 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 Here we write upgrade notes. It's a team effort to make them as straightforward as possible.
 
+## [19.0.0] - 2025-09-22
+
+### Added
+
+- Introduced `RouteStatus` enum and a `status` field on `RoutingResponse` (defaults to `ROUTE_FOUND`) to explicitly communicate routing
+  outcomes.
+
+### Changed
+
+- Router behaviour: instead of throwing exceptions for invalid routing requests (e.g., out-of-bounds waypoints or points that cannot be
+  snapped to nodes),
+- a `RoutingResponse` is returned with `status = NO_ROUTE` or  `status = EXCEPTION`. Clients should check `response.getStatus()` and handle
+  `NO_ROUTE`
+- and `EXCEPTION` accordingly.
+
 ## [18.0.0] - 2025-06-11
 
 ### Added
@@ -127,3 +142,21 @@ structure for QueryGraphWeightingAdapter.
 ### Changed
 
 ### Fixed
+
+## [19.0.0] - 2025-09-22
+
+### Added
+
+- Introduced `RouteStatus` enum and a `status` field on `RoutingResponse` (defaults to `ROUTE_FOUND`) to explicitly communicate routing
+  outcomes.
+
+### Changed
+
+- Router behavior: instead of throwing `RoutingRequestException` for invalid routing requests (e.g., out-of-bounds waypoints or points that
+  cannot be snapped to nodes), a `RoutingResponse` is returned with `status = NO_ROUTE`. Clients should check `response.getStatus()` and
+  handle `NO_ROUTE` accordingly.
+- Improved internal logging in `Router` for failed routing requests.
+
+### Removed
+
+- Removed deprecated constructors from `RoutingMapMatcherException`: `(Throwable cause)` and `(String message, Throwable cause)`.
