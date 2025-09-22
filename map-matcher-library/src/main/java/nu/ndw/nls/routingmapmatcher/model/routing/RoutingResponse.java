@@ -9,6 +9,7 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
 import nu.ndw.nls.routingmapmatcher.mappers.RoutingLegResponseSequencePairMapper;
+import nu.ndw.nls.routingmapmatcher.model.RouteStatus;
 import nu.ndw.nls.routingmapmatcher.model.linestring.MatchedLink;
 import org.locationtech.jts.geom.LineString;
 import org.locationtech.jts.geom.Point;
@@ -19,6 +20,8 @@ import org.locationtech.jts.geom.Point;
 @ToString
 public class RoutingResponse {
 
+    @Builder.Default
+    RouteStatus status = RouteStatus.ROUTE_FOUND;
     @Builder.Default
     private final List<Point> snappedWaypoints = List.of();
     private final LineString geometry;
