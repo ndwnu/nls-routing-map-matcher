@@ -66,7 +66,7 @@ public class Router extends BaseMapMatcher {
         getNetwork().getRouterConfig().setSimplifyResponse(false);
     }
 
-    public RoutingResponse route(RoutingRequest routingRequest) throws RoutingException, RoutingRequestException {
+    public RoutingResponse route(RoutingRequest routingRequest) {
         try {
             List<Point> points =
                     routingRequest.isSnapToNodes() ? snapPointsToNodes(routingRequest.getWayPoints()) : routingRequest.getWayPoints();
@@ -75,14 +75,13 @@ public class Router extends BaseMapMatcher {
                 graphHopperRequest.setCustomModel(getCustomModel());
             }
             return getRoutingResponse(graphHopperRequest, routingRequest.isSimplifyResponseGeometry());
-        } catch (RuntimeException e) {
+        } catch (RuntimeException | RoutingException e) {
             log.debug("Routing request failed: {}", e.getMessage(), e);
             if (e instanceof RoutingRequestException) {
                 return createEmptyRoutingResponse(RouteStatus.NO_ROUTE);
             } else {
                 return createEmptyRoutingResponse(RouteStatus.EXCEPTION);
             }
-
         }
     }
 
