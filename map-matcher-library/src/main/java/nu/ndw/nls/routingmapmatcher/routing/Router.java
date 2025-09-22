@@ -177,13 +177,11 @@ public class Router extends BaseMapMatcher {
     private static void ensureResponseHasNoErrors(GHResponse ghResponse) throws RoutingRequestException, RoutingException {
 
         if (ghResponse.hasErrors()) {
+            String errors = ghResponse.getErrors().stream().map(Throwable::getMessage)
+                    .collect(Collectors.joining(", "));
             if (hasAllPointOutOfBoundsOrConnectionErrors(ghResponse.getErrors())) {
-                String errors = ghResponse.getErrors().stream().map(Throwable::getMessage)
-                        .collect(Collectors.joining(", "));
                 throw new RoutingRequestException("Invalid routing request: %s".formatted(errors));
             } else {
-                String errors = ghResponse.getErrors().stream().map(Throwable::getMessage)
-                        .collect(Collectors.joining(", "));
                 throw new RoutingException("Routing request failed: %s".formatted(errors));
             }
 
