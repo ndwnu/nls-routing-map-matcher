@@ -143,20 +143,3 @@ structure for QueryGraphWeightingAdapter.
 
 ### Fixed
 
-## [19.0.0] - 2025-09-22
-
-### Added
-
-- Introduced `RouteStatus` enum and a `status` field on `RoutingResponse` (defaults to `ROUTE_FOUND`) to explicitly communicate routing
-  outcomes.
-
-### Changed
-
-- Router behavior: instead of throwing `RoutingRequestException` for invalid routing requests (e.g., out-of-bounds waypoints or points that
-  cannot be snapped to nodes), a `RoutingResponse` is returned with `status = NO_ROUTE`. Clients should check `response.getStatus()` and
-  handle `NO_ROUTE` accordingly.
-- Improved internal logging in `Router` for failed routing requests.
-
-### Removed
-
-- Removed deprecated constructors from `RoutingMapMatcherException`: `(Throwable cause)` and `(String message, Throwable cause)`.
