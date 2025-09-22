@@ -127,23 +127,11 @@ public class Router extends BaseMapMatcher {
 
 
     private RoutingResponse getRoutingResponse(GHRequest ghRequest, boolean simplify) throws RoutingRequestException, RoutingException {
+
         GHResponse ghResponse = getNetwork().route(ghRequest);
-
-        if (ghResponse.hasErrors()) {
-            for (Throwable error : ghResponse.getErrors()) {
-                if (error instanceof PointOutOfBoundsException || error instanceof ConnectionNotFoundException) {
-                    throw new RoutingRequestException(error.getMessage());
-                } else {
-                    throw new RoutingException(error.getMessage());
-                }
-            }
-        }
-
+        ensureResponseHasNoErrors(ghResponse);
         ResponsePath responsePath = ghResponse.getBest();
-        if (responsePath.getWaypoints().isEmpty()) {
-            throw new RoutingRequestException("No route found for request: %s".formatted(ghRequest));
-        }
-
+        ensurePathsAreNotEmpty(responsePath);
         List<RoutingLegResponse> routingLegResponses = getRoutingLegResponses(ghRequest);
         return createRoutingResponse(responsePath, simplify).
                 legs(routingLegResponses).
@@ -184,6 +172,24 @@ public class Router extends BaseMapMatcher {
 
     private RoutingResponse createEmptyRoutingResponse(RouteStatus routeStatus) {
         return RoutingResponse.builder().status(routeStatus).build();
+    }
+
+    private static void ensurePathsAreNotEmpty(ResponsePath path) {
+        if (path.getWaypoints().isEmpty()) {
+            throw new RoutingRequestException("Calculate resulted in no paths");
+        }
+    }
+
+    private static void ensureResponseHasNoErrors(GHResponse ghResponse) throws RoutingRequestException, RoutingException {
+        if (ghResponse.hasErrors()) {
+            for (Throwable error : ghResponse.getErrors()) {
+                if (error instanceof PointOutOfBoundsException || error instanceof ConnectionNotFoundException) {
+                    throw new RoutingRequestException(error.getMessage());
+                } else {
+                    throw new RoutingException(error.getMessage());
+                }
+            }
+        }
     }
 
     private RoutingResponseBuilder createRoutingResponse(ResponsePath path, boolean simplify) {
