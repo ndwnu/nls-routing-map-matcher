@@ -25,6 +25,7 @@ import com.graphhopper.util.shapes.BBox;
 import com.graphhopper.util.shapes.GHPoint;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import nu.ndw.nls.geometry.distance.FractionAndDistanceCalculator;
 import nu.ndw.nls.geometry.factories.GeometryFactoryWgs84;
@@ -75,7 +76,7 @@ public class Router extends BaseMapMatcher {
                 graphHopperRequest.setCustomModel(getCustomModel());
             }
             return getRoutingResponse(graphHopperRequest, routingRequest.isSimplifyResponseGeometry());
-        } catch (RuntimeException | RoutingException e) {
+        } catch (RuntimeException e) {
             log.debug("Routing request failed: {}", e.getMessage(), e);
             if (e instanceof RoutingRequestException) {
                 return createEmptyRoutingResponse(RouteStatus.NO_ROUTE);
@@ -174,22 +175,36 @@ public class Router extends BaseMapMatcher {
     }
 
     private static void ensureResponseHasNoErrors(GHResponse ghResponse) throws RoutingRequestException, RoutingException {
+
         if (ghResponse.hasErrors()) {
-            for (Throwable error : ghResponse.getErrors()) {
-                if (error instanceof PointOutOfBoundsException || error instanceof ConnectionNotFoundException) {
-                    throw new RoutingRequestException(error.getMessage());
-                } else {
-                    throw new RoutingException(error.getMessage());
-                }
+            if (hasAllPointOutOfBoundsOrConnectionErrors(ghResponse.getErrors())) {
+                String errors = ghResponse.getErrors().stream().map(Throwable::getMessage)
+                        .collect(Collectors.joining(", "));
+                throw new RoutingRequestException("Invalid routing request: %s".formatted(errors));
+            } else {
+                String errors = ghResponse.getErrors().stream().map(Throwable::getMessage)
+                        .collect(Collectors.joining(", "));
+                throw new RoutingException("Routing request failed: %s".formatted(errors));
             }
+
         }
     }
 
+    private static boolean hasAllPointOutOfBoundsOrConnectionErrors(List<Throwable> errors) {
+        return errors
+                .stream()
+                .allMatch(error -> error instanceof PointOutOfBoundsException || error instanceof ConnectionNotFoundException);
+    }
+
     private RoutingResponseBuilder createRoutingResponse(ResponsePath path, boolean simplify) {
+
         PointList points = simplify ? PathSimplification.simplify(path, new RamerDouglasPeucker(), false) : path.getPoints();
-        return RoutingResponse.builder().geometry(points.toLineString(INCLUDE_ELEVATION))
-                .snappedWaypoints(mapToSnappedWaypoints(path.getWaypoints())).weight(Helper.round(path.getRouteWeight(), DECIMAL_PLACES))
-                .duration(path.getTime() / MILLISECONDS_PER_SECOND).distance(Helper.round(path.getDistance(), DECIMAL_PLACES));
+        return RoutingResponse.builder()
+                .geometry(points.toLineString(INCLUDE_ELEVATION))
+                .snappedWaypoints(mapToSnappedWaypoints(path.getWaypoints()))
+                .weight(Helper.round(path.getRouteWeight(), DECIMAL_PLACES))
+                .duration(path.getTime() / MILLISECONDS_PER_SECOND)
+                .distance(Helper.round(path.getDistance(), DECIMAL_PLACES));
     }
 
     private static List<GHPoint> getGHPointsFromPoints(List<Point> points) {
