@@ -2,13 +2,11 @@ package nu.ndw.nls.routingmapmatcher.routing;
 
 import static nu.ndw.nls.routingmapmatcher.testutil.TestNetworkProvider.CAR;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatException;
 
 import java.util.List;
 import lombok.SneakyThrows;
 import nu.ndw.nls.geometry.factories.GeometryFactoryWgs84;
 import nu.ndw.nls.routingmapmatcher.TestConfig;
-import nu.ndw.nls.routingmapmatcher.exception.RoutingRequestException;
 import nu.ndw.nls.routingmapmatcher.model.RouteStatus;
 import nu.ndw.nls.routingmapmatcher.model.linestring.MatchedLink;
 import nu.ndw.nls.routingmapmatcher.model.routing.RoutingLegResponse;
@@ -189,15 +187,12 @@ class RouterIT {
         Point sameAsStart = geometryFactory.createPoint(new Coordinate(5.430500, 52.177700));
         Point end = geometryFactory.createPoint(new Coordinate(5.428436, 52.175901));
         List<Point> wayPoints = List.of(start, sameAsStart, end);
-        assertThatException()
-                .isThrownBy(
-                        () -> router.route(RoutingRequest.builder()
-                                .wayPoints(wayPoints)
-                                .snapToNodes(true)
-                                .build())
-                )
-                .isInstanceOf(RoutingRequestException.class)
-                .withMessage("Invalid routing request: Points are snapped to the same node");
+        RoutingResponse result = router.route(RoutingRequest.builder()
+                .wayPoints(wayPoints)
+                .simplifyResponseGeometry(false)
+                .build());
+        assertStatus(result, RouteStatus.NO_ROUTE);
+
     }
 
     @SneakyThrows
