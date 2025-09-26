@@ -1,8 +1,8 @@
 package nu.ndw.nls.routingmapmatcher.routing;
 
 import static nu.ndw.nls.routingmapmatcher.testutil.TestNetworkProvider.getNetworkService;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import com.graphhopper.config.Profile;
 import java.util.List;
@@ -11,8 +11,9 @@ import lombok.Getter;
 import lombok.SneakyThrows;
 import nu.ndw.nls.geometry.factories.GeometryFactoryRijksdriehoek;
 import nu.ndw.nls.routingmapmatcher.TestConfig;
-import nu.ndw.nls.routingmapmatcher.exception.RoutingRequestException;
+import nu.ndw.nls.routingmapmatcher.model.RouteStatus;
 import nu.ndw.nls.routingmapmatcher.model.routing.RoutingRequest;
+import nu.ndw.nls.routingmapmatcher.model.routing.RoutingResponse;
 import nu.ndw.nls.routingmapmatcher.network.annotations.EncodedValue;
 import nu.ndw.nls.routingmapmatcher.network.model.DirectionalDto;
 import nu.ndw.nls.routingmapmatcher.network.model.Link;
@@ -159,13 +160,9 @@ class BikeRouterIT {
     @SneakyThrows
     void route_newWay_linkNotAccessible() {
         setup(false);
-
-        RoutingRequestException routingRequestException = assertThrows(RoutingRequestException.class,
-                () -> router.route(RoutingRequest.builder()
-                        .wayPoints(List.of(create1DPoint(1), create1DPoint(28)))
-                        .build()));
-
-        assertEquals("Invalid routing request: Connection between locations not found",
-                routingRequestException.getMessage());
+        RoutingResponse response = router.route(RoutingRequest.builder()
+                .wayPoints(List.of(create1DPoint(1), create1DPoint(28)))
+                .build());
+        assertThat(response.getStatus()).isEqualTo(RouteStatus.NO_ROUTE);
     }
 }

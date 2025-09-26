@@ -64,6 +64,7 @@ public class LineStringMatchUtil {
     public LineStringMatch createMatch(LineStringLocation lineStringLocation, Path path, QueryGraph queryGraph,
             double reliability) {
         List<EdgeIteratorState> edges = path.calcEdges();
+
         if (edges.isEmpty()) {
             throw new RoutingMapMatcherException("Unexpected: path has no edges");
         }

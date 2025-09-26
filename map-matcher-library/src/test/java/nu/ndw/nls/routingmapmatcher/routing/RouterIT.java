@@ -2,13 +2,12 @@ package nu.ndw.nls.routingmapmatcher.routing;
 
 import static nu.ndw.nls.routingmapmatcher.testutil.TestNetworkProvider.CAR;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatException;
 
 import java.util.List;
 import lombok.SneakyThrows;
 import nu.ndw.nls.geometry.factories.GeometryFactoryWgs84;
 import nu.ndw.nls.routingmapmatcher.TestConfig;
-import nu.ndw.nls.routingmapmatcher.exception.RoutingRequestException;
+import nu.ndw.nls.routingmapmatcher.model.RouteStatus;
 import nu.ndw.nls.routingmapmatcher.model.linestring.MatchedLink;
 import nu.ndw.nls.routingmapmatcher.model.routing.RoutingLegResponse;
 import nu.ndw.nls.routingmapmatcher.model.routing.RoutingRequest;
@@ -103,6 +102,7 @@ class RouterIT {
         var result = router.route(RoutingRequest.builder()
                 .wayPoints(wayPoints)
                 .build());
+        assertStatus(result, RouteStatus.ROUTE_FOUND);
         verifySumDistanceOfIndividualRoadSections(result);
         assertSuccess(result, new Coordinate[]{
                 new Coordinate(5.430483, 52.177693),
@@ -121,6 +121,7 @@ class RouterIT {
         var result = router.route(RoutingRequest.builder()
                 .wayPoints(wayPoints)
                 .build());
+        assertStatus(result, RouteStatus.ROUTE_FOUND);
         verifySumDistanceOfIndividualRoadSections(result);
         assertViaPointSuccess(result, new Coordinate[]{
                 new Coordinate(5.430483, 52.177693),
@@ -140,6 +141,7 @@ class RouterIT {
                 .wayPoints(wayPoints)
                 .snapToNodes(true)
                 .build());
+        assertStatus(result, RouteStatus.ROUTE_FOUND);
         verifySumDistanceOfIndividualRoadSections(result);
         assertSnapToNodesSuccess(result, new Coordinate[]{
                 new Coordinate(5.430413, 52.177631),
@@ -155,16 +157,11 @@ class RouterIT {
         Point outOfBounds = geometryFactory.createPoint(new Coordinate(5.430496, 42.0));
         Point end = geometryFactory.createPoint(new Coordinate(5.428436, 52.175901));
         List<Point> wayPoints = List.of(start, outOfBounds, end);
-        assertThatException()
-                .isThrownBy(
-                        () -> router.route(RoutingRequest.builder()
-                                .wayPoints(wayPoints)
-                                .snapToNodes(true)
-                                .build())
-                )
-                .isInstanceOf(RoutingRequestException.class)
-                .withMessage("Invalid routing request: Point is out of bounds: POINT (5.430496 42), "
-                        + "the bounds are: 4.9467900079047,5.433661,52.172107,52.63028869479728");
+        var result = router.route(RoutingRequest.builder()
+                .wayPoints(wayPoints)
+                .snapToNodes(true)
+                .build());
+        assertStatus(result, RouteStatus.NO_ROUTE);
     }
 
     @SneakyThrows
@@ -175,15 +172,11 @@ class RouterIT {
         Point cannotSnap = geometryFactory.createPoint(new Coordinate(5.430496, 52.318371));
         Point end = geometryFactory.createPoint(new Coordinate(5.428436, 52.175901));
         List<Point> wayPoints = List.of(start, cannotSnap, end);
-        assertThatException()
-                .isThrownBy(
-                        () -> router.route(RoutingRequest.builder()
-                                .wayPoints(wayPoints)
-                                .snapToNodes(true)
-                                .build())
-                )
-                .isInstanceOf(RoutingRequestException.class)
-                .withMessage("Invalid routing request: Cannot snap point 52.318371,5.430496 to node");
+        var result = router.route(RoutingRequest.builder()
+                .wayPoints(wayPoints)
+                .snapToNodes(true)
+                .build());
+        assertStatus(result, RouteStatus.NO_ROUTE);
     }
 
     @SneakyThrows
@@ -194,15 +187,12 @@ class RouterIT {
         Point sameAsStart = geometryFactory.createPoint(new Coordinate(5.430500, 52.177700));
         Point end = geometryFactory.createPoint(new Coordinate(5.428436, 52.175901));
         List<Point> wayPoints = List.of(start, sameAsStart, end);
-        assertThatException()
-                .isThrownBy(
-                        () -> router.route(RoutingRequest.builder()
-                                .wayPoints(wayPoints)
-                                .snapToNodes(true)
-                                .build())
-                )
-                .isInstanceOf(RoutingRequestException.class)
-                .withMessage("Invalid routing request: Points are snapped to the same node");
+        RoutingResponse result = router.route(RoutingRequest.builder()
+                .wayPoints(wayPoints)
+                .simplifyResponseGeometry(false)
+                .build());
+        assertStatus(result, RouteStatus.NO_ROUTE);
+
     }
 
     @SneakyThrows
@@ -216,6 +206,7 @@ class RouterIT {
                 .wayPoints(wayPoints)
                 .simplifyResponseGeometry(false)
                 .build());
+        assertStatus(result, RouteStatus.ROUTE_FOUND);
         verifySumDistanceOfIndividualRoadSections(result);
         assertSuccess(result, new Coordinate[]{
                 new Coordinate(5.430483, 52.177693),
@@ -319,5 +310,9 @@ class RouterIT {
                 .sum();
         assertThat(matchedLinksGroupedDistance)
                 .isCloseTo(matchedLinksDistance, Offset.offset(0.0005));
+    }
+
+    void assertStatus(RoutingResponse response, RouteStatus routeStatus) {
+        assertThat(response.getStatus()).isEqualTo(routeStatus);
     }
 }
