@@ -48,15 +48,20 @@ import org.locationtech.jts.geom.Point;
 public class Router extends BaseMapMatcher {
 
     private static final boolean INCLUDE_ELEVATION = false;
+
     private static final int DECIMAL_PLACES = 3;
+
     private static final double MILLISECONDS_PER_SECOND = 1000.0;
+
     private final MatchedLinkMapper matchedLinkMapper;
+
     private final GeometryFactoryWgs84 geometryFactoryWgs84;
+
     private final FractionAndDistanceCalculator fractionAndDistanceCalculator;
 
-
     public Router(NetworkGraphHopper network, MatchedLinkMapper matchedLinkMapper, GeometryFactoryWgs84 geometryFactoryWgs84,
-            FractionAndDistanceCalculator fractionAndDistanceCalculator, String profileName, CustomModel customModel) {
+            FractionAndDistanceCalculator fractionAndDistanceCalculator, String profileName, CustomModel customModel
+    ) {
         super(profileName, network, customModel);
         this.matchedLinkMapper = matchedLinkMapper;
         this.geometryFactoryWgs84 = geometryFactoryWgs84;
@@ -119,7 +124,6 @@ public class Router extends BaseMapMatcher {
         return geometryFactoryWgs84.createPoint(new Coordinate(snappedLon, snappedLat));
     }
 
-
     private RoutingResponse getRoutingResponse(GHRequest ghRequest, boolean simplify) throws RoutingRequestException, RoutingException {
 
         GHResponse ghResponse = getNetwork().route(ghRequest);
@@ -127,9 +131,7 @@ public class Router extends BaseMapMatcher {
         ResponsePath responsePath = ghResponse.getBest();
         ensurePathsAreNotEmpty(responsePath);
         List<RoutingLegResponse> routingLegResponses = getRoutingLegResponses(ghRequest);
-        return createRoutingResponse(responsePath, simplify).
-                legs(routingLegResponses).
-                build();
+        return createRoutingResponse(responsePath, simplify).legs(routingLegResponses).build();
     }
 
     private GHRequest getGraphHopperRequest(List<Point> points) {
@@ -177,32 +179,26 @@ public class Router extends BaseMapMatcher {
     private static void ensureResponseHasNoErrors(GHResponse ghResponse) throws RoutingRequestException, RoutingException {
 
         if (ghResponse.hasErrors()) {
-            String errors = ghResponse.getErrors().stream().map(Throwable::getMessage)
-                    .collect(Collectors.joining(", "));
+            String errors = ghResponse.getErrors().stream().map(Throwable::getMessage).collect(Collectors.joining(", "));
             if (hasAllPointOutOfBoundsOrConnectionErrors(ghResponse.getErrors())) {
                 throw new RoutingRequestException("Invalid routing request: %s".formatted(errors));
             } else {
                 throw new RoutingException("Routing request failed: %s".formatted(errors));
             }
-
         }
     }
 
     private static boolean hasAllPointOutOfBoundsOrConnectionErrors(List<Throwable> errors) {
-        return errors
-                .stream()
+        return errors.stream()
                 .allMatch(error -> error instanceof PointOutOfBoundsException || error instanceof ConnectionNotFoundException);
     }
 
     private RoutingResponseBuilder createRoutingResponse(ResponsePath path, boolean simplify) {
 
         PointList points = simplify ? PathSimplification.simplify(path, new RamerDouglasPeucker(), false) : path.getPoints();
-        return RoutingResponse.builder()
-                .geometry(points.toLineString(INCLUDE_ELEVATION))
-                .snappedWaypoints(mapToSnappedWaypoints(path.getWaypoints()))
-                .weight(Helper.round(path.getRouteWeight(), DECIMAL_PLACES))
-                .duration(path.getTime() / MILLISECONDS_PER_SECOND)
-                .distance(Helper.round(path.getDistance(), DECIMAL_PLACES));
+        return RoutingResponse.builder().geometry(points.toLineString(INCLUDE_ELEVATION))
+                .snappedWaypoints(mapToSnappedWaypoints(path.getWaypoints())).weight(Helper.round(path.getRouteWeight(), DECIMAL_PLACES))
+                .duration(path.getTime() / MILLISECONDS_PER_SECOND).distance(Helper.round(path.getDistance(), DECIMAL_PLACES));
     }
 
     private static List<GHPoint> getGHPointsFromPoints(List<Point> points) {
