@@ -4,7 +4,7 @@
   <parent>
     <groupId>nu.ndw.nls</groupId>
     <artifactId>routing-map-matcher-parent</artifactId>
-    <version>19.0.4-SNAPSHOT</version>
+    <version>19.0.5-SNAPSHOT</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
   <artifactId>routing-map-matcher-library</artifactId>
