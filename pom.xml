@@ -30,7 +30,7 @@
     <java.version>21</java.version>
     <maven.compiler.source>21</maven.compiler.source>
     <maven.compiler.target>21</maven.compiler.target>
-    <nls-springboot.test.version>9.0.3</nls-springboot.test.version>
+    <nls-springboot.test.version>9.0.4</nls-springboot.test.version>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <maven.javadoc.failOnError>false</maven.javadoc.failOnError>
     <graphhopper.version>10.2</graphhopper.version>
