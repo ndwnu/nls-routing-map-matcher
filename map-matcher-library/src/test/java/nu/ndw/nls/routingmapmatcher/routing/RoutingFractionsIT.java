@@ -157,8 +157,8 @@ class RoutingFractionsIT {
                 .legs(List.of(RoutingLegResponse.builder()
                                 .matchedLinks(List.of(
                                         MatchedLink.builder()
-                                                .linkId(6369283)
-                                                .reversed(false)
+                                                .linkId(6369284)
+                                                .reversed(true)
                                                 .distance(42.10921482022403)
                                                 .startFraction(0.11164377136022784)
                                                 .endFraction(1.0)
