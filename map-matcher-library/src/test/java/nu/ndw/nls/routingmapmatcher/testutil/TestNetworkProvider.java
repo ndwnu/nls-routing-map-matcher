@@ -102,6 +102,7 @@ public final class TestNetworkProvider {
                 .networkNameAndVersion("test_network")
                 .profiles(TEST_PROFILES)
                 .linkSupplier(links::iterator)
+                .indexed(true)
                 .build();
 
         return NETWORK_SERVICE.inMemory(routingNetworkSettings);

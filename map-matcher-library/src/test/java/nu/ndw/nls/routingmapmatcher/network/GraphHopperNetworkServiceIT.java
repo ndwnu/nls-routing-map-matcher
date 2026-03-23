@@ -105,7 +105,7 @@ class GraphHopperNetworkServiceIT {
                 .filter(event -> event.getMessage().startsWith("Build wayId to edgeKey maps in "))
                 .count())
                 .withFailMessage("Expected debug log message with edge map build time but was not found.")
-                .isEqualTo(1);
+                .isEqualTo(2);
     }
 
     private GraphHopperNetworkService getNewGraphHopperNetworkService() {
