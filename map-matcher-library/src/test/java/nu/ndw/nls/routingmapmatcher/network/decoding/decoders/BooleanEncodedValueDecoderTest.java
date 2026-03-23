@@ -19,8 +19,11 @@ import org.mockito.junit.jupiter.MockitoExtension;
 class BooleanEncodedValueDecoderTest {
 
     private static final long LINK_ID = 1L;
+
     private static final int EDGE_ID = 1234;
+
     private static final String ENCODED_VALUE_NAME = "encoded_value_name";
+
     private static final Boolean BOOLEAN_VALUE = Boolean.TRUE;
 
     @Mock
@@ -33,7 +36,7 @@ class BooleanEncodedValueDecoderTest {
     private EncodingManager encodingManager;
 
     @Mock
-    private HashMap<Long,Integer> edgeMap;
+    private HashMap<Long, Integer> edgeMap;
 
     @Mock
     private BaseGraph baseGraph;
@@ -45,10 +48,10 @@ class BooleanEncodedValueDecoderTest {
     private BooleanEncodedValue booleanEncodedValue;
 
     @Test
-    void retrieveValueFromNetwork_ok_forward() {
+    void retrieveValueFromNetwork_forward() {
         when(networkGraphHopper.getEncodingManager()).thenReturn(encodingManager);
 
-        when(networkGraphHopper.getEdgeMap()).thenReturn(edgeMap);
+        when(networkGraphHopper.getWayIdToEdgeKey()).thenReturn(edgeMap);
         when(edgeMap.get(LINK_ID)).thenReturn(EDGE_ID);
 
         when(networkGraphHopper.getBaseGraph()).thenReturn(baseGraph);
@@ -62,10 +65,10 @@ class BooleanEncodedValueDecoderTest {
     }
 
     @Test
-    void retrieveValueFromNetwork_ok_reverse() {
+    void retrieveValueFromNetwork_reverse() {
         when(networkGraphHopper.getEncodingManager()).thenReturn(encodingManager);
 
-        when(networkGraphHopper.getEdgeMap()).thenReturn(edgeMap);
+        when(networkGraphHopper.getWayIdToEdgeKey()).thenReturn(edgeMap);
         when(edgeMap.get(LINK_ID)).thenReturn(EDGE_ID);
 
         when(networkGraphHopper.getBaseGraph()).thenReturn(baseGraph);
