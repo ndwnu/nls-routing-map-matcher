@@ -43,7 +43,7 @@ class GraphHopperNetworkServiceIT {
 
     private Supplier<Iterator<TestLink>> iteratorSupplier;
 
-    private GeometryFactoryWgs84 geometryFactoryWgs84 = new GeometryFactoryWgs84();
+    private final GeometryFactoryWgs84 geometryFactoryWgs84 = new GeometryFactoryWgs84();
 
     @RegisterExtension
     LoggerExtension loggerExtension = new LoggerExtension();
@@ -59,23 +59,23 @@ class GraphHopperNetworkServiceIT {
     @Test
     void loadFromDisk() {
 
-        Path graphHopperDir = Path.of(TEST_NETWORK);
+        Path graphHopperLocation = Path.of(TEST_NETWORK);
 
         RoutingNetworkSettings<TestLink> routingNetworkSettings = RoutingNetworkSettings.builder(TestLink.class)
                 .networkNameAndVersion(TEST_NETWORK)
                 .profiles(TEST_PROFILES)
-                .graphhopperRootPath(Files.createDirectories(graphHopperDir))
+                .graphhopperRootPath(Files.createDirectories(graphHopperLocation))
                 .linkSupplier(iteratorSupplier)
                 .dataDate(DATA_DATE)
                 .indexed(true)
                 .build();
 
-        Files.createDirectories(graphHopperDir);
+        Files.createDirectories(graphHopperLocation);
         GraphHopperNetworkService graphHopperNetworkService = getNewGraphHopperNetworkService();
         graphHopperNetworkService.storeOnDisk(routingNetworkSettings);
 
-        assertThat(graphHopperDir.resolve(TEST_NETWORK)).exists();
-        assertThat(graphHopperDir.resolve(TEST_NETWORK).resolve("properties")).exists();
+        assertThat(graphHopperLocation.resolve(TEST_NETWORK)).exists();
+        assertThat(graphHopperLocation.resolve(TEST_NETWORK).resolve("properties")).exists();
 
         graphHopperNetworkService = getNewGraphHopperNetworkService();
         NetworkGraphHopper networkGraphHopper = graphHopperNetworkService.loadFromDisk(routingNetworkSettings);
@@ -177,20 +177,21 @@ class GraphHopperNetworkServiceIT {
     @SneakyThrows
     @Test
     void storeOnDisk() {
+        Path graphHopperLocation = Path.of(TEST_NETWORK);
+
         RoutingNetworkSettings<TestLink> routingNetworkSettings = RoutingNetworkSettings.builder(TestLink.class)
                 .networkNameAndVersion(TEST_NETWORK)
                 .profiles(TEST_PROFILES)
-                .graphhopperRootPath(Files.createDirectories(Path.of(TEST_NETWORK)))
+                .graphhopperRootPath(Files.createDirectories(graphHopperLocation))
                 .linkSupplier(iteratorSupplier)
                 .dataDate(DATA_DATE)
                 .build();
-        Path path = Path.of(TEST_NETWORK);
-        Files.createDirectories(path);
+        Files.createDirectories(graphHopperLocation);
 
         GraphHopperNetworkService graphHopperNetworkService = getNewGraphHopperNetworkService();
         graphHopperNetworkService.storeOnDisk(routingNetworkSettings);
-        assertThat(path.resolve(TEST_NETWORK)).exists();
-        assertThat(path.resolve(TEST_NETWORK).resolve("properties")).exists();
+        assertThat(graphHopperLocation.resolve(TEST_NETWORK)).exists();
+        assertThat(graphHopperLocation.resolve(TEST_NETWORK).resolve("properties")).exists();
     }
 
     @SneakyThrows

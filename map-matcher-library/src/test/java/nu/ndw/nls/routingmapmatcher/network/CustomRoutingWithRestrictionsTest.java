@@ -23,7 +23,7 @@ import org.locationtech.jts.geom.LineString;
 import org.locationtech.jts.geom.impl.CoordinateArraySequence;
 
 @Slf4j
-public class CustomRoutingWithRestrictionsTest {
+class CustomRoutingWithRestrictionsTest {
 
     private static final Coordinate START_NODE = new Coordinate(5.108409, 52.081079);
 
@@ -62,16 +62,6 @@ public class CustomRoutingWithRestrictionsTest {
 
     @Test
     void route_withLongerRoute_restrictedForTruck() {
-        NetworkGraphHopper graphHopper = getTestNetwork(linkList);
-        GHRequest req = getRequest(END_NODE_GH, START_NODE_GH).setCustomModel(HGV_MODEL);
-
-        GHResponse res = graphHopper.route(req);
-
-        assertBestDistance(res, 450.0);
-    }
-
-    @Test
-    void route_withLongerRoute_restrictedInReverseForTruck() {
         NetworkGraphHopper graphHopper = getTestNetwork(linkList);
         GHRequest req = getRequest(END_NODE_GH, START_NODE_GH).setCustomModel(HGV_MODEL);
 

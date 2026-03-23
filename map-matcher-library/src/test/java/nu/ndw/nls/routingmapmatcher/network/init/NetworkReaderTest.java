@@ -48,16 +48,12 @@ class NetworkReaderTest {
 
     private static final double DISTANCE = 12.15;
 
-    private static final long LINK_ID = 100;
-
     // Internal fields
     private static final int FROM_NODE_ID_INTERNAL = 0;
 
     private static final int TO_NODE_ID_INTERNAL = 1;
 
     private static final int EDGE_ID = 2;
-
-    private static final int EDGE_KEY = 3;
 
     private static final Coordinate coordinateA1 = new Coordinate(LONG_1, LAT_1);
 
