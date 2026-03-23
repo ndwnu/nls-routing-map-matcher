@@ -55,9 +55,6 @@ public class NetworkGraphHopper extends GraphHopper {
     private final Map<Long, Integer> wayIdToEdgeKey = new HashMap<>();
 
     @Getter
-    private final Map<Long, Integer> wayIdToReverseEdgeKey = new HashMap<>();
-
-    @Getter
     private final boolean expandBounds;
 
     public NetworkGraphHopper(RoutingNetworkSettings routingNetworkSettings) {
@@ -116,7 +113,6 @@ public class NetworkGraphHopper extends GraphHopper {
         while (edgeIterator.next()) {
             long wayId = edgeIterator.get(wayIdEncodedValue);
             wayIdToEdgeKey.put(wayId, edgeIterator.getEdgeKey());
-            wayIdToReverseEdgeKey.put(wayId, edgeIterator.getReverseEdgeKey());
         }
 
         stopWatch.stop();
