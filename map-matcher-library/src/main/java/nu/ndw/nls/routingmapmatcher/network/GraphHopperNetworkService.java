@@ -32,20 +32,30 @@ import org.springframework.stereotype.Service;
 public class GraphHopperNetworkService {
 
     private static final String DELIMITER = ",";
+
     private static final String NO_LINK_SUPPLIER_MSG = "Link supplier must be provided when creating new network";
+
     private static final String NO_PATH_MSG_READ = "GraphHopper root path must be specified when reading from disk";
+
     private static final String NO_NAME_MSG_READ = "Network name and version must be specified when reading from disk";
+
     private static final String NO_PATH_MSG_WRITE = "GraphHopper root path must be specified when writing to disk";
+
     private static final String NO_NAME_MSG_WRITE = "Network name and version must be specified when writing to disk";
+
     private static final String NO_NETWORK_MSG = "GraphHopper network %s is not imported on disk";
 
     private final LinkVehicleMapperProvider linkVehicleMapperProvider;
-    private final EncodedValueFactoryRegistry encodedValueFactoryRegistry;
-    private final EncodedValuesMapper encodedValuesMapper;
-    private final EncodedMapperFactoryRegistry encodedMapperFactoryRegistry;
-    private final CustomModelMapper customModelMapper;
-    private final ProfileAccessAndSpeedAttributesMapper profileAccessAndSpeedAttributesMapper;
 
+    private final EncodedValueFactoryRegistry encodedValueFactoryRegistry;
+
+    private final EncodedValuesMapper encodedValuesMapper;
+
+    private final EncodedMapperFactoryRegistry encodedMapperFactoryRegistry;
+
+    private final CustomModelMapper customModelMapper;
+
+    private final ProfileAccessAndSpeedAttributesMapper profileAccessAndSpeedAttributesMapper;
 
     /**
      * Creates an in memory network
@@ -69,7 +79,6 @@ public class GraphHopperNetworkService {
 
         return graphHopper;
     }
-
 
     /***
      * In order to separate reads and writes to/form disk cache this method only loads existing networks from disk.
@@ -102,44 +111,49 @@ public class GraphHopperNetworkService {
      * @param networkSettings Routing network with link supplier
      */
     public <T extends Link> void storeOnDisk(RoutingNetworkSettings<T> networkSettings) {
+
         requireNonNull(networkSettings.getLinkSupplier(), NO_LINK_SUPPLIER_MSG);
         NetworkGraphHopper graphHopper = new NetworkGraphHopper(networkSettings);
         Path path = requireNonNull(networkSettings.getGraphhopperRootPath(), NO_PATH_MSG_WRITE);
         String nameAndVersion = requireNonNull(networkSettings.getNetworkNameAndVersion(), NO_NAME_MSG_WRITE);
         graphHopper.setGraphHopperLocation(formatNormalizedPath(path, nameAndVersion).toString());
-        Map<String, LinkVehicleMapper<T>> providers = linkVehicleMapperProvider.getLinksForType(
-                networkSettings.getLinkType());
+
+        Map<String, LinkVehicleMapper<T>> providers = linkVehicleMapperProvider.getLinksForType(networkSettings.getLinkType());
         validateVehicles(networkSettings.getProfiles(), providers, networkSettings.getLinkType());
+
         configureGraphHopper(networkSettings.getLinkType(), networkSettings.getProfiles(), graphHopper);
+
         graphHopper.clean();
         graphHopper.setStoreOnFlush(true);
         graphHopper.importAndClose();
     }
 
     /**
-     * Configures graphhopper by scanning the annotations from the linkClass and configuration encoders and parsers
-     * accordingly.
+     * Configures graphhopper by scanning the annotations from the linkClass and configuration encoders and parsers accordingly.
      *
      * @param linkClass The annotated link class
      * @param profiles  The profiles for which we need to encode vehicle information
      * @param <T>       Link class
      */
-    private <T extends Link> void configureGraphHopper(Class<T> linkClass, List<Profile> profiles,
+    private <T extends Link> void configureGraphHopper(
+            Class<T> linkClass,
+            List<Profile> profiles,
             NetworkGraphHopper networkGraphHopper) {
+
         networkGraphHopper.setElevation(false);
 
         EncodedValuesByTypeDto<T> encodedValuesByTypeDto = encodedValuesMapper.map(linkClass);
-        Map<String, LinkVehicleMapper<T>> providers = linkVehicleMapperProvider.getLinksForType(
-                linkClass);
-        ProfileAccessAndSpeedAttributes profileAccessAndSpeedAttributes = profileAccessAndSpeedAttributesMapper.map(
-                profiles);
-        String encodedValuesString = getEncodedValuesString(profileAccessAndSpeedAttributes.getAll(),
-                encodedValuesByTypeDto);
-        ImportRegistry importRegistry = new LinkImportRegistry<>(encodedValuesByTypeDto,
+        Map<String, LinkVehicleMapper<T>> providers = linkVehicleMapperProvider.getLinksForType(linkClass);
+        ProfileAccessAndSpeedAttributes profileAccessAndSpeedAttributes = profileAccessAndSpeedAttributesMapper.map(profiles);
+        String encodedValuesString = getEncodedValuesString(profileAccessAndSpeedAttributes.getAll(), encodedValuesByTypeDto);
+
+        ImportRegistry importRegistry = new LinkImportRegistry<>(
+                encodedValuesByTypeDto,
                 encodedValueFactoryRegistry, encodedMapperFactoryRegistry,
                 providers,
                 new DefaultImportRegistry(),
                 profileAccessAndSpeedAttributes);
+
         addSpeedAndAccessRestrictionsToProfiles(profiles);
         networkGraphHopper.setImportRegistry(importRegistry);
         networkGraphHopper.setEncodedValuesString(encodedValuesString);
@@ -147,8 +161,10 @@ public class GraphHopperNetworkService {
         networkGraphHopper.setMinNetworkSize(0);
     }
 
-    private <T extends Link> String getEncodedValuesString(List<String> accessAndSpeedAttributes,
+    private <T extends Link> String getEncodedValuesString(
+            List<String> accessAndSpeedAttributes,
             EncodedValuesByTypeDto<T> encodedValuesByTypeDto) {
+
         return Stream.concat(
                         encodedValuesByTypeDto.getNetworkEncodedValueNameKeySet().stream(),
                         accessAndSpeedAttributes.stream()
@@ -156,13 +172,16 @@ public class GraphHopperNetworkService {
                 .collect(Collectors.joining(DELIMITER));
     }
 
-
-    private <T extends Link> void validateVehicles(List<Profile> profiles, Map<String, LinkVehicleMapper<T>> providers,
+    private <T extends Link> void validateVehicles(
+            List<Profile> profiles,
+            Map<String, LinkVehicleMapper<T>> providers,
             Class<T> linkClass) {
+
         Set<String> missingVehicles = profiles.stream()
                 .map(Profile::getName)
                 .filter(vehicle -> !providers.containsKey(vehicle))
                 .collect(Collectors.toSet());
+
         if (!missingVehicles.isEmpty()) {
             throw new IllegalArgumentException(
                     "Missing LinkVehicle implementations for Link type [%s] and vehicle type(s) [%s]"
@@ -171,7 +190,7 @@ public class GraphHopperNetworkService {
     }
 
     private void addSpeedAndAccessRestrictionsToProfiles(List<Profile> profiles) {
+
         profiles.forEach(profile -> profile.setCustomModel(customModelMapper.mapToCustomModel(profile)));
     }
-
 }

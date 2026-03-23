@@ -30,7 +30,7 @@ abstract class AbstractEncodedValueDecoder<T> implements EncodedValueDecoder<T> 
             String encodedValueName, boolean reverse);
 
     private static EdgeIteratorState getEdgeIteratorState(NetworkGraphHopper networkGraphHopper, Long roadSectionId) {
-        Integer edgeKey = networkGraphHopper.getEdgeMap().get(roadSectionId);
+        Integer edgeKey = networkGraphHopper.getWayIdToEdgeKey().get(roadSectionId);
         return networkGraphHopper.getBaseGraph().getEdgeIteratorStateForKey(edgeKey);
     }
 
