@@ -99,8 +99,12 @@ public class NetworkGraphHopper extends GraphHopper {
     }
 
     @Override
-    public boolean load() {
-        return indexed ? (super.load() && buildWayIdToEdgeKeyMaps()) : super.load();
+    protected void postProcessing(boolean closeEarly) {
+        super.postProcessing(closeEarly);
+
+        if (indexed) {
+            buildWayIdToEdgeKeyMaps();
+        }
     }
 
     private boolean buildWayIdToEdgeKeyMaps() {

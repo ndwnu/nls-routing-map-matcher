@@ -81,21 +81,18 @@ public class CustomRoutingWithRestrictionsTest {
     }
 
     @Test
-    void route_withShorterRoute_restrictionsLiftedAfterInit_notSupported() {
+    void route_withShorterRoute_restrictionsLiftedAfterInit() {
         NetworkGraphHopper graphHopper = getTestNetwork(linkList);
         GHRequest req = getRequest(END_NODE_GH, START_NODE_GH).setCustomModel(HGV_MODEL);
 
         GHResponse responseBefore = graphHopper.route(req);
-
         assertBestDistance(responseBefore, 450.0);
 
         // Modifying the network
         liftHgvRestriction(graphHopper);
 
         GHResponse responseAfter = graphHopper.route(req);
-
-        // As modifications are no longer supported in GraphHopper 11 the result should be the same
-        assertBestDistance(responseAfter, 450.0);
+        assertBestDistance(responseAfter, 324.0);
     }
 
     private static void liftHgvRestriction(NetworkGraphHopper graphHopper) {
