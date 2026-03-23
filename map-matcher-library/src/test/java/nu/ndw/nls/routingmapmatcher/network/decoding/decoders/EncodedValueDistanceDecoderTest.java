@@ -17,7 +17,9 @@ import org.mockito.junit.jupiter.MockitoExtension;
 class EncodedValueDistanceDecoderTest {
 
     private static final long ROAD_SECTION_ID = 123;
+
     private static final int INTERNAL_EDGE_ID = 678;
+
     private static final double DISTANCE = 100D;
 
     @InjectMocks
@@ -33,15 +35,14 @@ class EncodedValueDistanceDecoderTest {
     private EdgeIteratorState edgeIteratorState;
 
     @Test
-    void decode_ok() {
+    void decode() {
         HashMap<Long, Integer> edgeMap = new HashMap<>();
         edgeMap.put(ROAD_SECTION_ID, INTERNAL_EDGE_ID);
-        when(networkGraphHopper.getEdgeMap()).thenReturn(edgeMap);
+        when(networkGraphHopper.getWayIdToEdgeKey()).thenReturn(edgeMap);
         when(networkGraphHopper.getBaseGraph()).thenReturn(baseGraph);
         when(baseGraph.getEdgeIteratorStateForKey(INTERNAL_EDGE_ID)).thenReturn(edgeIteratorState);
         when(edgeIteratorState.getDistance()).thenReturn(DISTANCE);
 
         assertThat(encodedValueDistanceDecoder.decode(networkGraphHopper, ROAD_SECTION_ID)).isEqualTo(DISTANCE);
     }
-
 }

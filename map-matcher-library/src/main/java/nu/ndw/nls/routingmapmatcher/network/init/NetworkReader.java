@@ -10,7 +10,6 @@ import com.graphhopper.util.PointList;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 import java.util.function.Supplier;
 import lombok.extern.slf4j.Slf4j;
@@ -21,26 +20,32 @@ import org.locationtech.jts.geom.Coordinate;
 public class NetworkReader {
 
     private static final int COORDINATES_LENGTH_START_END = 2;
+
     private static final double BOUND_EXPAND = .000001;
 
     private final Supplier<Iterator<? extends Link>> linkSupplier;
+
     private final LongLongMap nodeIdToInternalNodeIdMap;
+
     private final EdgeIntAccess edgeIntAccess;
+
     private final List<TagParser> wayTagParsers;
 
     protected final BaseGraph baseGraph;
-    private final Map<Long, Integer> edgeMap;
+
     private final boolean expandBounds;
 
-    public NetworkReader(BaseGraph baseGraph, Supplier<Iterator<? extends Link>> linkSupplier,
-            List<TagParser> wayTagParsers, LongLongMap nodeIdToInternalNodeIdMap, Map<Long, Integer> edgeMap,
+    public NetworkReader(
+            BaseGraph baseGraph,
+            Supplier<Iterator<? extends Link>> linkSupplier,
+            List<TagParser> wayTagParsers,
+            LongLongMap nodeIdToInternalNodeIdMap,
             boolean expandBounds) {
         this.linkSupplier = linkSupplier;
         this.nodeIdToInternalNodeIdMap = Objects.requireNonNull(nodeIdToInternalNodeIdMap);
         this.wayTagParsers = Objects.requireNonNull(wayTagParsers);
         this.baseGraph = Objects.requireNonNull(baseGraph);
         this.edgeIntAccess = baseGraph.getEdgeAccess();
-        this.edgeMap = edgeMap;
         this.expandBounds = expandBounds;
     }
 
@@ -82,7 +87,9 @@ public class NetworkReader {
             });
         }
         int internalFromNodeId = addNodeIfNeeded(link.getFromNodeId(), coordinates[0].y, coordinates[0].x);
-        int internalToNodeId = addNodeIfNeeded(link.getToNodeId(), coordinates[coordinates.length - 1].y,
+        int internalToNodeId = addNodeIfNeeded(
+                link.getToNodeId(),
+                coordinates[coordinates.length - 1].y,
                 coordinates[coordinates.length - 1].x);
 
         EdgeIteratorState edge = baseGraph.edge(internalFromNodeId, internalToNodeId)
@@ -92,8 +99,6 @@ public class NetworkReader {
             PointList geometry = createPointListWithoutStartAndEndPoint(coordinates);
             edge.setWayGeometry(geometry);
         }
-
-        edgeMap.put(link.getId(), edge.getEdgeKey());
     }
 
     private int addNodeIfNeeded(long id, double latitude, double longitude) {

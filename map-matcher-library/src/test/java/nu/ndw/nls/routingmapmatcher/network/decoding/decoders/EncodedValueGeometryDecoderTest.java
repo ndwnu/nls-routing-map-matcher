@@ -21,6 +21,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 class EncodedValueGeometryDecoderTest {
 
     private static final long ROAD_SECTION_ID = 123;
+
     private static final int INTERNAL_EDGE_ID = 678;
 
     @Mock
@@ -45,10 +46,10 @@ class EncodedValueGeometryDecoderTest {
     private PointList geometryPointList;
 
     @Test
-    void decode_ok_is2D() {
+    void decode_is2D() {
         HashMap<Long, Integer> edgeMap = new HashMap<>();
         edgeMap.put(ROAD_SECTION_ID, INTERNAL_EDGE_ID);
-        when(networkGraphHopper.getEdgeMap()).thenReturn(edgeMap);
+        when(networkGraphHopper.getWayIdToEdgeKey()).thenReturn(edgeMap);
         when(networkGraphHopper.getBaseGraph()).thenReturn(baseGraph);
         when(baseGraph.getEdgeIteratorStateForKey(INTERNAL_EDGE_ID)).thenReturn(edgeIteratorState);
 
@@ -60,12 +61,11 @@ class EncodedValueGeometryDecoderTest {
         assertThat(encodedValueGeometryDecoder.decode(networkGraphHopper, ROAD_SECTION_ID)).isEqualTo(geometryLineString);
     }
 
-
     @Test
-    void decode_ok_is3D() {
+    void decode_is3D() {
         HashMap<Long, Integer> edgeMap = new HashMap<>();
         edgeMap.put(ROAD_SECTION_ID, INTERNAL_EDGE_ID);
-        when(networkGraphHopper.getEdgeMap()).thenReturn(edgeMap);
+        when(networkGraphHopper.getWayIdToEdgeKey()).thenReturn(edgeMap);
         when(networkGraphHopper.getBaseGraph()).thenReturn(baseGraph);
         when(baseGraph.getEdgeIteratorStateForKey(INTERNAL_EDGE_ID)).thenReturn(edgeIteratorState);
 
