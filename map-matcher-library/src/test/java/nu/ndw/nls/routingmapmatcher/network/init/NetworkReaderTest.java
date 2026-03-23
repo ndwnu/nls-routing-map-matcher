@@ -144,8 +144,6 @@ class NetworkReaderTest {
         when(link.getDistanceInMeters()).thenReturn(DISTANCE);
         when(edge.setDistance(DISTANCE)).thenReturn(edge);
         when(edge.getEdge()).thenReturn(EDGE_ID);
-        when(edge.getEdgeKey()).thenReturn(EDGE_KEY);
-        when(link.getId()).thenReturn(LINK_ID);
     }
 
     private void verifyResults() {
