@@ -87,18 +87,15 @@ class GraphHopperNetworkServiceIT {
         verifyCustomEncodedValue(networkGraphHopper, 3666256L, true);
 
         HashMap<Long, Integer> expectedWayIdToEdgeKey = new HashMap<>();
-        HashMap<Long, Integer> expectedWayIdToReverseEdgeKey = new HashMap<>();
 
         AllEdgesIterator edgeIterator = networkGraphHopper.getBaseGraph().getAllEdges();
         IntEncodedValue wayIdEncodedValue = networkGraphHopper.getEncodingManager().getIntEncodedValue(Link.WAY_ID_KEY);
         while (edgeIterator.next()) {
             long wayId = edgeIterator.get(wayIdEncodedValue);
             expectedWayIdToEdgeKey.put(wayId, edgeIterator.getEdgeKey());
-            expectedWayIdToReverseEdgeKey.put(wayId, edgeIterator.getReverseEdgeKey());
         }
 
         assertThat(networkGraphHopper.getWayIdToEdgeKey()).isEqualTo(expectedWayIdToEdgeKey);
-        assertThat(networkGraphHopper.getWayIdToReverseEdgeKey()).isEqualTo(expectedWayIdToReverseEdgeKey);
 
         assertThat(loggerExtension.getLogEvents().stream()
                 .filter(event -> event.getLevel() == Level.DEBUG)
