@@ -26,11 +26,17 @@ import org.locationtech.jts.geom.impl.CoordinateArraySequence;
 public class CustomRoutingWithRestrictionsTest {
 
     private static final Coordinate START_NODE = new Coordinate(5.108409, 52.081079);
+
     private static final Coordinate NODE_A = new Coordinate(5.1099461, 52.0794303);
+
     private static final Coordinate NODE_B = new Coordinate(5.1110934, 52.0782690);
+
     private static final Coordinate NODE_C = new Coordinate(5.112295, 52.074527);
+
     private static final Coordinate END_NODE = new Coordinate(5.1148870, 52.0811334);
+
     private static final GHPoint START_NODE_GH = new GHPoint(START_NODE.y, START_NODE.x);
+
     private static final GHPoint END_NODE_GH = new GHPoint(END_NODE.y, END_NODE.x);
 
     private static final List<TestLink> linkList = List.of(
@@ -45,7 +51,7 @@ public class CustomRoutingWithRestrictionsTest {
             Statement.If("hgv_accessible == false", Op.MULTIPLY, "0"));
 
     @Test
-    void route_okWithShorterRoute_notRestrictedForCar() {
+    void route_withShorterRoute_notRestrictedForCar() {
         NetworkGraphHopper graphHopper = getTestNetwork(linkList);
         GHRequest req = getRequest(START_NODE_GH, END_NODE_GH);
 
@@ -55,7 +61,7 @@ public class CustomRoutingWithRestrictionsTest {
     }
 
     @Test
-    void route_okWithLongerRoute_restrictedForTruck() {
+    void route_withLongerRoute_restrictedForTruck() {
         NetworkGraphHopper graphHopper = getTestNetwork(linkList);
         GHRequest req = getRequest(END_NODE_GH, START_NODE_GH).setCustomModel(HGV_MODEL);
 
@@ -65,7 +71,7 @@ public class CustomRoutingWithRestrictionsTest {
     }
 
     @Test
-    void route_okWithLongerRoute_restrictedInReverseForTruck() {
+    void route_withLongerRoute_restrictedInReverseForTruck() {
         NetworkGraphHopper graphHopper = getTestNetwork(linkList);
         GHRequest req = getRequest(END_NODE_GH, START_NODE_GH).setCustomModel(HGV_MODEL);
 
@@ -75,7 +81,7 @@ public class CustomRoutingWithRestrictionsTest {
     }
 
     @Test
-    void route_okWithShorterRoute_restrictionsLiftedAfterInit_notSupported() {
+    void route_withShorterRoute_restrictionsLiftedAfterInit_notSupported() {
         NetworkGraphHopper graphHopper = getTestNetwork(linkList);
         GHRequest req = getRequest(END_NODE_GH, START_NODE_GH).setCustomModel(HGV_MODEL);
 
@@ -93,7 +99,7 @@ public class CustomRoutingWithRestrictionsTest {
     }
 
     private static void liftHgvRestriction(NetworkGraphHopper graphHopper) {
-        Integer edgeKey = graphHopper.getEdgeMap().get(1L);
+        Integer edgeKey = graphHopper.getWayIdToEdgeKey().get(1L);
         EdgeIteratorState edge = graphHopper.getBaseGraph().getEdgeIteratorStateForKey(edgeKey);
         BooleanEncodedValue encodedValue = graphHopper.getEncodingManager().getBooleanEncodedValue(HGV_ACCESSIBLE_KEY);
         edge.set(encodedValue, true);
@@ -112,8 +118,14 @@ public class CustomRoutingWithRestrictionsTest {
         assertThat(response.getBest().getDistance()).isEqualTo(expectedDistance);
     }
 
-    private static TestLink createLineLink(long id, long fromNodeId, long toNodeId, int distance,
-            boolean hgvAccessible, Coordinate... coordinates) {
+    private static TestLink createLineLink(
+            long id,
+            long fromNodeId,
+            long toNodeId,
+            int distance,
+            boolean hgvAccessible,
+            Coordinate... coordinates) {
+
         return TestLink.builder()
                 .id(id)
                 .fromNodeId(fromNodeId)
@@ -129,5 +141,4 @@ public class CustomRoutingWithRestrictionsTest {
     private static LineString createLineStringWktReader(Coordinate... coordinates) {
         return new LineString(new CoordinateArraySequence(coordinates), new GeometryFactoryWgs84());
     }
-
 }

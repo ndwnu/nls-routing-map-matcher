@@ -8,7 +8,7 @@ import org.springframework.stereotype.Component;
 public class EncodedValueDistanceDecoder {
 
     public double decode(NetworkGraphHopper networkGraphHopper, long roadSectionId) {
-        Integer i = networkGraphHopper.getEdgeMap().get(roadSectionId);
+        Integer i = networkGraphHopper.getWayIdToEdgeKey().get(roadSectionId);
         EdgeIteratorState edgeIteratorState = networkGraphHopper.getBaseGraph().getEdgeIteratorStateForKey(i);
         return edgeIteratorState.getDistance();
     }

@@ -13,7 +13,7 @@ import org.springframework.stereotype.Component;
 public class EncodedValueGeometryDecoder {
 
     public LineString decode(NetworkGraphHopper networkGraphHopper, long roadSectionId) {
-        Integer i = networkGraphHopper.getEdgeMap().get(roadSectionId);
+        Integer i = networkGraphHopper.getWayIdToEdgeKey().get(roadSectionId);
         EdgeIteratorState edgeIteratorState = networkGraphHopper.getBaseGraph().getEdgeIteratorStateForKey(i);
 
         PointList geometryPointList = edgeIteratorState.fetchWayGeometry(FetchMode.ALL);
