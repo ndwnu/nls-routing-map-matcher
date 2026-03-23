@@ -107,7 +107,7 @@ public class NetworkGraphHopper extends GraphHopper {
         }
     }
 
-    private boolean buildWayIdToEdgeKeyMaps() {
+    private void buildWayIdToEdgeKeyMaps() {
         StopWatch stopWatch = new StopWatch();
         stopWatch.start();
 
@@ -122,8 +122,6 @@ public class NetworkGraphHopper extends GraphHopper {
         stopWatch.stop();
         stopWatch.getTotalTime(TimeUnit.MILLISECONDS);
         log.debug("Build wayId to edgeKey maps in " + stopWatch.getTotalTime(TimeUnit.MILLISECONDS) + "ms");
-
-        return true;
     }
 
     @Override
