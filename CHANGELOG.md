@@ -6,6 +6,11 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
 Here we write upgrade notes. It's a team effort to make them as straightforward as possible.
+
+## [21.0.0] - 2026-05-08
+
+Spring boot 4 upgrade
+
 ## [20.0.0] - 2026-03-17
 - Update GraphHopper to version 11.0
 

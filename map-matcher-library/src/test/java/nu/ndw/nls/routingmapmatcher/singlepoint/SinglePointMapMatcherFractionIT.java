@@ -19,18 +19,15 @@ import nu.ndw.nls.routingmapmatcher.model.singlepoint.SinglePointMatch.Candidate
 import nu.ndw.nls.routingmapmatcher.testutil.TestNetworkProvider.TestLink;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.LineString;
 import org.locationtech.jts.geom.Point;
 import org.locationtech.jts.io.WKTReader;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 
 @Slf4j
-@ExtendWith(SpringExtension.class)
-@ContextConfiguration(classes = {TestConfig.class})
+@SpringJUnitConfig(classes = {TestConfig.class})
 class SinglePointMapMatcherFractionIT {
 
     @Autowired

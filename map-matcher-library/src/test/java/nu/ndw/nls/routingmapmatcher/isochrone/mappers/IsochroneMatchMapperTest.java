@@ -31,11 +31,10 @@ import org.locationtech.jts.geom.LineString;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 
-@ExtendWith({MockitoExtension.class, SpringExtension.class})
-@ContextConfiguration(classes = {TestConfig.class})
+@ExtendWith({MockitoExtension.class})
+@SpringJUnitConfig(classes = {TestConfig.class})
 class IsochroneMatchMapperTest {
 
     private static final int MAX_DISTANCE = 200;
