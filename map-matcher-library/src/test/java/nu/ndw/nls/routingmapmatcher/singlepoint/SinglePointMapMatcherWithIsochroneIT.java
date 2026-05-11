@@ -18,15 +18,12 @@ import nu.ndw.nls.routingmapmatcher.model.singlepoint.SinglePointMatch;
 import nu.ndw.nls.routingmapmatcher.model.singlepoint.SinglePointMatch.CandidateMatch;
 import nu.ndw.nls.routingmapmatcher.testutil.TestNetworkProvider;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Point;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 
-@ExtendWith(SpringExtension.class)
-@ContextConfiguration(classes = {TestConfig.class})
+@SpringJUnitConfig(classes = {TestConfig.class})
 class SinglePointMapMatcherWithIsochroneIT {
 
     private static final String LINKS_RESOURCE = "/test-data/network_bidirectional.geojson";
