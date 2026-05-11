@@ -104,8 +104,6 @@
           </exclusion>
         </exclusions>
       </dependency>
-      <!-- Fixes weird error. See
-           https://discuss.graphhopper.com/t/custommodelparser-error-when-parsing-priority-statement/7386/5 -->
       <dependency>
         <groupId>com.graphhopper</groupId>
         <artifactId>graphhopper-map-matching</artifactId>
