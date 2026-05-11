@@ -16,15 +16,12 @@ import nu.ndw.nls.routingmapmatcher.testutil.TestNetworkProvider;
 import org.assertj.core.data.Percentage;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.LineString;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 
-@ExtendWith(SpringExtension.class)
-@ContextConfiguration(classes = {TestConfig.class})
+@SpringJUnitConfig(classes = {TestConfig.class})
 class StartToEndMapMatcherIT {
 
     private static final int END_FRACTION_1 = 1;

@@ -38,17 +38,14 @@ import nu.ndw.nls.routingmapmatcher.network.model.LinkVehicleMapper;
 import nu.ndw.nls.routingmapmatcher.network.model.RoutingNetworkSettings;
 import nu.ndw.nls.springboot.test.logging.LoggerExtension;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.LineString;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 
-@ExtendWith(SpringExtension.class)
-@ContextConfiguration(classes = {TestConfig.class})
+@SpringJUnitConfig(classes = {TestConfig.class})
 class NetworkDecodingServiceIT {
 
     private static final String TEST_NETWORK = "test_network";
