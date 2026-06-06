@@ -29,7 +29,7 @@
   <properties>
     <java.version>21</java.version>
     <nls-springboot.test.version>10.0.2</nls-springboot.test.version>
-    <nls-geometry.version>6.0.2</nls-geometry.version>
+    <nls-geometry.version>6.0.3</nls-geometry.version>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <maven.javadoc.failOnError>false</maven.javadoc.failOnError>
     <graphhopper.version>11.0</graphhopper.version>
