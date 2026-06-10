@@ -27,14 +27,14 @@ class ExploreDistanceLimitTest {
 
     @Test
     void isInLimit() {
-        IsochroneLabel label = new IsochroneLabel(0, 5, 5, 0.0, 0L, LIMIT - 0.1, null);
+        IsochroneLabel label = new IsochroneLabel(0, 5, 5, null, 0L, LIMIT - 0.1, 0.0);
 
         assertThat(exploreDistanceLimit.isInLimit(label, encodingManager)).isTrue();
     }
 
     @Test
     void isInLimit_distanceToLarge() {
-        IsochroneLabel label = new IsochroneLabel(0, 5, 5, 0.0, 0L, LIMIT, null);
+        IsochroneLabel label = new IsochroneLabel(0, 5, 5, null, 0L, LIMIT, 0.0);
 
         assertThat(exploreDistanceLimit.isInLimit(label, encodingManager)).isFalse();
     }

@@ -274,7 +274,7 @@ class AbstractDijkstraIsochroneAlgorithmTest {
         protected IsochroneLabel createNewIsoLabel(
                 int node, int edge, int edgeKey, IsochroneLabel parent,
                 long time, double distance, double weight, EncodingManager em) {
-            return new IsochroneLabel(node, edge, edgeKey, weight, time, distance, parent);
+            return new IsochroneLabel(node, edge, edgeKey, parent, time, distance, weight);
         }
 
         @Override

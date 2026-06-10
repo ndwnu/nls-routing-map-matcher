@@ -15,13 +15,13 @@ public class IsochroneLabel {
 
     private final int edgeKey;
 
-    private final double weight;
+    private final IsochroneLabel parent;
 
     private final long time;
 
     private final double distance;
 
-    private final IsochroneLabel parent;
+    private final double weight;
 
     private boolean leafNode;
 
