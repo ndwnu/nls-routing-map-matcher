@@ -22,6 +22,10 @@ public abstract class AbstractDijkstraIsochroneAlgorithm<LABEL extends Isochrone
 
     private static final int INITIAL_CAPACITY = 1000;
 
+    public static final int INVALID_EDGE = -1;
+
+    public static final int INVALID_TRAVERSAL_ID = -1;
+
     private final EncodingManager encodingManager;
 
     private final IntObjectHashMap<LABEL> fromMap;
@@ -29,6 +33,8 @@ public abstract class AbstractDijkstraIsochroneAlgorithm<LABEL extends Isochrone
     private final PriorityQueue<LABEL> priorityQueue;
 
     private final boolean traversalInReverseFlow;
+
+    private final Comparator<LABEL> explorePriorityComparator;
 
     @Getter
     private int visitedNodes;
@@ -46,6 +52,7 @@ public abstract class AbstractDijkstraIsochroneAlgorithm<LABEL extends Isochrone
 
         super(graph, weighting, traversalMode);
 
+        this.explorePriorityComparator = explorePriorityComparator;
         priorityQueue = new PriorityQueue<>(INITIAL_CAPACITY, explorePriorityComparator);
         fromMap = new GHIntObjectHashMap<>(INITIAL_CAPACITY);
 
@@ -62,7 +69,7 @@ public abstract class AbstractDijkstraIsochroneAlgorithm<LABEL extends Isochrone
     @SuppressWarnings({"java:S3776", "java:S135"})
     public void search(int from, Consumer<LABEL> labelConsumer) {
         checkAlreadyRun();
-        LABEL fromLabel = createNewIsoLabel(from, -1, -1, null, 0, 0, 0, this.encodingManager);
+        LABEL fromLabel = createNewIsoLabel(from, INVALID_EDGE, INVALID_TRAVERSAL_ID, null, 0, 0, 0, this.encodingManager);
 
         priorityQueue.add(fromLabel);
         if (traversalMode == TraversalMode.NODE_BASED) {
@@ -95,16 +102,22 @@ public abstract class AbstractDijkstraIsochroneAlgorithm<LABEL extends Isochrone
                               + fromLabel.getTime();
                 int toNode = edgeIterator.getAdjNode();
                 int toEdge = edgeIterator.getEdge();
-                int toEdgeKey = traversalMode.createTraversalId(edgeIterator, traversalInReverseFlow);
+                int toEdgeKey = edgeIterator.getEdgeKey();
+                int toTraversalId = traversalMode.createTraversalId(edgeIterator, traversalInReverseFlow);
 
-                LABEL toLabel = fromMap.get(toEdgeKey);
+                LABEL toLabel = fromMap.get(toTraversalId);
                 if (toLabel == null) {
-                    toLabel = createNewIsoLabel(toNode, toEdge, toEdgeKey, fromLabel, toTime, toDistance, toWeight, this.encodingManager);
-                    fromMap.put(toEdgeKey, toLabel);
-                } else if (fromLabel.getWeight() > toLabel.getWeight()) {
-                    replaceOutweighedLabelWithNewLabel(toLabel, toNode, toEdge, toEdgeKey, fromLabel, toTime, toDistance, toWeight);
+                    toLabel = createNewIsoLabel(toNode, toEdge, toEdgeKey, fromLabel, toTime, toDistance, toWeight, encodingManager);
+                    fromMap.put(toTraversalId, toLabel);
                 } else {
-                    mergeEqualWeightedIsoLabels(toLabel, fromLabel);
+                    var newToLabel = createNewIsoLabel(toNode, toEdge, toEdgeKey, fromLabel, toTime, toDistance, toWeight, encodingManager);
+                    if (explorePriorityComparator.compare(toLabel, newToLabel) > 0) {
+                        toLabel.markAsDeleted();
+                        fromMap.put(toTraversalId, newToLabel);
+                        toLabel = newToLabel;
+                    } else {
+                        mergeEqualWeightedIsoLabels(toLabel, newToLabel);
+                    }
                 }
 
                 if (isInLimit(toLabel, this.encodingManager)) {
@@ -117,30 +130,6 @@ public abstract class AbstractDijkstraIsochroneAlgorithm<LABEL extends Isochrone
     }
 
     @SuppressWarnings("java:S107")
-    private void replaceOutweighedLabelWithNewLabel(
-            LABEL toLabel,
-            int toNode,
-            int toEdge,
-            int toEdgeKey,
-            LABEL fromLabel,
-            long toTime,
-            double toDistance,
-            double toWeight) {
-
-        toLabel.markAsDeleted();
-        LABEL replacementLabel = createNewIsoLabel(
-                toNode,
-                toEdge,
-                toEdgeKey,
-                fromLabel,
-                toTime,
-                toDistance,
-                toWeight,
-                this.encodingManager);
-        fromMap.put(toEdgeKey, replacementLabel);
-    }
-
-    @SuppressWarnings("java:S107")
     protected abstract LABEL createNewIsoLabel(
             int node,
             int edge,
@@ -149,13 +138,11 @@ public abstract class AbstractDijkstraIsochroneAlgorithm<LABEL extends Isochrone
             long time,
             double distance,
             double weight,
-            EncodingManager encodingManager
-    );
+            EncodingManager encodingManager);
 
     protected abstract void mergeEqualWeightedIsoLabels(LABEL target, LABEL source);
 
-    @SuppressWarnings("unchecked")
     protected boolean isInLimit(LABEL isoLabel, EncodingManager encodingManager) {
-        return exploreLimit.isInLimit((LABEL) isoLabel.getParent(), encodingManager);
+        return exploreLimit.isInLimit(isoLabel, encodingManager);
     }
 }
