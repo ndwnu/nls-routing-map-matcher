@@ -4,6 +4,7 @@ package nu.ndw.nls.routingmapmatcher.isochrone.algorithm;
 import com.graphhopper.routing.util.TraversalMode;
 import com.graphhopper.routing.weighting.Weighting;
 import com.graphhopper.storage.Graph;
+import nu.ndw.nls.routingmapmatcher.isochrone.v2.algorithm.AbstractDijkstraIsochroneAlgorithm;
 
 /**
  * This class is a fork of the com.graphhopper.isochrone.algorithm. ShortestPathTree class. The inclusion logic is
@@ -13,7 +14,10 @@ import com.graphhopper.storage.Graph;
  * current implementation in the graphhopper Library did not include those partial road-segments leading to unwanted
  * results for nls requirements. This class fixes this by replacing the original check for inclusion
  * getExploreValue(label) <= limit with (this.limit - getExploreValue(isoLabel.parent)) > 0.
+ * <br />
+ * Deprecated in favour of the {@link AbstractDijkstraIsochroneAlgorithm}
  */
+@Deprecated(forRemoval = true, since = "2026-06-10")
 public class IsochroneByTimeDistanceAndWeight extends AbstractShortestPathTree {
 
     enum ExploreType {TIME, DISTANCE, WEIGHT}

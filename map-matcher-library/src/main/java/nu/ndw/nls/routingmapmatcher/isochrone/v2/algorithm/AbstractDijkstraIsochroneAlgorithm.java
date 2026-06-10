@@ -140,6 +140,7 @@ public abstract class AbstractDijkstraIsochroneAlgorithm<LABEL extends Isochrone
         fromMap.put(toEdgeKey, replacementLabel);
     }
 
+    @SuppressWarnings("java:S107")
     protected abstract LABEL createNewIsoLabel(
             int node,
             int edge,
