@@ -25,10 +25,10 @@ class NoExploreLimitTest {
 
     @Test
     void isInLimit() {
-        IsochroneLabel label = new IsochroneLabel(0, -1, -1, Double.MIN_VALUE, Long.MIN_VALUE, Double.MIN_VALUE, null);
+        IsochroneLabel label = new IsochroneLabel(0, -1, -1, null, Long.MIN_VALUE, Double.MIN_VALUE, Double.MIN_VALUE);
         assertThat(noExploreLimit.isInLimit(label, encodingManager)).isTrue();
 
-        label = new IsochroneLabel(0, 5, 5, Double.MAX_VALUE, Long.MAX_VALUE, Double.MAX_VALUE, null);
+        label = new IsochroneLabel(0, -1, -1, null, Long.MAX_VALUE, Double.MAX_VALUE, Double.MAX_VALUE);
         assertThat(noExploreLimit.isInLimit(label, encodingManager)).isTrue();
     }
 }

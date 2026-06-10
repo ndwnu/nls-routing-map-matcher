@@ -27,14 +27,14 @@ class ExploreTimeLimitTest {
 
     @Test
     void isInLimit() {
-        IsochroneLabel label = new IsochroneLabel(0, 5, 5, 0.0, (long) (LIMIT - 0.1), 0.0, null);
+        IsochroneLabel label = new IsochroneLabel(0, 5, 5, null, (long) (LIMIT - 0.1), 0.0, 0.0);
 
         assertThat(exploreTimeLimit.isInLimit(label, encodingManager)).isTrue();
     }
 
     @Test
     void isInLimit_timeLimitExceeded() {
-        IsochroneLabel label = new IsochroneLabel(0, 5, 5, 0.0, (long) LIMIT, 0.0, null);
+        IsochroneLabel label = new IsochroneLabel(0, 5, 5, null, (long) LIMIT, 0.0, 0.0);
 
         assertThat(exploreTimeLimit.isInLimit(label, encodingManager)).isFalse();
     }

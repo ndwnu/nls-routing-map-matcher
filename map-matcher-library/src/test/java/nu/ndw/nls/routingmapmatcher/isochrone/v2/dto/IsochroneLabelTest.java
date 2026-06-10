@@ -10,21 +10,21 @@ class IsochroneLabelTest {
 
     @Test
     void isRoot_true() {
-        IsochroneLabel label = createLabel(0, ROOT_EDGE, null);
+        IsochroneLabel label = createLabel(ROOT_EDGE);
 
         assertThat(label.isRoot()).isTrue();
     }
 
     @Test
     void isRoot_false() {
-        IsochroneLabel label = createLabel(0, 5, null);
+        IsochroneLabel label = createLabel(5);
 
         assertThat(label.isRoot()).isFalse();
     }
 
     @Test
     void markAsLeafNode() {
-        IsochroneLabel label = createLabel(0, 5, null);
+        IsochroneLabel label = createLabel(5);
         assertThat(label.isLeafNode()).isFalse();
 
         label.markAsLeafNode();
@@ -34,7 +34,7 @@ class IsochroneLabelTest {
 
     @Test
     void markAsDeleted() {
-        IsochroneLabel label = createLabel(0, 5, null);
+        IsochroneLabel label = createLabel(5);
         assertThat(label.isDeleted()).isFalse();
 
         label.markAsDeleted();
@@ -42,7 +42,7 @@ class IsochroneLabelTest {
         assertThat(label.isDeleted()).isTrue();
     }
 
-    private IsochroneLabel createLabel(int node, int edge, IsochroneLabel parent) {
-        return new IsochroneLabel(node, edge, 0, 0.0, 0L, 0.0, parent);
+    private IsochroneLabel createLabel(int edge) {
+        return new IsochroneLabel(0, edge, 0, null, 0L, 0.0, 0.0);
     }
 }
