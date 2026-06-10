@@ -12,6 +12,7 @@ import nu.ndw.nls.routingmapmatcher.model.IsochroneUnit;
 
 @RequiredArgsConstructor
 @Getter
+@Deprecated(forRemoval = true, since = "2026-06-10")
 public class ShortestPathTreeFactory {
 
     private static final int MILLISECONDS = 1000;
