@@ -109,23 +109,27 @@ public abstract class AbstractDijkstraIsochroneAlgorithm<LABEL extends Isochrone
                 if (toLabel == null) {
                     toLabel = createNewIsoLabel(toNode, toEdge, toEdgeKey, fromLabel, toTime, toDistance, toWeight, encodingManager);
                     fromMap.put(toTraversalId, toLabel);
+                    handleLimits(toLabel);
                 } else {
                     var newToLabel = createNewIsoLabel(toNode, toEdge, toEdgeKey, fromLabel, toTime, toDistance, toWeight, encodingManager);
                     if (explorePriorityComparator.compare(toLabel, newToLabel) > 0) {
                         toLabel.markAsDeleted();
                         fromMap.put(toTraversalId, newToLabel);
                         toLabel = newToLabel;
+                        handleLimits(toLabel);
                     } else {
                         mergeEqualWeightedIsoLabels(toLabel, newToLabel);
                     }
                 }
-
-                if (isInLimit(toLabel, this.encodingManager)) {
-                    priorityQueue.add(toLabel);
-                } else {
-                    toLabel.getParent().markAsLeafNode();
-                }
             }
+        }
+    }
+
+    private void handleLimits(LABEL toLabel) {
+        if (isInLimit(toLabel, this.encodingManager)) {
+            priorityQueue.add(toLabel);
+        } else {
+            toLabel.getParent().markAsLeafNode();
         }
     }
 

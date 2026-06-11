@@ -23,6 +23,10 @@ public class IsochroneLabel {
 
     private final double weight;
 
+    /**
+     * Marks this label in the context of an isochrone as a path that has ended. Where it has
+     * at least one outgoing path that is not traversable.
+     */
     private boolean leafNode;
 
     private boolean deleted;
