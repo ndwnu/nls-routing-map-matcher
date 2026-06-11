@@ -66,7 +66,7 @@ public abstract class AbstractDijkstraIsochroneAlgorithm<LABEL extends Isochrone
         throw new IllegalStateException("call search instead");
     }
 
-    @SuppressWarnings({"java:S3776", "java:S135"})
+    @SuppressWarnings({"java:S3776", "java:S135", "java:S134"})
     public void search(int from, Consumer<LABEL> labelConsumer) {
         checkAlreadyRun();
         LABEL fromLabel = createNewIsoLabel(from, INVALID_EDGE, INVALID_TRAVERSAL_ID, null, 0, 0, 0, this.encodingManager);
