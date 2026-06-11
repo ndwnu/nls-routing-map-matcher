@@ -22,9 +22,9 @@ public abstract class AbstractDijkstraIsochroneAlgorithm<LABEL extends Isochrone
 
     private static final int INITIAL_CAPACITY = 1000;
 
-    public static final int INVALID_EDGE = -1;
+    private static final int INVALID_EDGE = -1;
 
-    public static final int INVALID_TRAVERSAL_ID = -1;
+    private static final int INVALID_TRAVERSAL_ID = -1;
 
     private final EncodingManager encodingManager;
 
