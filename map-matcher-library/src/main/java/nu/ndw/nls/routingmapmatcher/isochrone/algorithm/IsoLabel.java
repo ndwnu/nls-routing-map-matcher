@@ -5,6 +5,7 @@ import lombok.Setter;
 
 @Getter
 @Setter
+@Deprecated(forRemoval = true, since = "2026-06-10")
 public class IsoLabel {
 
     private static final int ROOT_ID = -1;

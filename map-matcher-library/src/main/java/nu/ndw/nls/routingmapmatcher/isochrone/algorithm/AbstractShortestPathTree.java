@@ -14,12 +14,16 @@ import com.graphhopper.util.EdgeIterator;
 import com.graphhopper.util.GHUtility;
 import java.util.PriorityQueue;
 import java.util.function.Consumer;
+import nu.ndw.nls.routingmapmatcher.isochrone.v2.algorithm.AbstractDijkstraIsochroneAlgorithm;
 
 /**
  * This class is a fork of the com.graphhopper.isochrone.algorithm. ShortestPathTree class. The inclusion logic is moved
  * to an abstract template method to allow more limiting conditions in subclasses and still reusing the tree traversal
  * algorithm.
+ * <br />
+ * Deprecated in favour of the {@link AbstractDijkstraIsochroneAlgorithm}
  */
+@Deprecated(forRemoval = true, since = "2026-06-10")
 public abstract class AbstractShortestPathTree extends AbstractRoutingAlgorithm {
 
     private static final int INITIAL_CAPACITY = 1000;
