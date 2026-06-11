@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 Here we write upgrade notes. It's a team effort to make them as straightforward as possible.
 
+## [21.1.0] - 2026-06-10
+ - Added [AbstractDijkstraIsochroneAlgorithm.java](map-matcher-library/src/main/java/nu/ndw/nls/routingmapmatcher/isochrone/v2/algorithm/AbstractDijkstraIsochroneAlgorithm.java) to replace [AbstractShortestPathTree.java](map-matcher-library/src/main/java/nu/ndw/nls/routingmapmatcher/isochrone/algorithm/AbstractShortestPathTree.java) and [IsochroneByTimeDistanceAndWeight.java](map-matcher-library/src/main/java/nu/ndw/nls/routingmapmatcher/isochrone/algorithm/IsochroneByTimeDistanceAndWeight.java)
 ## [21.0.0] - 2026-05-08
 
 Spring boot 4 upgrade
