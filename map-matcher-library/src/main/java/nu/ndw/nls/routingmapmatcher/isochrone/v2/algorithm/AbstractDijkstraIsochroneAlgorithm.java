@@ -11,6 +11,7 @@ import com.graphhopper.storage.Graph;
 import com.graphhopper.util.EdgeIterator;
 import com.graphhopper.util.GHUtility;
 import java.util.Comparator;
+import java.util.Locale;
 import java.util.Objects;
 import java.util.PriorityQueue;
 import java.util.function.Consumer;
@@ -154,6 +155,7 @@ public abstract class AbstractDijkstraIsochroneAlgorithm<LABEL extends Isochrone
                                 : "");
             } else {
                 String message = String.format(
+                        Locale.ROOT,
                         "Node %-7d EdgeKey: %-7d Distance: %-10.2f Time: %-8d Weight: %-10.2f Path: %s%s",
                         isochroneLabel.getNode(),
                         isochroneLabel.getEdgeKey(),
