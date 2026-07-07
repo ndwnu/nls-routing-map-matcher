@@ -26,6 +26,14 @@ class ExploreDistanceLimitTest {
     }
 
     @Test
+    void constructor() {
+        exploreDistanceLimit = new ExploreDistanceLimit<>(LIMIT, true);
+
+        assertThat(exploreDistanceLimit.isApplyLimitToParent()).isTrue();
+        assertThat(exploreDistanceLimit.getLimit()).isEqualTo(LIMIT);
+    }
+
+    @Test
     void isInLimit() {
         IsochroneLabel label = new IsochroneLabel(0, 5, 5, null, 0L, LIMIT - 0.1, 0.0);
 
@@ -37,5 +45,12 @@ class ExploreDistanceLimitTest {
         IsochroneLabel label = new IsochroneLabel(0, 5, 5, null, 0L, LIMIT, 0.0);
 
         assertThat(exploreDistanceLimit.isInLimit(label, encodingManager)).isFalse();
+    }
+
+    @Test
+    void debug() {
+        IsochroneLabel label = new IsochroneLabel(0, 5, 5, null, 0L, LIMIT - 0.1, 0.0);
+
+        assertThat(exploreDistanceLimit.debug(label, encodingManager)).isEqualTo("ExploreDistanceLimit{limit=500.0, distance=499.9, reached=false}");
     }
 }
