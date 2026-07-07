@@ -24,11 +24,24 @@ class NoExploreLimitTest {
     }
 
     @Test
+    void constructor() {
+
+        assertThat(noExploreLimit.isApplyLimitToParent()).isFalse();
+    }
+
+    @Test
     void isInLimit() {
         IsochroneLabel label = new IsochroneLabel(0, -1, -1, null, Long.MIN_VALUE, Double.MIN_VALUE, Double.MIN_VALUE);
         assertThat(noExploreLimit.isInLimit(label, encodingManager)).isTrue();
 
         label = new IsochroneLabel(0, -1, -1, null, Long.MAX_VALUE, Double.MAX_VALUE, Double.MAX_VALUE);
         assertThat(noExploreLimit.isInLimit(label, encodingManager)).isTrue();
+    }
+
+    @Test
+    void debug() {
+        IsochroneLabel label = new IsochroneLabel(0, -1, -1, null, Long.MIN_VALUE, Double.MIN_VALUE, Double.MIN_VALUE);
+
+        assertThat(noExploreLimit.debug(label, encodingManager)).isEqualTo("NoExploreLimit{reached=false}");
     }
 }
