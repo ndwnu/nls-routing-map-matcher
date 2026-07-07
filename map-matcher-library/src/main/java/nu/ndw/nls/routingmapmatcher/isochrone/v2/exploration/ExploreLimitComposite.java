@@ -3,6 +3,7 @@ package nu.ndw.nls.routingmapmatcher.isochrone.v2.exploration;
 import com.graphhopper.routing.util.EncodingManager;
 import java.util.List;
 import java.util.stream.Collectors;
+import lombok.Getter;
 import nu.ndw.nls.routingmapmatcher.isochrone.v2.dto.IsochroneLabel;
 
 public class ExploreLimitComposite<LABEL extends IsochroneLabel> extends ExploreLimit<LABEL> {
@@ -13,6 +14,7 @@ public class ExploreLimitComposite<LABEL extends IsochroneLabel> extends Explore
 
     public static final int ACCESSIBLE = 0;
 
+    @Getter
     private final List<ExploreLimit<LABEL>> exploreLimits;
 
     @SafeVarargs
