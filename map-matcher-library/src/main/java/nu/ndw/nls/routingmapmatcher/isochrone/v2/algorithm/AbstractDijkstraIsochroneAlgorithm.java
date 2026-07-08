@@ -11,13 +11,17 @@ import com.graphhopper.storage.Graph;
 import com.graphhopper.util.EdgeIterator;
 import com.graphhopper.util.GHUtility;
 import java.util.Comparator;
+import java.util.Locale;
+import java.util.Objects;
 import java.util.PriorityQueue;
 import java.util.function.Consumer;
 import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
 import nu.ndw.nls.routingmapmatcher.isochrone.v2.dto.IsochroneLabel;
 import nu.ndw.nls.routingmapmatcher.isochrone.v2.exploration.ExploreLimit;
 
 @SuppressWarnings("java:S119")
+@Slf4j
 public abstract class AbstractDijkstraIsochroneAlgorithm<LABEL extends IsochroneLabel> extends AbstractRoutingAlgorithm {
 
     private static final int INITIAL_CAPACITY = 1000;
@@ -80,6 +84,7 @@ public abstract class AbstractDijkstraIsochroneAlgorithm<LABEL extends Isochrone
             if (fromLabel.isDeleted()) {
                 continue;
             }
+            logRoute(fromLabel, false);
             labelConsumer.accept(fromLabel);
             fromLabel.markAsDeleted();
             visitedNodes++;
@@ -94,6 +99,7 @@ public abstract class AbstractDijkstraIsochroneAlgorithm<LABEL extends Isochrone
                 double toWeight = GHUtility.calcWeightWithTurnWeight(weighting, edgeIterator, traversalInReverseFlow, fromLabel.getEdge())
                                   + fromLabel.getWeight();
                 if (Double.isInfinite(toWeight)) {
+                    logRoute(fromLabel, true);
                     continue;
                 }
 
@@ -128,8 +134,42 @@ public abstract class AbstractDijkstraIsochroneAlgorithm<LABEL extends Isochrone
     private void handleLimits(LABEL toLabel) {
         if (isInLimit(toLabel, this.encodingManager)) {
             priorityQueue.add(toLabel);
+            if (log.isDebugEnabled()) {
+                log.debug("Adding new label: {}. {}", toLabel.drawPath(), toLabel);
+            }
         } else {
             toLabel.getParent().markAsLeafNode();
+            logRoute(toLabel, true);
+        }
+    }
+
+    protected void logRoute(LABEL isochroneLabel, boolean limitReached) {
+        if (log.isDebugEnabled()) {
+            if (Objects.isNull(isochroneLabel.getParent())) {
+                log.debug(
+                        "Root node: {}{}",
+                        isochroneLabel.getNode(),
+                        limitReached
+                                ? ". LimitReached (not travelled), %s".formatted(
+                                this.exploreLimit.debug(isochroneLabel, this.encodingManager))
+                                : "");
+            } else {
+                String message = String.format(
+                        Locale.ROOT,
+                        "Node %-7d EdgeKey: %-7d Distance: %-10.2f Time: %-8d Weight: %-10.2f Path: %s%s",
+                        isochroneLabel.getNode(),
+                        isochroneLabel.getEdgeKey(),
+                        isochroneLabel.getDistance(),
+                        isochroneLabel.getTime(),
+                        isochroneLabel.getWeight(),
+                        isochroneLabel.drawPath(),
+                        limitReached
+                                ? ", LimitReached (not travelled), %s".formatted(
+                                this.exploreLimit.debug(isochroneLabel, this.encodingManager))
+                                : ""
+                );
+                log.debug(message);
+            }
         }
     }
 

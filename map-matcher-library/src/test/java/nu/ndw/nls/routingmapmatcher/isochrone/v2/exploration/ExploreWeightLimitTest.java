@@ -26,6 +26,14 @@ class ExploreWeightLimitTest {
     }
 
     @Test
+    void constructor() {
+        exploreWeightLimit = new ExploreWeightLimit<>(LIMIT, true);
+
+        assertThat(exploreWeightLimit.isApplyLimitToParent()).isTrue();
+        assertThat(exploreWeightLimit.getLimit()).isEqualTo(LIMIT);
+    }
+
+    @Test
     void isInLimit() {
         IsochroneLabel label = new IsochroneLabel(0, 5, 5, null, 0L, 0.0, LIMIT - 0.1);
 
@@ -37,5 +45,12 @@ class ExploreWeightLimitTest {
         IsochroneLabel label = new IsochroneLabel(0, 5, 5, null, 0L, 0.0, LIMIT);
 
         assertThat(exploreWeightLimit.isInLimit(label, encodingManager)).isFalse();
+    }
+
+    @Test
+    void debug() {
+        IsochroneLabel label = new IsochroneLabel(0, 5, 5, null, 0L, 0.0, LIMIT - 0.1);
+
+        assertThat(exploreWeightLimit.debug(label, encodingManager)).isEqualTo("ExploreWeightLimit{limit=100.0, weight=99.9, reached=false}");
     }
 }
