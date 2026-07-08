@@ -7,6 +7,8 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import ch.qos.logback.classic.Level;
+import ch.qos.logback.classic.Logger;
 import com.graphhopper.routing.util.EncodingManager;
 import com.graphhopper.routing.util.TraversalMode;
 import com.graphhopper.routing.weighting.Weighting;
@@ -20,16 +22,22 @@ import java.util.List;
 import lombok.Getter;
 import nu.ndw.nls.routingmapmatcher.isochrone.v2.dto.IsochroneLabel;
 import nu.ndw.nls.routingmapmatcher.isochrone.v2.exploration.ExploreLimit;
+import nu.ndw.nls.springboot.test.logging.LoggerExtension;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.slf4j.LoggerFactory;
 
 @ExtendWith(MockitoExtension.class)
 class AbstractDijkstraIsochroneAlgorithmTest {
+
+    private static final Logger LOGGER = (Logger) LoggerFactory.getLogger(
+            "nu.ndw.nls.routingmapmatcher.isochrone.v2.algorithm.AbstractDijkstraIsochroneAlgorithm");
 
     @Mock
     private Graph graph;
@@ -52,8 +60,13 @@ class AbstractDijkstraIsochroneAlgorithmTest {
     @Mock
     private ExploreLimit<IsochroneLabel> exploreLimit;
 
+    @RegisterExtension
+    LoggerExtension loggerExtension = new LoggerExtension();
+
     @BeforeEach
     void setUp() {
+        LOGGER.setLevel(Level.DEBUG);
+
         when(graph.getNodeAccess()).thenReturn(nodeAccess);
         when(graph.createEdgeExplorer()).thenReturn(edgeExplorer);
         when(weighting.hasTurnCosts()).thenReturn(false);
@@ -89,6 +102,8 @@ class AbstractDijkstraIsochroneAlgorithmTest {
 
         assertThat(algorithm.getVisitedNodes()).isEqualTo(1);
         assertThat(algorithm.getMerges()).isEmpty();
+
+        loggerExtension.containsLog(Level.DEBUG, "Root node: 1");
     }
 
     @ParameterizedTest
@@ -120,11 +135,21 @@ class AbstractDijkstraIsochroneAlgorithmTest {
         assertThat(adjacentNode.getWeight()).isEqualTo(10.0);
         assertThat(adjacentNode.getDistance()).isEqualTo(100.0);
         assertThat(adjacentNode.getTime()).isEqualTo(3600L);
-        assertThat(adjacentNode.getParent()).isSameAs(rootNode);
+
+        IsochroneLabel adjacentNodeParent = adjacentNode.getParent();
+        assertThat(adjacentNodeParent).isSameAs(rootNode);
         assertThat(adjacentNode.isLeafNode()).isFalse();
 
         assertThat(algorithm.getVisitedNodes()).isEqualTo(2);
         assertThat(algorithm.getMerges()).isEmpty();
+
+        loggerExtension.containsLog(Level.DEBUG, "Root node: 1");
+        loggerExtension.containsLog(
+                Level.DEBUG,
+                "Adding new label: 1(-1) -> 2(0). IsochroneLabel(node=2, edge=10, edgeKey=0, time=3600, distance=100.0, weight=10.0, leafNode=false, deleted=true)");
+        loggerExtension.containsLog(
+                Level.DEBUG,
+                "Node 2       EdgeKey: 0       Distance: 100.00     Time: 3600     Weight: 10.00      Path: 1(-1) -> 2(0)");
     }
 
     @ParameterizedTest
@@ -138,6 +163,7 @@ class AbstractDijkstraIsochroneAlgorithmTest {
         when(weighting.calcEdgeWeight(edgeIterator, false)).thenReturn(10.0);
         when(weighting.calcEdgeMillis(edgeIterator, false)).thenReturn(3600L);
         when(exploreLimit.isInLimit(any(IsochroneLabel.class), eq(encodingManager))).thenReturn(false);
+        when(exploreLimit.debug(any(IsochroneLabel.class), eq(encodingManager))).thenReturn("ExploreLimit");
 
         List<IsochroneLabel> visited = new ArrayList<>();
         TestAlgorithm algorithm = createAlgorithm(traversalMode);
@@ -151,11 +177,69 @@ class AbstractDijkstraIsochroneAlgorithmTest {
 
         assertThat(algorithm.getVisitedNodes()).isEqualTo(1);
         assertThat(algorithm.getMerges()).isEmpty();
+
+        loggerExtension.containsLog(Level.DEBUG, "Root node: 1");
+        loggerExtension.containsLog(
+                Level.DEBUG,
+                "Node 2       EdgeKey: 0       Distance: 100.00     Time: 3600     Weight: 10.00      Path: 1(-1) -> 2(0), LimitReached (not travelled), ExploreLimit");
     }
 
     @ParameterizedTest
     @EnumSource(TraversalMode.class)
     void search_stopIfEncounteredEdgeWithInfiniteWeight(TraversalMode traversalMode) {
+        EdgeIterator emptyIterator = mock(EdgeIterator.class);
+        when(edgeExplorer.setBaseNode(1)).thenReturn(edgeIterator);
+        when(edgeExplorer.setBaseNode(2)).thenReturn(emptyIterator);
+        when(edgeIterator.next()).thenReturn(true, true, false);
+        when(edgeIterator.getEdge()).thenReturn(10, 20);
+        when(edgeIterator.getAdjNode()).thenReturn(2);
+        when(edgeIterator.getDistance()).thenReturn(100.0);
+        when(weighting.calcEdgeWeight(edgeIterator, false)).thenReturn(Double.POSITIVE_INFINITY, 20.0);
+        when(weighting.calcEdgeMillis(edgeIterator, false)).thenReturn(3600L);
+        when(emptyIterator.next()).thenReturn(false);
+        when(exploreLimit.isInLimit(any(IsochroneLabel.class), eq(encodingManager))).thenReturn(true);
+        when(exploreLimit.debug(any(IsochroneLabel.class), eq(encodingManager))).thenReturn("ExploreLimit");
+
+        List<IsochroneLabel> visited = new ArrayList<>();
+        TestAlgorithm algorithm = createAlgorithm(traversalMode);
+        algorithm.search(1, visited::add);
+
+        assertThat(visited).hasSize(2);
+        IsochroneLabel rootNode = visited.getFirst();
+        assertThat(rootNode.getNode()).isEqualTo(1);
+        assertThat(rootNode.isLeafNode()).isFalse();
+
+        IsochroneLabel adjacentNode = visited.get(1);
+        assertThat(adjacentNode.getNode()).isEqualTo(2);
+        assertThat(adjacentNode.getWeight()).isEqualTo(20.0);
+        assertThat(adjacentNode.getDistance()).isEqualTo(100.0);
+        assertThat(adjacentNode.getTime()).isEqualTo(3600L);
+
+        IsochroneLabel adjacentNodeParent = adjacentNode.getParent();
+        assertThat(adjacentNodeParent).isSameAs(rootNode);
+        assertThat(adjacentNode.isLeafNode()).isFalse();
+
+        assertThat(algorithm.getVisitedNodes()).isEqualTo(2);
+        assertThat(algorithm.getMerges()).isEmpty();
+
+        loggerExtension.containsLog(Level.DEBUG, "Root node: 1");
+        loggerExtension.containsLog(Level.DEBUG, "Root node: 1. LimitReached (not travelled), ExploreLimit");
+        loggerExtension.containsLog(
+                Level.DEBUG,
+                "Adding new label: 1(-1) -> 2(0). IsochroneLabel(node=2, edge=%s, edgeKey=0, time=3600, distance=100.0, weight=20.0, leafNode=false, deleted=true)"
+                        .formatted(traversalMode == TraversalMode.NODE_BASED ? 20 : 10
+                        ));
+        loggerExtension.containsLog(
+                Level.DEBUG,
+                "Node 2       EdgeKey: 0       Distance: 100.00     Time: 3600     Weight: 20.00      Path: 1(-1) -> 2(0)");
+    }
+
+
+    @ParameterizedTest
+    @EnumSource(TraversalMode.class)
+    void search_stopIfEncounteredEdgeWithInfiniteWeight_debugModeOff(TraversalMode traversalMode) {
+        LOGGER.setLevel(Level.INFO);
+
         EdgeIterator emptyIterator = mock(EdgeIterator.class);
         when(edgeExplorer.setBaseNode(1)).thenReturn(edgeIterator);
         when(edgeExplorer.setBaseNode(2)).thenReturn(emptyIterator);
@@ -182,11 +266,15 @@ class AbstractDijkstraIsochroneAlgorithmTest {
         assertThat(adjacentNode.getWeight()).isEqualTo(20.0);
         assertThat(adjacentNode.getDistance()).isEqualTo(100.0);
         assertThat(adjacentNode.getTime()).isEqualTo(3600L);
-        assertThat(adjacentNode.getParent()).isSameAs(rootNode);
+
+        IsochroneLabel adjacentNodeParent = adjacentNode.getParent();
+        assertThat(adjacentNodeParent).isSameAs(rootNode);
         assertThat(adjacentNode.isLeafNode()).isFalse();
 
         assertThat(algorithm.getVisitedNodes()).isEqualTo(2);
         assertThat(algorithm.getMerges()).isEmpty();
+
+        loggerExtension.isEmpty();
     }
 
     @Test
@@ -238,10 +326,29 @@ class AbstractDijkstraIsochroneAlgorithmTest {
         assertThat(node3Label.getWeight()).isEqualTo(8.0);
         assertThat(node3Label.getDistance()).isEqualTo(80.0);
         assertThat(node3Label.getTime()).isEqualTo(800L);
-        assertThat(node3Label.getParent()).isSameAs(visited.get(1));
+
+        IsochroneLabel node3LabelParent = node3Label.getParent();
+        assertThat(node3LabelParent).isSameAs(visited.get(1));
         assertThat(algorithm.getVisitedNodes()).isEqualTo(3);
 
         assertThat(algorithm.getMerges()).isEmpty();
+
+        loggerExtension.containsLog(Level.DEBUG, "Root node: 1");
+        loggerExtension.containsLog(
+                Level.DEBUG,
+                "Adding new label: 1(-1) -> 3(0). IsochroneLabel(node=3, edge=10, edgeKey=0, time=2000, distance=200.0, weight=20.0, leafNode=false, deleted=true)");
+        loggerExtension.containsLog(
+                Level.DEBUG,
+                "Adding new label: 1(-1) -> 2(0). IsochroneLabel(node=2, edge=11, edgeKey=0, time=500, distance=50.0, weight=5.0, leafNode=false, deleted=true)");
+        loggerExtension.containsLog(
+                Level.DEBUG,
+                "Node 2       EdgeKey: 0       Distance: 50.00      Time: 500      Weight: 5.00       Path: 1(-1) -> 2(0)");
+        loggerExtension.containsLog(
+                Level.DEBUG,
+                "Adding new label: 1(-1) -> 2(0) -> 3(0). IsochroneLabel(node=3, edge=12, edgeKey=0, time=800, distance=80.0, weight=8.0, leafNode=false, deleted=true)");
+        loggerExtension.containsLog(
+                Level.DEBUG,
+                "Node 3       EdgeKey: 0       Distance: 80.00      Time: 800      Weight: 8.00       Path: 1(-1) -> 2(0) -> 3(0)");
     }
 
     @ParameterizedTest
@@ -277,6 +384,14 @@ class AbstractDijkstraIsochroneAlgorithmTest {
         assertThat(visited.get(0).getNode()).isEqualTo(1);
         assertThat(visited.get(1).getNode()).isEqualTo(2);
         assertThat(visited.get(1).getWeight()).isEqualTo(10);
+
+        loggerExtension.containsLog(Level.DEBUG, "Root node: 1");
+        loggerExtension.containsLog(
+                Level.DEBUG,
+                "Adding new label: 1(-1) -> 2(0). IsochroneLabel(node=2, edge=10, edgeKey=0, time=1000, distance=100.0, weight=10.0, leafNode=false, deleted=true)");
+        loggerExtension.containsLog(
+                Level.DEBUG,
+                "Node 2       EdgeKey: 0       Distance: 100.00     Time: 1000     Weight: 10.00      Path: 1(-1) -> 2(0)");
     }
 
     private TestAlgorithm createAlgorithm(TraversalMode traversalMode) {
