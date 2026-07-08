@@ -25,9 +25,7 @@ public abstract class ExploreLimit<LABEL extends IsochroneLabel> {
             return true;
         }
 
-        return (this.limit - getValueForLabel(
-                getLabelToUse(isochroneLabel),
-                encodingManager)) > 0;
+        return (this.limit - getValueForLabel(getLabelToUse(isochroneLabel), encodingManager)) > 0;
     }
 
     protected abstract double getValueForLabel(LABEL isochroneLabel, EncodingManager encodingManager);
