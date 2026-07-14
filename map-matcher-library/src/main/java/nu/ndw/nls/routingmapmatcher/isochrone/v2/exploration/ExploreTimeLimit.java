@@ -18,7 +18,7 @@ public class ExploreTimeLimit<LABEL extends IsochroneLabel> extends ExploreLimit
 
     @Override
     public double getValueForLabel(LABEL isochroneLabel, EncodingManager encodingManager) {
-        return isochroneLabel.getTime();
+        return isochroneLabel.getTimeInMilliSeconds();
     }
 
     @Override
