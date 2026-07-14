@@ -146,7 +146,7 @@ class AbstractDijkstraIsochroneAlgorithmTest {
         loggerExtension.containsLog(Level.DEBUG, "Root node: 1");
         loggerExtension.containsLog(
                 Level.DEBUG,
-                "Adding new label: 1(-1) -> 2(0). IsochroneLabel(node=2, edge=10, edgeKey=0, time=3600, distance=100.0, weight=10.0, leafNode=false, deleted=true)");
+                "Adding new label: 1(-1) -> 2(0). IsochroneLabel(node=2, edge=10, edgeKey=0, timeInMilliSeconds=3600, distanceInMeters=100.0, weight=10.0, leafNode=false, deleted=true)");
         loggerExtension.containsLog(
                 Level.DEBUG,
                 "Node 2       EdgeKey: 0       Distance: 100.00     Time: 3600     Weight: 10.00      Path: 1(-1) -> 2(0)");
@@ -226,7 +226,7 @@ class AbstractDijkstraIsochroneAlgorithmTest {
         loggerExtension.containsLog(Level.DEBUG, "Root node: 1. LimitReached (not travelled), ExploreLimit");
         loggerExtension.containsLog(
                 Level.DEBUG,
-                "Adding new label: 1(-1) -> 2(0). IsochroneLabel(node=2, edge=%s, edgeKey=0, time=3600, distance=100.0, weight=20.0, leafNode=false, deleted=true)"
+                "Adding new label: 1(-1) -> 2(0). IsochroneLabel(node=2, edge=%s, edgeKey=0, timeInMilliSeconds=3600, distanceInMeters=100.0, weight=20.0, leafNode=false, deleted=true)"
                         .formatted(traversalMode == TraversalMode.NODE_BASED ? 20 : 10
                         ));
         loggerExtension.containsLog(
@@ -336,16 +336,16 @@ class AbstractDijkstraIsochroneAlgorithmTest {
         loggerExtension.containsLog(Level.DEBUG, "Root node: 1");
         loggerExtension.containsLog(
                 Level.DEBUG,
-                "Adding new label: 1(-1) -> 3(0). IsochroneLabel(node=3, edge=10, edgeKey=0, time=2000, distance=200.0, weight=20.0, leafNode=false, deleted=true)");
+                "Adding new label: 1(-1) -> 3(0). IsochroneLabel(node=3, edge=10, edgeKey=0, timeInMilliSeconds=2000, distanceInMeters=200.0, weight=20.0, leafNode=false, deleted=true)");
         loggerExtension.containsLog(
                 Level.DEBUG,
-                "Adding new label: 1(-1) -> 2(0). IsochroneLabel(node=2, edge=11, edgeKey=0, time=500, distance=50.0, weight=5.0, leafNode=false, deleted=true)");
+                "Adding new label: 1(-1) -> 2(0). IsochroneLabel(node=2, edge=11, edgeKey=0, timeInMilliSeconds=500, distanceInMeters=50.0, weight=5.0, leafNode=false, deleted=true)");
         loggerExtension.containsLog(
                 Level.DEBUG,
                 "Node 2       EdgeKey: 0       Distance: 50.00      Time: 500      Weight: 5.00       Path: 1(-1) -> 2(0)");
         loggerExtension.containsLog(
                 Level.DEBUG,
-                "Adding new label: 1(-1) -> 2(0) -> 3(0). IsochroneLabel(node=3, edge=12, edgeKey=0, time=800, distance=80.0, weight=8.0, leafNode=false, deleted=true)");
+                "Adding new label: 1(-1) -> 2(0) -> 3(0). IsochroneLabel(node=3, edge=12, edgeKey=0, timeInMilliSeconds=800, distanceInMeters=80.0, weight=8.0, leafNode=false, deleted=true)");
         loggerExtension.containsLog(
                 Level.DEBUG,
                 "Node 3       EdgeKey: 0       Distance: 80.00      Time: 800      Weight: 8.00       Path: 1(-1) -> 2(0) -> 3(0)");
@@ -388,7 +388,7 @@ class AbstractDijkstraIsochroneAlgorithmTest {
         loggerExtension.containsLog(Level.DEBUG, "Root node: 1");
         loggerExtension.containsLog(
                 Level.DEBUG,
-                "Adding new label: 1(-1) -> 2(0). IsochroneLabel(node=2, edge=10, edgeKey=0, time=1000, distance=100.0, weight=10.0, leafNode=false, deleted=true)");
+                "Adding new label: 1(-1) -> 2(0). IsochroneLabel(node=2, edge=10, edgeKey=0, timeInMilliSeconds=1000, distanceInMeters=100.0, weight=10.0, leafNode=false, deleted=true)");
         loggerExtension.containsLog(
                 Level.DEBUG,
                 "Node 2       EdgeKey: 0       Distance: 100.00     Time: 1000     Weight: 10.00      Path: 1(-1) -> 2(0)");
