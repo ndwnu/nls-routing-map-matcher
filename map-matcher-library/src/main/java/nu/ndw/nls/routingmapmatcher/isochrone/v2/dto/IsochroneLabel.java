@@ -23,10 +23,10 @@ public class IsochroneLabel {
     private final IsochroneLabel parent;
 
     @Getter
-    private final long time;
+    private final long timeInMilliSeconds;
 
     @Getter
-    private final double distance;
+    private final double distanceInMeters;
 
     @Getter
     private final double weight;

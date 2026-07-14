@@ -97,8 +97,8 @@ class AbstractDijkstraIsochroneAlgorithmTest {
         assertThat(root.getNode()).isEqualTo(1);
         assertThat(root.isRoot()).isTrue();
         assertThat(root.getWeight()).isEqualTo(0.0);
-        assertThat(root.getTime()).isZero();
-        assertThat(root.getDistance()).isEqualTo(0.0);
+        assertThat(root.getTimeInMilliSeconds()).isZero();
+        assertThat(root.getDistanceInMeters()).isEqualTo(0.0);
 
         assertThat(algorithm.getVisitedNodes()).isEqualTo(1);
         assertThat(algorithm.getMerges()).isEmpty();
@@ -133,8 +133,8 @@ class AbstractDijkstraIsochroneAlgorithmTest {
         IsochroneLabel adjacentNode = visited.get(1);
         assertThat(adjacentNode.getNode()).isEqualTo(2);
         assertThat(adjacentNode.getWeight()).isEqualTo(10.0);
-        assertThat(adjacentNode.getDistance()).isEqualTo(100.0);
-        assertThat(adjacentNode.getTime()).isEqualTo(3600L);
+        assertThat(adjacentNode.getDistanceInMeters()).isEqualTo(100.0);
+        assertThat(adjacentNode.getTimeInMilliSeconds()).isEqualTo(3600L);
 
         IsochroneLabel adjacentNodeParent = adjacentNode.getParent();
         assertThat(adjacentNodeParent).isSameAs(rootNode);
@@ -212,8 +212,8 @@ class AbstractDijkstraIsochroneAlgorithmTest {
         IsochroneLabel adjacentNode = visited.get(1);
         assertThat(adjacentNode.getNode()).isEqualTo(2);
         assertThat(adjacentNode.getWeight()).isEqualTo(20.0);
-        assertThat(adjacentNode.getDistance()).isEqualTo(100.0);
-        assertThat(adjacentNode.getTime()).isEqualTo(3600L);
+        assertThat(adjacentNode.getDistanceInMeters()).isEqualTo(100.0);
+        assertThat(adjacentNode.getTimeInMilliSeconds()).isEqualTo(3600L);
 
         IsochroneLabel adjacentNodeParent = adjacentNode.getParent();
         assertThat(adjacentNodeParent).isSameAs(rootNode);
@@ -264,8 +264,8 @@ class AbstractDijkstraIsochroneAlgorithmTest {
         IsochroneLabel adjacentNode = visited.get(1);
         assertThat(adjacentNode.getNode()).isEqualTo(2);
         assertThat(adjacentNode.getWeight()).isEqualTo(20.0);
-        assertThat(adjacentNode.getDistance()).isEqualTo(100.0);
-        assertThat(adjacentNode.getTime()).isEqualTo(3600L);
+        assertThat(adjacentNode.getDistanceInMeters()).isEqualTo(100.0);
+        assertThat(adjacentNode.getTimeInMilliSeconds()).isEqualTo(3600L);
 
         IsochroneLabel adjacentNodeParent = adjacentNode.getParent();
         assertThat(adjacentNodeParent).isSameAs(rootNode);
@@ -324,8 +324,8 @@ class AbstractDijkstraIsochroneAlgorithmTest {
         IsochroneLabel node3Label = visited.get(2);
         assertThat(node3Label.getNode()).isEqualTo(3);
         assertThat(node3Label.getWeight()).isEqualTo(8.0);
-        assertThat(node3Label.getDistance()).isEqualTo(80.0);
-        assertThat(node3Label.getTime()).isEqualTo(800L);
+        assertThat(node3Label.getDistanceInMeters()).isEqualTo(80.0);
+        assertThat(node3Label.getTimeInMilliSeconds()).isEqualTo(800L);
 
         IsochroneLabel node3LabelParent = node3Label.getParent();
         assertThat(node3LabelParent).isSameAs(visited.get(1));
