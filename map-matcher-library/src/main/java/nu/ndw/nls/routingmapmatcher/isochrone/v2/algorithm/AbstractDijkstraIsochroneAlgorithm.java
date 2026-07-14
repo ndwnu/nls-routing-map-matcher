@@ -103,9 +103,13 @@ public abstract class AbstractDijkstraIsochroneAlgorithm<LABEL extends Isochrone
                     continue;
                 }
 
-                double toDistance = edgeIterator.getDistance() + fromLabel.getDistance();
-                long toTime = GHUtility.calcMillisWithTurnMillis(weighting, edgeIterator, traversalInReverseFlow, fromLabel.getEdge())
-                              + fromLabel.getTime();
+                double toDistanceInMeters = edgeIterator.getDistance() + fromLabel.getDistanceInMeters();
+                long toTimeInMilliSeconds = GHUtility.calcMillisWithTurnMillis(
+                        weighting,
+                        edgeIterator,
+                        traversalInReverseFlow,
+                        fromLabel.getEdge())
+                                            + fromLabel.getTimeInMilliSeconds();
                 int toNode = edgeIterator.getAdjNode();
                 int toEdge = edgeIterator.getEdge();
                 int toEdgeKey = edgeIterator.getEdgeKey();
@@ -113,11 +117,27 @@ public abstract class AbstractDijkstraIsochroneAlgorithm<LABEL extends Isochrone
 
                 LABEL toLabel = fromMap.get(toTraversalId);
                 if (toLabel == null) {
-                    toLabel = createNewIsoLabel(toNode, toEdge, toEdgeKey, fromLabel, toTime, toDistance, toWeight, encodingManager);
+                    toLabel = createNewIsoLabel(
+                            toNode,
+                            toEdge,
+                            toEdgeKey,
+                            fromLabel,
+                            toTimeInMilliSeconds,
+                            toDistanceInMeters,
+                            toWeight,
+                            encodingManager);
                     fromMap.put(toTraversalId, toLabel);
                     handleLimits(toLabel);
                 } else {
-                    var newToLabel = createNewIsoLabel(toNode, toEdge, toEdgeKey, fromLabel, toTime, toDistance, toWeight, encodingManager);
+                    var newToLabel = createNewIsoLabel(
+                            toNode,
+                            toEdge,
+                            toEdgeKey,
+                            fromLabel,
+                            toTimeInMilliSeconds,
+                            toDistanceInMeters,
+                            toWeight,
+                            encodingManager);
                     if (explorePriorityComparator.compare(toLabel, newToLabel) > 0) {
                         toLabel.markAsDeleted();
                         fromMap.put(toTraversalId, newToLabel);
@@ -159,8 +179,8 @@ public abstract class AbstractDijkstraIsochroneAlgorithm<LABEL extends Isochrone
                         "Node %-7d EdgeKey: %-7d Distance: %-10.2f Time: %-8d Weight: %-10.2f Path: %s%s",
                         isochroneLabel.getNode(),
                         isochroneLabel.getEdgeKey(),
-                        isochroneLabel.getDistance(),
-                        isochroneLabel.getTime(),
+                        isochroneLabel.getDistanceInMeters(),
+                        isochroneLabel.getTimeInMilliSeconds(),
                         isochroneLabel.getWeight(),
                         isochroneLabel.drawPath(),
                         limitReached
@@ -179,8 +199,8 @@ public abstract class AbstractDijkstraIsochroneAlgorithm<LABEL extends Isochrone
             int edge,
             int edgeKey,
             LABEL parent,
-            long time,
-            double distance,
+            long timeInMilliSeconds,
+            double distanceInMeters,
             double weight,
             EncodingManager encodingManager);
 

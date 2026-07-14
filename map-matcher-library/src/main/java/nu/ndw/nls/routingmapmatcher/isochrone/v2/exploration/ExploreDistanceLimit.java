@@ -18,7 +18,7 @@ public class ExploreDistanceLimit<LABEL extends IsochroneLabel> extends ExploreL
 
     @Override
     public double getValueForLabel(LABEL isochroneLabel, EncodingManager encodingManager) {
-        return isochroneLabel.getDistance();
+        return isochroneLabel.getDistanceInMeters();
     }
 
     @Override
