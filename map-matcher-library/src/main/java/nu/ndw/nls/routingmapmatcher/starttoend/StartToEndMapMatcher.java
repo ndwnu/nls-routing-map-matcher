@@ -26,7 +26,7 @@ import java.util.Objects;
 import lombok.extern.slf4j.Slf4j;
 import nu.ndw.nls.geometry.confidence.LineStringReliabilityCalculator;
 import nu.ndw.nls.geometry.distance.FractionAndDistanceCalculator;
-import nu.ndw.nls.routingmapmatcher.domain.BaseMapMatcher;
+import nu.ndw.nls.routingmapmatcher.domain.BaseMapMatcherShortestPath;
 import nu.ndw.nls.routingmapmatcher.domain.MapMatcher;
 import nu.ndw.nls.routingmapmatcher.model.MatchStatus;
 import nu.ndw.nls.routingmapmatcher.model.linestring.LineStringLocation;
@@ -38,7 +38,7 @@ import nu.ndw.nls.routingmapmatcher.util.PointListUtil;
 import org.locationtech.jts.geom.Point;
 
 @Slf4j
-public class StartToEndMapMatcher extends BaseMapMatcher implements MapMatcher<LineStringLocation, LineStringMatch> {
+public class StartToEndMapMatcher extends BaseMapMatcherShortestPath implements MapMatcher<LineStringLocation, LineStringMatch> {
 
     /**
      * Only search for candidates within this distance.
@@ -64,9 +64,9 @@ public class StartToEndMapMatcher extends BaseMapMatcher implements MapMatcher<L
         this.algorithmFactory = new RoutingAlgorithmFactorySimple();
         this.locationIndexTree = network.getLocationIndex();
         this.lineStringMatchUtil = new LineStringMatchUtil(network, getProfile(), fractionAndDistanceCalculator,
-                pointListUtil, createCustomModelMergedWithShortestCustomModelHintsIfPresent());
+                pointListUtil, createPropertyMapWithOptionalCustomModel());
         this.lineStringScoreUtil = new LineStringScoreUtil(pointListUtil, lineStringReliabilityCalculator);
-        this.weighting = network.createWeighting(getProfile(), createCustomModelMergedWithShortestCustomModelHintsIfPresent());
+        this.weighting = network.createWeighting(getProfile(), createPropertyMapWithOptionalCustomModel());
     }
 
     public LineStringMatch match(LineStringLocation lineStringLocation) {
