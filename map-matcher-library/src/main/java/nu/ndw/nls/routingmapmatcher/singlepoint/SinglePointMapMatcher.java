@@ -22,7 +22,7 @@ import nu.ndw.nls.geometry.bearing.BearingCalculator;
 import nu.ndw.nls.geometry.distance.FractionAndDistanceCalculator;
 import nu.ndw.nls.geometry.factories.GeometryFactoryWgs84;
 import nu.ndw.nls.geometry.mappers.DiameterToPolygonMapper;
-import nu.ndw.nls.routingmapmatcher.domain.BaseMapMatcher;
+import nu.ndw.nls.routingmapmatcher.domain.BaseMapMatcherShortestPath;
 import nu.ndw.nls.routingmapmatcher.domain.MapMatcher;
 import nu.ndw.nls.routingmapmatcher.geometry.services.ClosestPointService;
 import nu.ndw.nls.routingmapmatcher.isochrone.IsochroneService;
@@ -43,7 +43,7 @@ import org.locationtech.jts.geom.LineString;
 import org.locationtech.jts.geom.Point;
 import org.locationtech.jts.geom.Polygon;
 
-public class SinglePointMapMatcher extends BaseMapMatcher implements MapMatcher<SinglePointLocation, SinglePointMatch> {
+public class SinglePointMapMatcher extends BaseMapMatcherShortestPath implements MapMatcher<SinglePointLocation, SinglePointMatch> {
 
     private static final int RADIUS_TO_DIAMETER = 2;
     private static final double DISTANCE_THRESHOLD = 0.1;
@@ -68,7 +68,7 @@ public class SinglePointMapMatcher extends BaseMapMatcher implements MapMatcher<
         EncodingManager encodingManager = network.getEncodingManager();
 
         Weighting shortestWeightingForIsochrone = network.createWeighting(getProfile(),
-                createCustomModelMergedWithShortestCustomModelHintsIfPresent());
+                createPropertyMapWithOptionalCustomModel());
         this.edgeIteratorStateReverseExtractor = new EdgeIteratorStateReverseExtractor();
         this.pointListUtil = pointListUtil;
         this.isochroneService = new IsochroneService(encodingManager, baseGraph,
@@ -84,7 +84,7 @@ public class SinglePointMapMatcher extends BaseMapMatcher implements MapMatcher<
 
     public SinglePointMatch match(SinglePointLocation singlePointLocation) {
         Objects.requireNonNull(singlePointLocation);
-        Weighting matchWeighting = getNetwork().createWeighting(getProfile(), createCustomModelHintsIfPresent());
+        Weighting matchWeighting = getNetwork().createWeighting(getProfile(), createPropertyMapWithOptionalCustomModel());
         Point inputPoint = singlePointLocation.getPoint();
         double inputRadius = singlePointLocation.getCutoffDistance();
         List<Snap> queryResults = getQueryResults(getNetwork(), inputPoint, inputRadius, locationIndexTree,

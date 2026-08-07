@@ -5,7 +5,6 @@ import com.graphhopper.util.CustomModel;
 import com.graphhopper.util.PMap;
 import java.util.Objects;
 import nu.ndw.nls.routingmapmatcher.network.NetworkGraphHopper;
-import nu.ndw.nls.routingmapmatcher.util.Constants;
 
 /**
  * Base class for implementing map-matching functionality. This class provides core mechanisms and configurations necessary for extending
@@ -23,16 +22,7 @@ public class BaseMapMatcher {
         this.customModel = customModel;
     }
 
-    protected final PMap createCustomModelMergedWithShortestCustomModelHintsIfPresent() {
-        if (customModel != null) {
-            return new PMap()
-                    .putObject(CustomModel.KEY, CustomModel.merge(Constants.SHORTEST_CUSTOM_MODEL, customModel));
-        }
-        return new PMap()
-                .putObject(CustomModel.KEY, Constants.SHORTEST_CUSTOM_MODEL);
-    }
-
-    protected final PMap createCustomModelHintsIfPresent() {
+    protected PMap createPropertyMapWithOptionalCustomModel() {
         if (customModel != null) {
             return new PMap()
                     .putObject(CustomModel.KEY, customModel);

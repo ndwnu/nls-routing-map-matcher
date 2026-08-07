@@ -112,7 +112,7 @@ public class Router extends BaseMapMatcher {
     }
 
     private Point snapPointToNode(Point point) {
-        Weighting weighting = getNetwork().createWeighting(getProfile(), createCustomModelHintsIfPresent());
+        Weighting weighting = getNetwork().createWeighting(getProfile(), createPropertyMapWithOptionalCustomModel());
         FiniteWeightFilter finiteWeightFilter = new FiniteWeightFilter(weighting);
         Snap snap = getNetwork().getLocationIndex().findClosest(point.getY(), point.getX(), finiteWeightFilter);
         if (!snap.isValid()) {

@@ -27,7 +27,7 @@ import lombok.extern.slf4j.Slf4j;
 import nu.ndw.nls.geometry.confidence.LineStringReliabilityCalculator;
 import nu.ndw.nls.geometry.distance.FractionAndDistanceCalculator;
 import nu.ndw.nls.geometry.factories.GeometryFactoryWgs84;
-import nu.ndw.nls.routingmapmatcher.domain.BaseMapMatcher;
+import nu.ndw.nls.routingmapmatcher.domain.BaseMapMatcherShortestPath;
 import nu.ndw.nls.routingmapmatcher.domain.MapMatcher;
 import nu.ndw.nls.routingmapmatcher.model.MatchStatus;
 import nu.ndw.nls.routingmapmatcher.model.linestring.LineStringLocation;
@@ -42,7 +42,7 @@ import org.locationtech.jts.geom.LineString;
 import org.locationtech.jts.geom.Point;
 
 @Slf4j
-public class ViterbiLineStringMapMatcher extends BaseMapMatcher implements
+public class ViterbiLineStringMapMatcher extends BaseMapMatcherShortestPath implements
         MapMatcher<LineStringLocation, LineStringMatch> {
 
     /**
@@ -86,7 +86,7 @@ public class ViterbiLineStringMapMatcher extends BaseMapMatcher implements
         this.geometryFactoryWgs84 = geometryFactoryWgs84;
         this.locationIndexTree = network.getLocationIndex();
         this.lineStringMatchUtil = new LineStringMatchUtil(network, getProfile(), fractionAndDistanceCalculator, pointListUtil,
-                createCustomModelMergedWithShortestCustomModelHintsIfPresent());
+                createPropertyMapWithOptionalCustomModel());
         this.lineStringScoreUtil = new LineStringScoreUtil(pointListUtil, lineStringReliabilityCalculator);
         this.pointListUtil = pointListUtil;
     }
@@ -133,7 +133,7 @@ public class ViterbiLineStringMapMatcher extends BaseMapMatcher implements
     }
 
     private PMap createHints() {
-        PMap hints = createCustomModelMergedWithShortestCustomModelHintsIfPresent();
+        PMap hints = createPropertyMapWithOptionalCustomModel();
         hints.putObject(PROFILE_KEY, getProfile().getName());
         hints.putObject(Parameters.CH.DISABLE, true);
         return hints;
