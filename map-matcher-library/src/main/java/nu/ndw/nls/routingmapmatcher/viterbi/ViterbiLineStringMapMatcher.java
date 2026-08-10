@@ -27,8 +27,9 @@ import lombok.extern.slf4j.Slf4j;
 import nu.ndw.nls.geometry.confidence.LineStringReliabilityCalculator;
 import nu.ndw.nls.geometry.distance.FractionAndDistanceCalculator;
 import nu.ndw.nls.geometry.factories.GeometryFactoryWgs84;
-import nu.ndw.nls.routingmapmatcher.domain.BaseMapMatcherShortestPath;
+import nu.ndw.nls.routingmapmatcher.domain.BaseMapMatcher;
 import nu.ndw.nls.routingmapmatcher.domain.MapMatcher;
+import nu.ndw.nls.routingmapmatcher.mappers.PMapMapper;
 import nu.ndw.nls.routingmapmatcher.model.MatchStatus;
 import nu.ndw.nls.routingmapmatcher.model.linestring.LineStringLocation;
 import nu.ndw.nls.routingmapmatcher.model.linestring.LineStringMatch;
@@ -42,7 +43,7 @@ import org.locationtech.jts.geom.LineString;
 import org.locationtech.jts.geom.Point;
 
 @Slf4j
-public class ViterbiLineStringMapMatcher extends BaseMapMatcherShortestPath implements
+public class ViterbiLineStringMapMatcher extends BaseMapMatcher implements
         MapMatcher<LineStringLocation, LineStringMatch> {
 
     /**
@@ -72,6 +73,7 @@ public class ViterbiLineStringMapMatcher extends BaseMapMatcherShortestPath impl
     private static final int COORDINATES_LENGTH_START_END = 2;
     private static final String PROFILE_KEY = "profile";
 
+    private final PMapMapper pMapMapper;
     private final LocationIndexTree locationIndexTree;
     private final LineStringMatchUtil lineStringMatchUtil;
     private final LineStringScoreUtil lineStringScoreUtil;
@@ -79,14 +81,16 @@ public class ViterbiLineStringMapMatcher extends BaseMapMatcherShortestPath impl
     private final GeometryFactoryWgs84 geometryFactoryWgs84;
 
 
-    public ViterbiLineStringMapMatcher(NetworkGraphHopper network, String profileName,
+    @SuppressWarnings("java:S107")
+    public ViterbiLineStringMapMatcher(PMapMapper pMapMapper, NetworkGraphHopper network, String profileName,
             GeometryFactoryWgs84 geometryFactoryWgs84, FractionAndDistanceCalculator fractionAndDistanceCalculator,
             PointListUtil pointListUtil, LineStringReliabilityCalculator lineStringReliabilityCalculator, CustomModel customModel) {
         super(profileName, network, customModel);
+        this.pMapMapper = pMapMapper;
         this.geometryFactoryWgs84 = geometryFactoryWgs84;
         this.locationIndexTree = network.getLocationIndex();
         this.lineStringMatchUtil = new LineStringMatchUtil(network, getProfile(), fractionAndDistanceCalculator, pointListUtil,
-                createPropertyMapWithOptionalCustomModel());
+                pMapMapper.mapCustomModelOrDefaultToShortestWeighting(customModel));
         this.lineStringScoreUtil = new LineStringScoreUtil(pointListUtil, lineStringReliabilityCalculator);
         this.pointListUtil = pointListUtil;
     }
@@ -133,7 +137,7 @@ public class ViterbiLineStringMapMatcher extends BaseMapMatcherShortestPath impl
     }
 
     private PMap createHints() {
-        PMap hints = createPropertyMapWithOptionalCustomModel();
+        PMap hints = pMapMapper.mapCustomModelOrDefaultToShortestWeighting(getCustomModel());
         hints.putObject(PROFILE_KEY, getProfile().getName());
         hints.putObject(Parameters.CH.DISABLE, true);
         return hints;
