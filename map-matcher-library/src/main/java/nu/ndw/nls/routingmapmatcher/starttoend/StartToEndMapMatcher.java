@@ -28,6 +28,7 @@ import nu.ndw.nls.geometry.confidence.LineStringReliabilityCalculator;
 import nu.ndw.nls.geometry.distance.FractionAndDistanceCalculator;
 import nu.ndw.nls.routingmapmatcher.domain.BaseMapMatcher;
 import nu.ndw.nls.routingmapmatcher.domain.MapMatcher;
+import nu.ndw.nls.routingmapmatcher.mappers.PMapMapper;
 import nu.ndw.nls.routingmapmatcher.model.MatchStatus;
 import nu.ndw.nls.routingmapmatcher.model.linestring.LineStringLocation;
 import nu.ndw.nls.routingmapmatcher.model.linestring.LineStringMatch;
@@ -53,7 +54,7 @@ public class StartToEndMapMatcher extends BaseMapMatcher implements MapMatcher<L
     private final LineStringScoreUtil lineStringScoreUtil;
     private final Weighting weighting;
 
-    public StartToEndMapMatcher(NetworkGraphHopper network, String profileName,
+    public StartToEndMapMatcher(PMapMapper pMapMapper, NetworkGraphHopper network, String profileName,
             FractionAndDistanceCalculator fractionAndDistanceCalculator, PointListUtil pointListUtil,
             LineStringReliabilityCalculator lineStringReliabilityCalculator, CustomModel customModel) {
         super(profileName, network, customModel);
@@ -64,9 +65,9 @@ public class StartToEndMapMatcher extends BaseMapMatcher implements MapMatcher<L
         this.algorithmFactory = new RoutingAlgorithmFactorySimple();
         this.locationIndexTree = network.getLocationIndex();
         this.lineStringMatchUtil = new LineStringMatchUtil(network, getProfile(), fractionAndDistanceCalculator,
-                pointListUtil, createCustomModelMergedWithShortestCustomModelHintsIfPresent());
+                pointListUtil, pMapMapper.mapCustomModelOrDefaultToShortestWeighting(customModel));
         this.lineStringScoreUtil = new LineStringScoreUtil(pointListUtil, lineStringReliabilityCalculator);
-        this.weighting = network.createWeighting(getProfile(), createCustomModelMergedWithShortestCustomModelHintsIfPresent());
+        this.weighting = network.createWeighting(getProfile(), pMapMapper.mapCustomModelOrDefaultToShortestWeighting(customModel));
     }
 
     public LineStringMatch match(LineStringLocation lineStringLocation) {

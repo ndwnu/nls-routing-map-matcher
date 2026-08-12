@@ -6,6 +6,21 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
 Here we write upgrade notes. It's a team effort to make them as straightforward as possible.
+
+## [22.0.0] - 2026-08-06
+Breaking change in MapMatcherFactory when producing the following instances:  
+- SinglePointMapMatcher
+- StartToEndMapMatcher 
+- ViterbiLineStringMapMatcher
+
+Custom model are no longer merged with Constants.SHORTEST_CUSTOM_MODEL. To restore the old behavior, perform the following
+code to merge Constants.SHORTEST_CUSTOM_MODEL with your customModel prior to passing it to the MapMatcherFactory:
+```java
+CustomModel.merge(Constants.SHORTEST_CUSTOM_MODEL, customModel)
+```
+
+Default behavior remains as is for projects that do not supply custom models to the MapMatcherFactory 
+
 ## [21.2.0] - 2026-06-10
 - Added ExploreLimitComposite
 - Exploration limits now support checking against the isochroneLabel parent. This is relevant if you want to include the road section where the limit is reached in the isochrone calculation.
