@@ -33,6 +33,7 @@ import nu.ndw.nls.routingmapmatcher.domain.BaseMapMatcher;
 import nu.ndw.nls.routingmapmatcher.exception.RoutingException;
 import nu.ndw.nls.routingmapmatcher.exception.RoutingRequestException;
 import nu.ndw.nls.routingmapmatcher.mappers.MatchedLinkMapper;
+import nu.ndw.nls.routingmapmatcher.mappers.PMapMapper;
 import nu.ndw.nls.routingmapmatcher.model.RouteStatus;
 import nu.ndw.nls.routingmapmatcher.model.linestring.MatchedEdgeLink;
 import nu.ndw.nls.routingmapmatcher.model.routing.RoutingLegResponse;
@@ -59,10 +60,13 @@ public class Router extends BaseMapMatcher {
 
     private final FractionAndDistanceCalculator fractionAndDistanceCalculator;
 
-    public Router(NetworkGraphHopper network, MatchedLinkMapper matchedLinkMapper, GeometryFactoryWgs84 geometryFactoryWgs84,
-            FractionAndDistanceCalculator fractionAndDistanceCalculator, String profileName, CustomModel customModel
-    ) {
+    private final PMapMapper pMapMapper;
+
+    public Router(PMapMapper pMapMapper, NetworkGraphHopper network, MatchedLinkMapper matchedLinkMapper,
+            GeometryFactoryWgs84 geometryFactoryWgs84, FractionAndDistanceCalculator fractionAndDistanceCalculator, String profileName,
+            CustomModel customModel) {
         super(profileName, network, customModel);
+        this.pMapMapper = pMapMapper;
         this.matchedLinkMapper = matchedLinkMapper;
         this.geometryFactoryWgs84 = geometryFactoryWgs84;
         this.fractionAndDistanceCalculator = fractionAndDistanceCalculator;
@@ -91,6 +95,15 @@ public class Router extends BaseMapMatcher {
         }
     }
 
+    private static boolean hasAllPointOutOfBoundsOrConnectionErrors(List<Throwable> errors) {
+        return errors.stream()
+                .allMatch(error -> error instanceof PointOutOfBoundsException || error instanceof ConnectionNotFoundException);
+    }
+
+    private static List<GHPoint> getGHPointsFromPoints(List<Point> points) {
+        return points.stream().map(point -> new GHPoint(point.getY(), point.getX())).toList();
+    }
+
     private List<Point> snapPointsToNodes(List<Point> points) {
 
         ensurePointsAreInBounds(points);
@@ -112,7 +125,8 @@ public class Router extends BaseMapMatcher {
     }
 
     private Point snapPointToNode(Point point) {
-        Weighting weighting = getNetwork().createWeighting(getProfile(), createCustomModelHintsIfPresent());
+        Weighting weighting = getNetwork().createWeighting(getProfile(),
+                pMapMapper.createPropertyMapWithOptionalCustomModel(getCustomModel()));
         FiniteWeightFilter finiteWeightFilter = new FiniteWeightFilter(weighting);
         Snap snap = getNetwork().getLocationIndex().findClosest(point.getY(), point.getX(), finiteWeightFilter);
         if (!snap.isValid()) {
@@ -188,21 +202,12 @@ public class Router extends BaseMapMatcher {
         }
     }
 
-    private static boolean hasAllPointOutOfBoundsOrConnectionErrors(List<Throwable> errors) {
-        return errors.stream()
-                .allMatch(error -> error instanceof PointOutOfBoundsException || error instanceof ConnectionNotFoundException);
-    }
-
     private RoutingResponseBuilder createRoutingResponse(ResponsePath path, boolean simplify) {
 
         PointList points = simplify ? PathSimplification.simplify(path, new RamerDouglasPeucker(), false) : path.getPoints();
         return RoutingResponse.builder().geometry(points.toLineString(INCLUDE_ELEVATION))
                 .snappedWaypoints(mapToSnappedWaypoints(path.getWaypoints())).weight(Helper.round(path.getRouteWeight(), DECIMAL_PLACES))
                 .duration(path.getTime() / MILLISECONDS_PER_SECOND).distance(Helper.round(path.getDistance(), DECIMAL_PLACES));
-    }
-
-    private static List<GHPoint> getGHPointsFromPoints(List<Point> points) {
-        return points.stream().map(point -> new GHPoint(point.getY(), point.getX())).toList();
     }
 
     private List<Point> mapToSnappedWaypoints(PointList pointList) {
