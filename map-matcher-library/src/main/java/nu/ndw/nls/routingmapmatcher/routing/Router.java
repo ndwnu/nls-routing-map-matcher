@@ -76,33 +76,6 @@ public class Router extends BaseMapMatcher {
         getNetwork().getRouterConfig().setSimplifyResponse(false);
     }
 
-    private static void ensurePathsAreNotEmpty(ResponsePath path) {
-        if (path.getWaypoints().isEmpty()) {
-            throw new RoutingRequestException("Calculate resulted in no paths");
-        }
-    }
-
-    private static void ensureResponseHasNoErrors(GHResponse ghResponse) throws RoutingRequestException, RoutingException {
-
-        if (ghResponse.hasErrors()) {
-            String errors = ghResponse.getErrors().stream().map(Throwable::getMessage).collect(Collectors.joining(", "));
-            if (hasAllPointOutOfBoundsOrConnectionErrors(ghResponse.getErrors())) {
-                throw new RoutingRequestException("Invalid routing request: %s".formatted(errors));
-            } else {
-                throw new RoutingException("Routing request failed: %s".formatted(errors));
-            }
-        }
-    }
-
-    private static boolean hasAllPointOutOfBoundsOrConnectionErrors(List<Throwable> errors) {
-        return errors.stream()
-                .allMatch(error -> error instanceof PointOutOfBoundsException || error instanceof ConnectionNotFoundException);
-    }
-
-    private static List<GHPoint> getGHPointsFromPoints(List<Point> points) {
-        return points.stream().map(point -> new GHPoint(point.getY(), point.getX())).toList();
-    }
-
     public RoutingResponse route(RoutingRequest routingRequest) {
         try {
             List<Point> points =
@@ -120,6 +93,15 @@ public class Router extends BaseMapMatcher {
                 return createEmptyRoutingResponse(RouteStatus.EXCEPTION);
             }
         }
+    }
+
+    private static boolean hasAllPointOutOfBoundsOrConnectionErrors(List<Throwable> errors) {
+        return errors.stream()
+                .allMatch(error -> error instanceof PointOutOfBoundsException || error instanceof ConnectionNotFoundException);
+    }
+
+    private static List<GHPoint> getGHPointsFromPoints(List<Point> points) {
+        return points.stream().map(point -> new GHPoint(point.getY(), point.getX())).toList();
     }
 
     private List<Point> snapPointsToNodes(List<Point> points) {
@@ -200,6 +182,24 @@ public class Router extends BaseMapMatcher {
 
     private RoutingResponse createEmptyRoutingResponse(RouteStatus routeStatus) {
         return RoutingResponse.builder().status(routeStatus).build();
+    }
+
+    private static void ensurePathsAreNotEmpty(ResponsePath path) {
+        if (path.getWaypoints().isEmpty()) {
+            throw new RoutingRequestException("Calculate resulted in no paths");
+        }
+    }
+
+    private static void ensureResponseHasNoErrors(GHResponse ghResponse) throws RoutingRequestException, RoutingException {
+
+        if (ghResponse.hasErrors()) {
+            String errors = ghResponse.getErrors().stream().map(Throwable::getMessage).collect(Collectors.joining(", "));
+            if (hasAllPointOutOfBoundsOrConnectionErrors(ghResponse.getErrors())) {
+                throw new RoutingRequestException("Invalid routing request: %s".formatted(errors));
+            } else {
+                throw new RoutingException("Routing request failed: %s".formatted(errors));
+            }
+        }
     }
 
     private RoutingResponseBuilder createRoutingResponse(ResponsePath path, boolean simplify) {
