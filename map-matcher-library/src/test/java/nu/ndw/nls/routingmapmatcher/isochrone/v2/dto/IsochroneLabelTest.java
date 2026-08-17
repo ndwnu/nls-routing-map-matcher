@@ -56,13 +56,13 @@ class IsochroneLabelTest {
 
     @Test
     void drawPath() {
-        IsochroneLabel parent = new IsochroneLabel(1, 1, 4, null, 0L, 0.0, 0.0);
-        IsochroneLabel label = new IsochroneLabel(2, 3, 6, parent, 0L, 0.0, 0.0);
+        IsochroneLabel parent = new IsochroneLabel(1, 1, 4, null, 0L, 0.0, 0.0, false);
+        IsochroneLabel label = new IsochroneLabel(2, 3, 6, parent, 0L, 0.0, 0.0, false);
 
         assertThat(label.drawPath()).isEqualTo("1(4) -> 2(6)");
     }
 
     private IsochroneLabel createLabel(int edge, IsochroneLabel parent) {
-        return new IsochroneLabel(0, edge, 0, parent, 0L, 0.0, 0.0);
+        return new IsochroneLabel(0, edge, 0, parent, 0L, 0.0, 0.0, false);
     }
 }
