@@ -7,6 +7,7 @@ import com.graphhopper.routing.Path;
 import com.graphhopper.routing.util.EncodingManager;
 import com.graphhopper.routing.util.TraversalMode;
 import com.graphhopper.routing.weighting.Weighting;
+import com.graphhopper.storage.EdgeIteratorStateReverseExtractor;
 import com.graphhopper.storage.Graph;
 import com.graphhopper.util.EdgeIterator;
 import com.graphhopper.util.GHUtility;
@@ -40,11 +41,14 @@ public abstract class AbstractDijkstraIsochroneAlgorithm<LABEL extends Isochrone
 
     private final Comparator<LABEL> explorePriorityComparator;
 
+    private final EdgeIteratorStateReverseExtractor edgeIteratorStateReverseExtractor;
+
     @Getter
     private int visitedNodes;
 
     private final ExploreLimit<LABEL> exploreLimit;
 
+    @SuppressWarnings("java:S107")
     protected AbstractDijkstraIsochroneAlgorithm(
             Graph graph,
             EncodingManager encodingManager,
@@ -52,17 +56,19 @@ public abstract class AbstractDijkstraIsochroneAlgorithm<LABEL extends Isochrone
             boolean traversalInReverseFlow,
             Weighting weighting,
             ExploreLimit<LABEL> exploreLimit,
-            Comparator<LABEL> explorePriorityComparator) {
+            Comparator<LABEL> explorePriorityComparator,
+            EdgeIteratorStateReverseExtractor edgeIteratorStateReverseExtractor) {
 
         super(graph, weighting, traversalMode);
 
         this.explorePriorityComparator = explorePriorityComparator;
-        priorityQueue = new PriorityQueue<>(INITIAL_CAPACITY, explorePriorityComparator);
-        fromMap = new GHIntObjectHashMap<>(INITIAL_CAPACITY);
-
         this.encodingManager = encodingManager;
         this.traversalInReverseFlow = traversalInReverseFlow;
         this.exploreLimit = exploreLimit;
+        this.edgeIteratorStateReverseExtractor = edgeIteratorStateReverseExtractor;
+
+        priorityQueue = new PriorityQueue<>(INITIAL_CAPACITY, explorePriorityComparator);
+        fromMap = new GHIntObjectHashMap<>(INITIAL_CAPACITY);
     }
 
     @Override
@@ -73,7 +79,7 @@ public abstract class AbstractDijkstraIsochroneAlgorithm<LABEL extends Isochrone
     @SuppressWarnings({"java:S3776", "java:S135", "java:S134"})
     public void search(int from, Consumer<LABEL> labelConsumer) {
         checkAlreadyRun();
-        LABEL fromLabel = createNewIsoLabel(from, INVALID_EDGE, INVALID_TRAVERSAL_ID, null, 0, 0, 0, this.encodingManager);
+        LABEL fromLabel = createNewIsoLabel(from, INVALID_EDGE, INVALID_TRAVERSAL_ID, null, 0, 0, 0, this.encodingManager, false);
 
         priorityQueue.add(fromLabel);
         if (traversalMode == TraversalMode.NODE_BASED) {
@@ -112,8 +118,12 @@ public abstract class AbstractDijkstraIsochroneAlgorithm<LABEL extends Isochrone
                                             + fromLabel.getTimeInMilliSeconds();
                 int toNode = edgeIterator.getAdjNode();
                 int toEdge = edgeIterator.getEdge();
-                int toEdgeKey = edgeIterator.getEdgeKey();
+                boolean edgeTraversedInReversedDirection = edgeIteratorStateReverseExtractor.hasReversed(edgeIterator);
+                int toEdgeKey = traversalInReverseFlow ? edgeIterator.getReverseEdgeKey() : edgeIterator.getEdgeKey();
                 int toTraversalId = traversalMode.createTraversalId(edgeIterator, traversalInReverseFlow);
+
+                // Reasoning behind this see documentation/technical-details.md for more details.
+                boolean traversedInReversedDirection = traversalInReverseFlow ^ edgeTraversedInReversedDirection;
 
                 LABEL toLabel = fromMap.get(toTraversalId);
                 if (toLabel == null) {
@@ -125,7 +135,9 @@ public abstract class AbstractDijkstraIsochroneAlgorithm<LABEL extends Isochrone
                             toTimeInMilliSeconds,
                             toDistanceInMeters,
                             toWeight,
-                            encodingManager);
+                            encodingManager,
+                            traversedInReversedDirection
+                    );
                     fromMap.put(toTraversalId, toLabel);
                     handleLimits(toLabel);
                 } else {
@@ -137,7 +149,8 @@ public abstract class AbstractDijkstraIsochroneAlgorithm<LABEL extends Isochrone
                             toTimeInMilliSeconds,
                             toDistanceInMeters,
                             toWeight,
-                            encodingManager);
+                            encodingManager,
+                            traversedInReversedDirection);
                     if (explorePriorityComparator.compare(toLabel, newToLabel) > 0) {
                         toLabel.markAsDeleted();
                         fromMap.put(toTraversalId, newToLabel);
@@ -202,7 +215,8 @@ public abstract class AbstractDijkstraIsochroneAlgorithm<LABEL extends Isochrone
             long timeInMilliSeconds,
             double distanceInMeters,
             double weight,
-            EncodingManager encodingManager);
+            EncodingManager encodingManager,
+            boolean traversedInReversedDirection);
 
     protected abstract void mergeEqualWeightedIsoLabels(LABEL target, LABEL source);
 
