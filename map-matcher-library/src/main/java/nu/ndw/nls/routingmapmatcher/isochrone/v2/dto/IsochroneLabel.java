@@ -31,6 +31,9 @@ public class IsochroneLabel {
     @Getter
     private final double weight;
 
+    @Getter
+    private final boolean traversedInReversedDirection;
+
     /**
      * Marks this label in the context of an isochrone as a path that has ended. Where it has at least one outgoing path that is not
      * traversable.
@@ -40,6 +43,7 @@ public class IsochroneLabel {
 
     @Getter
     private boolean deleted;
+
 
     public boolean isRoot() {
         return ROOT_ID == edge;

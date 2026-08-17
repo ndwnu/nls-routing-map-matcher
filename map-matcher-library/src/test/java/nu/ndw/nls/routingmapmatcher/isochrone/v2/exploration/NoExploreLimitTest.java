@@ -31,16 +31,16 @@ class NoExploreLimitTest {
 
     @Test
     void isInLimit() {
-        IsochroneLabel label = new IsochroneLabel(0, -1, -1, null, Long.MIN_VALUE, Double.MIN_VALUE, Double.MIN_VALUE);
+        IsochroneLabel label = new IsochroneLabel(0, -1, -1, null, Long.MIN_VALUE, Double.MIN_VALUE, Double.MIN_VALUE, false);
         assertThat(noExploreLimit.isInLimit(label, encodingManager)).isTrue();
 
-        label = new IsochroneLabel(0, -1, -1, null, Long.MAX_VALUE, Double.MAX_VALUE, Double.MAX_VALUE);
+        label = new IsochroneLabel(0, -1, -1, null, Long.MAX_VALUE, Double.MAX_VALUE, Double.MAX_VALUE, false);
         assertThat(noExploreLimit.isInLimit(label, encodingManager)).isTrue();
     }
 
     @Test
     void debug() {
-        IsochroneLabel label = new IsochroneLabel(0, -1, -1, null, Long.MIN_VALUE, Double.MIN_VALUE, Double.MIN_VALUE);
+        IsochroneLabel label = new IsochroneLabel(0, -1, -1, null, Long.MIN_VALUE, Double.MIN_VALUE, Double.MIN_VALUE, false);
 
         assertThat(noExploreLimit.debug(label, encodingManager)).isEqualTo("NoExploreLimit{reached=false}");
     }
