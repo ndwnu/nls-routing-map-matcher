@@ -35,21 +35,21 @@ class ExploreWeightLimitTest {
 
     @Test
     void isInLimit() {
-        IsochroneLabel label = new IsochroneLabel(0, 5, 5, null, 0L, 0.0, LIMIT - 0.1);
+        IsochroneLabel label = new IsochroneLabel(0, 5, 5, null, 0L, 0.0, LIMIT - 0.1, false);
 
         assertThat(exploreWeightLimit.isInLimit(label, encodingManager)).isTrue();
     }
 
     @Test
     void isInLimit_weightExceeded() {
-        IsochroneLabel label = new IsochroneLabel(0, 5, 5, null, 0L, 0.0, LIMIT);
+        IsochroneLabel label = new IsochroneLabel(0, 5, 5, null, 0L, 0.0, LIMIT, false);
 
         assertThat(exploreWeightLimit.isInLimit(label, encodingManager)).isFalse();
     }
 
     @Test
     void debug() {
-        IsochroneLabel label = new IsochroneLabel(0, 5, 5, null, 0L, 0.0, LIMIT - 0.1);
+        IsochroneLabel label = new IsochroneLabel(0, 5, 5, null, 0L, 0.0, LIMIT - 0.1, false);
 
         assertThat(exploreWeightLimit.debug(label, encodingManager)).isEqualTo("ExploreWeightLimit{limit=100.0, weight=99.9, reached=false}");
     }
