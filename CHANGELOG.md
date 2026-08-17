@@ -6,6 +6,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
 Here we write upgrade notes. It's a team effort to make them as straightforward as possible.
+## [23.0.0] - 2026-08-06
+Breaking change in `AbstractDijkstraIsochroneAlgorithm` and `IsochroneLabel` where now traversedInReversedDirection is recorded breaking some constructors of those classes.
 
 ## [22.0.0] - 2026-08-06
 Breaking change in MapMatcherFactory when producing the following instances:  
