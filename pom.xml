@@ -35,7 +35,7 @@
     <graphhopper.version>11.0</graphhopper.version>
     <jts-core.version>1.19.0</jts-core.version>
     <jacoco.version>0.8.15</jacoco.version>
-    <geotools.version>34.4</geotools.version>
+    <geotools.version>34.5</geotools.version>
     <jts2geojson.version>0.18.1</jts2geojson.version>
     <commons-io.version>2.22.0</commons-io.version>
     <sonar-maven-plugin.version>3.9.1.2184</sonar-maven-plugin.version>
