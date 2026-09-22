@@ -26,8 +26,9 @@ class RouterTest {
     @Test
     void ensurePathIsRoutable_throwsRoutingRequestException_whenPathIsFoundButHasNoEdges() {
         when(path.isFound()).thenReturn(true);
+        List<EdgeIteratorState> edges = List.of();
 
-        assertThatThrownBy(() -> Router.ensurePathIsRoutable(path, List.of()))
+        assertThatThrownBy(() -> Router.ensurePathIsRoutable(path, edges))
                 .isInstanceOf(RoutingRequestException.class)
                 .hasMessage("No route found: waypoints resolve to the same node");
     }
@@ -35,8 +36,9 @@ class RouterTest {
     @Test
     void ensurePathIsRoutable_throwsRoutingException_whenPathIsNotFoundAndHasNoEdges() {
         when(path.isFound()).thenReturn(false);
+        List<EdgeIteratorState> edges = List.of();
 
-        assertThatThrownBy(() -> Router.ensurePathIsRoutable(path, List.of()))
+        assertThatThrownBy(() -> Router.ensurePathIsRoutable(path, edges))
                 .isInstanceOf(RoutingException.class)
                 .hasMessage("Unexpected: path was not found and has no edges");
     }
