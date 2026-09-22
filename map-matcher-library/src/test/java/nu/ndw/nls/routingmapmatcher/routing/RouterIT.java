@@ -187,6 +187,7 @@ class RouterIT {
         RoutingResponse result = router.route(RoutingRequest.builder()
                 .wayPoints(wayPoints)
                 .simplifyResponseGeometry(false)
+                .snapToNodes(true)
                 .build());
         assertStatus(result, RouteStatus.NO_ROUTE);
 
