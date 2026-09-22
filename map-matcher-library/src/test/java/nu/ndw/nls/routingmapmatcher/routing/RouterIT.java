@@ -195,6 +195,21 @@ class RouterIT {
 
     @SneakyThrows
     @Test
+    void route_sameNode_noSnapToNodes() {
+        setupNetwork();
+        Point start = geometryFactory.createPoint(new Coordinate(5.433133, 52.173317));
+        Point sameAsStart = geometryFactory.createPoint(new Coordinate(5.4331331, 52.1733171));
+        List<Point> wayPoints = List.of(start, sameAsStart);
+        RoutingResponse result = router.route(RoutingRequest.builder()
+                .wayPoints(wayPoints)
+                .simplifyResponseGeometry(false)
+                .snapToNodes(false)
+                .build());
+        assertStatus(result, RouteStatus.NO_ROUTE);
+    }
+
+    @SneakyThrows
+    @Test
     void route_ok_noSimplify() {
         setupNetwork();
         Point start = geometryFactory.createPoint(new Coordinate(5.430496, 52.177687));
