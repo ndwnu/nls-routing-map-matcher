@@ -18,34 +18,18 @@ public class EncodedValuesByTypeDto<T extends NetworkEncoded> {
     @SuppressWarnings("java:S6411")
     private final Map<Class<?>, Map<String, EncodedValueDto<T, ?>>> typeToKeyToEncodedValues = new HashMap<>();
 
-    @SuppressWarnings("java:S6411")
-    private final Map<Class<?>, Map<String, EncodedValueDto<T, ?>>> typeToPropertyToEncodedValues = new HashMap<>();
-
     private final Map<String, Class<?>> keyToValueClass = new HashMap<>();
-
-    private final Map<String, Class<?>> propertyNameToValueClass = new HashMap<>();
 
     public <R> void add(Class<R> valueTypeClass, EncodedValueDto<T, R> encodedValueDto) {
         typeToKeyToEncodedValues.computeIfAbsent(valueTypeClass, aClass -> new HashMap<>());
         typeToKeyToEncodedValues.get(valueTypeClass).put(encodedValueDto.key(), encodedValueDto);
 
-        typeToPropertyToEncodedValues.computeIfAbsent(valueTypeClass, aClass -> new HashMap<>());
-        typeToPropertyToEncodedValues.get(valueTypeClass).put(encodedValueDto.propertyName(), encodedValueDto);
-
         keyToValueClass.put(encodedValueDto.key(), encodedValueDto.valueType());
-        propertyNameToValueClass.put(encodedValueDto.propertyName(), encodedValueDto.valueType());
     }
     @SuppressWarnings("unchecked")
     public <R> Optional<EncodedValueDto<T, R>> getByKey(Class<R> valueTypeClass, String key) {
         return Optional.ofNullable(typeToKeyToEncodedValues.get(valueTypeClass).get(key))
                 .map(dto -> (EncodedValueDto<T, R>)dto);
-    }
-
-    @SuppressWarnings("unchecked")
-    public <R> Optional<EncodedValueDto<T, R>> getByProperty(Class<R> valueTypeClass, String property) {
-        return Optional.ofNullable(typeToPropertyToEncodedValues.get(valueTypeClass))
-                .map(propertyNameToEncodedValue -> propertyNameToEncodedValue.get(property))
-                .map(dto -> (EncodedValueDto<T, R>) dto);
     }
 
     public Optional<Class<?>> getValueTypeByKey(String key) {
@@ -54,10 +38,6 @@ public class EncodedValuesByTypeDto<T extends NetworkEncoded> {
 
     public Set<String> getNetworkEncodedValueNameKeySet() {
         return keyToValueClass.keySet();
-    }
-
-    public Set<String> getPropertyNameKeySet() {
-        return propertyNameToValueClass.keySet();
     }
 
 }

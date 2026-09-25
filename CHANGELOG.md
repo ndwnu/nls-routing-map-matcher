@@ -6,6 +6,12 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
 Here we write upgrade notes. It's a team effort to make them as straightforward as possible.
+## [24.0.0] - 2026-09-25
+Breaking change: removed the unused network decoding functionality. The package `nu.ndw.nls.routingmapmatcher.network.decoding` has been
+deleted, including `NetworkDecodingService`, `EncodedValueObjectConstructorRegistry`, `EncodedValueDecoderRegistry`,
+`NonEncodedValueLinkPropertyRegistry` and all `EncodedValueDecoder` implementations. `EncodedValuesByTypeDto#getByProperty` and
+`EncodedValuesByTypeDto#getPropertyNameKeySet` have been removed as well.
+
 ## [23.0.0] - 2026-08-06
 Breaking change in `AbstractDijkstraIsochroneAlgorithm` and `IsochroneLabel` where now traversedInReversedDirection is recorded breaking some constructors of those classes.
 
