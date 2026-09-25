@@ -85,13 +85,12 @@ public class Router extends BaseMapMatcher {
                 graphHopperRequest.setCustomModel(getCustomModel());
             }
             return getRoutingResponse(graphHopperRequest, routingRequest.isSimplifyResponseGeometry());
-        } catch (RuntimeException e) {
+        } catch (RoutingRequestException e) {
             log.debug("Routing request failed: {}", e.getMessage(), e);
-            if (e instanceof RoutingRequestException) {
-                return createEmptyRoutingResponse(RouteStatus.NO_ROUTE);
-            } else {
-                return createEmptyRoutingResponse(RouteStatus.EXCEPTION);
-            }
+            return createEmptyRoutingResponse(RouteStatus.NO_ROUTE);
+        } catch (RuntimeException e) {
+            log.warn("Routing request failed: {}, waypoints: {}", e.getMessage(), formatWaypoints(routingRequest.getWayPoints()), e);
+            return createEmptyRoutingResponse(RouteStatus.EXCEPTION);
         }
     }
 
@@ -141,7 +140,7 @@ public class Router extends BaseMapMatcher {
     private RoutingResponse getRoutingResponse(GHRequest ghRequest, boolean simplify) throws RoutingRequestException, RoutingException {
 
         GHResponse ghResponse = getNetwork().route(ghRequest);
-        ensureResponseHasNoErrors(ghResponse, ghRequest);
+        ensureResponseHasNoErrors(ghResponse);
         ResponsePath responsePath = ghResponse.getBest();
         ensurePathsAreNotEmpty(responsePath);
         List<RoutingLegResponse> routingLegResponses = getRoutingLegResponses(ghRequest);
@@ -189,8 +188,7 @@ public class Router extends BaseMapMatcher {
     }
 
     // Package-visible (rather than private) so the whitelist-gap branch is unit-testable with a mocked GHResponse.
-    static void ensureResponseHasNoErrors(GHResponse ghResponse, GHRequest ghRequest)
-            throws RoutingRequestException, RoutingException {
+    static void ensureResponseHasNoErrors(GHResponse ghResponse) throws RoutingRequestException, RoutingException {
 
         if (ghResponse.hasErrors()) {
             List<Throwable> errors = ghResponse.getErrors();
@@ -198,17 +196,16 @@ public class Router extends BaseMapMatcher {
             if (hasAllPointOutOfBoundsOrConnectionErrors(errors)) {
                 throw new RoutingRequestException("Invalid routing request: %s".formatted(errorMessages));
             } else {
-                log.warn("Routing response contained an error type outside the known NO_ROUTE whitelist: {}, waypoints: {}",
-                        errors.stream().map(error -> error.getClass().getName()).distinct().toList(),
-                        formatWaypoints(ghRequest));
-                throw new RoutingException("Routing request failed: %s".formatted(errorMessages), errors.getFirst());
+                RoutingException routingException = new RoutingException(errorMessages, errors.getFirst());
+                errors.stream().skip(1).forEach(routingException::addSuppressed);
+                throw routingException;
             }
         }
     }
 
-    private static String formatWaypoints(GHRequest ghRequest) {
-        return ghRequest.getPoints().stream()
-                .map(point -> "%s,%s".formatted(point.getLon(), point.getLat()))
+    private static String formatWaypoints(List<Point> wayPoints) {
+        return wayPoints.stream()
+                .map(point -> "%s,%s".formatted(point.getX(), point.getY()))
                 .collect(Collectors.joining(";"));
     }
 
@@ -217,7 +214,6 @@ public class Router extends BaseMapMatcher {
             if (path.isFound()) {
                 throw new RoutingRequestException("No route found: waypoints resolve to the same node");
             }
-            log.warn("Unexpected: path was not found and has no edges");
             throw new RoutingException("Unexpected: path was not found and has no edges");
         }
     }
