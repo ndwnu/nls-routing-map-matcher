@@ -165,9 +165,7 @@ public class Router extends BaseMapMatcher {
 
         for (Path path : getNetwork().calcPaths(ghRequest)) {
             List<EdgeIteratorState> edges = path.calcEdges();
-            if (edges.isEmpty()) {
-                throw new RoutingException("Unexpected: path has no edges");
-            }
+            ensurePathIsRoutable(path, edges);
             QueryGraph queryGraph = QueryGraphExtractor.extractQueryGraph(path);
             double startFraction = PathUtil.determineStartLinkFraction(edges.getFirst(), queryGraph, fractionAndDistanceCalculator);
             double endFraction = PathUtil.determineEndLinkFraction(edges.getLast(), queryGraph, fractionAndDistanceCalculator);
@@ -199,6 +197,15 @@ public class Router extends BaseMapMatcher {
             } else {
                 throw new RoutingException("Routing request failed: %s".formatted(errors));
             }
+        }
+    }
+
+    static void ensurePathIsRoutable(Path path, List<EdgeIteratorState> edges) {
+        if (edges.isEmpty()) {
+            if (path.isFound()) {
+                throw new RoutingRequestException("No route found: waypoints resolve to the same node");
+            }
+            throw new RoutingException("Unexpected: path was not found and has no edges");
         }
     }
 
