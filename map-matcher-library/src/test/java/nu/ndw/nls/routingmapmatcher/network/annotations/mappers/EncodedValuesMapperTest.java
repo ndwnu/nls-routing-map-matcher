@@ -67,12 +67,12 @@ class EncodedValuesMapperTest {
 
         Optional<EncodedValueDto<MyLink, Long>> optionalId = resultEncodedValues.getByKey(Long.class, "way_id");
         assertThat(optionalId)
-                .isPresent()
-                .isEqualTo(resultEncodedValues.getByProperty(Long.class, "id"));
+                .isPresent();
 
         EncodedValueDto<MyLink, Long> id = optionalId.get();
 
         assertEquals("way_id", id.key());
+        assertEquals("id", id.propertyName());
         assertEquals(Long.class, id.valueType());
         assertEquals(31, id.bits());
         assertFalse(id.isDirectional());
@@ -82,11 +82,11 @@ class EncodedValuesMapperTest {
 
         Optional<EncodedValueDto<MyLink, Boolean>> optionalBoolean = resultEncodedValues.getByKey(Boolean.class, "boolean_field");
         assertThat(optionalBoolean)
-                .isPresent()
-                .isEqualTo(resultEncodedValues.getByProperty(Boolean.class, "booleanField"));
+                .isPresent();
 
         EncodedValueDto<MyLink, Boolean> booleanField = optionalBoolean.get();
         assertEquals("boolean_field", booleanField.key());
+        assertEquals("booleanField", booleanField.propertyName());
         assertEquals( Boolean.class, booleanField.valueType());
         assertEquals(0, booleanField.bits());
         assertFalse(booleanField.isDirectional());
@@ -99,12 +99,12 @@ class EncodedValuesMapperTest {
                 resultEncodedValues.getByKey(Integer.class, "directional_integer");
 
         assertThat(optionalDirectionInteger)
-                    .isPresent()
-                    .isEqualTo(resultEncodedValues.getByProperty(Integer.class, "directionalInteger"));
+                .isPresent();
 
         EncodedValueDto<MyLink, Integer> directionalIntegerField = optionalDirectionInteger.get();
 
         assertEquals("directional_integer", directionalIntegerField.key());
+        assertEquals("directionalInteger", directionalIntegerField.propertyName());
         assertEquals( Integer.class, directionalIntegerField.valueType());
         assertEquals(12, directionalIntegerField.bits());
         assertTrue(directionalIntegerField.isDirectional());
