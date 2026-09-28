@@ -85,13 +85,12 @@ public class Router extends BaseMapMatcher {
                 graphHopperRequest.setCustomModel(getCustomModel());
             }
             return getRoutingResponse(graphHopperRequest, routingRequest.isSimplifyResponseGeometry());
-        } catch (RuntimeException e) {
+        } catch (RoutingRequestException e) {
             log.debug("Routing request failed: {}", e.getMessage(), e);
-            if (e instanceof RoutingRequestException) {
-                return createEmptyRoutingResponse(RouteStatus.NO_ROUTE);
-            } else {
-                return createEmptyRoutingResponse(RouteStatus.EXCEPTION);
-            }
+            return createEmptyRoutingResponse(RouteStatus.NO_ROUTE);
+        } catch (RuntimeException e) {
+            log.warn("Routing request failed: {}, waypoints: {}", e.getMessage(), formatWaypoints(routingRequest.getWayPoints()), e);
+            return createEmptyRoutingResponse(RouteStatus.EXCEPTION);
         }
     }
 
@@ -188,16 +187,26 @@ public class Router extends BaseMapMatcher {
         }
     }
 
-    private static void ensureResponseHasNoErrors(GHResponse ghResponse) throws RoutingRequestException, RoutingException {
+    // Package-visible (rather than private) so the whitelist-gap branch is unit-testable with a mocked GHResponse.
+    static void ensureResponseHasNoErrors(GHResponse ghResponse) throws RoutingRequestException, RoutingException {
 
         if (ghResponse.hasErrors()) {
-            String errors = ghResponse.getErrors().stream().map(Throwable::getMessage).collect(Collectors.joining(", "));
-            if (hasAllPointOutOfBoundsOrConnectionErrors(ghResponse.getErrors())) {
-                throw new RoutingRequestException("Invalid routing request: %s".formatted(errors));
+            List<Throwable> errors = ghResponse.getErrors();
+            String errorMessages = errors.stream().map(Throwable::getMessage).collect(Collectors.joining(", "));
+            if (hasAllPointOutOfBoundsOrConnectionErrors(errors)) {
+                throw new RoutingRequestException("Invalid routing request: %s".formatted(errorMessages));
             } else {
-                throw new RoutingException("Routing request failed: %s".formatted(errors));
+                RoutingException routingException = new RoutingException(errorMessages, errors.getFirst());
+                errors.stream().skip(1).forEach(routingException::addSuppressed);
+                throw routingException;
             }
         }
+    }
+
+    private static String formatWaypoints(List<Point> wayPoints) {
+        return wayPoints.stream()
+                .map(point -> "%s,%s".formatted(point.getX(), point.getY()))
+                .collect(Collectors.joining(";"));
     }
 
     static void ensurePathIsRoutable(Path path, List<EdgeIteratorState> edges) {
