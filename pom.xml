@@ -35,7 +35,13 @@
     <graphhopper.version>11.0</graphhopper.version>
     <jts-core.version>1.19.0</jts-core.version>
     <jacoco.version>0.8.15</jacoco.version>
-    <geotools.version>34.5</geotools.version>
+    <!--
+      GeoTools is partially pinned to v34 due to Jackson compatibility issues. GeoTools and GraphHopper deliver a fork of the unmaintained
+      Jackson-datatype-jts library, which causes conflicts. See the following upstream issues for more information:
+      * https://osgeo-org.atlassian.net/browse/GEOT-7954 (GeoTools issue)
+      * https://github.com/graphhopper/jackson-datatype-jts/pull/6 (GraphHopper issue) -->
+    <geotools-35.version>35.2</geotools-35.version>
+    <geotools-34.version>34.5</geotools-34.version>
     <jts2geojson.version>0.18.1</jts2geojson.version>
     <commons-io.version>2.22.0</commons-io.version>
     <sonar-maven-plugin.version>3.9.1.2184</sonar-maven-plugin.version>
@@ -132,8 +138,15 @@
       </dependency>
       <dependency>
         <groupId>org.geotools</groupId>
+        <artifactId>gt-bom</artifactId>
+        <version>${geotools-35.version}</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
+      <dependency>
+        <groupId>org.geotools</groupId>
         <artifactId>gt-geojson-core</artifactId>
-        <version>${geotools.version}</version>
+        <version>${geotools-34.version}</version>
         <exclusions>
           <exclusion>
             <groupId>commons-io</groupId>
