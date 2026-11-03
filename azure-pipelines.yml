@@ -24,7 +24,7 @@ parameters:
 extends:
   template: v2/pipelines/java.yml@nls-pipeline-templates
   parameters:
-    jdkVersion: 1.21
+    jdkVersion: 1.25
     skipSonar: ${{ parameters.skipSonar }}
     skipTests: ${{ parameters.skipTests }}
     skipSecurityScanning: true
