@@ -28,7 +28,7 @@
   </modules>
   <properties>
     <java.version>25</java.version>
-    <nls-springboot.test.version>10.0.22</nls-springboot.test.version>
+    <nls-springboot.test.version>10.0.24</nls-springboot.test.version>
     <nls-geometry.version>7.0.6</nls-geometry.version>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <maven.javadoc.failOnError>false</maven.javadoc.failOnError>
